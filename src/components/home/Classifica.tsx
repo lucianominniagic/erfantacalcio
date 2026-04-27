@@ -122,7 +122,7 @@ export default function Classifica({
       <Typography variant="h4">
         Classifica {getNomeTorneo(nomeTorneo, gruppo)}
       </Typography>
-      <Box sx={{ padding: '0', backgroundColor: '#fff' }}>
+      <Box sx={{ padding: '0', backgroundColor: theme.palette.background.paper }}>
         <DataGrid
           columnHeaderHeight={45}
           rowHeight={40}
@@ -156,10 +156,10 @@ export default function Classifica({
           disableRowSelectionOnClick={true}
           autosizeOptions={autosizeOptions}
           sx={{
-            backgroundColor: '#fff',
+            backgroundColor: theme.palette.background.paper,
             '& .MuiDataGrid-columnHeader': {
-              color: theme.palette.primary.main,
-              backgroundColor: theme.palette.secondary.light,
+              color: theme.palette.primary.light,
+              backgroundColor: theme.palette.primary.dark,
             },
           }}
         />

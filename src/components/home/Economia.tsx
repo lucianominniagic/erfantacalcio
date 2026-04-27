@@ -219,10 +219,10 @@ export default function Economia() {
             disableRowSelectionOnClick={true}
             autosizeOptions={autosizeOptions}
             sx={{
-              backgroundColor: '#fff',
+              backgroundColor: theme.palette.background.paper,
               '& .MuiDataGrid-columnHeader': {
-                color: theme.palette.primary.main,
-                backgroundColor: theme.palette.secondary.light,
+                color: theme.palette.primary.light,
+                backgroundColor: theme.palette.primary.dark,
               },
             }}
           />

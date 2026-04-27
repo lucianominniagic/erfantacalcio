@@ -5,7 +5,7 @@ import type { Theme } from '@mui/material/styles'
 export default function Button(theme: Theme) {
   const disabledStyle = {
     '&.Mui-disabled': {
-      backgroundColor: theme.palette.grey[200],
+      backgroundColor: theme.palette.grey[800],
     },
   }
 

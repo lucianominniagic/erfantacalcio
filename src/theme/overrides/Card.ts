@@ -1,4 +1,4 @@
-// ==============================|| OVERRIDES - CARD CONTENT ||============================== //
+// ==============================|| OVERRIDES - CARD ||============================== //
 
 export default function Card() {
   return {
@@ -8,6 +8,7 @@ export default function Card() {
           padding: '0px',
           marginTop: '3px',
           marginBottom: '8px',
+          border: '1px solid rgba(229, 57, 53, 0.15)',
         },
       },
     },

@@ -12,7 +12,7 @@ export function getToolbarPresentation(variant: SeasonalVariant) {
       buttonSx: { backgroundColor: '#2f3a44', color: '#ffffff' },
     }
   }
-  return { titleColor: undefined, iconColor: undefined }
+  return { titleColor: '#f5f5f5', iconColor: undefined }
 }
 
 export default getToolbarPresentation
