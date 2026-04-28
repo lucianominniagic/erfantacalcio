@@ -50,7 +50,7 @@ export default function Classifica({
       align: 'left',
       renderHeader: () => <strong>Squadra</strong>,
       flex: 1,
-      minWidth: 100,
+      minWidth: 120,
     },
     {
       field: 'punti',
