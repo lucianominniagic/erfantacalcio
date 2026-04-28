@@ -15,6 +15,7 @@ import { useState } from 'react'
 import ProvidersWrapper from '~/ProvidersWrapper'
 import Sidebar, { SIDEBAR_WIDTH } from '~/components/sidebar/Sidebar'
 import { Configurazione } from '~/config'
+import Breadcrumb from '~/components/Breadcrumb'
 
 function MobileTopBar({ onMenuClick }: { onMenuClick: () => void }) {
   return (
@@ -122,8 +123,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           <Box sx={{ display: { xs: 'block', md: 'none' }, height: '48px' }} />
 
           <Container maxWidth="lg" sx={{ mt: '8px', mb: '8px', flex: 1 }}>
-            {children}
-          </Container>
+              <Breadcrumb />
+              {children}
+            </Container>
 
           <Footer />
         </Box>
