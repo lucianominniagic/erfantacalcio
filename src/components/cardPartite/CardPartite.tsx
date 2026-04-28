@@ -67,6 +67,13 @@ export default function CardPartite({
                     spacing={0}
                     padding={1}
                     key={`grid_${partita.idPartita}`}
+                    sx={{
+                      borderRadius: '8px',
+                      transition: 'background-color 0.15s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 193, 7, 0.07)',
+                      },
+                    }}
                   >
                     {withAvatar && (
                       <Grid item xs={!isXs ? 1 : 1.5} alignSelf={'center'} sx={{pr:1}}>
