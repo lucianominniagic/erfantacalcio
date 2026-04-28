@@ -167,11 +167,8 @@ export default function Classifica({
             borderRadius: '0 0 12px 12px',
             border: 'none',
             backgroundColor: theme.palette.background.paper,
-            '& .MuiDataGrid-columnHeaders': {
-              background: 'linear-gradient(135deg, #FF8F00 0%, #FFC107 100%)',
-              borderRadius: '0',
-            },
             '& .MuiDataGrid-columnHeader': {
+              background: 'linear-gradient(135deg, #FF8F00 0%, #FFC107 100%)',
               color: '#0d0d14',
               fontWeight: 700,
             },

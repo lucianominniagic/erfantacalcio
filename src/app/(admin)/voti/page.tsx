@@ -298,8 +298,8 @@ export default function Voti() {
                 sx={{
                   backgroundColor: theme.palette.background.paper,
                   '& .MuiDataGrid-columnHeader': {
-                    color: '#0d0d14',
                   background: 'linear-gradient(135deg, #FF8F00 0%, #FFC107 100%)',
+                  color: '#0d0d14',
                   },
                 }}
               />
