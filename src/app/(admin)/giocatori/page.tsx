@@ -919,10 +919,6 @@ export default function Giocatori() {
               disableRowSelectionOnClick={true}
               sx={{
                 backgroundColor: theme.palette.background.paper,
-                '& .MuiDataGrid-columnHeader': {
-                  background: 'linear-gradient(135deg, #FF8F00 0%, #FFC107 100%)',
-                  color: '#0d0d14',
-                },
                 overflowX: 'auto',
                 '& .MuiDataGrid-virtualScroller': {
                   overflowX: 'auto',

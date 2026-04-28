@@ -220,16 +220,6 @@ export default function Economia() {
             autosizeOptions={autosizeOptions}
             sx={{
               backgroundColor: theme.palette.background.paper,
-              border: 'none',
-                            '& .MuiDataGrid-columnHeader': {
-                  background: 'linear-gradient(135deg, #FF8F00 0%, #FFC107 100%)',
-                  color: '#0d0d14',
-                fontWeight: 700,
-              },
-              '& .MuiDataGrid-columnHeaderTitle': { fontWeight: 700, fontSize: '0.72rem' },
-              '& .MuiDataGrid-row:nth-of-type(even)': { backgroundColor: 'rgba(255,193,7,0.03)' },
-              '& .MuiDataGrid-row:hover': { backgroundColor: 'rgba(255,193,7,0.07)' },
-              '& .MuiDataGrid-cell': { borderBottom: '1px solid rgba(255,193,7,0.06)' },
             }}
           />
         </Box>
