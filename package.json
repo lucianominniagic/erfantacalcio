@@ -23,7 +23,10 @@
     "migration:generate:prod": "cross-env DOTENV_CONFIG_PATH=.env.prod npm run migration:generate",
     "migration:run:prod": "cross-env DOTENV_CONFIG_PATH=.env.prod npm run migration:run",
     "migration:revert:prod": "cross-env DOTENV_CONFIG_PATH=.env.prod npm run migration:revert",
-    "migration:show:prod": "cross-env DOTENV_CONFIG_PATH=.env.prod npm run migration:show"
+    "migration:show:prod": "cross-env DOTENV_CONFIG_PATH=.env.prod npm run migration:show",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@emotion/react": "^11.13.0",
@@ -62,12 +65,14 @@
     "@types/node": "^18.19.130",
     "@types/pg": "^8.16.0",
     "@types/react": "^19.2.7",
+    "@vitest/coverage-v8": "^2.1.9",
     "cross-env": "^10.1.0",
     "eslint": "^9.39.2",
     "eslint-config-next": "^15.5.9",
     "prettier": "^3.7.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
   },
   "ct3aMetadata": {
     "initVersion": "7.26.0"
