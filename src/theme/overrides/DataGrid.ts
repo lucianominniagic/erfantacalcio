@@ -8,13 +8,13 @@ export default function DataGrid(theme: Theme) {
       styleOverrides: {
         root: {
           border: 'none',
-          backgroundColor: theme.palette.background.paper,
+          background: 'linear-gradient(135deg, rgba(255,143,0,0.15) 0%, rgba(255,193,7,0.08) 100%)',
           fontFamily: theme.typography.fontFamily,
           fontSize: '0.75rem',
         },
         columnHeader: {
-          background: 'linear-gradient(135deg, #FF8F00 0%, #FFC107 100%)',
-          color: '#0d0d14',
+          background: '#393027',
+          color: theme.palette.secondary.main,
           fontWeight: 700,
         },
         columnHeaderTitle: {
