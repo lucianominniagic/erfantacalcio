@@ -5,8 +5,7 @@ import { checkVotiUltimaGiornata, checkVerificaPartiteGiocate, updateFase } from
 import { toUtcDate } from '~/utils/dateUtils'
 import { z } from 'zod'
 import { AppDataSource } from '~/data-source'
-import { Classifiche, Formazioni, Partite, Voti } from '~/server/db/entities'
-import Calendario from '~/components/home/Calendario'
+import { Classifiche, Formazioni, Partite, Voti, Calendario } from '~/server/db/entities'
 
 export const preparaStagioneProcedure = adminProcedure.mutation<z.infer<typeof messageSchema>>(async () => {
   let message = { isError: false, isComplete: true, message: `Azzeramento dati della scorsa stagione ${Configurazione.stagione}` }

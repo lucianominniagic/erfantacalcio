@@ -1,5 +1,5 @@
 import { protectedProcedure } from '~/server/api/trpc'
-import { magliaType } from '~/components/selectColors'
+import type { magliaType } from '~/components/selectColors'
 import { Utenti } from '~/server/db/entities'
 
 export const getMagliaProcedure = protectedProcedure.query(
