@@ -1,6 +1,6 @@
 import type { Theme } from '@mui/material/styles'
 
-// ==============================|| OVERRIDES - TABLE CELL ||============================== //
+// ==============================|| OVERRIDES - TABLE HEAD ||============================== //
 
 export default function TableHead(theme: Theme) {
   return {
@@ -10,12 +10,13 @@ export default function TableHead(theme: Theme) {
           fontSize: '0.875rem',
           padding: '2px',
           borderColor: theme.palette.divider,
-          backgroundColor: '#faf6e5',
+          background: 'linear-gradient(135deg, #FF8F00 0%, #FFC107 100%)',
         },
         head: {
-          fontWeight: 600,
+          fontWeight: 700,
           paddingTop: '0px',
           paddingBottom: '2px',
+          color: '#0d0d14',
         },
       },
     },

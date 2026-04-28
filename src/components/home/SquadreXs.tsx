@@ -43,7 +43,18 @@ export default function SquadreXs() {
           <Grid container spacing={0}>
             {squadreList.data?.map((squadra, index) => (
               <Grid item xs={3} key={index}>
-                <Card sx={{ minWidth: 90, maxWidth: 90, marginBottom: '2px' }}>
+                <Card
+                  sx={{
+                    minWidth: 84,
+                    maxWidth: 84,
+                    marginBottom: '4px',
+                    transition: 'transform 0.15s ease, border-color 0.15s ease',
+                    '&:hover': {
+                      transform: 'scale(1.03)',
+                      borderColor: 'rgba(255,193,7,0.5)',
+                    },
+                  }}
+                >
                   <CardActionArea>
                     <CardMedia
                       component="img"

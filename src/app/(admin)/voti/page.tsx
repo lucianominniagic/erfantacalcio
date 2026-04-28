@@ -298,8 +298,8 @@ export default function Voti() {
                 sx={{
                   backgroundColor: theme.palette.background.paper,
                   '& .MuiDataGrid-columnHeader': {
-                    color: theme.palette.primary.light,
-                    backgroundColor: theme.palette.primary.dark,
+                    color: '#0d0d14',
+                  background: 'linear-gradient(135deg, #FF8F00 0%, #FFC107 100%)',
                   },
                 }}
               />
@@ -379,7 +379,7 @@ export default function Voti() {
                       <MenuItem
                         key={`slc_gol_${i}`}
                         value={i}
-                        sx={{ color: 'black' }}
+                        
                       >
                         {i}
                       </MenuItem>
@@ -411,7 +411,7 @@ export default function Voti() {
                       <MenuItem
                         key={`slc_gol_${i}`}
                         value={i}
-                        sx={{ color: 'black' }}
+                        
                       >
                         {i}
                       </MenuItem>
@@ -487,7 +487,7 @@ export default function Voti() {
                       <MenuItem
                         key={`slc_gol_${i}`}
                         value={i}
-                        sx={{ color: 'black' }}
+                        
                       >
                         {i}
                       </MenuItem>

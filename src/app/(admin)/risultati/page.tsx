@@ -109,7 +109,7 @@ export default function Risultati() {
                         <MenuItem
                           key={item.id}
                           value={item.id}
-                          sx={{ color: 'black' }}
+                          
                         >
                           {getDescrizioneGiornata(
                             item.giornataSerieA,

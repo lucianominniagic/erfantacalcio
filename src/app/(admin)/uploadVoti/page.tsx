@@ -269,7 +269,7 @@ export default function UploadVoti() {
                           <MenuItem
                             key={item.id}
                             value={item.id.toString()}
-                            sx={{ color: 'black' }}
+                            
                           >
                             {getDescrizioneGiornata(
                               item.giornataSerieA,

@@ -48,12 +48,12 @@ export function getToolbarSx(variant: SeasonalVariant) {
       borderTopRightRadius: '0px',
       borderBottomLeftRadius: '8px',
       borderBottomRightRadius: '8px',
-      background: 'linear-gradient(135deg, #1a1a1a 0%, #ab000d 100%)',
+      background: 'linear-gradient(135deg, #0d0d14 0%, #1a1208 100%)',
       backdropFilter: 'blur(24px)',
       maxHeight: 40,
       border: '1px solid',
-      borderColor: 'rgba(229,57,53,0.25)',
-      boxShadow: `0 2px 8px rgba(229, 57, 53, 0.18), 0 1px 3px rgba(0,0,0,0.5)`,
+      borderColor: 'rgba(255,193,7,0.22)',
+      boxShadow: `0 2px 8px rgba(255, 193, 7, 0.10), 0 1px 3px rgba(0,0,0,0.5)`,
     }
   }
 }

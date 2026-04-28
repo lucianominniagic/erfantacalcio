@@ -4,9 +4,9 @@ export const themeOptions: ThemeOptions = {
   palette: {
     mode: 'dark',
     primary: {
-      light: '#ff6f60',
-      main: '#e53935',
-      dark: '#ab000d',
+      light: '#FFD54F',
+      main: '#FFC107',
+      dark: '#FF8F00',
     },
     secondary: {
       light: '#cfcfcf',
@@ -34,17 +34,18 @@ export const themeOptions: ThemeOptions = {
       dark: '#c8a600',
     },
     background: {
-      default: '#121212',
-      paper: '#1e1e1e',
+      default: '#0d0d14',
+      paper: '#16161f',
     },
     action: {
-      active: '#e53935',
-      hover: 'rgba(229, 57, 53, 0.12)',
+      active: '#FFC107',
+      hover: 'rgba(255, 193, 7, 0.08)',
     },
     text: {
       primary: '#f5f5f5',
       secondary: '#bdbdbd',
     },
+    divider: 'rgba(255, 193, 7, 0.12)',
   },
   breakpoints: {
     values: {
@@ -66,51 +67,52 @@ export const themeOptions: ThemeOptions = {
   typography: {
     htmlFontSize: 16,
     fontFamily: [
-      '"Segoe UI Emoji"',
-      '"Segoe UI"',
-      '"Segoe UI Symbol"',
+      '"Montserrat"',
       '-apple-system',
       'BlinkMacSystemFont',
+      '"Segoe UI"',
       'Roboto',
       '"Helvetica Neue"',
       'Arial',
       'sans-serif',
-      '"Apple Color Emoji"',
     ].join(','),
     fontWeightLight: 300,
     fontWeightRegular: 400,
     fontWeightMedium: 500,
-    fontWeightBold: 600,
+    fontWeightBold: 700,
     h1: {
       color: '#f5f5f5',
-      fontWeight: 600,
+      fontWeight: 700,
       fontSize: '2.0rem',
       lineHeight: 1.21,
+      letterSpacing: '-0.02em',
     },
     h2: {
-      color: '#ff6f60',
-      fontWeight: 600,
+      color: '#FFD54F',
+      fontWeight: 700,
       fontSize: '1.675rem',
       lineHeight: 1.27,
+      letterSpacing: '-0.01em',
     },
     h3: {
-      color: '#ff6f60',
+      color: '#FFD54F',
       fontWeight: 600,
       fontSize: '1.4rem',
       lineHeight: 1.33,
     },
     h4: {
-      // titolo classifica
-      background: 'linear-gradient(to bottom, #ab000d, #ff6f60)',
+      // titolo classifica — gold gradient
+      background: 'linear-gradient(135deg, #FF8F00 0%, #FFD54F 100%)',
       WebkitBackgroundClip: 'text',
       WebkitTextFillColor: 'transparent',
-      fontWeight: 600,
+      fontWeight: 700,
       fontSize: '1.1rem',
       lineHeight: 1.4,
+      letterSpacing: '0.02em',
     },
     h5: {
       // titolo card partite
-      color: '#cfcfcf',
+      color: '#FFD54F',
       fontWeight: 600,
       fontSize: '0.9rem',
       lineHeight: 1.5,
@@ -151,10 +153,12 @@ export const themeOptions: ThemeOptions = {
     },
     overline: {
       lineHeight: 1.66,
+      letterSpacing: '0.08em',
     },
     button: {
       textTransform: 'capitalize',
-      fontSize: '0.975rem',
+      fontSize: '0.875rem',
+      fontWeight: 600,
     },
   },
 }

@@ -88,9 +88,9 @@ export const LoginForm = () => {
       <Button
         type="submit"
         fullWidth
-        color="info"
+        color="primary"
         variant="contained"
-        sx={{ mt: 3, mb: 2 }}
+        sx={{ mt: 3, mb: 2, py: 1.25 }}
         disabled={loading}
       >
         {loading ? 'loading...' : 'Sign in'}

@@ -122,10 +122,18 @@ export default function Classifica({
       <Typography variant="h4">
         Classifica {getNomeTorneo(nomeTorneo, gruppo)}
       </Typography>
-      <Box sx={{ padding: '0', backgroundColor: theme.palette.background.paper }}>
+      <Box
+        sx={{
+          borderRadius: '0 0 12px 12px',
+          overflow: 'hidden',
+          border: '1px solid rgba(255,193,7,0.12)',
+          borderTop: 'none',
+          backgroundColor: theme.palette.background.paper,
+        }}
+      >
         <DataGrid
-          columnHeaderHeight={45}
-          rowHeight={40}
+          columnHeaderHeight={40}
+          rowHeight={36}
           loading={classificaList.isLoading}
           initialState={{
             columns: {
@@ -156,10 +164,29 @@ export default function Classifica({
           disableRowSelectionOnClick={true}
           autosizeOptions={autosizeOptions}
           sx={{
+            borderRadius: '0 0 12px 12px',
+            border: 'none',
             backgroundColor: theme.palette.background.paper,
+            '& .MuiDataGrid-columnHeaders': {
+              background: 'linear-gradient(135deg, #FF8F00 0%, #FFC107 100%)',
+              borderRadius: '0',
+            },
             '& .MuiDataGrid-columnHeader': {
-              color: theme.palette.primary.light,
-              backgroundColor: theme.palette.primary.dark,
+              color: '#0d0d14',
+              fontWeight: 700,
+            },
+            '& .MuiDataGrid-columnHeaderTitle': {
+              fontWeight: 700,
+              fontSize: '0.72rem',
+            },
+            '& .MuiDataGrid-row:nth-of-type(even)': {
+              backgroundColor: 'rgba(255,193,7,0.03)',
+            },
+            '& .MuiDataGrid-row:hover': {
+              backgroundColor: 'rgba(255,193,7,0.07)',
+            },
+            '& .MuiDataGrid-cell': {
+              borderBottom: '1px solid rgba(255,193,7,0.06)',
             },
           }}
         />
