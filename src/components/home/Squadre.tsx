@@ -44,16 +44,24 @@ export default function Squadre() {
             }}
           >
             <CardActionArea>
-              <CardMedia
-                component="img"
-                height="80"
-                image={squadra.foto ?? ''}
-                alt={squadra.squadra}
-                sx={{ objectFit: 'cover' }}
-                onClick={() =>
-                  (window.location.href = `/squadra/${squadra.id}/${squadra.squadra}`)
-                }
-              />
+              <Box sx={{ overflow: 'hidden', height: 80 }}>
+                <CardMedia
+                  component="img"
+                  height="80"
+                  image={squadra.foto ?? ''}
+                  alt={squadra.squadra}
+                  sx={{
+                    objectFit: 'cover',
+                    transition: 'transform 0.3s ease',
+                    'a:hover &, .MuiCardActionArea-root:hover &': {
+                      transform: 'scale(1.12)',
+                    },
+                  }}
+                  onClick={() =>
+                    (window.location.href = `/squadra/${squadra.id}/${squadra.squadra}`)
+                  }
+                />
+              </Box>
               <CardContent sx={{ p: '6px 8px', '&:last-child': { pb: '6px' } }}>
                 <Typography
                   variant="h5"

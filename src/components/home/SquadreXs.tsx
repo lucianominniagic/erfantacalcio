@@ -56,15 +56,24 @@ export default function SquadreXs() {
                   }}
                 >
                   <CardActionArea>
-                    <CardMedia
-                      component="img"
-                      height="68"
-                      image={squadra.foto ?? ''}
-                      alt={squadra.squadra}
-                      onClick={() =>
-                        (window.location.href = `/squadra/${squadra.id}/${squadra.squadra}`)
-                      }
-                    />
+                    <Box sx={{ overflow: 'hidden', height: 68 }}>
+                      <CardMedia
+                        component="img"
+                        height="68"
+                        image={squadra.foto ?? ''}
+                        alt={squadra.squadra}
+                        sx={{
+                          objectFit: 'cover',
+                          transition: 'transform 0.3s ease',
+                          '.MuiCardActionArea-root:hover &': {
+                            transform: 'scale(1.12)',
+                          },
+                        }}
+                        onClick={() =>
+                          (window.location.href = `/squadra/${squadra.id}/${squadra.squadra}`)
+                        }
+                      />
+                    </Box>
                     <CardContent
                       sx={{ paddingBottom: '1px', paddingLeft: '3px' }}
                     >
