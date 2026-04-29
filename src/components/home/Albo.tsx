@@ -26,7 +26,7 @@ export default function Albo() {
       field: 'campionato',
       type: 'string',
       align: 'left',
-      renderHeader: () => <strong>Campionatooo</strong>,
+      renderHeader: () => <strong>Campionato</strong>,
       flex: isXs ? 0 : 1,
     },
     {
