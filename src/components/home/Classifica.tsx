@@ -58,7 +58,7 @@ export default function Classifica({
       align: 'right',
       renderHeader: () => <strong>Punti</strong>,
       flex: 1,
-      width: 80,
+      width: 70,
     },
     {
       field: 'golFatti',
@@ -66,7 +66,7 @@ export default function Classifica({
       align: 'right',
       renderHeader: () => <strong>Gol+</strong>,
       flex: 1,
-      width: 80,
+      width: 70,
     },
     {
       field: 'golSubiti',
@@ -74,7 +74,7 @@ export default function Classifica({
       align: 'right',
       renderHeader: () => <strong>Gol-</strong>,
       flex: 1,
-      width: 80,
+      width: 70,
     },
     {
       field: 'giocate',
@@ -82,7 +82,7 @@ export default function Classifica({
       align: 'right',
       renderHeader: () => <strong>Giocate</strong>,
       flex: 1,
-      width: 80,
+      width: 70,
     },
     {
       field: 'fantapunti',

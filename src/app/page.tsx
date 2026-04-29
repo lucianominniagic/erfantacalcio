@@ -135,8 +135,9 @@ export default function HomePage() {
                   <Calendario
                     tipo={'risultati'}
                     prefixTitle="Risultati:"
+                    enableTabs={true}
                   ></Calendario>
-                  <Calendario tipo={'prossima'} prefixTitle=""></Calendario>
+                  <Calendario tipo={'prossima'} prefixTitle="" enableTabs={true}></Calendario>
                   <Box
                     sx={{
                       display: 'flex',
