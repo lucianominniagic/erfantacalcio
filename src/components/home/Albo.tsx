@@ -54,6 +54,7 @@ export default function Albo() {
 
   const pageSize = 20
 
+  
   const skeletonRows = Array.from({ length: pageSize }, (_, index) => ({
     id: `skeleton-${index}`,
   }))
