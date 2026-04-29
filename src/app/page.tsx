@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { api } from '~/utils/api'
 import {
   Box,
@@ -130,7 +130,7 @@ export default function HomePage() {
                   item
                   xs={12}
                   sm={6}
-                  sx={!isXs ? { pr: '2px', pl: '15px', pt: '15px' } : {}}
+                  sx={!isXs ? { pt: '15px' } : {}}
                 >
                   <Calendario
                     tipo={'risultati'}
@@ -252,10 +252,7 @@ export default function HomePage() {
                 <SquadreXs />
               </Grid>
             )}
-            
-            <Grid item xs={12} sx={{ height: '80px' }}>
-              <></>
-            </Grid>
+
           </>
         )}
       </Grid>
