@@ -54,6 +54,7 @@ function Giocatori() {
   }, [giocatoriList.data])
 
   const handleGiocatoreSelected = async (idGiocatore: number | undefined) => {
+    if (idGiocatore === undefined) return
     setSelectedGiocatoreId(idGiocatore)
     setOpenModalCalendario(true)
   }
