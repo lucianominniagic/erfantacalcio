@@ -17,6 +17,7 @@ import {
   AccountBalanceWallet,
   EmojiEvents,
   Group,
+  MilitaryTech,
   MonetizationOn,
   RemoveCircleOutline,
   TrendingDown,
@@ -132,6 +133,16 @@ export default function Economia() {
     return premio
   }
 
+  function getPremiVinti(idSquadra: number): { label: string; color: 'warning' | 'info' | 'default' }[] {
+    const premi: { label: string; color: 'warning' | 'info' | 'default' }[] = []
+    const pos = classificaMap[idSquadra]
+    if (pos === 1) premi.push({ label: '1° Classificato', color: 'warning' })
+    else if (pos === 2) premi.push({ label: '2° Classificato', color: 'default' })
+    else if (pos === 3) premi.push({ label: '3° Classificato', color: 'default' })
+    if (idVincitriceChampions === idSquadra) premi.push({ label: 'Vincitore Champions', color: 'info' })
+    return premi
+  }
+
   const isLoading = economiaList.isLoading || saldoData.isLoading
 
   return (
@@ -210,6 +221,7 @@ export default function Economia() {
                 .map((squadra) => {
                 const pagato = (squadra.importoAnnuale ?? 0) + (squadra.importoMulte ?? 0) + (squadra.importoMercato ?? 0)
                 const premio = getPremio(squadra.id)
+                const premiVinti = getPremiVinti(squadra.id)
                 const saldo = premio - pagato
                 const saldoPositivo = saldo > 0
                 const saldoZero = saldo === 0
@@ -260,6 +272,23 @@ export default function Economia() {
                           </Grid>
                         ))}
                       </Grid>
+
+                      {/* Premi vinti */}
+                      {premiVinti.length > 0 && (
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                          {premiVinti.map((p) => (
+                            <Chip
+                              key={p.label}
+                              size="small"
+                              icon={<MilitaryTech fontSize="small" />}
+                              label={p.label}
+                              color={p.color}
+                              variant="filled"
+                              sx={{ fontSize: '0.7rem', fontWeight: 600 }}
+                            />
+                          ))}
+                        </Box>
+                      )}
 
                       {/* Saldo */}
                       <Box sx={{ mt: 'auto' }}>
