@@ -11,6 +11,7 @@ const PATH_LABELS: Record<string, string> = {
   '/foto': 'Foto profilo',
   '/statistiche_giocatori': 'Statistiche giocatori',
   '/statistiche_giocatore': 'Statistiche giocatore',
+  '/statistiche_squadre': 'Statistiche squadre',
   '/economia': 'Economia e premi',
   '/albo': "Albo d'oro",
   '/documenti': 'Documenti',

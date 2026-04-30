@@ -25,6 +25,7 @@ import {
   Euro,
   FiberNew,
   Group,
+  Groups,
   HistoryEdu,
   ListAlt,
   ManageAccounts,
@@ -59,6 +60,7 @@ interface NavItem {
 
 const legaItems: NavItem[] = [
   { key: 'statistiche', label: 'Statistiche giocatori', href: '/statistiche_giocatori', icon: <Portrait /> },
+  { key: 'statisticheSquadre', label: 'Statistiche squadre', href: '/statistiche_squadre', icon: <Groups /> },
   { key: 'economia', label: 'Economia e premi', href: '/economia', icon: <Euro /> },
   { key: 'albo', label: "Albo d'oro", href: '/albo', icon: <EmojiEvents /> },
   { key: 'documenti', label: 'Documenti', href: '/documenti', icon: <ListAlt /> },
