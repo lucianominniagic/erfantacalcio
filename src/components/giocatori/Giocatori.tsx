@@ -35,13 +35,14 @@ function Giocatori() {
 
   const [selectedGiocatoreId, setSelectedGiocatoreId] = useState<number>()
   const [openModalCalendario, setOpenModalCalendario] = useState(false)
+  const [soloSvincolati, setSoloSvincolati] = useState(false)
   const giocatoriList = api.giocatori.listAll.useQuery(undefined, {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   })
   const [ruolo, setRuolo] = useState<Ruoli>('C')
   const giocatoriStats = api.giocatori.listStatistiche.useQuery(
-    { ruolo: ruolo },
+    { ruolo: ruolo, soloSvincolati: soloSvincolati },
     { refetchOnWindowFocus: false, refetchOnReconnect: false },
   )
   const [giocatori, setGiocatori] = useState<AutocompleteOption[]>([])
@@ -209,6 +210,15 @@ function Giocatori() {
               />
             }
             label={isXs ? 'A' : getRuoloEsteso('A', true)}
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                onChange={(e) => setSoloSvincolati(e.target.checked)}
+                checked={soloSvincolati}
+              />
+            }
+            label="Solo svincolati"
           />
         </Grid>
         <Grid item xs={12} sm={6}>
