@@ -1,39 +1,22 @@
 import { publicProcedure } from '../../trpc'
 import { z } from 'zod'
 import { Configurazione } from '~/config'
-import { StatsA, StatsC, StatsD, StatsP } from '~/server/db/entities'
-import { FindManyOptions, MoreThanOrEqual } from 'typeorm'
-
-const roleEntityMap: Record<string, any> = {
-  P: StatsP,
-  D: StatsD,
-  C: StatsC,
-  A: StatsA,
-}
-
-const toClientPlayer = (player: any) => ({
-  ...player,
-  id: player.idgiocatore,
-  maglia: player.maglia ? `/images/maglie/${player.maglia}` : player.maglia,
-})
+import { IsNull, MoreThanOrEqual, type FindManyOptions } from 'typeorm'
+import { roleEntityMap, toClientPlayer, getSogliaGiocate } from '../utils'
 
 export const listStatistiche = publicProcedure
   .input(
     z.object({
-      ruolo: z.string(),
+      ruolo: z.enum(['P', 'D', 'C', 'A']),
+      soloSvincolati: z.boolean().default(false),
     }),
   )
   .query(async (opts) => {
     try {
-      const ruolo = (opts.input.ruolo ?? '').toUpperCase()
+      const { ruolo, soloSvincolati } = opts.input
       const Entity = roleEntityMap[ruolo]
-      if (!Entity) return []
 
-      const maxGiocateRow = await StatsP.createQueryBuilder('s')
-        .select('MAX(s.giocate)', 'max')
-        .getRawOne()
-      const maxGiocate = Number(maxGiocateRow?.max ?? 0)
-      const sogliaGiocate = Math.floor(maxGiocate * (Configurazione.percentualeMinimaGiocate / 100))
+      const sogliaGiocate = await getSogliaGiocate()
 
       const findOptions: FindManyOptions = {
         select: {
@@ -56,9 +39,9 @@ export const listStatistiche = publicProcedure
         },
         where: {
           giocate: MoreThanOrEqual(sogliaGiocate),
+          ...(soloSvincolati ? { idSquadra: IsNull() } : {}),
         },
         order: { media: 'desc', mediabonus: 'desc', giocate: 'desc' },
-        skip: 0,
         take: Configurazione.recordCount,
       }
 
@@ -69,3 +52,4 @@ export const listStatistiche = publicProcedure
       throw error
     }
   })
+

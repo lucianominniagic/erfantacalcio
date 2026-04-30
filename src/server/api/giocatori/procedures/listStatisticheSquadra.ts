@@ -1,6 +1,7 @@
 import { publicProcedure } from '../../trpc'
 import { z } from 'zod'
 import { StatsA, StatsC, StatsD, StatsP } from '~/server/db/entities'
+import { toClientPlayer } from '../utils'
 
 export const listStatisticheSquadra = publicProcedure
   .input(
@@ -26,39 +27,23 @@ export const listStatisticheSquadra = publicProcedure
       }
       const whereClause = { idSquadra: opts.input.id_squadra }
       const [statsP, statsD, statsC, statsA] = await Promise.all([
-        StatsP.find({
-          select: playerStatsSelect,
-          where: whereClause,
-        }),
-        StatsD.find({
-          select: playerStatsSelect,
-          where: whereClause,
-        }),
-        StatsC.find({
-          select: playerStatsSelect,
-          where: whereClause,
-        }),
-        StatsA.find({
-          select: playerStatsSelect,
-          where: whereClause,
-        }),
+        StatsP.find({ select: playerStatsSelect, where: whereClause }),
+        StatsD.find({ select: playerStatsSelect, where: whereClause }),
+        StatsC.find({ select: playerStatsSelect, where: whereClause }),
+        StatsA.find({ select: playerStatsSelect, where: whereClause }),
       ])
 
-      let stat = [...statsP, ...statsD, ...statsC, ...statsA]
+      const stat = [...statsP, ...statsD, ...statsC, ...statsA]
 
-      return stat
-        ? stat.map((player) => ({
-            ...player,
-            id: player.idgiocatore,
-            maglia: `/images/maglie/${player.maglia}`,
-            gol:
-              player.ruolo === 'P'
-                ? -Number(player.golsubiti)
-                : Number(player.golfatti),
-          }))
-        : []
+      return stat.map((player) => ({
+        ...toClientPlayer(player),
+        gol: player.ruolo === 'P'
+          ? -Number(player.golsubiti)
+          : Number(player.golfatti),
+      }))
     } catch (error) {
       console.error('Si è verificato un errore', error)
       throw error
     }
   })
+
