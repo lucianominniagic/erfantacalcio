@@ -15,6 +15,7 @@ import { partitaRouter } from './partita'
 import { alboRouter } from './albo'
 import { classificaRouter } from './classifica'
 import { statisticheSquadreRouter } from './statisticheSquadre'
+import { economiaRouter } from './economia'
 
 /**
  * This is the primary router for your server.
@@ -25,6 +26,7 @@ export const appRouter = createTRPCRouter({
   albo: alboRouter,
   calendario: calendarioRouter,
   classifica: classificaRouter,
+  economia: economiaRouter,
   formazione: formazioneRouter,
   partita: partitaRouter,
   giocatori: giocatoriRouter,
