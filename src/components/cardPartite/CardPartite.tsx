@@ -66,7 +66,6 @@ export default function CardPartite({
                     container
                     spacing={0}
                     padding={1}
-                    key={`grid_${partita.idPartita}`}
                     sx={{
                       borderRadius: '8px',
                       transition: 'background-color 0.15s ease',
@@ -140,20 +139,16 @@ export default function CardPartite({
                         ></Avatar>
                       </Grid>
                     )}
-                    {/* <Grid item xs={12}>
-                      <Divider />
-                    </Grid> */}
                   </Grid>
                 </a>
               ))
             ) : (
-              <Grid container spacing={0} key={`grid_0`}>
+              <Grid container spacing={0}>
                 <Grid item xs={12}>
                   <Typography
                     variant="body2"
                     component="div"
                     color="text.secondary"
-                    key={`CardPartiteEmpty_${g.idCalendario}`}
                   >
                     Nessuna partita in programma
                   </Typography>

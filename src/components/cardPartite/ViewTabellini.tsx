@@ -20,10 +20,9 @@ import {
 import { api } from '~/utils/api'
 import Image from 'next/image'
 import { getShortName } from '~/utils/helper'
-import { useEffect, useState } from 'react'
 import Modal from '../modal/Modal'
 import { Configurazione } from '~/config'
-import { useSearchParams } from 'next/navigation'
+import { usePartitaFromSearchParams, useGiocatoreModal } from './usePartitaParams'
 import Giocatore from '../giocatori/Giocatore'
 import { ShirtTemplate, magliaType } from '../selectColors'
 import { ShirtSVG } from '../selectColors/shirtSVG'
@@ -61,35 +60,11 @@ interface Tabellino {
 }
 
 function ViewTabellini() {
-  const searchParams = useSearchParams()
-
-  // Recupera i valori della query string
-  const idPartita = searchParams?.get('idPartita')
-  const idCalendario = searchParams?.get('idCalendario')
-
-  // Stato per la partita e il calendario convertiti in numero
-  const [partita, setPartita] = useState<number | null>(null)
-
-  useEffect(() => {
-    if (idPartita) {
-      // Converte i valori in numeri
-      const parsedPartita = Number(idPartita)
-
-      // Verifica se entrambi i valori sono numeri validi
-      if (!isNaN(parsedPartita)) {
-        setPartita(parsedPartita)
-        //setCalendario(parsedCalendario);
-      } else {
-        setPartita(null)
-        //setCalendario(null);
-      }
-    }
-  }, [idPartita, idCalendario])
+  const [partita, setPartita] = usePartitaFromSearchParams()
+  const { idGiocatore, openModalCalendario, handleStatGiocatore, handleModalClose } = useGiocatoreModal()
 
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
-  const [idGiocatore, setIdGiocatore] = useState<number>()
-  const [openModalCalendario, setOpenModalCalendario] = useState(false)
 
   const tabelliniList = api.partita.getTabellini.useQuery(
     { idPartita: partita! },
@@ -106,10 +81,6 @@ function ViewTabellini() {
   const tabellinoHome = tabelliniList.data?.TabellinoHome
   const tabellinoAway = tabelliniList.data?.TabellinoAway
 
-  const handleModalClose = () => {
-    setOpenModalCalendario(false)
-  }
-
   const renderTabellino = (
     tabellino?: Tabellino,
     squadra?: string | null,
@@ -117,11 +88,6 @@ function ViewTabellini() {
     maglia?: magliaType | null,
     multa?: boolean,
   ) => {
-    const handleStatGiocatore = (idGiocatore: number) => {
-      setIdGiocatore(idGiocatore)
-      setOpenModalCalendario(true)
-    }
-
     if (tabellino) {
       return (
         <GenericCard

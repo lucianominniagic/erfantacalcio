@@ -1,15 +1,8 @@
 'use client'
 import {
   Analytics,
-  ExpandMore,
   HourglassTop,
   ResetTv,
-  Looks3Outlined,
-  Looks4Outlined,
-  Looks5Outlined,
-  Looks6Outlined,
-  LooksOneOutlined,
-  LooksTwoOutlined,
   Save,
   SportsSoccer,
 } from '@mui/icons-material'
@@ -17,245 +10,68 @@ import {
   Box,
   CircularProgress,
   Grid,
+  IconButton,
   List,
   ListItem,
   ListItemText,
   MenuItem,
   Select,
   Typography,
-  Stack,
   Button,
   Snackbar,
   Alert,
-  IconButton,
   Divider,
   Tooltip,
 } from '@mui/material'
-import { useSession } from 'next-auth/react'
-import { api } from '~/utils/api'
-import React, { useEffect, useState } from 'react'
-import { type Moduli } from '~/types/common'
-import { getShortName, moduloDefault } from '~/utils/helper'
-import {
-  type GiocatoreFormazioneType,
-  type GiocatoreType,
-} from '~/types/squadre'
-import Image from 'next/image'
+import React from 'react'
+import { getShortName } from '~/utils/helper'
+import { type GiocatoreFormazioneType } from '~/types/squadre'
 import Modal from '../modal/Modal'
 import Giocatore from '../giocatori/Giocatore'
-import {
-  checkDataFormazione,
-  sortPlayersByRoleDescThenCostoDesc,
-  sortPlayersByRoleDescThenRiserva,
-  calcolaCodiceFormazione,
-  allowedFormations,
-  formatModulo,
-  getMatch,
-} from './utils'
-import { z } from 'zod'
+import { getMatch } from './utils'
 import Statistica from './Statistica'
-import { giornataSchema } from '~/schemas/calendario'
+import { useFormazioneState } from './useFormazioneState'
 
 function FormazioneXs() {
-  const session = useSession()
-  const idSquadra = parseInt(session.data?.user?.id ?? '0')
-  const [idGiocatoreStat, setIdGiocatoreStat] = useState<number>()
-  const [openModalCalendario, setOpenModalCalendario] = useState(false)
-  const [openModalStatistica, setOpenModalStatistica] = useState(false)
-  const [enableRosa, setEnableRosa] = useState(false)
-  const [message, setMessage] = useState('')
-  const [giornate, setGiornate] = useState<z.infer<typeof giornataSchema>[]>([])
-  const [idTorneo, setIdTorneo] = useState<number>()
-  const [rosa, setRosa] = useState<GiocatoreFormazioneType[]>([])
-  const [campo, setCampo] = useState<GiocatoreFormazioneType[]>([])
-  const [panca, setPanca] = useState<GiocatoreFormazioneType[]>([])
-  const [idPartita, setIdPartita] = useState<number>(0)
-  const [modulo, setModulo] = useState<Moduli>(moduloDefault)
-  const [openAlert, setOpenAlert] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [alertMessage, setAlertMessage] = useState('')
-  const [alertSeverity, setAlertSeverity] = useState<'success' | 'error'>(
-    'success',
-  )
-
-  const calendarioProssima = api.formazione.getGiornateDaGiocare.useQuery(
-    undefined,
-    { refetchOnWindowFocus: false, refetchOnReconnect: false },
-  )
-  const saveFormazione = api.formazione.create.useMutation({
-    onSuccess: async () => {
-      setAlertSeverity('success')
-    },
-  })
-  const formazioneList = api.formazione.get.useQuery(
-    { idTorneo: idTorneo! },
-    {
-      enabled: !!idTorneo,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-    },
-  )
-  const rosaList = api.squadre.getRosa.useQuery(
-    { idSquadra: idSquadra, includeVenduti: false },
-    {
-      enabled: enableRosa,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-    },
-  )
-
-  useEffect(() => {
-    if (calendarioProssima.data) {
-      if (
-        calendarioProssima.data.length > 0 &&
-        checkDataFormazione(calendarioProssima.data[0]?.data)
-      ) {
-        setEnableRosa(true)
-        setIdTorneo(calendarioProssima.data[0]?.idTorneo)
-      } else setMessage('Formazione non rilasciabile')
-      setGiornate(calendarioProssima.data)
-    }
-  }, [calendarioProssima.data])
-
-  useEffect(() => {
-    if (rosaList.data) {
-      const rosaConRuolo = rosaList.data.map((giocatore: GiocatoreType) => ({
-        ...giocatore,
-        titolare: false,
-        riserva: null,
-      }))
-
-      setRosa(rosaConRuolo)
-    }
-  }, [rosaList.data, idTorneo])
-
-  useEffect(() => {
-    if (formazioneList.data) {
-      setIdPartita(formazioneList.data.idPartita)
-      setModulo(formazioneList.data.modulo as Moduli)
-      setCampo(formazioneList.data.giocatori.filter((c) => c.titolare))
-      setRosa(
-        sortPlayersByRoleDescThenCostoDesc(
-          formazioneList.data.giocatori.filter(
-            (c) => !c.titolare && c.riserva === null,
-          ),
-        ),
-      )
-      setPanca(
-        sortPlayersByRoleDescThenRiserva(
-          formazioneList.data.giocatori.filter((c) => !c.titolare && c.riserva),
-        ),
-      )
-    }
-  }, [formazioneList.isFetching, formazioneList.isSuccess, formazioneList.data])
-
-  const handleClickPlayer = async (playerClicked: GiocatoreFormazioneType) => {
-    playerClicked.riserva = null
-    playerClicked.titolare = false
-
-    const canAdd = canAddPlayer(playerClicked.ruolo)
-
-    if (
-      rosa.some((c) => c.idGiocatore === playerClicked.idGiocatore) &&
-      canAdd
-    ) {
-      // Va da rosa a campo
-      playerClicked.titolare = true
-      await updateLists(playerClicked, campo, setCampo, rosa, setRosa, false)
-    } else if (rosa.some((c) => c.idGiocatore === playerClicked.idGiocatore)) {
-      // Va da rosa a panca
-      playerClicked.riserva = 100
-      await updateLists(playerClicked, panca, setPanca, rosa, setRosa, true)
-    } else if (campo.some((c) => c.idGiocatore === playerClicked.idGiocatore)) {
-      // Va da campo a rosa
-      await updateLists(playerClicked, rosa, setRosa, campo, setCampo, true)
-    } else if (panca.some((c) => c.idGiocatore === playerClicked.idGiocatore)) {
-      // Va da panca a rosa
-      await updateLists(
-        playerClicked,
-        rosa,
-        setRosa,
-        panca,
-        setPanca,
-        false,
-        true,
-      )
-    }
-  }
-
-  function canAddPlayer(ruoloGiocatore: string): boolean {
-    const newState = calcolaCodiceFormazione(campo, ruoloGiocatore)
-    const newStateStr = newState.toString().padStart(4, '0')
-
-    const isValid = allowedFormations.some((formation) => {
-      const formationStr = formation.toString().padStart(4, '0')
-
-      for (let i = 0; i < 4; i++) {
-        const currentRoleCount = parseInt(newStateStr.charAt(i), 10)
-        const maxRoleCount = parseInt(formationStr.charAt(i), 10)
-
-        if (currentRoleCount > maxRoleCount) {
-          return false
-        }
-      }
-      return true
-    })
-
-    if (isValid) {
-      const moduloFormatted = formatModulo(newStateStr)
-      setModulo(moduloFormatted as Moduli)
-    }
-
-    return isValid
-  }
-
-  const updateLists = async (
-    playerSelected: GiocatoreFormazioneType,
-    targetArray: GiocatoreFormazioneType[],
-    setTargetArray: (value: GiocatoreFormazioneType[]) => void,
-    sourceArray: GiocatoreFormazioneType[],
-    setSourceArray: (value: GiocatoreFormazioneType[]) => void,
-    orderTargetList = true,
-    orderSourceList = false,
-  ) => {
-    if (
-      playerSelected &&
-      !targetArray.find((c) => c.idGiocatore === playerSelected.idGiocatore)
-    ) {
-      const updatedSourceArray = sourceArray.filter(
-        (player) => player.idGiocatore !== playerSelected.idGiocatore,
-      )
-      setSourceArray(updatedSourceArray)
-      const updatedTargetArray = [...targetArray, playerSelected]
-      orderSourceList
-        ? sortPlayersByRoleDescThenRiserva(updatedSourceArray)
-        : setSourceArray(updatedSourceArray)
-      orderTargetList
-        ? setTargetArray(sortPlayersByRoleDescThenRiserva(updatedTargetArray))
-        : setTargetArray(updatedTargetArray)
-    }
-  }
+  const {
+    idSquadra,
+    idGiocatoreStat,
+    setIdGiocatoreStat,
+    openModalCalendario,
+    setOpenModalCalendario,
+    openModalStatistica,
+    openAlert,
+    setOpenAlert,
+    saving,
+    alertMessage,
+    alertSeverity,
+    enableRosa,
+    message,
+    giornate,
+    setIdTorneo,
+    setIdPartita,
+    rosa,
+    campo,
+    panca,
+    modulo,
+    isLoading,
+    filterIcons,
+    handleClickPlayer,
+    handleSave,
+    handleModalCalendarioClose,
+    handleModalStatisticaClose,
+    openStatisticaSquadra,
+    resetFormazione,
+  } = useFormazioneState()
 
   const renderRosa = (roles: string[], title: string) => {
-    // creo un array unico con info su dove si trova il giocatore
     const mergedPlayers = [
-      ...rosa
-        .filter((p) => roles.includes(p.ruolo))
-        .map((p) => ({ ...p, status: 'rosa' })),
-      ...campo
-        .filter((p) => roles.includes(p.ruolo))
-        .map((p) => ({ ...p, status: 'campo' })),
-      ...panca
-        .filter((p) => roles.includes(p.ruolo))
-        .map((p) => ({ ...p, status: 'panca' })),
+      ...rosa.filter((p) => roles.includes(p.ruolo)).map((p) => ({ ...p, status: 'rosa' as const })),
+      ...campo.filter((p) => roles.includes(p.ruolo)).map((p) => ({ ...p, status: 'campo' as const })),
+      ...panca.filter((p) => roles.includes(p.ruolo)).map((p) => ({ ...p, status: 'panca' as const })),
     ]
 
-    const handleStatGiocatore = (idGiocatore: number) => {
-      setIdGiocatoreStat(idGiocatore)
-      setOpenModalCalendario(true)
-    }
-
-    const renderStatusIcon = (player: any) => {
+    const renderStatusIcon = (player: GiocatoreFormazioneType & { status: 'rosa' | 'campo' | 'panca' }) => {
       if (player.status === 'campo') {
         return (
           <Tooltip title="Titolare">
@@ -265,7 +81,6 @@ function FormazioneXs() {
           </Tooltip>
         )
       }
-
       if (player.status === 'panca') {
         return (
           <Tooltip title={`Riserva ${player.riserva}`}>
@@ -273,8 +88,6 @@ function FormazioneXs() {
           </Tooltip>
         )
       }
-
-      // se è solo in rosa -> nessuna icona extra
       return null
     }
 
@@ -316,7 +129,10 @@ function FormazioneXs() {
                   {renderStatusIcon(player)}
                   <Tooltip title="Statistiche giocatore">
                     <IconButton
-                      onClick={() => handleStatGiocatore(player.idGiocatore)}
+                      onClick={() => {
+                        setIdGiocatoreStat(player.idGiocatore)
+                        setOpenModalCalendario(true)
+                      }}
                     >
                       <Analytics color="info" />
                     </IconButton>
@@ -330,87 +146,10 @@ function FormazioneXs() {
     )
   }
 
-  const filterIcons = [
-    <LooksOneOutlined key={0} color="error" />,
-    <LooksTwoOutlined key={1} color="error" />,
-    <Looks3Outlined key={2} color="error" />,
-    <Looks4Outlined key={3} color="error" />,
-    <Looks5Outlined key={4} color="error" />,
-    <Looks6Outlined key={5} color="error" />,
-  ]
-
-  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (rosa.length > 0 || campo.length !== 11) {
-      setAlertMessage('Completa la formazione')
-      setAlertSeverity('error')
-    } else if (!idPartita && idPartita !== 0) {
-      setAlertMessage('Nessuna partita in programma, impossibile procedere')
-      setAlertSeverity('error')
-    } else {
-      console.log(`Salvataggio formazione per idSquadra: ${idSquadra} e idPartita: ${idPartita}`)
-      setSaving(true)
-      if (idPartita !== 0) {
-        await saveFormazione.mutateAsync({
-          idPartita: idPartita,
-          modulo: modulo,
-          giocatori: [...campo, ...panca].map((giocatore) => ({
-            idGiocatore: giocatore.idGiocatore,
-            titolare: giocatore.titolare,
-            riserva: giocatore.riserva,
-          })),
-        })
-        setAlertMessage(`Salvataggio completato: ${giornate.filter(g => g.partite.some(p => p.idPartita === idPartita))[0]?.Title}`)
-        setSaving(false)
-      } else {
-        await Promise.all(
-          giornate.map(async (g) => {
-            await saveFormazione.mutateAsync({
-              idPartita: g.partite
-                .filter((c) => c.idHome === idSquadra || c.idAway === idSquadra)
-                .map((p) => p.idPartita)[0]!,
-              modulo: modulo,
-              giocatori: [...campo, ...panca].map((giocatore) => ({
-                idGiocatore: giocatore.idGiocatore,
-                titolare: giocatore.titolare,
-                riserva: giocatore.riserva,
-              })),
-            })
-          }),
-        )
-        setAlertMessage(
-          'Salvataggio completato per entrambe le giornate di campionato e champions',
-        )
-        setSaving(false)
-      }
-    }
-    setOpenAlert(true)
-  }
-
-  const handleModalCalendarioClose = () => {
-    setOpenModalCalendario(false)
-  }
-
-  const handleModalStatisticaClose = () => {
-    setOpenModalStatistica(false)
-  }
-
-  function StatisticaSquadra(): void {
-    setOpenModalStatistica(true)
-  }
-
-  function resetFormazione(idTorneo: number): void {
-    setCampo([])
-    setPanca([])
-    setRosa([])
-    setIdTorneo(idTorneo)
-  }
-
   return (
     <>
       <Grid container spacing={1}>
-        {((rosaList.isLoading && enableRosa) ||
-          calendarioProssima.isLoading) && (
+        {isLoading && (
           <Grid item xs={12}>
             <Box
               sx={{
@@ -426,7 +165,7 @@ function FormazioneXs() {
         )}
         {enableRosa ? (
           <>
-            <Grid item xs={12} textAlign={'center'}>
+            <Grid item xs={12} textAlign="center">
               <Typography variant={giornate.length > 0 ? 'h6' : 'h5'} sx={{ lineHeight: 2 }}>
                 <b>{giornate.length > 1 ? `${giornate[0]?.Title} / ${giornate[1]?.Title}` : giornate[0]?.Title}</b>
               </Typography>
@@ -442,12 +181,12 @@ function FormazioneXs() {
                   name="giornata"
                   onChange={(e) =>
                     e.target.value !== 0
-                      ? resetFormazione(e.target.value as number) 
+                      ? resetFormazione(e.target.value as number)
                       : setIdPartita(0)
                   }
                   defaultValue={giornate[0]?.idTorneo}
                 >
-                  <MenuItem value={0} key={`giornata_0`}>
+                  <MenuItem value={0} key="giornata_0">
                     Salva entrambe le formazioni
                   </MenuItem>
                   {giornate.map((g, index) => (
@@ -455,19 +194,21 @@ function FormazioneXs() {
                       value={g.idTorneo}
                       key={`giornata_${g.idTorneo}`}
                       selected={index === 0}
-                    >{`Salva solo ${g.Title}`}</MenuItem>
+                    >
+                      {`Salva solo ${g.Title}`}
+                    </MenuItem>
                   ))}
                 </Select>
               )}
             </Grid>
-            <Grid item xs={12} justifyItems={'end'}>
+            <Grid item xs={12} justifyItems="end">
               <Box component="form" onSubmit={handleSave} noValidate>
                 <Button
                   type="button"
                   variant="contained"
                   color="primary"
                   size="medium"
-                  onClick={() => StatisticaSquadra()}
+                  onClick={() => openStatisticaSquadra()}
                   endIcon={<SportsSoccer />}
                   sx={{ mr: 1, fontSize: '11px' }}
                 >
@@ -493,7 +234,7 @@ function FormazioneXs() {
                     Rosa ({rosa.length}) / Panchina ({panca.length})
                   </Typography>
                 </Grid>
-                <Grid item sm={6} xs={6} textAlign={'right'}>
+                <Grid item sm={6} xs={6} textAlign="right">
                   <Typography variant="h5">{`Modulo: ${modulo}`}</Typography>
                 </Grid>
               </Grid>
@@ -520,21 +261,12 @@ function FormazioneXs() {
                 </Alert>
               </Snackbar>
             </Grid>
-            <Grid item xs={12} minHeight={100} justifyItems={'end'}>
+            <Grid item xs={12} minHeight={100} justifyItems="end">
               <Button
                 type="button"
                 endIcon={<ResetTv />}
                 variant="contained"
-                onClick={() => {
-                  setModulo(moduloDefault)
-                  setCampo([])
-                  setPanca([])
-                  setRosa(
-                    sortPlayersByRoleDescThenCostoDesc(
-                      rosa.concat(campo, panca),
-                    ),
-                  )
-                }}
+                onClick={() => resetFormazione()}
                 color="info"
                 size="medium"
                 sx={{ fontSize: '10px' }}
@@ -551,11 +283,11 @@ function FormazioneXs() {
       </Grid>
 
       <Modal
-        title={'Statistica giocatore'}
+        title="Statistica giocatore"
         open={openModalCalendario}
         onClose={handleModalCalendarioClose}
-        width={'98%'}
-        height={'98%'}
+        width="98%"
+        height="98%"
       >
         <Divider />
         <Box sx={{ mt: 1, gap: '0px', flexWrap: 'wrap' }}>
@@ -566,15 +298,15 @@ function FormazioneXs() {
       </Modal>
 
       <Modal
-        title={'Statistica squadra'}
+        title="Statistica squadra"
         open={openModalStatistica}
         onClose={handleModalStatisticaClose}
-        width={'98%'}
-        height={'98%'}
+        width="98%"
+        height="98%"
       >
         <Divider />
         <Box sx={{ mt: 1, gap: '0px', flexWrap: 'wrap' }}>
-          <Statistica idSquadra={parseInt(session.data?.user?.id ?? '0')} />
+          <Statistica idSquadra={idSquadra} />
         </Box>
       </Modal>
     </>

@@ -3,9 +3,6 @@ import React, { useEffect, useState, useMemo } from 'react'
 import { api } from '~/utils/api'
 import { Alert, Box, Skeleton, Stack, Typography, Tabs, Tab } from '@mui/material'
 import CardPartite from '../cardPartite/CardPartite'
-import CheckIcon from '@mui/icons-material/CheckCircle'
-import { z } from 'zod'
-import { giornataSchema } from '~/schemas/calendario'
 
 
 interface CalendarioProps {
@@ -26,19 +23,8 @@ export default function Calendario({ prefixTitle, tipo, enableTabs = false }: Ca
           refetchOnReconnect: false,
         })
   const [errorMessage, setErrorMessage] = useState('')
-  const [giornata, setGiornata] = useState<z.infer<typeof giornataSchema>[]>()
   // selectedTorneo now stores the tournament name (key) so that entries with the same name are grouped together
   const [selectedTorneo, setSelectedTorneo] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (
-      !calendarioList.isFetching &&
-      calendarioList.isSuccess &&
-      calendarioList.data
-    ) {
-      setGiornata(calendarioList.data)
-    }
-  }, [calendarioList.data, calendarioList.isSuccess, calendarioList.isFetching])
 
   useEffect(() => {
     if (calendarioList.isError) {
@@ -47,9 +33,10 @@ export default function Calendario({ prefixTitle, tipo, enableTabs = false }: Ca
   }, [calendarioList.isError])
 
   const groups = useMemo(() => {
-    if (!giornata) return [] as { key: string; name: string; items: z.infer<typeof giornataSchema>[] }[]
-    const map = new Map<string, { name: string; items: z.infer<typeof giornataSchema>[] }>()
-    for (const g of giornata) {
+    const data = calendarioList.data
+    if (!data) return []
+    const map = new Map<string, { name: string; items: typeof data }>()
+    for (const g of data) {
       const id = g.idTorneo ?? -1
       const name = g.Torneo ?? `Torneo ${id}`
       const key = name // group by tournament name
@@ -61,7 +48,7 @@ export default function Calendario({ prefixTitle, tipo, enableTabs = false }: Ca
       }
     }
     return Array.from(map.entries()).map(([key, v]) => ({ key, name: v.name, items: v.items }))
-  }, [giornata])
+  }, [calendarioList.data])
 
   useEffect(() => {
     if (groups.length > 0) {
@@ -89,7 +76,7 @@ export default function Calendario({ prefixTitle, tipo, enableTabs = false }: Ca
 
     return (
       <CardPartite
-        giornata={giornata ?? []}
+        giornata={calendarioList.data ?? []}
         prefixTitle={prefixTitle}
         maxWidth={600}
         withAvatar={true}
@@ -99,7 +86,7 @@ export default function Calendario({ prefixTitle, tipo, enableTabs = false }: Ca
 
   return (
     <>
-      {!calendarioList.isLoading && giornata && (
+      {!calendarioList.isLoading && calendarioList.data && (
         <>
           {enableTabs && groups.length > 1 && (
             <Tabs
@@ -139,7 +126,7 @@ export default function Calendario({ prefixTitle, tipo, enableTabs = false }: Ca
       )}
       {errorMessage && (
         <Stack sx={{ width: '100%' }} spacing={0}>
-          <Alert icon={<CheckIcon fontSize="inherit" />} severity="error">
+          <Alert severity="error">
             {errorMessage}
           </Alert>
         </Stack>

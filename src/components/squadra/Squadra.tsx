@@ -28,6 +28,9 @@ export default function Squadra({ idSquadra }: SquadraProps) {
 
   const datiSquadra = apiSquadra.data
   const datiAlbo = apiAlbo.data
+  const maglia = datiSquadra
+    ? (JSON.parse(datiSquadra.maglia ?? '{}') as magliaType)
+    : null
 
   return (
     <>
@@ -48,60 +51,52 @@ export default function Squadra({ idSquadra }: SquadraProps) {
         </Grid>
       )}
       {datiSquadra && datiAlbo && (
-        <>
-          {(() => {
-            const maglia = JSON.parse(datiSquadra.maglia ?? '{}') as magliaType
-
-            return (
-              <Grid container spacing={0}>
-                <Grid item xs={12}>
-                  <Typography color="primary" variant="h4">
-                    {datiSquadra.squadra}
-                  </Typography>
-                  <Typography color="primary" variant="h5">
-                    Presidente: {datiSquadra.presidente}
-                  </Typography>
-                </Grid>
-                <Grid item xs={6} md={12} sx={{ mt: 1 }}>
-                  {maglia && (
-                    <ShirtSVG
-                      template={maglia.selectedTemplate as ShirtTemplate}
-                      mainColor={maglia.mainColor}
-                      secondaryColor={maglia.secondaryColor}
-                      thirdColor={maglia.thirdColor}
-                      textColor={maglia.textColor}
-                      size={100}
-                      number={maglia.shirtNumber}
-                    />
-                  )}
-                </Grid>
-                <Grid item xs={6} md={12} sx={{ mt: 1 }}>
-                  <Avatar
-                    src={datiSquadra.foto ?? ''}
-                    sx={{ width: 100, height: 100 }}
-                  ></Avatar>
-                </Grid>
-                <Grid item xs={6} md={12} sx={{ mt: 2 }}>
-                  <Typography color="primary" variant="h6">
-                    <u>Trofei vinti</u>
-                  </Typography>
-                  <Typography color="primary" variant="body1">
-                    Campionato: {datiAlbo.campionato}
-                  </Typography>
-                  <Typography color="primary" variant="body1">
-                    Champions: {datiAlbo.champions}
-                  </Typography>
-                  <Typography color="primary" variant="body1">
-                    Secondo: {datiAlbo.secondo}
-                  </Typography>
-                  <Typography color="primary" variant="body1">
-                    Terzo: {datiAlbo.terzo}
-                  </Typography>
-                </Grid>
-              </Grid>
-            )
-          })()}
-        </>
+        <Grid container spacing={0}>
+          <Grid item xs={12}>
+            <Typography color="primary" variant="h4">
+              {datiSquadra.squadra}
+            </Typography>
+            <Typography color="primary" variant="h5">
+              Presidente: {datiSquadra.presidente}
+            </Typography>
+          </Grid>
+          <Grid item xs={6} md={12} sx={{ mt: 1 }}>
+            {maglia && (
+              <ShirtSVG
+                template={maglia.selectedTemplate as ShirtTemplate}
+                mainColor={maglia.mainColor}
+                secondaryColor={maglia.secondaryColor}
+                thirdColor={maglia.thirdColor}
+                textColor={maglia.textColor}
+                size={100}
+                number={maglia.shirtNumber}
+              />
+            )}
+          </Grid>
+          <Grid item xs={6} md={12} sx={{ mt: 1 }}>
+            <Avatar
+              src={datiSquadra.foto ?? ''}
+              sx={{ width: 100, height: 100 }}
+            />
+          </Grid>
+          <Grid item xs={6} md={12} sx={{ mt: 2 }}>
+            <Typography color="primary" variant="h6">
+              <u>Trofei vinti</u>
+            </Typography>
+            <Typography color="primary" variant="body1">
+              Campionato: {datiAlbo.campionato}
+            </Typography>
+            <Typography color="primary" variant="body1">
+              Champions: {datiAlbo.champions}
+            </Typography>
+            <Typography color="primary" variant="body1">
+              Secondo: {datiAlbo.secondo}
+            </Typography>
+            <Typography color="primary" variant="body1">
+              Terzo: {datiAlbo.terzo}
+            </Typography>
+          </Grid>
+        </Grid>
       )}
     </>
   )

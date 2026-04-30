@@ -57,7 +57,6 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
     })
 
     setRisultati(updatedResults)
-    //console.log(updatedResults);
   }
 
   const handleCheckboxChange = (
@@ -78,10 +77,9 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
     })
 
     setRisultati(updatedResults)
-    //console.log(updatedResults);
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit= async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setMessage('')
     setErrorMessage('')
@@ -159,7 +157,6 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
               direction="row"
               spacing={0}
               justifyContent="space-between"
-              key={`infopartita_${partita.idPartita}`}
             >
               <Typography variant="h5" component="div" color="text.secondary">
                 {partita.squadraHome} - {partita.squadraAway}
@@ -168,11 +165,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
                 {partita.golHome} - {partita.golAway}
               </Typography>
             </Stack>
-            <Stack
-              direction="row"
-              spacing={0}
-              key={`multe_${partita.idPartita}`}
-            >
+            <Stack direction="row" spacing={0}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -220,7 +213,6 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
               direction="row"
               spacing={0}
               justifyContent="space-between"
-              key={`inputpartita_${partita.idPartita}`}
             >
               <TextField
                 margin="normal"
@@ -279,7 +271,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
                 }
               />
             </Stack>
-            <Divider key={`divider_${partita.idPartita}`}></Divider>
+            <Divider />
           </span>
         ))
       ) : (

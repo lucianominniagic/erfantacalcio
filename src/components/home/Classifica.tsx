@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import React, { useEffect, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { api } from '~/utils/api'
 import { Avatar, Box, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { getNomeTorneo } from '~/utils/helper'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
-import { autosizeOptions } from '~/utils/datatable'
+import { autosizeOptions, createSkeletonRows } from '~/utils/datatable'
 import { z } from 'zod'
 import { classificaSchema } from '~/schemas/classifica'
 
@@ -30,17 +29,11 @@ export default function Classifica({
       refetchOnReconnect: false,
     },
   )
-  const [rows, setRows] = useState<z.infer<typeof classificaSchema>[]>([])
 
-  useEffect(() => {
-    if (
-      !classificaList.isFetching &&
-      classificaList.isSuccess &&
-      classificaList.data
-    ) {
-      setRows(classificaList.data)
-    }
-  }, [classificaList.data, classificaList.isSuccess, classificaList.isFetching])
+  const rows = useMemo<z.infer<typeof classificaSchema>[]>(
+    () => (classificaList.isSuccess ? (classificaList.data ?? []) : []),
+    [classificaList.data, classificaList.isSuccess],
+  )
 
   const columns: GridColDef[] = [
     { field: 'id', hideable: true },
@@ -108,9 +101,7 @@ export default function Classifica({
 
   const pageSize = gruppo ? 8 : 4
 
-  const skeletonRows = Array.from({ length: pageSize }, (_, index) => ({
-    id: `skeleton-${index}`,
-  }))
+  const skeletonRows = createSkeletonRows(pageSize)
 
   return (
     <>
@@ -162,7 +153,6 @@ export default function Classifica({
               }}
         />
       </Box>
-      <br></br>
     </>
   )
 }

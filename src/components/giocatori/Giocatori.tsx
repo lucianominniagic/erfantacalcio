@@ -11,7 +11,7 @@ import {
   Typography,
   useMediaQuery,
 } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { api } from '~/utils/api'
 import { useTheme } from '@mui/material/styles'
 import GenericAutocomplete, {
@@ -28,6 +28,7 @@ import {
   GridActionsCellItem,
   type GridColDef,
 } from '@mui/x-data-grid'
+import { createSkeletonRows } from '~/utils/datatable'
 
 function Giocatori() {
   const theme = useTheme()
@@ -45,13 +46,6 @@ function Giocatori() {
     { ruolo: ruolo, soloSvincolati: soloSvincolati },
     { refetchOnWindowFocus: false, refetchOnReconnect: false },
   )
-  const [giocatori, setGiocatori] = useState<AutocompleteOption[]>([])
-
-  useEffect(() => {
-    if (giocatoriList.data) {
-      setGiocatori(giocatoriList.data)
-    }
-  }, [giocatoriList.data])
 
   const handleGiocatoreSelected = async (idGiocatore: number | undefined) => {
     if (idGiocatore === undefined) return
@@ -161,9 +155,7 @@ function Giocatori() {
 
   const pageSize = isXs ? 10 : 15
 
-  const skeletonRows = Array.from({ length: pageSize }, (_, index) => ({
-    id: `skeleton-${index}`,
-  }))
+  const skeletonRows = createSkeletonRows(pageSize)
 
   return (
     <>
@@ -228,7 +220,7 @@ function Giocatori() {
               const numericId = typeof id === 'number' ? id : undefined
               handleGiocatoreSelected(numericId)
             }}
-            items={giocatori ?? []}
+            items={giocatoriList.data ?? []}
           />
         </Grid>
         <Grid item xs={12} sx={{ minHeight: 500 }}>

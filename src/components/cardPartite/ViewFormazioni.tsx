@@ -15,44 +15,20 @@ import { api } from '~/utils/api'
 import { formatDateFromIso } from '~/utils/dateUtils'
 import { Configurazione } from '~/config'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { Fragment, useMemo } from 'react'
 import Modal from '../modal/Modal'
-import { useSearchParams } from 'next/navigation'
+import { usePartitaFromSearchParams, useGiocatoreModal } from './usePartitaParams'
 import Giocatore from '../giocatori/Giocatore'
 import { magliaType, ShirtTemplate } from '../selectColors'
 import { ShirtSVG } from '../selectColors/shirtSVG'
 import { GenericCard } from '~/components/cards'
 
 function ViewFormazioni() {
-  const searchParams = useSearchParams()
-
-  // Recupera i valori della query string
-  const idPartita = searchParams?.get('idPartita')
-  const idCalendario = searchParams?.get('idCalendario')
-
-  // Stato per la partita e il calendario convertiti in numero
-  const [partita, setPartita] = useState<number | null>(null)
-
-  useEffect(() => {
-    if (idPartita) {
-      // Converte i valori in numeri
-      const parsedPartita = Number(idPartita)
-
-      // Verifica se entrambi i valori sono numeri validi
-      if (!isNaN(parsedPartita)) {
-        setPartita(parsedPartita)
-      } else {
-        setPartita(null)
-      }
-    }
-  }, [idPartita, idCalendario])
+  const [partita, setPartita] = usePartitaFromSearchParams()
+  const { idGiocatore, openModalCalendario, handleStatGiocatore, handleModalClose } = useGiocatoreModal()
 
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
-  const [idGiocatore, setIdGiocatore] = useState<number | undefined>()
-  const [openModalCalendario, setOpenModalCalendario] = useState(false)
-  const [magliaHome, setMagliaHome] = useState<magliaType | undefined>(undefined)
-  const [magliaAway, setMagliaAway] = useState<magliaType | undefined>(undefined)
   
   const formazioniList = api.partita.getFormazioni.useQuery(
     { idPartita: partita! },
@@ -69,23 +45,14 @@ function ViewFormazioni() {
   const formazioneHome = formazioniList.data?.FormazioneHome
   const formazioneAway = formazioniList.data?.FormazioneAway
 
-  useEffect(() => {
-      if (!formazioniList.isFetching && formazioniList.isSuccess && formazioniList.data) {
-        const mHome = JSON.parse(infoPartita?.magliaHome ?? '{}') as magliaType
-        setMagliaHome(mHome)
-        const mAway = JSON.parse(infoPartita?.magliaAway ?? '{}') as magliaType
-        setMagliaAway(mAway)
-      }
-    }, [formazioniList.data, formazioniList.isSuccess, formazioniList.isFetching])
-
-  const handleModalClose = () => {
-    setOpenModalCalendario(false)
-  }
-
-  const handleStatGiocatore = (idGiocatore: number) => {
-    setIdGiocatore(idGiocatore)
-    setOpenModalCalendario(true)
-  }
+  const magliaHome = useMemo(
+    () => infoPartita?.magliaHome ? JSON.parse(infoPartita.magliaHome) as magliaType : undefined,
+    [infoPartita?.magliaHome],
+  )
+  const magliaAway = useMemo(
+    () => infoPartita?.magliaAway ? JSON.parse(infoPartita.magliaAway) as magliaType : undefined,
+    [infoPartita?.magliaAway],
+  )
 
   return (
     <>
@@ -166,7 +133,7 @@ function ViewFormazioni() {
                               {formazioneHome.Voti.filter(
                                 (g) => g.titolare,
                               ).map((g) => (
-                                <>
+                                <Fragment key={g.Giocatore.idGiocatore}>
                                   <Grid item xs={2} sm={1}>
                                     <Tooltip
                                       title={
@@ -204,7 +171,7 @@ function ViewFormazioni() {
                                       {g.Giocatore.nome}
                                     </Typography>
                                   </Grid>
-                                </>
+                                </Fragment>
                               ))}
                             </Grid>
                           </Grid>
@@ -222,7 +189,7 @@ function ViewFormazioni() {
                               {formazioneHome.Voti.filter(
                                 (g) => !g.titolare,
                               ).map((g) => (
-                                <>
+                                <Fragment key={g.Giocatore.idGiocatore}>
                                   <Grid item xs={2} sm={2}>
                                     <Tooltip
                                       title={
@@ -260,7 +227,7 @@ function ViewFormazioni() {
                                       {g.Giocatore.nome}
                                     </Typography>
                                   </Grid>
-                                </>
+                                </Fragment>
                               ))}
                             </Grid>
                           </Grid>
@@ -330,7 +297,7 @@ function ViewFormazioni() {
                               {formazioneAway.Voti.filter(
                                 (g) => g.titolare,
                               ).map((g) => (
-                                <>
+                                <Fragment key={g.Giocatore.idGiocatore}>
                                   <Grid item xs={2} sm={1}>
                                     <Tooltip
                                       title={
@@ -368,7 +335,7 @@ function ViewFormazioni() {
                                       {g.Giocatore.nome}
                                     </Typography>
                                   </Grid>
-                                </>
+                                </Fragment>
                               ))}
                             </Grid>
                           </Grid>
@@ -386,7 +353,7 @@ function ViewFormazioni() {
                               {formazioneAway.Voti.filter(
                                 (g) => !g.titolare,
                               ).map((g) => (
-                                <>
+                                <Fragment key={g.Giocatore.idGiocatore}>
                                   <Grid item xs={2} sm={2}>
                                     <Tooltip
                                       title={
@@ -424,7 +391,7 @@ function ViewFormazioni() {
                                       {g.Giocatore.nome}
                                     </Typography>
                                   </Grid>
-                                </>
+                                </Fragment>
                               ))}
                             </Grid>
                           </Grid>

@@ -29,7 +29,6 @@ import Calendario from '~/components/home/Calendario'
 import Modal from '~/components/modal/Modal'
 import CardPartite from '~/components/cardPartite/CardPartite'
 import { useSession } from 'next-auth/react'
-import SquadreXs from '~/components/home/SquadreXs'
 import { z } from 'zod'
 import { Configurazione } from '~/config'
 import { giornataSchema } from '~/schemas/calendario'
@@ -115,13 +114,11 @@ export default function HomePage() {
   return (
     <>
       <Grid container spacing={0}>
-        {!isXs && (
-          <Slide direction={'down'} in={true}>
+        <Slide direction={'down'} in={true}>
             <Grid item xs={12}>
               <Squadre />
             </Grid>
           </Slide>
-        )}
         {!torneiList.isLoading && (
           <>
             {new Date() >= Configurazione.dataGiornata1SerieA && (
@@ -247,12 +244,6 @@ export default function HomePage() {
                 </Grid>
               </>
             )}
-            {isXs && (
-              <Grid item xs={12}>
-                <SquadreXs />
-              </Grid>
-            )}
-
           </>
         )}
       </Grid>
