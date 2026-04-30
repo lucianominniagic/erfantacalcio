@@ -1,11 +1,9 @@
 import { publicProcedure } from '~/server/api/trpc'
-import { z } from 'zod'
 import { Tornei, Classifiche, Calendario, Partite } from '~/server/db/entities'
 import { In } from 'typeorm'
 
 export const getSaldoSquadreProcedure = publicProcedure
-  .input(z.object({ detrazioneSito: z.number() }))
-  .query(async ({ input }) => {
+  .query(async () => {
     // 1. Find campionato and champions tornei IDs
     const tornei = await Tornei.find({ select: { idTorneo: true, nome: true } })
     const campionatoIds = tornei
@@ -15,7 +13,9 @@ export const getSaldoSquadreProcedure = publicProcedure
       .filter((t) => t.nome.toLowerCase().includes('champions'))
       .map((t) => t.idTorneo)
 
-    if (campionatoIds.length === 0) return []
+    if (campionatoIds.length === 0) {
+      return { classificaMap: {} as Record<string, number>, idVincitriceChampions: null, finaleGiocata: false }
+    }
 
     // 2. Get campionato classifica (sorted by punti desc, then golFatti desc, golSubiti asc)
     const classifiche = await Classifiche.find({

@@ -111,10 +111,10 @@ export default function Economia() {
     refetchOnReconnect: false,
   })
 
-  const saldoData = api.economia.getSaldoSquadre.useQuery(
-    { detrazioneSito },
-    { refetchOnWindowFocus: false, refetchOnReconnect: false },
-  )
+  const saldoData = api.economia.getSaldoSquadre.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  })
 
   const importoAnnuale = economiaList.data?.reduce((acc, item) => acc + (item.importoAnnuale ?? 0), 0) ?? 0
   const importoMulte = economiaList.data?.reduce((acc, item) => acc + (item.importoMulte ?? 0), 0) ?? 0
