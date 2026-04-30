@@ -110,7 +110,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         <Sidebar
           mobileOpen={mobileOpen}
           onMobileClose={() => setMobileOpen(false)}
-          isXs={isXs}
         />
 
         {/* Main content */}

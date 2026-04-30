@@ -45,7 +45,6 @@ import {
 } from '@mui/icons-material'
 import { RuoloUtente } from '~/utils/enums'
 import { Configurazione } from '~/config'
-import useSeasonal from '~/components/appbar/seasonalHooks'
 import { useThemeMode } from '~/theme/themeContext'
 
 export const SIDEBAR_WIDTH = 240
@@ -53,7 +52,6 @@ export const SIDEBAR_WIDTH = 240
 interface SidebarProps {
   mobileOpen: boolean
   onMobileClose: () => void
-  isXs: boolean
 }
 
 interface NavItem {
@@ -190,22 +188,14 @@ function SidebarSection({
   )
 }
 
-function SidebarContent({ isXs }: { isXs: boolean }) {
+function SidebarContent() {
   const { data: session } = useSession()
   const pathname = usePathname() ?? ''
-  const { variant: seasonalVariant } = useSeasonal(isXs)
   const theme = useTheme()
   const { mode, toggleMode } = useThemeMode()
 
-  const headerBg =
-    seasonalVariant === 'christmas'
-      ? 'linear-gradient(135deg, #0b6623 0%, #7a0000 100%)'
-      : seasonalVariant === 'january'
-        ? 'linear-gradient(180deg, #0960bd 0%, #1a2a40 100%)'
-        : `linear-gradient(135deg, ${theme.palette.background.default} 0%, #1a1208 100%)`
-
-  const titleColor =
-    seasonalVariant === 'january' ? theme.palette.info.light : theme.palette.primary.main
+  const headerBg = `linear-gradient(135deg, ${theme.palette.background.default} 0%, #1a1208 100%)`
+  const titleColor = theme.palette.primary.main
 
   return (
     <Box
@@ -376,7 +366,7 @@ function SidebarContent({ isXs }: { isXs: boolean }) {
   )
 }
 
-export default function Sidebar({ mobileOpen, onMobileClose, isXs }: SidebarProps) {
+export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
   const theme = useTheme()
   const drawerSx = {
     width: SIDEBAR_WIDTH,
@@ -398,7 +388,7 @@ export default function Sidebar({ mobileOpen, onMobileClose, isXs }: SidebarProp
         }}
         open
       >
-        <SidebarContent isXs={isXs} />
+        <SidebarContent />
       </Drawer>
 
       {/* Mobile temporary drawer */}
@@ -412,7 +402,7 @@ export default function Sidebar({ mobileOpen, onMobileClose, isXs }: SidebarProp
           '& .MuiDrawer-paper': drawerSx,
         }}
       >
-        <SidebarContent isXs={isXs} />
+        <SidebarContent />
       </Drawer>
     </>
   )
