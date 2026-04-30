@@ -139,7 +139,7 @@ export default function Economia() {
       {/* Metric boxes */}
       <Grid container spacing={1.5}>
         <Grid item xs={6} sm={3}>
-          <MetricBox label="Montepremi netto" value={formatCurrency(montepremi)} icon={<AccountBalanceWallet />} color="primary" />
+          <MetricBox label="Montepremi totale" value={formatCurrency(montepremi)} icon={<AccountBalanceWallet />} color="primary" />
         </Grid>
         <Grid item xs={6} sm={3}>
           <MetricBox label="Totale quote" value={formatCurrency(importoAnnuale)} icon={<MonetizationOn />} color="info" />
