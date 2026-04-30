@@ -79,7 +79,7 @@ export default function RiepilogoSquadre({ idTornei }: RiepilogoSquadreProps) {
     <Box sx={{ pt: 2 }}>
       <Grid container spacing={2}>
         {data.map((s, idx) => (
-          <Grid item xs={12} sm={6} md={3} key={s.idSquadra}>
+          <Grid item xs={12} sm={6} md={4} key={s.idSquadra}>
             <Card sx={{ height: '100%' }}>
               <CardContent>
                 {/* Header: rank + avatar + nome */}
@@ -95,9 +95,9 @@ export default function RiepilogoSquadre({ idTornei }: RiepilogoSquadreProps) {
                 </Stack>
                 <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
                   <Stack direction="row" spacing={0.5}>
-                    <Chip label={`${s.vittorie}V`} size="small" color="success" sx={{ fontSize: '0.7rem', height: 20 }} />
-                    <Chip label={`${s.pareggi}N`} size="small" sx={{ fontSize: '0.7rem', height: 20 }} />
-                    <Chip label={`${s.sconfitte}P`} size="small" color="error" sx={{ fontSize: '0.7rem', height: 20 }} />
+                    <Chip label={`${s.vittorie} V`} size="small" color="success" sx={{ fontSize: '0.7rem', height: 20 }} />
+                    <Chip label={`${s.pareggi} N`} size="small" sx={{ fontSize: '0.7rem', height: 20 }} />
+                    <Chip label={`${s.sconfitte} P`} size="small" color="error" sx={{ fontSize: '0.7rem', height: 20 }} />
                   </Stack>
                 </Stack>
 

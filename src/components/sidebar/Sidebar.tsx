@@ -64,8 +64,8 @@ interface NavItem {
 }
 
 const legaItems: NavItem[] = [
-  { key: 'statistiche', label: 'Statistiche giocatori', href: '/statistiche_giocatori', icon: <Portrait /> },
   { key: 'statisticheSquadre', label: 'Statistiche squadre', href: '/statistiche_squadre', icon: <Groups /> },
+  { key: 'statistiche', label: 'Statistiche giocatori', href: '/statistiche_giocatori', icon: <Portrait /> },
   { key: 'economia', label: 'Economia e premi', href: '/economia', icon: <Euro /> },
   { key: 'albo', label: "Albo d'oro", href: '/albo', icon: <EmojiEvents /> },
   { key: 'documenti', label: 'Documenti', href: '/documenti', icon: <ListAlt /> },
@@ -295,15 +295,13 @@ function SidebarContent() {
 
       {/* Nav sections */}
       <Box sx={{ flex: 1, overflowY: 'auto', py: 1 }}>
-        <SidebarSection title="Lega" items={legaItems} pathname={pathname} />
-
         {session?.user && (
           <>
             <Divider sx={{ mx: 2, my: 0.5 }} />
             <SidebarSection title="Il mio profilo" items={profiloItems} pathname={pathname} />
           </>
         )}
-
+        <SidebarSection title="Lega" items={legaItems} pathname={pathname} />
         {session?.user?.ruolo === RuoloUtente.admin && (
           <>
             <Divider sx={{ mx: 2, my: 0.5 }} />

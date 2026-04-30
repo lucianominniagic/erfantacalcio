@@ -105,16 +105,16 @@ export function guestListItems(isXs: boolean, isAuthenticated: boolean) {
         ]
       : []),
     listItem(
-      'guest_profilo_4',
-      '/statistiche_giocatori',
-      'Statistiche giocatori',
-      <Portrait color="error" />,
-    ),
-    listItem(
       'guest_profilo_4b',
       '/statistiche_squadre',
       'Statistiche squadre',
       <Groups color="error" />,
+    ),
+    listItem(
+      'guest_profilo_4',
+      '/statistiche_giocatori',
+      'Statistiche giocatori',
+      <Portrait color="error" />,
     ),
     listItem(
       'guest_profilo_5',
