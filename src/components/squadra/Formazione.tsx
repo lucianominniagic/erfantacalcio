@@ -268,7 +268,7 @@ function Formazione() {
     return (
       <Grid item sm={columns} xs={12}>
         <Box>
-          <Typography variant="h5">{title}</Typography>
+          <Typography variant="h6">{title}</Typography>
           <List sx={{ bgcolor: 'background.paper' }}>
             {filteredRosa.map((player) => (
               <Grid container spacing={0} key={player.idGiocatore}>
@@ -504,7 +504,7 @@ function Formazione() {
         {enableRosa ? (
           <>
             <Grid item xs={6}>
-              <Typography variant={'h3'}>
+              <Typography variant={'h4'}>
                 Formazione {squadra}{' '}
                 {giornate.length === 1 && ` - ${giornate[0]?.Title}`}
               </Typography>
