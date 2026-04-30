@@ -57,7 +57,7 @@ export const statsStagioniProcedure = publicProcedure
 
       return Object.entries(aggregatedStats).map(([stagione, stats]) => ({
         stagione,
-        media: stats.media.toFixed(2),
+        media: Math.round(stats.media * 100) / 100,
         gol: stats.gol,
         assist: stats.assist,
         giocate: stats.giocate,
