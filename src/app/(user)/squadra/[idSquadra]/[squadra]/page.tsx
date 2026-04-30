@@ -17,12 +17,12 @@ export default async function SquadraPage({
 
   return (
     <Grid container justifyContent="center" spacing={0}>
-      <Grid item xs={12} md={2}>
+      <Grid item xs={12}>
         <Suspense fallback={<div>Caricamento...</div>}>
           <StatisticaSquadra idSquadra={idSquadra} />
         </Suspense>
       </Grid>
-      <Grid item xs={12} md={10}>
+      <Grid item xs={12}>
         <Suspense fallback={<div>Caricamento...</div>}>
           <Rosa
             idSquadra={idSquadra}

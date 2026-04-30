@@ -1,252 +1,188 @@
 'use client'
 import {
+  Avatar,
   Box,
-  Card,
-  CardContent,
-  CardMedia,
   CircularProgress,
   Divider,
-  Grid,
-  Tab,
-  Tabs,
   Typography,
   useMediaQuery,
 } from '@mui/material'
-import { useEffect, useState } from 'react'
+import { useMemo } from 'react'
 import { api } from '~/utils/api'
 import { useTheme } from '@mui/material/styles'
+import { type GiocatoreType } from '~/types/squadre'
 import {
-  type GiocatoreFormazioneType,
-  type GiocatoreType,
-} from '~/types/squadre'
+  DataGrid,
+  type GridColDef,
+  type GridRenderCellParams,
+} from '@mui/x-data-grid'
 import Modal from '../modal/Modal'
 import Giocatore from '../giocatori/Giocatore'
-
-interface TabPanelProps {
-  children?: React.ReactNode
-  dir?: string
-  index: number
-  value: number
-}
+import { useGiocatoreModal } from '../cardPartite/usePartitaParams'
 
 type RosaProps = {
   idSquadra: number
   squadra: string
 }
 
+const RUOLO_ORDER: Record<string, number> = { A: 0, C: 1, D: 2, P: 3 }
+
 function Rosa({ idSquadra, squadra }: RosaProps) {
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
 
-  const [selectedGiocatoreId, setSelectedGiocatoreId] = useState<number>()
-  const [openModalCalendario, setOpenModalCalendario] = useState(false)
+  const {
+    idGiocatore: selectedGiocatoreId,
+    openModalCalendario,
+    handleStatGiocatore: handleGiocatoreSelected,
+    handleModalClose,
+  } = useGiocatoreModal()
 
   const rosaList = api.squadre.getRosa.useQuery(
-    { idSquadra: idSquadra, includeVenduti: true },
+    { idSquadra, includeVenduti: true },
     { refetchOnWindowFocus: false, refetchOnReconnect: false },
   )
-  const [rosa, setRosa] = useState<GiocatoreFormazioneType[]>([])
-  const [value, setValue] = useState(3)
 
-  useEffect(() => {
-    if (rosaList.data) {
-      const rosaConRuolo = rosaList.data.map((giocatore: GiocatoreType) => ({
-        ...giocatore,
-        titolare: false,
-        riserva: null,
-      }))
-
-      setRosa(rosaConRuolo)
-    }
+  const { rosaAttiva, rosaVenduta } = useMemo(() => {
+    if (!rosaList.data) return { rosaAttiva: [], rosaVenduta: [] }
+    const attiva = rosaList.data
+      .filter((g: GiocatoreType) => !g.isVenduto)
+      .sort((a: GiocatoreType, b: GiocatoreType) =>
+        (RUOLO_ORDER[b.ruolo] ?? 9) - (RUOLO_ORDER[a.ruolo] ?? 9) || b.costo - a.costo,
+      )
+    const venduta = rosaList.data
+      .filter((g: GiocatoreType) => g.isVenduto)
+      .sort((a: GiocatoreType, b: GiocatoreType) =>
+        (RUOLO_ORDER[b.ruolo] ?? 9) - (RUOLO_ORDER[a.ruolo] ?? 9) || b.costo - a.costo,
+      )
+    return { rosaAttiva: attiva, rosaVenduta: venduta }
   }, [rosaList.data])
 
-  const handleGiocatoreSelected = async (idGiocatore: number | undefined) => {
-    setSelectedGiocatoreId(idGiocatore)
-    setOpenModalCalendario(true)
-  }
+  const columns: GridColDef[] = [
+    {
+      field: 'urlCampioncinoSmall',
+      headerName: '',
+      width: 40,
+      sortable: false,
+      filterable: false,
+      hideable: false,
+      renderCell: (params: GridRenderCellParams) => (
+        <Avatar
+          src={params.value as string}
+          alt={params.row.nome as string}
+          variant="square"
+          sx={{ width: 28, height: 28 }}
+        />
+      ),
+    },
+    {
+      field: 'ruolo',
+      headerName: 'Ruolo',
+      width: 90,
+      sortable: false,
+      filterable: false,
+      hideable: false,
+    },
+    {
+      field: 'nome',
+      headerName: 'Giocatore',
+      flex: 1,
+      minWidth: 120,
+      sortable: false,
+      filterable: false,
+      hideable: false,
+      renderCell: (params: GridRenderCellParams) => (
+        <Typography
+          variant="body2"
+          sx={{ cursor: 'pointer', color: 'primary.main', fontWeight: 500 }}
+          onClick={() => handleGiocatoreSelected(params.row.idGiocatore as number)}
+        >
+          {params.value as string}
+        </Typography>
+      ),
+    },
+    {
+      field: 'nomeSquadraSerieA',
+      headerName: 'Squadra',
+      flex: 1,
+      minWidth: 100,
+      sortable: false,
+      filterable: false,
+      hideable: false,
+    },
+    {
+      field: 'costo',
+      headerName: 'Costo',
+      width: 80,
+      type: 'number',
+      sortable: false,
+      filterable: false,
+      hideable: false,
+      valueFormatter: (value: number) => `${value.toFixed(0)} M€`,
+    },
+  ]
 
-  const handleModalClose = () => {
-    setOpenModalCalendario(false)
-  }
-
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue)
-  }
-
-  const renderRosa = (roles: string[], isVenduto: boolean) => {
-    const filteredRosa = rosa.filter(
-      (player) =>
-        roles.includes(player.ruolo) && player.isVenduto === isVenduto,
-    )
-    return (
-      <Grid container spacing={0}>
-        {filteredRosa.map((giocatore, index) => (
-          <Grid
-            key={index}
-            item
-            xs={6}
-            sm={1.5}
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              p: '10px',
-              mb: '10px',
-              flexWrap: 'wrap',
-            }}
-          >
-            <Card sx={{ marginBottom: '1px', maxWidth: '180px' }}>
-              <CardMedia
-                component="img"
-                sx={{ cursor: 'pointer', width: '60' }}
-                image={giocatore.urlCampioncino}
-                alt={giocatore.nome}
-                onClick={() => handleGiocatoreSelected(giocatore.idGiocatore)}
-              />
-              <CardContent sx={{ paddingBottom: '0px' }}>
-                <Typography
-                  gutterBottom
-                  variant="body2"
-                  sx={{
-                    fontSize: '10px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                  }}
-                  component="div"
-                >
-                  {giocatore.nome}
-                </Typography>
-                <Typography
-                  gutterBottom
-                  variant="body1"
-                  sx={{
-                    fontSize: '10px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                  }}
-                  component="div"
-                >
-                  {giocatore.nomeSquadraSerieA}
-                </Typography>
-                <Typography
-                  gutterBottom
-                  variant="body1"
-                  sx={{
-                    fontSize: '10px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                  }}
-                  component="div"
-                >
-                  {giocatore.ruoloEsteso}
-                </Typography>
-                <Typography
-                  gutterBottom
-                  variant="body1"
-                  sx={{
-                    fontSize: '10px',
-                    display: 'flex',
-                    justifyContent: 'center',
-                  }}
-                  component="div"
-                >
-                  {giocatore.costo.toFixed(0)} M€
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    )
-  }
-
-  function TabPanel(props: TabPanelProps) {
-    const { children, value, index, ...other } = props
-
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`full-width-tabpanel-${index}`}
-        aria-labelledby={`full-width-tab-${index}`}
-        {...other}
-      >
-        {value === index && children}
-      </div>
-    )
-  }
-
-  function a11yProps(index: number) {
-    return {
-      id: `full-width-tab-${index}`,
-      'aria-controls': `full-width-tabpanel-${index}`,
-    }
+  const gridSx = {
+    border: 'none',
+    '& .MuiDataGrid-columnHeaders': { bgcolor: 'action.hover' },
+    '& .MuiDataGrid-row:hover': { cursor: 'default' },
+    '& .MuiDataGrid-cell': { alignItems: 'center', display: 'flex' },
   }
 
   return (
     <>
-      <Grid container spacing={0}>
-        <Grid item xs={12}>
-          <Typography variant="h4">Rosa</Typography>
-        </Grid>
+      <Box>
+        <Typography variant="h4" sx={{ mb: 2 }}>Rosa</Typography>
+
         {rosaList.isLoading ? (
-          <Box
-            sx={{
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress color="warning" />
           </Box>
         ) : (
-          <Grid item xs={12}>
-            <Grid container spacing={0}>
-              <Grid item xs={12}>
-                <Tabs
-                  value={value}
-                  onChange={handleChange}
-                  indicatorColor="secondary"
-                  textColor="inherit"
-                  variant={isXs ? 'scrollable' : 'fullWidth'}
-                  sx={isXs ? { maxWidth: '350px' } : {}}
-                  scrollButtons="auto"
-                  aria-label="Rosa giocatori"
-                >
-                  <Tab label={isXs ? 'Por' : 'Portieri'} {...a11yProps(0)} />
-                  <Tab label={isXs ? 'Dif' : 'Difensori'} {...a11yProps(1)} />
-                  <Tab
-                    label={isXs ? 'Cen' : 'Centrocampisti'}
-                    {...a11yProps(2)}
-                  />
-                  <Tab label={isXs ? 'Att' : 'Attaccanti'} {...a11yProps(3)} />
-                  <Tab label={isXs ? 'Ex' : 'Venduti'} {...a11yProps(4)} />
-                </Tabs>
-              </Grid>
-              <Grid item xs={12}>
-                <TabPanel value={value} index={0} dir={theme.direction}>
-                  {renderRosa(['P'], false)}
-                </TabPanel>
-                <TabPanel value={value} index={1} dir={theme.direction}>
-                  {renderRosa(['D'], false)}
-                </TabPanel>
-                <TabPanel value={value} index={2} dir={theme.direction}>
-                  {renderRosa(['C'], false)}
-                </TabPanel>
-                <TabPanel value={value} index={3} dir={theme.direction}>
-                  {renderRosa(['A'], false)}
-                </TabPanel>
-                <TabPanel value={value} index={4} dir={theme.direction}>
-                  {renderRosa(['P', 'D', 'C', 'A'], true)}
-                </TabPanel>
-              </Grid>
-            </Grid>
-          </Grid>
+          <>
+            <DataGrid
+              rows={rosaAttiva}
+              columns={columns}
+              getRowId={(row: GiocatoreType) => row.idGiocatore}
+              disableRowSelectionOnClick
+              disableColumnSorting
+              hideFooter={rosaAttiva.length <= 100}
+              rowHeight={36}
+              sx={gridSx}
+              initialState={{
+                sorting: { sortModel: [{ field: 'ruolo', sort: 'desc' }] },
+              }}
+            />
+
+            {rosaVenduta.length > 0 && (
+              <Box sx={{ mt: 4 }}>
+                <Typography variant="h5" color="text.secondary" sx={{ mb: 1 }}>
+                  Giocatori ceduti
+                </Typography>
+                <Divider sx={{ mb: 1 }} />
+                <DataGrid
+                  rows={rosaVenduta}
+                  columns={columns}
+                  getRowId={(row: GiocatoreType) => row.idGiocatore}
+                  disableRowSelectionOnClick
+                  disableColumnSorting
+                  hideFooter={rosaVenduta.length <= 100}
+                  rowHeight={36}
+                  sx={{
+                    ...gridSx,
+                    '& .MuiDataGrid-row': { color: 'text.disabled' },
+                  }}
+                  initialState={{
+                    sorting: { sortModel: [{ field: 'ruolo', sort: 'asc' }] },
+                  }}
+                />
+              </Box>
+            )}
+          </>
         )}
-        <Grid item xs={12} sx={{ height: '100px' }}>
-          <></>
-        </Grid>
-      </Grid>
+
+        <Box sx={{ height: '100px' }} />
+      </Box>
 
       <Modal
         title={'Statistica giocatore'}
@@ -256,7 +192,7 @@ function Rosa({ idSquadra, squadra }: RosaProps) {
         height={isXs ? '98%' : ''}
       >
         <Divider />
-        <Box sx={{ mt: 1, gap: '0px', flexWrap: 'wrap' }}>
+        <Box sx={{ mt: 1 }}>
           {selectedGiocatoreId !== undefined && (
             <Giocatore idGiocatore={selectedGiocatoreId} />
           )}
