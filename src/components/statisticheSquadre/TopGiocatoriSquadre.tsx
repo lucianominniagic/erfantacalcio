@@ -146,19 +146,19 @@ export default function TopGiocatoriSquadre({ idTornei }: TopGiocatoriSquadrePro
                 </Stack>
                 <Divider sx={{ mb: 1 }} />
                 <StatRow
-                  icon={<StarOutlined fontSize="small" sx={{ color: '#FFC107' }} />}
+                  icon={<StarOutlined fontSize="small" sx={{ color: 'primary.main' }} />}
                   label="Top media"
                   entry={s.topMedia}
                   formatValue={(n) => n.toFixed(2)}
                 />
                 <StatRow
-                  icon={<ScoreOutlined fontSize="small" sx={{ color: '#4CAF50' }} />}
+                  icon={<ScoreOutlined fontSize="small" sx={{ color: 'success.main' }} />}
                   label="Top bomber"
                   entry={s.topBomber}
                   formatValue={(n) => `${n} gol`}
                 />
                 <StatRow
-                  icon={<EmojiEvents fontSize="small" sx={{ color: '#448AFF' }} />}
+                  icon={<EmojiEvents fontSize="small" sx={{ color: 'info.main' }} />}
                   label="Top assist"
                   entry={s.topAssist}
                   formatValue={(n) => `${n} ass.`}

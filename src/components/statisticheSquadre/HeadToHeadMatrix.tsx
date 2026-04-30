@@ -13,7 +13,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import { useTheme } from '@mui/material/styles'
+import { alpha, useTheme } from '@mui/material/styles'
 import { api } from '~/utils/api'
 
 interface HeadToHeadMatrixProps {
@@ -50,11 +50,15 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
     )
   }
 
+  const isDark = theme.palette.mode === 'dark'
+  const headerBg = isDark ? '#393027' : theme.palette.primary.dark
+  const headerColor = isDark ? theme.palette.secondary.main : '#fff'
+
   const cellColor = (v: number, n: number, p: number): string => {
-    if (v > p) return 'rgba(45, 223, 51, 0.32)'
-    if (p > v) return 'rgba(244, 67, 54, 0.4)'
+    if (v > p) return alpha(theme.palette.success.main, 0.25)
+    if (p > v) return alpha(theme.palette.error.main, 0.25)
     if (v + n + p === 0) return 'transparent'
-    return 'rgba(255, 193, 7, 0.4)'
+    return alpha(theme.palette.warning.main, 0.25)
   }
 
   return (
@@ -73,8 +77,8 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
                   left: 0,
                   zIndex: 2,
                   fontWeight: 700,
-                  background: '#393027',
-                  color: theme.palette.secondary.main,
+                  background: headerBg,
+                  color: headerColor,
                 }}
               >
                 Squadra
@@ -85,7 +89,6 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
                   align="center"
                   sx={{
                     minWidth: 90,
-                    background: '#393027',
                   }}
                 >
                   <Tooltip title={s.squadra}>
@@ -95,7 +98,6 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
                         flexDirection: 'column',
                         alignItems: 'center',
                         gap: 0.5,
-                        background: '#393027',
                       }}
                     >
                       {s.foto ? (
@@ -109,8 +111,7 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
-                          background: '#393027',
-                          color: theme.palette.text.primary,
+                          color: '#0d0d14',
                         }}
                       >
                         {s.squadra}
@@ -150,7 +151,7 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
                         key={colSquadra.idSquadra}
                         align="center"
                         sx={{
-                          backgroundColor: 'rgba(255,255,255,0.04)',
+                          backgroundColor: alpha(theme.palette.action.active, 0.06),
                           color: 'text.disabled',
                         }}
                       >

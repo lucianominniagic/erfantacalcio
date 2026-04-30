@@ -4,7 +4,9 @@ import { usePathname } from 'next/navigation'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import {
   Box,
+  Collapse,
   Drawer,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -16,17 +18,21 @@ import {
   Tooltip,
   Button,
 } from '@mui/material'
+import ExpandLess from '@mui/icons-material/ExpandLess'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import { useTheme } from '@mui/material/styles'
 import {
   AddAPhoto,
   AssignmentInd,
   Badge,
   Calculate,
   CalendarMonth,
+  DarkMode,
   Euro,
   FiberNew,
   Group,
   Groups,
-  HistoryEdu,
+  LightMode,
   ListAlt,
   ManageAccounts,
   Portrait,
@@ -40,6 +46,7 @@ import {
 import { RuoloUtente } from '~/utils/enums'
 import { Configurazione } from '~/config'
 import useSeasonal from '~/components/appbar/seasonalHooks'
+import { useThemeMode } from '~/theme/themeContext'
 
 export const SIDEBAR_WIDTH = 240
 
@@ -83,6 +90,7 @@ const adminItems: NavItem[] = [
 ]
 
 function SidebarNavItem({ item, isActive }: { item: NavItem; isActive: boolean }) {
+  const theme = useTheme()
   return (
     <ListItem disablePadding sx={{ mb: 0.5 }}>
       <ListItemButton
@@ -95,15 +103,15 @@ function SidebarNavItem({ item, isActive }: { item: NavItem; isActive: boolean }
           transition: 'all 0.15s ease',
           ...(isActive
             ? {
-                background: 'linear-gradient(135deg, rgba(255,143,0,0.18) 0%, rgba(255,193,7,0.10) 100%)',
-                borderLeft: '3px solid #FFC107',
-                '& .MuiListItemIcon-root': { color: '#FFC107' },
-                '& .MuiListItemText-secondary': { color: '#FFD54F !important' },
+                background: `linear-gradient(135deg, ${theme.palette.action.hover} 0%, ${theme.palette.action.hover} 100%)`,
+                borderLeft: `3px solid ${theme.palette.primary.main}`,
+                '& .MuiListItemIcon-root': { color: theme.palette.primary.main },
+                '& .MuiListItemText-secondary': { color: `${theme.palette.primary.light} !important` },
               }
             : {
                 '&:hover': {
-                  backgroundColor: 'rgba(255, 193, 7, 0.06)',
-                  '& .MuiListItemIcon-root': { color: '#FFC107' },
+                  backgroundColor: theme.palette.action.hover,
+                  '& .MuiListItemIcon-root': { color: theme.palette.primary.main },
                 },
               }),
         }}
@@ -111,7 +119,7 @@ function SidebarNavItem({ item, isActive }: { item: NavItem; isActive: boolean }
         <ListItemIcon
           sx={{
             minWidth: 36,
-            color: isActive ? '#FFC107' : 'text.secondary',
+            color: isActive ? 'primary.main' : 'text.secondary',
             fontSize: '1.1rem',
             '& .MuiSvgIcon-root': { fontSize: '1.1rem' },
           }}
@@ -124,7 +132,7 @@ function SidebarNavItem({ item, isActive }: { item: NavItem; isActive: boolean }
             sx: {
               fontSize: '0.78rem',
               fontWeight: isActive ? 600 : 400,
-              color: isActive ? '#FFD54F' : 'text.secondary',
+              color: isActive ? theme.palette.primary.light : 'text.secondary',
             },
           }}
         />
@@ -133,28 +141,51 @@ function SidebarNavItem({ item, isActive }: { item: NavItem; isActive: boolean }
   )
 }
 
-function SidebarSection({ title, items, pathname }: { title: string; items: NavItem[]; pathname: string }) {
+function SidebarSection({
+  title,
+  items,
+  pathname,
+  defaultOpen = true,
+}: {
+  title: string
+  items: NavItem[]
+  pathname: string
+  defaultOpen?: boolean
+}) {
+  const hasActiveItem = items.some((item) => pathname === item.href)
+  const [open, setOpen] = React.useState(defaultOpen || hasActiveItem)
   return (
-    <Box sx={{ mb: 1 }}>
-      <Typography
-        variant="overline"
-        sx={{
-          px: 2,
-          py: 0.5,
-          display: 'block',
-          fontSize: '0.65rem',
-          fontWeight: 700,
-          letterSpacing: '0.12em',
-          color: 'rgba(255,193,7,0.55)',
-        }}
+    <Box sx={{ mb: 0.5 }}>
+      <ListItemButton
+        onClick={() => setOpen((v) => !v)}
+        sx={{ py: 0.4, px: 2, borderRadius: '6px', mx: 1 }}
       >
-        {title}
-      </Typography>
-      <List dense disablePadding>
-        {items.map((item) => (
-          <SidebarNavItem key={item.key} item={item} isActive={pathname === item.href} />
-        ))}
-      </List>
+        <Typography
+          variant="overline"
+          sx={{
+            flex: 1,
+            fontSize: '0.65rem',
+            fontWeight: 700,
+            letterSpacing: '0.12em',
+            color: 'text.secondary',
+            opacity: 0.7,
+          }}
+        >
+          {title}
+        </Typography>
+        {open ? (
+          <ExpandLess sx={{ fontSize: '0.9rem', color: 'text.secondary', opacity: 0.5 }} />
+        ) : (
+          <ExpandMore sx={{ fontSize: '0.9rem', color: 'text.secondary', opacity: 0.5 }} />
+        )}
+      </ListItemButton>
+      <Collapse in={open} timeout="auto" unmountOnExit>
+        <List dense disablePadding>
+          {items.map((item) => (
+            <SidebarNavItem key={item.key} item={item} isActive={pathname === item.href} />
+          ))}
+        </List>
+      </Collapse>
     </Box>
   )
 }
@@ -163,16 +194,18 @@ function SidebarContent({ isXs }: { isXs: boolean }) {
   const { data: session } = useSession()
   const pathname = usePathname() ?? ''
   const { variant: seasonalVariant } = useSeasonal(isXs)
+  const theme = useTheme()
+  const { mode, toggleMode } = useThemeMode()
 
   const headerBg =
     seasonalVariant === 'christmas'
       ? 'linear-gradient(135deg, #0b6623 0%, #7a0000 100%)'
       : seasonalVariant === 'january'
         ? 'linear-gradient(180deg, #0960bd 0%, #1a2a40 100%)'
-        : 'linear-gradient(135deg, #0d0d14 0%, #1a1208 100%)'
+        : `linear-gradient(135deg, ${theme.palette.background.default} 0%, #1a1208 100%)`
 
   const titleColor =
-    seasonalVariant === 'january' ? '#82b1ff' : '#FFC107'
+    seasonalVariant === 'january' ? theme.palette.info.light : theme.palette.primary.main
 
   return (
     <Box
@@ -181,7 +214,7 @@ function SidebarContent({ isXs }: { isXs: boolean }) {
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        background: '#0f0f18',
+        background: theme.palette.background.default,
       }}
     >
       {/* Header */}
@@ -193,7 +226,7 @@ function SidebarContent({ isXs }: { isXs: boolean }) {
           pt: 2.5,
           pb: 2,
           background: headerBg,
-          borderBottom: '1px solid rgba(255,193,7,0.10)',
+          borderBottom: `1px solid ${theme.palette.divider}`,
           display: 'flex',
           alignItems: 'center',
           gap: 1,
@@ -231,7 +264,7 @@ function SidebarContent({ isXs }: { isXs: boolean }) {
           sx={{
             px: 2,
             py: 1.5,
-            borderBottom: '1px solid rgba(255,193,7,0.08)',
+            borderBottom: `1px solid ${theme.palette.divider}`,
             display: 'flex',
             alignItems: 'center',
             gap: 1.5,
@@ -240,7 +273,7 @@ function SidebarContent({ isXs }: { isXs: boolean }) {
           <Avatar
             src={session.user.image?.toString()}
             alt={session.user.squadra}
-            sx={{ width: 36, height: 36, border: '2px solid rgba(255,193,7,0.3)' }}
+            sx={{ width: 36, height: 36, border: `2px solid ${theme.palette.primary.main}`, opacity: 0.5 }}
           />
           <Box sx={{ overflow: 'hidden' }}>
             <Typography
@@ -276,26 +309,41 @@ function SidebarContent({ isXs }: { isXs: boolean }) {
 
         {session?.user && (
           <>
-            <Divider sx={{ mx: 2, my: 0.5, borderColor: 'rgba(255,193,7,0.08)' }} />
+            <Divider sx={{ mx: 2, my: 0.5 }} />
             <SidebarSection title="Il mio profilo" items={profiloItems} pathname={pathname} />
           </>
         )}
 
         {session?.user?.ruolo === RuoloUtente.admin && (
           <>
-            <Divider sx={{ mx: 2, my: 0.5, borderColor: 'rgba(255,193,7,0.08)' }} />
-            <SidebarSection title="Admin" items={adminItems} pathname={pathname} />
+            <Divider sx={{ mx: 2, my: 0.5 }} />
+            <SidebarSection title="Admin" items={adminItems} pathname={pathname} defaultOpen={false} />
           </>
         )}
       </Box>
 
-      {/* Bottom: sign in/out */}
+      {/* Bottom: theme toggle + sign in/out */}
       <Box
         sx={{
           p: 1.5,
-          borderTop: '1px solid rgba(255,193,7,0.08)',
+          borderTop: `1px solid ${theme.palette.divider}`,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
         }}
       >
+        {/* Theme toggle */}
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography variant="caption" color="text.secondary">
+            {mode === 'dark' ? 'Tema scuro' : 'Tema chiaro'}
+          </Typography>
+          <Tooltip title={mode === 'dark' ? 'Passa al tema chiaro' : 'Passa al tema scuro'}>
+            <IconButton size="small" onClick={toggleMode} sx={{ color: 'primary.main' }}>
+              {mode === 'dark' ? <LightMode fontSize="small" /> : <DarkMode fontSize="small" />}
+            </IconButton>
+          </Tooltip>
+        </Box>
+
         {!session ? (
           <Button
             fullWidth
@@ -329,6 +377,14 @@ function SidebarContent({ isXs }: { isXs: boolean }) {
 }
 
 export default function Sidebar({ mobileOpen, onMobileClose, isXs }: SidebarProps) {
+  const theme = useTheme()
+  const drawerSx = {
+    width: SIDEBAR_WIDTH,
+    boxSizing: 'border-box' as const,
+    borderRight: `1px solid ${theme.palette.divider}`,
+    background: theme.palette.background.default,
+  }
+
   return (
     <>
       {/* Desktop permanent sidebar */}
@@ -338,12 +394,7 @@ export default function Sidebar({ mobileOpen, onMobileClose, isXs }: SidebarProp
           display: { xs: 'none', md: 'block' },
           width: SIDEBAR_WIDTH,
           flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: SIDEBAR_WIDTH,
-            boxSizing: 'border-box',
-            borderRight: '1px solid rgba(255,193,7,0.10)',
-            background: '#0f0f18',
-          },
+          '& .MuiDrawer-paper': drawerSx,
         }}
         open
       >
@@ -358,12 +409,7 @@ export default function Sidebar({ mobileOpen, onMobileClose, isXs }: SidebarProp
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': {
-            width: SIDEBAR_WIDTH,
-            boxSizing: 'border-box',
-            borderRight: '1px solid rgba(255,193,7,0.10)',
-            background: '#0f0f18',
-          },
+          '& .MuiDrawer-paper': drawerSx,
         }}
       >
         <SidebarContent isXs={isXs} />

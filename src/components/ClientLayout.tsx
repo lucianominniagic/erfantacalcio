@@ -18,15 +18,19 @@ import { Configurazione } from '~/config'
 import Breadcrumb from '~/components/Breadcrumb'
 
 function MobileTopBar({ onMenuClick }: { onMenuClick: () => void }) {
+  const theme = useTheme()
+  const isDark = theme.palette.mode === 'dark'
   return (
     <AppBar
       position="fixed"
       sx={{
         display: { xs: 'flex', md: 'none' },
-        background: 'linear-gradient(135deg, #0d0d14 0%, #1a1208 100%)',
-        borderBottom: '1px solid rgba(255,193,7,0.12)',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
-        zIndex: (theme) => theme.zIndex.drawer + 1,
+        background: isDark
+          ? `linear-gradient(135deg, ${theme.palette.background.default} 0%, #1a1208 100%)`
+          : theme.palette.background.paper,
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        boxShadow: `0 2px 8px ${isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.12)'}`,
+        zIndex: (t) => t.zIndex.drawer + 1,
       }}
     >
       <Toolbar variant="dense" sx={{ gap: 1 }}>
@@ -35,16 +39,16 @@ function MobileTopBar({ onMenuClick }: { onMenuClick: () => void }) {
           edge="start"
           onClick={onMenuClick}
           size="small"
-          sx={{ color: '#FFC107' }}
+          sx={{ color: 'primary.main' }}
         >
           <MenuIcon />
         </IconButton>
-        <SportsSoccer sx={{ color: '#FFC107', fontSize: '1.2rem' }} />
+        <SportsSoccer sx={{ color: 'primary.main', fontSize: '1.2rem' }} />
         <Typography
           sx={{
             fontWeight: 700,
             fontSize: '0.9rem',
-            color: '#FFC107',
+            color: 'primary.main',
             letterSpacing: '-0.01em',
           }}
         >
@@ -56,6 +60,8 @@ function MobileTopBar({ onMenuClick }: { onMenuClick: () => void }) {
 }
 
 function Footer() {
+  const theme = useTheme()
+  const isDark = theme.palette.mode === 'dark'
   return (
     <Box
       component="footer"
@@ -63,8 +69,8 @@ function Footer() {
         width: '100%',
         py: 0.75,
         px: 2,
-        borderTop: '1px solid rgba(255,193,7,0.10)',
-        background: 'rgba(13,13,20,0.95)',
+        borderTop: `1px solid ${theme.palette.divider}`,
+        background: isDark ? 'rgba(13,13,20,0.95)' : theme.palette.background.paper,
         backdropFilter: 'blur(8px)',
         display: 'flex',
         justifyContent: 'space-between',
@@ -75,12 +81,12 @@ function Footer() {
     >
       <a href="mailto:lucianominni@gmail.com" style={{ textDecoration: 'none' }}>
         <Typography
-          sx={{ fontSize: '0.65rem', color: 'rgba(255,193,7,0.55)', fontWeight: 500 }}
+          sx={{ fontSize: '0.65rem', color: 'primary.main', fontWeight: 500, opacity: 0.7 }}
         >
           Powered by Luciano Minni
         </Typography>
       </a>
-      <Typography sx={{ fontSize: '0.65rem', color: 'rgba(255,193,7,0.35)' }}>
+      <Typography sx={{ fontSize: '0.65rem', color: 'text.secondary', opacity: 0.6 }}>
         Next.js · React · MUI · TypeORM
       </Typography>
     </Box>

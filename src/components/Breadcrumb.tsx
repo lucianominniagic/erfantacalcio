@@ -2,6 +2,7 @@
 import { Breadcrumbs, Link, Typography } from '@mui/material'
 import { Home, NavigateNext } from '@mui/icons-material'
 import { usePathname } from 'next/navigation'
+import { useTheme } from '@mui/material/styles'
 
 const PATH_LABELS: Record<string, string> = {
   '/formazione': 'Inserisci formazione',
@@ -52,6 +53,7 @@ function isAdminPath(pathname: string): boolean {
 
 export default function Breadcrumb() {
   const pathname = usePathname()
+  const theme = useTheme()
 
   if (HIDDEN_PATHS.includes(pathname)) return null
 
@@ -60,7 +62,7 @@ export default function Breadcrumb() {
 
   return (
     <Breadcrumbs
-      separator={<NavigateNext fontSize="small" sx={{ color: 'rgba(255,193,7,0.4)' }} />}
+      separator={<NavigateNext fontSize="small" sx={{ color: 'primary.main', opacity: 0.5 }} />}
       aria-label="breadcrumb"
       sx={{ mb: 1, mt: 0.5 }}
     >
@@ -71,18 +73,19 @@ export default function Breadcrumb() {
           display: 'flex',
           alignItems: 'center',
           gap: 0.5,
-          color: 'rgba(255,193,7,0.7)',
+          color: theme.palette.primary.main,
+          opacity: 0.75,
           fontSize: '0.75rem',
           fontWeight: 500,
-          '&:hover': { color: '#FFC107' },
-          transition: 'color 0.2s ease',
+          '&:hover': { opacity: 1 },
+          transition: 'opacity 0.2s ease',
         }}
       >
         <Home sx={{ fontSize: '0.95rem' }} />
         Home
       </Link>
       {isAdmin && (
-        <Typography sx={{ fontSize: '0.75rem', fontWeight: 500, color: 'rgba(255,193,7,0.5)' }}>
+        <Typography sx={{ fontSize: '0.75rem', fontWeight: 500, color: 'primary.main', opacity: 0.6 }}>
           Admin
         </Typography>
       )}
@@ -90,7 +93,7 @@ export default function Breadcrumb() {
         sx={{
           fontSize: '0.75rem',
           fontWeight: 600,
-          color: '#FFC107',
+          color: 'primary.main',
         }}
       >
         {label}
