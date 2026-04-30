@@ -7,10 +7,10 @@ import {
   Chip,
   Grid,
   Paper,
+  Skeleton,
   Stack,
   Tooltip,
   Typography,
-  useMediaQuery,
   useTheme,
 } from '@mui/material'
 import {
@@ -22,8 +22,6 @@ import {
   TrendingDown,
   TrendingUp,
 } from '@mui/icons-material'
-import { autosizeOptions } from '~/utils/datatable'
-import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { formatCurrency } from '~/utils/numberUtils'
 import { GenericCard } from '~/components/cards'
 
@@ -102,7 +100,6 @@ function PremioRow({ label, value, perc }: { label: string; value: number; perc:
 
 export default function Economia() {
   const theme = useTheme()
-  const isXs = useMediaQuery(theme.breakpoints.down('md'))
 
   const detrazioneSito = parseFloat(process.env.NEXT_PUBLIC_COSTI_DOMINIO ?? '0')
 
@@ -135,157 +132,30 @@ export default function Economia() {
     return premio
   }
 
-  const columns: GridColDef[] = [
-    { field: 'id', hideable: true },
-    {
-      field: 'squadra',
-      type: 'string',
-      align: 'left',
-      renderHeader: () => <strong>Squadra</strong>,
-      flex: isXs ? 0 : 1,
-    },
-    {
-      field: 'presidente',
-      type: 'string',
-      align: 'left',
-      renderHeader: () => <strong>Presidente</strong>,
-      flex: isXs ? 0 : 1,
-    },
-    {
-      field: 'importoAnnuale',
-      type: 'number',
-      align: 'right',
-      renderHeader: () => <strong>Quota</strong>,
-      width: 120,
-      valueFormatter: (value?: number) => value != null ? formatCurrency(value) : '',
-    },
-    {
-      field: 'importoMulte',
-      type: 'number',
-      align: 'right',
-      renderHeader: () => <strong>Multe</strong>,
-      width: 110,
-      valueFormatter: (value?: number) => value != null ? formatCurrency(value) : '',
-    },
-    {
-      field: 'importoMercato',
-      type: 'number',
-      align: 'right',
-      renderHeader: () => <strong>Mercato</strong>,
-      width: 110,
-      valueFormatter: (value?: number) => value != null ? formatCurrency(value) : '',
-    },
-    {
-      field: 'fantamilioni',
-      type: 'number',
-      align: 'right',
-      renderHeader: () => <strong>Fantamilioni</strong>,
-      width: 120,
-    },
-    {
-      field: 'saldo',
-      type: 'number',
-      align: 'right',
-      width: 160,
-      renderHeader: () => (
-        <Tooltip title={!finaleGiocata ? 'Finale Champions non ancora giocata' : ''}>
-          <strong>
-            Saldo{!finaleGiocata ? ' *' : ''}
-          </strong>
-        </Tooltip>
-      ),
-      valueGetter: (_value: unknown, row: { id: number; importoAnnuale?: number; importoMulte?: number; importoMercato?: number }) => {
-        if (!saldoData.data) return null
-        const pagato = (row.importoAnnuale ?? 0) + (row.importoMulte ?? 0) + (row.importoMercato ?? 0)
-        const premio = getPremio(row.id)
-        return premio - pagato
-      },
-      renderCell: (params) => {
-        if (!saldoData.data || params.value === null) return null
-        const saldo = params.value as number
-        const isPositive = saldo > 0
-        const isZero = saldo === 0
-        return (
-          <Chip
-            size="small"
-            icon={isZero ? <RemoveCircleOutline fontSize="small" /> : isPositive ? <TrendingUp fontSize="small" /> : <TrendingDown fontSize="small" />}
-            label={formatCurrency(Math.abs(saldo))}
-            color={isZero ? 'default' : isPositive ? 'success' : 'error'}
-            variant="outlined"
-            sx={{ fontWeight: 600, fontSize: '0.75rem' }}
-          />
-        )
-      },
-    },
-  ]
-
-  if (!isXs) {
-    columns.splice(1, 0, {
-      field: 'foto',
-      type: 'string',
-      align: 'left',
-      renderCell: (params) => (
-        <Avatar
-          src={params.row?.foto as string}
-          alt={params.row?.presidente as string}
-          sx={{ width: 24, height: 24 }}
-        />
-      ),
-      renderHeader: () => '',
-      width: 40,
-    })
-  }
-
-  const pageSize = 8
-  const skeletonRows = Array.from({ length: pageSize }, (_, index) => ({ id: `skeleton-${index}` }))
+  const isLoading = economiaList.isLoading || saldoData.isLoading
 
   return (
     <Stack spacing={2}>
       {/* Metric boxes */}
       <Grid container spacing={1.5}>
         <Grid item xs={6} sm={3}>
-          <MetricBox
-            label="Montepremi netto"
-            value={formatCurrency(montepremi)}
-            icon={<AccountBalanceWallet />}
-            color="primary"
-          />
+          <MetricBox label="Montepremi netto" value={formatCurrency(montepremi)} icon={<AccountBalanceWallet />} color="primary" />
         </Grid>
         <Grid item xs={6} sm={3}>
-          <MetricBox
-            label="Totale quote"
-            value={formatCurrency(importoAnnuale)}
-            icon={<MonetizationOn />}
-            color="info"
-          />
+          <MetricBox label="Totale quote" value={formatCurrency(importoAnnuale)} icon={<MonetizationOn />} color="info" />
         </Grid>
         <Grid item xs={6} sm={3}>
-          <MetricBox
-            label="Squadre partecipanti"
-            value={String(economiaList.data?.length ?? 0)}
-            icon={<Group />}
-            color="warning"
-          />
+          <MetricBox label="Squadre partecipanti" value={String(economiaList.data?.length ?? 0)} icon={<Group />} color="warning" />
         </Grid>
         <Grid item xs={6} sm={3}>
-          <MetricBox
-            label="Detrazione sito"
-            value={formatCurrency(detrazioneSito)}
-            icon={<RemoveCircleOutline />}
-            color="error"
-          />
+          <MetricBox label="Detrazione sito" value={formatCurrency(detrazioneSito)} icon={<RemoveCircleOutline />} color="error" />
         </Grid>
       </Grid>
 
       {/* Cards: Riepilogo + Premi */}
       <Grid container spacing={1.5}>
         <Grid item xs={12} sm={6}>
-          <GenericCard
-            title="Riepilogo versamenti"
-            titleVariant="h6"
-            avatar={<MonetizationOn color="primary" />}
-            showHeaderDivider
-          >
+          <GenericCard title="Riepilogo versamenti" titleVariant="h6" avatar={<MonetizationOn color="primary" />} showHeaderDivider>
             <Stack spacing={0}>
               {[
                 { label: 'Iscrizioni', value: importoAnnuale },
@@ -293,43 +163,23 @@ export default function Economia() {
                 { label: 'Mercato di riparazione', value: importoMercato },
                 { label: 'Detrazione sito', value: -detrazioneSito },
               ].map(({ label, value }) => (
-                <Box
-                  key={label}
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    py: 0.75,
-                    borderBottom: '1px solid',
-                    borderColor: 'divider',
-                    '&:last-child': { borderBottom: 'none' },
-                  }}
-                >
+                <Box key={label} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.75, borderBottom: '1px solid', borderColor: 'divider', '&:last-child': { borderBottom: 'none' } }}>
                   <Typography variant="body2" color="text.secondary">{label}</Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 600, color: value < 0 ? 'error.main' : 'text.primary' }}
-                  >
+                  <Typography variant="body2" sx={{ fontWeight: 600, color: value < 0 ? 'error.main' : 'text.primary' }}>
                     {formatCurrency(value)}
                   </Typography>
                 </Box>
               ))}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', pt: 1 }}>
                 <Typography variant="body2" sx={{ fontWeight: 700 }}>Totale montepremi</Typography>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                  {formatCurrency(montepremi)}
-                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 700, color: 'primary.main' }}>{formatCurrency(montepremi)}</Typography>
               </Box>
             </Stack>
           </GenericCard>
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <GenericCard
-            title="Premi stagionali"
-            titleVariant="h6"
-            avatar={<EmojiEvents color="warning" />}
-            showHeaderDivider
-          >
+          <GenericCard title="Premi stagionali" titleVariant="h6" avatar={<EmojiEvents color="warning" />} showHeaderDivider>
             <Stack spacing={0}>
               <PremioRow label="1° Classificato" value={calcolaPercentuale(montepremi, PERC_PRIMO)} perc={PERC_PRIMO} />
               <PremioRow label="2° Classificato" value={calcolaPercentuale(montepremi, PERC_SECONDO)} perc={PERC_SECONDO} />
@@ -340,42 +190,101 @@ export default function Economia() {
         </Grid>
       </Grid>
 
-      {/* DataGrid */}
+      {/* Squadre cards */}
       <Box>
         <Typography variant="h6" sx={{ mb: 1 }}>Economia squadre</Typography>
-        {!finaleGiocata && (
-          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-            * La finale Champions non è ancora stata giocata — il saldo è provvisorio e non include il premio Champions.
+        {!finaleGiocata && !isLoading && (
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1.5 }}>
+            * La finale Champions non è ancora stata giocata — il saldo è provvisorio.
           </Typography>
         )}
-        <Box sx={{ width: '100%', overflowX: 'auto', contain: 'inline-size' }}>
-          <DataGrid
-            columnHeaderHeight={45}
-            rowHeight={40}
-            loading={economiaList.isLoading || saldoData.isLoading}
-            initialState={{
-              columns: { columnVisibilityModel: { id: false } },
-              pagination: undefined,
-              filter: undefined,
-              density: 'compact',
-            }}
-            slotProps={{ loadingOverlay: { variant: 'skeleton' } }}
-            checkboxSelection={false}
-            disableColumnFilter={true}
-            disableColumnMenu={true}
-            disableColumnSelector={true}
-            disableColumnSorting={true}
-            disableColumnResize={true}
-            hideFooter={true}
-            hideFooterPagination={true}
-            hideFooterSelectedRowCount={true}
-            columns={columns}
-            rows={economiaList.isLoading ? skeletonRows : economiaList.data}
-            disableRowSelectionOnClick={true}
-            autosizeOptions={autosizeOptions}
-            sx={{ backgroundColor: theme.palette.background.paper }}
-          />
-        </Box>
+        <Grid container spacing={1.5}>
+          {isLoading
+            ? Array.from({ length: 8 }).map((_, i) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
+                  <Skeleton variant="rounded" height={180} />
+                </Grid>
+              ))
+            : [...(economiaList.data ?? [])]
+                .sort((a, b) => getPremio(b.id) - getPremio(a.id))
+                .map((squadra) => {
+                const pagato = (squadra.importoAnnuale ?? 0) + (squadra.importoMulte ?? 0) + (squadra.importoMercato ?? 0)
+                const premio = getPremio(squadra.id)
+                const saldo = premio - pagato
+                const saldoPositivo = saldo > 0
+                const saldoZero = saldo === 0
+
+                return (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={squadra.id}>
+                    <Paper
+                      elevation={1}
+                      sx={{
+                        p: 2,
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1.5,
+                        borderTop: `3px solid ${saldoZero ? theme.palette.divider : saldoPositivo ? theme.palette.success.main : theme.palette.error.main}`,
+                      }}
+                    >
+                      {/* Header: avatar + nome */}
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Avatar src={squadra.foto ?? undefined} alt={squadra.presidente ?? ''} sx={{ width: 36, height: 36 }} />
+                        <Box sx={{ overflow: 'hidden' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 700, lineHeight: 1.2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {squadra.squadra}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1 }}>
+                            {squadra.presidente}
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      {/* Stats grid */}
+                      <Grid container spacing={0.5}>
+                        {[
+                          { label: 'Quota', value: formatCurrency(squadra.importoAnnuale ?? 0) },
+                          { label: 'Multe', value: formatCurrency(squadra.importoMulte ?? 0) },
+                          { label: 'Mercato', value: formatCurrency(squadra.importoMercato ?? 0) },
+                          { label: 'Fantamilioni', value: squadra.fantamilioni != null ? `${squadra.fantamilioni} M` : '—' },
+                        ].map(({ label, value }) => (
+                          <Grid item xs={6} key={label}>
+                            <Box sx={{ bgcolor: 'action.hover', borderRadius: 1, px: 1, py: 0.5 }}>
+                              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.65rem', display: 'block' }}>
+                                {label}
+                              </Typography>
+                              <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.78rem' }}>
+                                {value}
+                              </Typography>
+                            </Box>
+                          </Grid>
+                        ))}
+                      </Grid>
+
+                      {/* Saldo */}
+                      <Box sx={{ mt: 'auto' }}>
+                        <Tooltip title={!finaleGiocata ? 'Provvisorio: finale Champions non ancora giocata' : saldoPositivo ? 'Importo da ricevere' : 'Importo da pagare'}>
+                          <Chip
+                            size="small"
+                            icon={
+                              saldoZero
+                                ? <RemoveCircleOutline fontSize="small" />
+                                : saldoPositivo
+                                  ? <TrendingUp fontSize="small" />
+                                  : <TrendingDown fontSize="small" />
+                            }
+                            label={`${saldoPositivo ? '+' : saldoZero ? '' : '-'}${formatCurrency(Math.abs(saldo))}${!finaleGiocata ? ' *' : ''}`}
+                            color={saldoZero ? 'default' : saldoPositivo ? 'success' : 'error'}
+                            variant="outlined"
+                            sx={{ fontWeight: 700, fontSize: '0.78rem', width: '100%', justifyContent: 'flex-start' }}
+                          />
+                        </Tooltip>
+                      </Box>
+                    </Paper>
+                  </Grid>
+                )
+              })}
+        </Grid>
       </Box>
     </Stack>
   )
