@@ -10,14 +10,12 @@ import {
   Stack,
   Alert,
   AlertTitle,
-  CardHeader,
   Select,
   MenuItem,
   type SelectChangeEvent,
   LinearProgress,
   FormControl,
   InputLabel,
-  Paper,
 } from '@mui/material'
 import LinearProgressBar from '~/components/LinearProgressBar/LinearProgressBar'
 import { api } from '~/utils/api'
@@ -26,6 +24,7 @@ import { CloudUpload } from '@mui/icons-material'
 import { type iVotoGiocatore } from '~/types/voti'
 import { z } from 'zod'
 import { calendarioSchema } from '~/schemas/calendario'
+import PageHeader from '~/components/PageHeader'
 
 export default function UploadVoti() {
   //#region select calendario
@@ -52,7 +51,6 @@ export default function UploadVoti() {
     if (calendarioList.data) {
       setCalendario(calendarioList.data)
       const idCalendario = getIdNextGiornata(calendarioList.data)
-      console.log(`Imposto calendario di default a ${idCalendario}`)
       setSelectedIdCalendario(idCalendario)
       setSelectedGiornataSerieA(getGiornataSerieA(idCalendario))
     }
@@ -224,26 +222,20 @@ export default function UploadVoti() {
   //#endregion
 
   return (
-    <Grid container justifyContent="center" spacing={0}>
-      <Grid item xs={12} md={6}>
-        {calendarioList.isLoading ? (
-          <Box
-            sx={{
-              width: '90%',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <LinearProgress color="inherit" />
-          </Box>
-        ) : (
-          <Paper elevation={3}>
-            <Card sx={{ maxWidth: 600, p: 1 }}>
-              <CardHeader
-                title="Upload file voti"
-                subheader="ammessi solo file .csv"
-                titleTypographyProps={{ variant: 'h4' }}
-              />
+    <Box>
+      <PageHeader
+        title="Upload voti"
+        subtitle="Carica il file CSV dei voti per la giornata selezionata"
+        Icon={CloudUpload}
+      />
+      <Grid container justifyContent="center" spacing={2}>
+        <Grid item xs={12} md={6}>
+          {calendarioList.isLoading ? (
+            <Box sx={{ mb: 2 }}>
+              <LinearProgress color="inherit" />
+            </Box>
+          ) : (
+            <Card elevation={2} sx={{ borderRadius: 2, p: 1 }}>
               <CardContent>
                 <Box sx={{ p: 1 }}>
                   <Stack
@@ -266,11 +258,7 @@ export default function UploadVoti() {
                         onChange={handleChangeCalendario}
                       >
                         {calendario.map((item) => (
-                          <MenuItem
-                            key={item.id}
-                            value={item.id.toString()}
-                            
-                          >
+                          <MenuItem key={item.id} value={item.id.toString()}>
                             {getDescrizioneGiornata(
                               item.giornataSerieA,
                               item.nome,
@@ -282,7 +270,6 @@ export default function UploadVoti() {
                       </Select>
                     </FormControl>
                     <Button
-                      color="info"
                       variant="contained"
                       component="div"
                       onClick={handleSelezioneFile}
@@ -297,7 +284,6 @@ export default function UploadVoti() {
                       id="upload-input"
                     />
                     <Button
-                      color="info"
                       variant="contained"
                       onClick={handleUploadVercel}
                       startIcon={<CloudUpload />}
@@ -318,10 +304,9 @@ export default function UploadVoti() {
                 </Box>
                 <Box sx={{ p: 1 }}>
                   {uploading && (
-                    <>
-                      <br />
+                    <Box sx={{ mt: 1 }}>
                       <LinearProgressBar progress={progress} />
-                    </>
+                    </Box>
                   )}
                   {alert && (
                     <Alert
@@ -335,13 +320,9 @@ export default function UploadVoti() {
                 </Box>
               </CardContent>
             </Card>
-          </Paper>
-        )}
+          )}
+        </Grid>
       </Grid>
-    </Grid>
+    </Box>
   )
-
-  /* function getGiornataSerieA(idCalendario: number | undefined) {
-        return calendarioList.data?.find(item => item.idCalendario === idCalendario)?.giornataSerieA ?? 0;
-    } */
 }

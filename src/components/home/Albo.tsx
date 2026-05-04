@@ -1,7 +1,7 @@
 'use client'
 import { Box, Card, CardContent, Skeleton, Typography, useTheme } from '@mui/material'
 import { EmojiEvents } from '@mui/icons-material'
-import { alpha } from '@mui/material/styles'
+import { alpha, darken } from '@mui/material/styles'
 import { api } from '~/utils/api'
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -81,8 +81,8 @@ export default function Albo() {
     refetchOnReconnect: false,
   })
 
-  const campionatoColor = isDark ? theme.palette.info.light : theme.palette.primary.main
-  const championsColor = isDark ? '#c084fc' : '#7c3aed'
+  const campionatoColor = theme.palette.info.light
+  const championsColor = theme.palette.champions.main
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -101,8 +101,8 @@ export default function Albo() {
                 <Box
                   sx={{
                     background: isDark
-                      ? 'linear-gradient(135deg, #78350f 0%, #92400e 50%, #b45309 100%)'
-                      : 'linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%)',
+                      ? `linear-gradient(135deg, ${darken(theme.palette.primary.main, 0.65)} 0%, ${darken(theme.palette.primary.main, 0.4)} 100%)`
+                      : `linear-gradient(135deg, ${theme.palette.primary.light} 0%, ${theme.palette.primary.dark} 100%)`,
                     px: 2,
                     py: 0.75,
                     display: 'flex',
@@ -110,12 +110,12 @@ export default function Albo() {
                     gap: 1,
                   }}
                 >
-                  <EmojiEvents sx={{ color: isDark ? '#fbbf24' : '#fff', fontSize: '1.1rem' }} />
+                  <EmojiEvents sx={{ color: isDark ? theme.palette.primary.light : theme.palette.common.white, fontSize: '1.1rem' }} />
                   <Typography
                     sx={{
                       fontWeight: 800,
                       fontSize: '1rem',
-                      color: isDark ? '#fbbf24' : '#fff',
+                      color: isDark ? theme.palette.primary.light : theme.palette.common.white,
                       letterSpacing: '0.04em',
                     }}
                   >

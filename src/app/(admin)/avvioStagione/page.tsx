@@ -9,13 +9,15 @@ import {
   Stepper,
   Step,
   StepLabel,
-  CircularProgress,
 } from '@mui/material'
 import { api } from '~/utils/api'
 import CheckIcon from '@mui/icons-material/CheckCircle'
+import PlayCircle from '@mui/icons-material/PlayCircle'
 import { Configurazione } from '~/config'
 import { messageSchema } from '~/schemas/messageSchema'
 import { z } from 'zod'
+import LoadingSpinner from '~/components/LinearProgressBar/LoadingSpinner'
+import PageHeader from '~/components/PageHeader'
 
 export default function AvvioStagione() {
   const faseNuovaStagione = api.nuovaStagione.getFaseAvvio.useQuery()
@@ -58,7 +60,6 @@ export default function AvvioStagione() {
       faseNuovaStagione.data
     ) {
       setErrorMessage('')
-      console.log(faseNuovaStagione.data)
       setActiveStep(faseNuovaStagione.data - 1)
     }
   }, [
@@ -108,34 +109,18 @@ export default function AvvioStagione() {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Typography sx={{ m: 2 }} variant="h3">
-        Avvio nuova stagione
-      </Typography>
+      <PageHeader title="Avvio nuova stagione" Icon={PlayCircle} />
       {faseNuovaStagione.isLoading ? (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-          }}
-        >
-          <CircularProgress color="info" />
-        </div>
+        <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
+          <LoadingSpinner />
+        </Box>
       ) : (
         <Stepper activeStep={activeStep}>
-          {steps.map((step) => {
-            const stepProps: { completed?: boolean } = {}
-            const labelProps: {
-              optional?: React.ReactNode
-              error?: boolean
-            } = {}
-            return (
-              <Step key={`step_${step.fase}`} {...stepProps}>
-                <StepLabel {...labelProps}>{step.label}</StepLabel>
-              </Step>
-            )
-          })}
+          {steps.map((step) => (
+            <Step key={`step_${step.fase}`}>
+              <StepLabel>{step.label}</StepLabel>
+            </Step>
+          ))}
         </Stepper>
       )}
       {activeStep === steps.length ? (
@@ -156,7 +141,6 @@ export default function AvvioStagione() {
               </Typography>
               <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
                 <Box sx={{ flex: '1 1 auto' }} />
-
                 <Button onClick={handleNext} disabled={disableButton}>
                   {activeStep === steps.length - 1 ? 'Completa' : 'Avvia'}
                 </Button>
@@ -164,22 +148,10 @@ export default function AvvioStagione() {
             </>
           )}
           {disableButton && (
-            <Stack
-              direction="column"
-              justifyContent="center"
-              sx={{
-                width: '100%',
-                m: 2,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, mt: 2 }}>
               <Typography variant="h5">Elaborazione in corso...</Typography>
-              <div>
-                <CircularProgress color="info" />
-              </div>
-            </Stack>
+              <LoadingSpinner />
+            </Box>
           )}
         </Fragment>
       )}

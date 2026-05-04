@@ -2,11 +2,10 @@
 import React, { useEffect, useState } from 'react'
 import { api } from '~/utils/api'
 import Modal from '~/components/modal/Modal'
-import { z } from 'zod'
 
 import CheckIcon from '@mui/icons-material/CheckCircle'
+import { Edit, Groups } from '@mui/icons-material'
 import {
-  CircularProgress,
   Divider,
   Typography,
   Checkbox,
@@ -16,10 +15,9 @@ import {
   TextField,
   Button,
   Box,
-  useTheme,
-  useMediaQuery,
   Grid,
 } from '@mui/material'
+import PageHeader from '~/components/PageHeader'
 import { type SquadraType } from '~/types/squadre'
 import {
   DataGrid,
@@ -27,12 +25,9 @@ import {
   type GridColDef,
 } from '@mui/x-data-grid'
 import { autosizeOptions } from '~/utils/datatable'
-import { Edit } from '@mui/icons-material'
 import { utenteSchema } from '~/schemas/presidente'
 
 export default function Presidenti() {
-  const theme = useTheme()
-  const isXs = useMediaQuery(theme.breakpoints.down('md'))
   const [idSquadra, setIdSquadra] = useState<number>()
 
   const squadreList = api.squadre.list.useQuery()
@@ -84,19 +79,19 @@ export default function Presidenti() {
       field: 'squadra',
       type: 'string',
       renderHeader: () => <strong>Squadra</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'presidente',
       type: 'string',
       renderHeader: () => <strong>Presidente</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'email',
       type: 'string',
       renderHeader: () => <strong>Email</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'isAdmin',
@@ -173,61 +168,44 @@ export default function Presidenti() {
 
   return (
     <>
-      {squadreList.isLoading ? (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
+      <PageHeader title="Squadre / Presidenti" Icon={Groups} />
+      <Box
+        sx={{ width: '100%', overflowX: 'auto', contain: 'inline-size' }}
+      >
+        <DataGrid
+          columnHeaderHeight={45}
+          rowHeight={40}
+          loading={squadreList.isLoading}
+          initialState={{
+            columns: {
+              columnVisibilityModel: {
+                id: false,
+              },
+            },
+            pagination: undefined,
+            filter: undefined,
+            density: 'compact',
           }}
-        >
-          <CircularProgress color="info" />
-        </div>
-      ) : (
-        <>
-          <Typography variant="h5">Squadre / Presidenti</Typography>
-          <Box
-            sx={{ width: '100%', overflowX: 'auto', contain: 'inline-size' }}
-          >
-            <DataGrid
-              columnHeaderHeight={45}
-              rowHeight={40}
-              loading={squadreList.isLoading}
-              initialState={{
-                columns: {
-                  columnVisibilityModel: {
-                    id: false,
-                  },
-                },
-                pagination: undefined,
-                filter: undefined,
-                density: 'compact',
-              }}
-              slotProps={{
-                loadingOverlay: {
-                  variant: 'skeleton',
-                },
-              }}
-              checkboxSelection={false}
-              disableColumnFilter={true}
-              disableColumnMenu={true}
-              disableColumnSelector={true}
-              disableColumnSorting={true}
-              disableColumnResize={true}
-              hideFooter={true}
-              hideFooterPagination={true}
-              hideFooterSelectedRowCount={true}
-              columns={columns}
-              rows={squadreList.isLoading ? skeletonRows : data}
-              disableRowSelectionOnClick={true}
-              autosizeOptions={autosizeOptions}
-              sx={{
-              }}
-            />
-          </Box>
-        </>
-      )}
+          slotProps={{
+            loadingOverlay: {
+              variant: 'skeleton',
+            },
+          }}
+          checkboxSelection={false}
+          disableColumnFilter={true}
+          disableColumnMenu={true}
+          disableColumnSelector={true}
+          disableColumnSorting={true}
+          disableColumnResize={true}
+          hideFooter={true}
+          hideFooterPagination={true}
+          hideFooterSelectedRowCount={true}
+          columns={columns}
+          rows={squadreList.isLoading ? skeletonRows : data}
+          disableRowSelectionOnClick={true}
+          autosizeOptions={autosizeOptions}
+        />
+      </Box>
 
       <Modal
         title="Modifica dati squadra"
@@ -351,29 +329,24 @@ export default function Presidenti() {
                 label={<Typography color="primary">Amministratore</Typography>}
               />
             </Grid>
-            <Grid item xs={5}>
-              <Button
-                type="submit"
-                fullWidth
-                color="info"
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Aggiorna dati
-              </Button>
-            </Grid>
-            <Grid item xs={2}></Grid>
-            <Grid item xs={5}>
-              <Button
-                type="button"
-                onClick={handleModalClose}
-                fullWidth
-                color="warning"
-                variant="outlined"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Chiudi
-              </Button>
+            <Grid item xs={12}>
+              <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 2 }}>
+                <Button
+                  type="button"
+                  onClick={handleModalClose}
+                  color="primary"
+                  variant="outlined"
+                >
+                  Chiudi
+                </Button>
+                <Button
+                  type="submit"
+          color="primary"
+          variant="contained"
+                >
+                  Aggiorna dati
+                </Button>
+              </Stack>
             </Grid>
             <Grid item xs={12}>
               {messageModal && (

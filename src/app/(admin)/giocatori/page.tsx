@@ -3,7 +3,6 @@ import {
   Alert,
   Box,
   Button,
-  CircularProgress,
   Grid,
   MenuItem,
   Select,
@@ -15,7 +14,6 @@ import {
   InputLabel,
   Paper,
   useTheme,
-  useMediaQuery,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
@@ -35,12 +33,13 @@ import { Configurazione } from '~/config'
 import dayjs from 'dayjs'
 import { convertFromIsoToDatetimeMUI } from '~/utils/dateUtils'
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid'
-import { BarChartOutlined } from '@mui/icons-material'
+import { BarChartOutlined, PersonSearch } from '@mui/icons-material'
+import PageHeader from '~/components/PageHeader'
 import { giocatoreSchema, trasferimentoSchema } from '~/schemas/giocatore'
+import LoadingSpinner from '~/components/LinearProgressBar/LoadingSpinner'
 
 export default function Giocatori() {
   const theme = useTheme()
-  const isXs = useMediaQuery(theme.breakpoints.down('md'))
 
   const [selectedGiocatoreId, setSelectedGiocatoreId] = useState<number>()
   const [selectedGiocatore, setSelectedGiocatore] = useState<string>()
@@ -139,7 +138,7 @@ export default function Giocatori() {
       type: 'string',
       align: 'left',
       renderHeader: () => <strong>ID P.F.</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
       sortable: true,
     },
     {
@@ -147,7 +146,7 @@ export default function Giocatori() {
       type: 'string',
       align: 'left',
       renderHeader: () => <strong>Ruolo</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
       sortable: true,
     },
     {
@@ -155,7 +154,7 @@ export default function Giocatori() {
       type: 'string',
       align: 'left',
       renderHeader: () => <strong>Squadra</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
       sortable: true,
     },
     {
@@ -163,7 +162,7 @@ export default function Giocatori() {
       type: 'string',
       align: 'left',
       renderHeader: () => <strong>Squadra serie A</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
       sortable: true,
     },
     {
@@ -171,7 +170,7 @@ export default function Giocatori() {
       type: 'date',
       align: 'left',
       renderHeader: () => <strong>Data acquisto</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
       sortable: true,
     },
     {
@@ -179,7 +178,7 @@ export default function Giocatori() {
       type: 'date',
       align: 'left',
       renderHeader: () => <strong>Data cessione</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
       sortable: true,
     },
     {
@@ -187,7 +186,7 @@ export default function Giocatori() {
       type: 'string',
       align: 'left',
       renderHeader: () => <strong>Stagione</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
       sortable: true,
     },
     {
@@ -195,7 +194,7 @@ export default function Giocatori() {
       type: 'number',
       align: 'right',
       renderHeader: () => <strong>Costo</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
       sortable: true,
     },
     {
@@ -216,7 +215,7 @@ export default function Giocatori() {
         }
         return []; // Nessuna azione se la stagione non è quella specificata
       },
-      width: isXs ? 90 : 100,
+      width: 100,
     },
   ]
 
@@ -390,7 +389,6 @@ export default function Giocatori() {
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault()
-    console.log('selectedGiocatoreId:', selectedGiocatoreId)
     setErrorMessageTrasferimento('')
     setMessageTrasferimento('')
     const responseVal = trasferimentoSchema.safeParse(trasferimento)
@@ -498,7 +496,7 @@ export default function Giocatori() {
       paddingTop={2}
       paddingBottom={2}
     >
-      <Typography variant="h5">Gestione giocatori</Typography>
+      <PageHeader title="Gestione giocatori" Icon={PersonSearch} />
       <GenericAutocomplete
         onItemSelected={(id, text) => {
           const numericId = typeof id === 'number' ? id : undefined
@@ -585,7 +583,6 @@ export default function Giocatori() {
                   <Button
                     type="button"
                     onClick={handleCancelGiocatore}
-                    color="warning"
                     variant="outlined"
                     sx={{ mt: 3, mb: 2 }}
                   >
@@ -604,7 +601,6 @@ export default function Giocatori() {
                   )}
                   <Button
                     type="submit"
-                    color="info"
                     variant="contained"
                     sx={{ mt: 3, mb: 2 }}
                   >
@@ -791,7 +787,6 @@ export default function Giocatori() {
                       <Button
                         type="button"
                         onClick={handleCancelTrasferimento}
-                        color="warning"
                         variant="outlined"
                         sx={{ mt: 3, mb: 2 }}
                       >
@@ -814,7 +809,6 @@ export default function Giocatori() {
                         Configurazione.stagione && (
                         <Button
                           type="submit"
-                          color="info"
                           variant="contained"
                           sx={{ mt: 3, mb: 2 }}
                         >
@@ -861,16 +855,9 @@ export default function Giocatori() {
       {trasferimentiList.isLoading &&
       !trasferimentiList.isSuccess &&
       selectedGiocatoreId !== undefined ? (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
-          }}
-        >
-          <CircularProgress color="info" />
-        </div>
+        <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
+          <LoadingSpinner />
+        </Box>
       ) : selectedGiocatoreId === undefined ? (
         <span></span>
       ) : (

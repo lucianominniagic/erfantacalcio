@@ -12,7 +12,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import { alpha, useTheme } from '@mui/material/styles'
+import { alpha, darken, useTheme } from '@mui/material/styles'
 import { useMediaQuery } from '@mui/material'
 import { api } from '~/utils/api'
 
@@ -52,8 +52,8 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
   }
 
   const isDark = theme.palette.mode === 'dark'
-  const headerBg = isDark ? '#393027' : theme.palette.primary.dark
-  const headerColor = isDark ? theme.palette.secondary.main : '#fff'
+  const headerBg = isDark ? darken(theme.palette.primary.dark, 0.72) : theme.palette.primary.dark
+  const headerColor = isDark ? theme.palette.secondary.main : theme.palette.common.white
 
   const cellColor = (v: number, n: number, p: number): string => {
     if (v > p) return alpha(theme.palette.success.main, 0.25)

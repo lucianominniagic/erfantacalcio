@@ -10,6 +10,7 @@ import {
   useTheme,
   useMediaQuery,
 } from '@mui/material'
+import { alpha, darken } from '@mui/material/styles'
 import { Menu as MenuIcon, SportsSoccer } from '@mui/icons-material'
 import { useState } from 'react'
 import ProvidersWrapper from '~/ProvidersWrapper'
@@ -25,11 +26,9 @@ function MobileTopBar({ onMenuClick }: { onMenuClick: () => void }) {
       position="fixed"
       sx={{
         display: { xs: 'flex', md: 'none' },
-        background: isDark
-          ? `linear-gradient(135deg, ${theme.palette.background.default} 0%, #1a1208 100%)`
-          : theme.palette.background.paper,
+        background: isDark ? `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${darken(theme.palette.primary.dark, 0.85)} 100%)` : theme.palette.background.paper,
         borderBottom: `1px solid ${theme.palette.divider}`,
-        boxShadow: `0 2px 8px ${isDark ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.12)'}`,
+        boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, isDark ? 0.4 : 0.12)}`,
         zIndex: (t) => t.zIndex.drawer + 1,
       }}
     >
@@ -70,7 +69,7 @@ function Footer() {
         py: 0.75,
         px: 2,
         borderTop: `1px solid ${theme.palette.divider}`,
-        background: isDark ? 'rgba(13,13,20,0.95)' : theme.palette.background.paper,
+        background: isDark ? alpha(theme.palette.background.default, 0.95) : theme.palette.background.paper,
         backdropFilter: 'blur(8px)',
         display: 'flex',
         justifyContent: 'space-between',

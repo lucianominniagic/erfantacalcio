@@ -3,7 +3,6 @@ import {
   Alert,
   Box,
   Button,
-  CircularProgress,
   Divider,
   FormControl,
   FormControlLabel,
@@ -14,9 +13,6 @@ import {
   Stack,
   Switch,
   TextField,
-  Typography,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
@@ -34,12 +30,12 @@ import {
   type GridColDef,
 } from '@mui/x-data-grid'
 import { autosizeOptions } from '~/utils/datatable'
-import { Edit } from '@mui/icons-material'
+import { Edit, GradingOutlined } from '@mui/icons-material'
+import PageHeader from '~/components/PageHeader'
 import { votoSchema } from '~/schemas/giocatore'
+import LoadingSpinner from '~/components/LinearProgressBar/LoadingSpinner'
 
 export default function Voti() {
-  const theme = useTheme()
-  const isXs = useMediaQuery(theme.breakpoints.down('md'))
   const [openModalEdit, setOpenModalEdit] = useState(false)
   const [selectedGiocatoreId, setSelectedGiocatoreId] = useState<number>()
   const [selectedVotoId, setSelectedVotoId] = useState<number>()
@@ -88,31 +84,31 @@ export default function Voti() {
       field: 'giornataSerieA',
       type: 'number',
       renderHeader: () => <strong>Giornata Serie A</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'torneo',
       type: 'string',
       renderHeader: () => <strong>Torneo</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'voto',
       type: 'number',
       renderHeader: () => <strong>Voto</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'gol',
       type: 'number',
       renderHeader: () => <strong>Gol</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'assist',
       type: 'number',
       renderHeader: () => <strong>Assist</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'actions',
@@ -180,7 +176,6 @@ export default function Voti() {
 
   const handleUpdateVoto = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    console.log('selectedGiocatoreId:', selectedGiocatoreId)
     setErrorMessageVoto('')
     setMessageVoto('')
     const responseVal = votoSchema.safeParse(voto)
@@ -228,7 +223,7 @@ export default function Voti() {
   return (
     <>
       <Stack direction="column" spacing={1} justifyContent="space-between">
-        <Typography variant="h5">Gestione voti</Typography>
+        <PageHeader title="Gestione voti" Icon={GradingOutlined} />
         <GenericAutocomplete
           onItemSelected={(id, text) => {
             const numericId = typeof id === 'number' ? id : undefined
@@ -239,16 +234,9 @@ export default function Voti() {
         {votiList.isLoading &&
         !votiList.isSuccess &&
         selectedGiocatoreId !== undefined ? (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100vh',
-            }}
-          >
-            <CircularProgress color="info" />
-          </div>
+          <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
+            <LoadingSpinner />
+          </Box>
         ) : selectedGiocatoreId === undefined ? (
           <span></span>
         ) : (
@@ -295,8 +283,6 @@ export default function Voti() {
                 rows={votiList.isLoading ? skeletonRows : voti}
                 disableRowSelectionOnClick={true}
                 autosizeOptions={autosizeOptions}
-                sx={{
-              }}
               />
             </Box>
           </>
@@ -509,29 +495,22 @@ export default function Voti() {
                 />
               </Stack>
             </Grid>
-            <Grid item xs={5}>
-              <Button
-                type="submit"
-                fullWidth
-                color="info"
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Aggiorna dati
-              </Button>
-            </Grid>
-            <Grid item xs={2}></Grid>
-            <Grid item xs={5}>
-              <Button
-                type="button"
-                onClick={handleModalClose}
-                fullWidth
-                color="warning"
-                variant="outlined"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Chiudi
-              </Button>
+            <Grid item xs={12}>
+              <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 2 }}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                >
+                  Aggiorna dati
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleModalClose}
+                  variant="outlined"
+                >
+                  Chiudi
+                </Button>
+              </Stack>
             </Grid>
             <Grid item xs={12}>
               {messageVoto && (

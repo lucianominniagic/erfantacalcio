@@ -46,5 +46,11 @@ export const lightThemeOptions: ThemeOptions = {
       secondary: '#4a4a6a',
     },
     divider: 'rgba(255, 143, 0, 0.2)',
+    champions: {
+      main: '#7c3aed',
+      light: '#a855f7',
+      dark: '#5b21b6',
+      contrastText: '#fff',
+    },
   },
 }

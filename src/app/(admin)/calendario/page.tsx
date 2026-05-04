@@ -6,8 +6,8 @@ import { z } from 'zod'
 
 //import material ui
 import CheckIcon from '@mui/icons-material/CheckCircle'
+import { CalendarMonth } from '@mui/icons-material'
 import {
-  CircularProgress,
   Grid,
   Divider,
   Alert,
@@ -23,9 +23,8 @@ import {
   FormControlLabel,
   Checkbox,
   Typography,
-  useTheme,
-  useMediaQuery,
 } from '@mui/material'
+import PageHeader from '~/components/PageHeader'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker'
@@ -42,9 +41,6 @@ import { calendarioSchema } from '~/schemas/calendario'
 
 
 export default function Calendario() {
-  const theme = useTheme()
-  const isXs = useMediaQuery(theme.breakpoints.down('md'))
-
   const [idCalendario, setIdCalendario] = useState<number>()
   const calendarioList = api.calendario.list.useQuery()
   const oneCalendario = api.calendario.getOne.useQuery(
@@ -105,25 +101,25 @@ export default function Calendario() {
       field: 'nome',
       type: 'string',
       renderHeader: () => <strong>Nome</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'giornataSerieA',
       type: 'number',
       renderHeader: () => <strong>Giornata Serie A</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'girone',
       type: 'number',
       renderHeader: () => <strong>Girone</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'gruppoFase',
       type: 'string',
       renderHeader: () => <strong>Gruppo fase</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'data',
@@ -135,13 +131,13 @@ export default function Calendario() {
         return ''
       },
       renderHeader: () => <strong>Data</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'giornata',
       type: 'number',
       renderHeader: () => <strong>Giornata</strong>,
-      flex: isXs ? 0 : 1,
+      flex: 1,
     },
     {
       field: 'isSovrapposta',
@@ -217,7 +213,6 @@ export default function Calendario() {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = event.currentTarget
-    console.log(event.currentTarget)
     setCalendarioInModifica((prevState) => ({
       ...prevState,
       [name]:
@@ -242,71 +237,51 @@ export default function Calendario() {
 
   return (
     <>
-      {calendarioList.isLoading ? (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh',
+      <PageHeader title="Gestione calendario" Icon={CalendarMonth} />
+      <Box
+        sx={{ width: '100%', overflowX: 'auto', contain: 'inline-size' }}
+      >
+        <DataGrid
+          columnHeaderHeight={45}
+          rowHeight={40}
+          loading={calendarioList.isLoading}
+          initialState={{
+            columns: {
+              columnVisibilityModel: {
+                id: false,
+              },
+            },
+            pagination: {
+              paginationModel: {
+                pageSize: 25,
+              },
+            },
+            filter: undefined,
+            density: 'compact',
           }}
-        >
-          <CircularProgress color="info" />
-        </div>
-      ) : (
-        <>
-          <Typography variant="h5">Gestione calendario</Typography>
-          <Box
-            sx={{ width: '100%', overflowX: 'auto', contain: 'inline-size' }}
-          >
-            <DataGrid
-              columnHeaderHeight={45}
-              rowHeight={40}
-              loading={calendarioList.isLoading}
-              initialState={{
-                columns: {
-                  columnVisibilityModel: {
-                    id: false,
-                  },
-                },
-                pagination: {
-                  paginationModel: {
-                    pageSize: 25,
-                  },
-                },
-                filter: undefined,
-                density: 'compact',
-              }}
-              slotProps={{
-                loadingOverlay: {
-                  variant: 'skeleton',
-                },
-              }}
-              checkboxSelection={false}
-              disableColumnFilter={true}
-              disableColumnMenu={true}
-              disableColumnSelector={true}
-              disableColumnSorting={false}
-              disableColumnResize={true}
-              hideFooter={false}
-              hideFooterPagination={false}
-              pageSizeOptions={[5, 10, 20]}
-              paginationMode="client"
-              pagination={true}
-              hideFooterSelectedRowCount={true}
-              columns={columns}
-              rows={calendarioList.isLoading ? skeletonRows : data}
-              disableRowSelectionOnClick={true}
-              autosizeOptions={autosizeOptions}
-              sx={{
-              }}
-            />
-          </Box>
-          <br></br>
-          <br></br>
-          <br></br>
-        </>
-      )}
+          slotProps={{
+            loadingOverlay: {
+              variant: 'skeleton',
+            },
+          }}
+          checkboxSelection={false}
+          disableColumnFilter={true}
+          disableColumnMenu={true}
+          disableColumnSelector={true}
+          disableColumnSorting={false}
+          disableColumnResize={true}
+          hideFooter={false}
+          hideFooterPagination={false}
+          pageSizeOptions={[5, 10, 20]}
+          paginationMode="client"
+          pagination={true}
+          hideFooterSelectedRowCount={true}
+          columns={columns}
+          rows={calendarioList.isLoading ? skeletonRows : data}
+          disableRowSelectionOnClick={true}
+          autosizeOptions={autosizeOptions}
+        />
+      </Box>
 
       <Modal
         title="Modifica dati calendario"
@@ -439,29 +414,24 @@ export default function Calendario() {
                 label={<Typography color="primary">Sovrapposta</Typography>}
               />
             </Grid>
-            <Grid item xs={5}>
-              <Button
-                type="submit"
-                fullWidth
-                color="info"
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Aggiorna dati
-              </Button>
-            </Grid>
-            <Grid item xs={2}></Grid>
-            <Grid item xs={5}>
-              <Button
-                type="button"
-                onClick={handleModalClose}
-                fullWidth
-                color="warning"
-                variant="outlined"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Chiudi
-              </Button>
+            <Grid item xs={12}>
+              <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 2 }}>
+                <Button
+                  type="button"
+                  onClick={handleModalClose}
+                  color="primary"
+                  variant="outlined"
+                >
+                  Chiudi
+                </Button>
+                <Button
+                  type="submit"
+                  color="primary"
+                  variant="contained"
+                >
+                  Aggiorna dati
+                </Button>
+              </Stack>
             </Grid>
             <Grid item xs={12}>
               {messageModal && (

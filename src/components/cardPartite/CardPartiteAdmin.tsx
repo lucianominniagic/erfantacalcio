@@ -140,10 +140,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
       actions={
         <Button
           type="submit"
-          fullWidth
-          color="info"
           variant="contained"
-          sx={{ mt: 3, mb: 2 }}
         >
           Aggiorna dati
         </Button>
