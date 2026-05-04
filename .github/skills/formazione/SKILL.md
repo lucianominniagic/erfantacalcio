@@ -1,8 +1,0 @@
----
-name: formazione
-description: "Miglioramento dell'interfaccia di inserimento formazione utente"
----
-
-# Descrizione
-Questa skill si concentra sul miglioramento dell'interfaccia di inserimento della formazione utente. L'obiettivo è rendere il processo di inserimento più intuitivo e user-friendly, consentendo agli utenti di selezionare facilmente i giocatori e visualizzare un'anteprima della formazione prima di confermare l'inserimento.
-Durante l'anteprima della formazione, gli utenti avranno la possibilità di modificare, spostare o rimuovere i giocatori per adattare meglio la formazione alle proprie strategie. voglio usare un solo componente sia per la versione mobile che per quella desktop, in modo da garantire un'esperienza coerente su tutti i dispositivi. Il componente sarà progettato per essere responsive, adattandosi automaticamente alle dimensioni dello schermo e offrendo un'interfaccia ottimizzata sia per dispositivi mobili che per desktop. In questo modo, gli utenti potranno inserire la loro formazione in modo semplice e veloce, indipendentemente dal dispositivo che stanno utilizzando. voglio che valuti il componente già esistente formazionexs.tsx; voglio che elimini l'attuale componente formazione.tsx e che tu lo sostituisca con formazionexs.tsx, adattandolo per essere utilizzato sia su mobile che su desktop. voglio che tu mantenga tutte le funzionalità attuali del componente formazionexs.tsx, ma che le adatti per funzionare in modo ottimale su entrambi i tipi di dispositivi. voglio che tu testassi il nuovo componente formazionexs.tsx su diversi dispositivi e risoluzioni per assicurarti che funzioni correttamente e offra un'esperienza utente coerente.
