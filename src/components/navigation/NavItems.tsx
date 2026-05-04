@@ -87,13 +87,13 @@ export function guestListItems(isXs: boolean, isAuthenticated: boolean) {
           listItem(
             'guest_profilo_1',
             `/formazione?isXs=${isXs}`,
-            'Inserisci formazione',
+            'Formazione',
             <FiberNew color="success" />,
           ),
           listItem(
             'guest_profilo_2',
             `/maglia`,
-            'Cambia maglia',
+            'Maglia',
             <AssignmentInd color="info" />,
           ),
           listItem(

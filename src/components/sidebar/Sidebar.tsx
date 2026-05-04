@@ -72,8 +72,8 @@ const legaItems: NavItem[] = [
 ]
 
 const profiloItems: NavItem[] = [
-  { key: 'formazione', label: 'Inserisci formazione', href: '/formazione', icon: <FiberNew color="success" /> },
-  { key: 'maglia', label: 'Cambia maglia', href: '/maglia', icon: <AssignmentInd color="info" /> },
+  { key: 'formazione', label: 'Formazione', href: '/formazione', icon: <FiberNew color="success" /> },
+  { key: 'maglia', label: 'Maglia', href: '/maglia', icon: <AssignmentInd color="info" /> },
   { key: 'foto', label: 'Foto profilo', href: '/foto', icon: <Badge color="success" /> },
 ]
 
@@ -84,7 +84,7 @@ const adminItems: NavItem[] = [
   { key: 'presidenti', label: 'Squadre', href: '/presidenti', icon: <Group /> },
   { key: 'giocatori', label: 'Giocatori', href: '/giocatori', icon: <ManageAccounts /> },
   { key: 'voti', label: 'Voti', href: '/voti', icon: <ThumbsUpDown /> },
-  { key: 'avvioStagione', label: 'Nuova stagione', href: '/avvioStagione', icon: <AddAPhoto /> },
+  { key: 'avvioStagione', label: 'Nuova stagione', href: '/avvioStagione', icon: <FiberNew /> },
 ]
 
 function SidebarNavItem({ item, isActive }: { item: NavItem; isActive: boolean }) {

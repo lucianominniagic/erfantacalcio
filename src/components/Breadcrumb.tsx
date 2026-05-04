@@ -5,10 +5,10 @@ import { usePathname } from 'next/navigation'
 import { useTheme } from '@mui/material/styles'
 
 const PATH_LABELS: Record<string, string> = {
-  '/formazione': 'Inserisci formazione',
+  '/formazione': 'Formazione',
   '/formazioni': 'Formazioni',
   '/tabellini': 'Tabellini',
-  '/maglia': 'Cambia maglia',
+  '/maglia': 'Maglia',
   '/foto': 'Foto profilo',
   '/statistiche_giocatori': 'Statistiche giocatori',
   '/statistiche_squadre': 'Statistiche squadre',
