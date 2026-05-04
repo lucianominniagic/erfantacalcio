@@ -1,16 +1,16 @@
 import { Grid } from '@mui/material'
 import { Suspense } from 'react'
 import Rosa from '~/components/squadra/Rosa'
-import StatisticaSquadra from '~/components/squadra/Squadra';
+import StatisticaSquadra from '~/components/squadra/Squadra'
 
 export default async function SquadraPage({
   params,
 }: {
-  params: Promise<{ idSquadra: string; squadra: string }>
+  params: Promise<{ idSquadra: string }>
 }) {
-  const { idSquadra: idSquadraStr, squadra } = await params
+  const { idSquadra: idSquadraStr } = await params
   const idSquadra = Number(idSquadraStr)
-  
+
   if (isNaN(idSquadra)) {
     return <p>Errore: ID Squadra non valido</p>
   }
@@ -24,10 +24,7 @@ export default async function SquadraPage({
       </Grid>
       <Grid item xs={12}>
         <Suspense fallback={<div>Caricamento...</div>}>
-          <Rosa
-            idSquadra={idSquadra}
-            squadra={squadra.replace('%20', ' ')}
-          />
+          <Rosa idSquadra={idSquadra} />
         </Suspense>
       </Grid>
     </Grid>

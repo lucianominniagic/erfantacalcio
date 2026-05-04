@@ -18,7 +18,6 @@ import { useGiocatoreModal } from '../cardPartite/usePartitaParams'
 
 type RosaProps = {
   idSquadra: number
-  squadra: string
 }
 
 const RUOLO_ORDER: Record<string, number> = { A: 0, C: 1, D: 2, P: 3 }
@@ -101,7 +100,7 @@ function RosaList({ giocatori, onSelect, dimmed = false, truncateSquad = false }
   )
 }
 
-function Rosa({ idSquadra, squadra }: RosaProps) {
+function Rosa({ idSquadra }: RosaProps) {
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
 

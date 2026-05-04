@@ -53,7 +53,7 @@ export default function Squadre() {
           {squadreList.data?.map((squadra) => (
             <Grid item xs={3} key={squadra.id}>
               <Link
-                href={`/squadra/${squadra.id}/${squadra.squadra}`}
+                href={`/squadra/${squadra.id}`}
                 style={{ textDecoration: 'none' }}
               >
                 <Card
@@ -111,7 +111,7 @@ export default function Squadre() {
       {squadreList.data?.map((squadra) => (
         <Link
           key={squadra.id}
-          href={`/squadra/${squadra.id}/${squadra.squadra}`}
+          href={`/squadra/${squadra.id}`}
           style={{ textDecoration: 'none' }}
         >
           <Card
