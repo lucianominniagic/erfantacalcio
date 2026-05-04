@@ -1,3 +1,4 @@
+'use client'
 import React from 'react'
 import { api } from '~/utils/api'
 import {
