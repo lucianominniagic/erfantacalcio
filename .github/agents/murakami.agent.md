@@ -43,49 +43,49 @@ Each specialist is a dedicated sub-agent. Delegate to them via the `task` tool u
 
 ### Standard delegation pattern
 ```
-task(agent_type: "cormac-mccarthy", prompt: "...<full context>...")
-task(agent_type: "jonathan-coe",    prompt: "...<full context>...")
+task(agent_type: "mccarthy", prompt: "...<full context>...")
+task(agent_type: "coe",      prompt: "...<full context>...")
 ```
 
 ### Parallel delegation (when tasks are independent)
 Launch multiple agents in the same response when their work does not depend on each other:
 ```
 // Both can run simultaneously
-task(agent_type: "cormac-mccarthy", ...)   → builds the API procedure
-task(agent_type: "jonathan-coe",    ...)   → builds the UI component
+task(agent_type: "mccarthy", ...)   → builds the API procedure
+task(agent_type: "coe",      ...)   → builds the UI component
 ```
 
 ### Sequential delegation (when there are dependencies)
 Wait for the first agent to complete before launching the next:
 ```
 // Step 1: define schema
-task(agent_type: "cixin-liu", ...)         → creates the entity + migration
+task(agent_type: "dostojevskij", ...)  → creates the entity + migration
 
 // Step 2 (after step 1 completes): use the new entity
-task(agent_type: "cormac-mccarthy", ...)   → writes the procedure using the new entity
+task(agent_type: "mccarthy", ...)      → writes the procedure using the new entity
 ```
 
 ### Typical task flows
 
 **New feature (full stack):**
-1. `cixin-liu` — entity/migration (if new data needed)
+1. `dostojevskij` — entity/migration (if new data needed)
 2. `ishiguro` — Zod schema for the new procedure
-3. `cormac-mccarthy` — tRPC procedure
-4. `jonathan-coe` — page/component
-5. `bjorn-larsson` — theme tokens (if new visual elements)
+3. `mccarthy` — tRPC procedure
+4. `coe` — page/component
+5. `asimov` — theme tokens (if new visual elements)
 6. `dick` — tests for the business logic
 
 **Backend-only change:**
-1. `cormac-mccarthy` — procedure logic
+1. `mccarthy` — procedure logic
 2. `dick` — unit tests
 
 **Schema/DB change:**
-1. `cixin-liu` — entity + migration
-2. `cormac-mccarthy` — update affected procedures
+1. `dostojevskij` — entity + migration
+2. `mccarthy` — update affected procedures
 
 **Auth change:**
-1. `william-gibson` — auth config / JWT / guards
-2. `cormac-mccarthy` — update affected procedures
+1. `gibson` — auth config / JWT / guards
+2. `mccarthy` — update affected procedures
 
 **Deploy to production:**
 1. `pasolini` — migration check, build verification, deploy
