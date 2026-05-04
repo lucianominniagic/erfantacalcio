@@ -69,24 +69,32 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
         Bilancio scontri diretti (riga = squadra di casa). Verde =
         bilancio favorevole, giallo = pareggio, rosso = sfavorevole.
       </Typography>
-      <TableContainer
-        component={Paper}
+      {/* Wrapper handles the scroll shadow trick without interfering with sticky stacking context */}
+      <Box
         sx={{
-          overflowX: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          // shadow gradient to hint scrollability on mobile
-          background: `
-            linear-gradient(to right, ${theme.palette.background.paper} 30%, transparent),
-            linear-gradient(to right, transparent, ${theme.palette.background.paper} 70%) 100% 0,
-            radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.15), transparent),
-            radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.15), transparent) 100% 0
-          `,
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: '40px 100%, 40px 100%, 14px 100%, 14px 100%',
-          backgroundAttachment: 'local, local, scroll, scroll',
+          position: 'relative',
+          // right shadow: appears when there is content to scroll right
+          '&::after': {
+            content: '""',
+            pointerEvents: 'none',
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            bottom: 0,
+            width: 24,
+            background: `linear-gradient(to right, transparent, ${alpha(theme.palette.common.black, 0.08)})`,
+            zIndex: 3,
+          },
         }}
       >
-        <Table size="small" sx={{ minWidth: 'max-content' }}>
+        <TableContainer
+          component={Paper}
+          sx={{
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          <Table size="small" sx={{ minWidth: 'max-content', borderCollapse: 'separate', borderSpacing: 0 }}>
           <TableHead>
             <TableRow>
               <TableCell
@@ -210,7 +218,8 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+        </TableContainer>
+      </Box>
       {isMobile && (
         <Typography
           variant="caption"
