@@ -200,7 +200,7 @@ function Formazione() {
                           ? resetFormazione(e.target.value as number)
                           : setIdPartita(0)
                       }
-                      defaultValue={giornate[0]?.idTorneo}
+                      defaultValue={giornate.length > 1 ? 0 : giornate[0]?.idTorneo}
                     >
                       <MenuItem value={0} key="giornata_0">
                         Salva entrambe le formazioni

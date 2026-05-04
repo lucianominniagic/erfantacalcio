@@ -81,7 +81,11 @@ export function useFormazioneState() {
         checkDataFormazione(calendarioProssima.data[0]?.data)
       ) {
         setEnableRosa(true)
-        setIdTorneo(calendarioProssima.data[0]?.idTorneo)
+        // When multiple giornate, load campionato (girone === null) by default
+        const campionato =
+          calendarioProssima.data.find((g) => g.girone === null) ??
+          calendarioProssima.data[0]
+        setIdTorneo(campionato?.idTorneo)
       } else {
         setMessage('Formazione non rilasciabile')
       }
