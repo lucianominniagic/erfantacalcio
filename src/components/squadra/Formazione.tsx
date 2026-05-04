@@ -7,8 +7,11 @@ import {
   SportsSoccer,
 } from '@mui/icons-material'
 import {
+  Alert,
   Box,
+  Button,
   CircularProgress,
+  Divider,
   Grid,
   IconButton,
   List,
@@ -16,22 +19,19 @@ import {
   ListItemText,
   MenuItem,
   Select,
+  Snackbar,
+  Stack,
   Tooltip,
   Typography,
-  Stack,
-  Button,
-  Snackbar,
-  Alert,
-  Divider,
-  Slide,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import React from 'react'
 import { getShortName } from '~/utils/helper'
 import { type GiocatoreFormazioneType } from '~/types/squadre'
-import Image from 'next/image'
 import Modal from '../modal/Modal'
 import Giocatore from '../giocatori/Giocatore'
-import { getMatch, getPlayerStylePosition } from './utils'
+import { getMatch } from './utils'
 import Statistica from './Statistica'
 import { useFormazioneState } from './useFormazioneState'
 
@@ -52,8 +52,6 @@ function Formazione() {
     enableRosa,
     message,
     giornate,
-    idTorneo,
-    setIdTorneo,
     setIdPartita,
     rosa,
     campo,
@@ -69,36 +67,44 @@ function Formazione() {
     resetFormazione,
   } = useFormazioneState()
 
-  const styleCampo = {
-    borderStyle: 'none',
-    borderWidth: '0px',
-    borderColor: '#E4221F',
-    position: 'relative',
-    width: '95%',
-    aspectRatio: '360 / 509',
-    backgroundRepeat: 'no-repeat',
-    backgroundSize: 'cover',
-    backgroundImage: "url('images/campo.jpg')",
-  }
-  const styleRosa = {
-    borderStyle: 'none',
-    borderWidth: '0px',
-    borderColor: '#E4221F',
-  }
+  const theme = useTheme()
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'))
 
-  // kept inline — only used in Formazione (desktop view)
-  const renderRosa = (roles: string[], columns: number, title: string) => {
-    const filteredRosa = rosa.filter((player) => roles.includes(player.ruolo))
-    const filteredPanca = panca.filter((player) => roles.includes(player.ruolo))
+  const renderRosa = (roles: string[], title: string) => {
+    const mergedPlayers = [
+      ...rosa.filter((p) => roles.includes(p.ruolo)).map((p) => ({ ...p, status: 'rosa' as const })),
+      ...campo.filter((p) => roles.includes(p.ruolo)).map((p) => ({ ...p, status: 'campo' as const })),
+      ...panca.filter((p) => roles.includes(p.ruolo)).map((p) => ({ ...p, status: 'panca' as const })),
+    ]
+
+    const renderStatusIcon = (player: GiocatoreFormazioneType & { status: 'rosa' | 'campo' | 'panca' }) => {
+      if (player.status === 'campo') {
+        return (
+          <Tooltip title="Titolare">
+            <IconButton>
+              <SportsSoccer color="success" />
+            </IconButton>
+          </Tooltip>
+        )
+      }
+      if (player.status === 'panca') {
+        return (
+          <Tooltip title={`Riserva ${player.riserva}`}>
+            <IconButton>{filterIcons[(player.riserva ?? 7) - 1]}</IconButton>
+          </Tooltip>
+        )
+      }
+      return null
+    }
 
     return (
-      <Grid item sm={columns} xs={12}>
+      <Grid item xs={12} md={6}>
         <Box>
-          <Typography variant="h6">{title}</Typography>
+          <Typography variant="h5">{title}</Typography>
           <List sx={{ bgcolor: 'background.paper' }}>
-            {filteredRosa.map((player) => (
+            {mergedPlayers.map((player) => (
               <Grid container spacing={0} key={player.idGiocatore}>
-                <Grid item xs={10}>
+                <Grid item xs={9}>
                   <div onClick={() => handleClickPlayer(player)}>
                     <ListItem
                       sx={{
@@ -106,6 +112,7 @@ function Formazione() {
                         zIndex: 2,
                         paddingTop: '0px',
                         paddingBottom: '0px',
+                        paddingLeft: '0px',
                       }}
                     >
                       <img
@@ -117,73 +124,25 @@ function Formazione() {
                       />
                       <ListItemText
                         primary={getShortName(player.nome)}
-                        secondary={getMatch(giornate[0], player, true)}
+                        secondary={`(${player.nomeSquadraSerieA
+                          ?.toUpperCase()
+                          .substring(0, 3)}) - ${getMatch(giornate[0], player, false)}`}
                       />
                     </ListItem>
                   </div>
                 </Grid>
-                <Grid item xs={2} display="flex" justifyContent="flex-end">
-                  <Slide
-                    direction="right"
-                    in={true}
-                    style={{ transitionDelay: '300ms' }}
-                    mountOnEnter
-                    unmountOnExit
-                  >
-                    <Tooltip title="Statistiche giocatore">
-                      <IconButton
-                        onClick={() => {
-                          setIdGiocatoreStat(player.idGiocatore)
-                          setOpenModalCalendario(true)
-                        }}
-                      >
-                        <Analytics color="info" />
-                      </IconButton>
-                    </Tooltip>
-                  </Slide>
-                </Grid>
-              </Grid>
-            ))}
-            {filteredPanca.map((player) => (
-              <Grid container spacing={0} key={player.idGiocatore}>
-                <Grid item xs={10}>
-                  <div onClick={() => handleClickPlayer(player)}>
-                    <ListItem
-                      sx={{
-                        cursor: 'pointer',
-                        zIndex: 2,
-                        paddingTop: '0px',
-                        paddingBottom: '0px',
+                <Grid item xs={3} display="flex" justifyContent="flex-end">
+                  {renderStatusIcon(player)}
+                  <Tooltip title="Statistiche giocatore">
+                    <IconButton
+                      onClick={() => {
+                        setIdGiocatoreStat(player.idGiocatore)
+                        setOpenModalCalendario(true)
                       }}
                     >
-                      <img
-                        src={player.urlCampioncinoSmall}
-                        width={42}
-                        height={42}
-                        alt={player.nomeSquadraSerieA ?? ''}
-                        title={player.nomeSquadraSerieA ?? ''}
-                      />
-                      <ListItemText
-                        primary={getShortName(player.nome)}
-                        secondary={getMatch(giornate[0], player, true)}
-                      />
-                    </ListItem>
-                  </div>
-                </Grid>
-                <Grid item xs={2} display="flex" justifyContent="flex-end">
-                  <Slide
-                    direction="right"
-                    in={true}
-                    style={{ transitionDelay: '300ms' }}
-                    mountOnEnter
-                    unmountOnExit
-                  >
-                    <Tooltip title={`Riserva ${player.riserva}`}>
-                      <IconButton>
-                        {filterIcons[(player.riserva ?? 0) - 1]}
-                      </IconButton>
-                    </Tooltip>
-                  </Slide>
+                      <Analytics color="info" />
+                    </IconButton>
+                  </Tooltip>
                 </Grid>
               </Grid>
             ))}
@@ -193,55 +152,11 @@ function Formazione() {
     )
   }
 
-  const renderCampo = (roles: string[]) => {
-    const filtered = campo.filter((player) => roles.includes(player.ruolo))
-    return (
-      <>
-        {filtered.map((player, index) => {
-          const style = getPlayerStylePosition(player.ruolo, index, modulo)
-          return (
-            <div
-              onClick={() => handleClickPlayer(player)}
-              key={player.idGiocatore}
-              style={{
-                cursor: 'pointer',
-                zIndex: 2,
-                minWidth: '120px',
-                position: 'absolute',
-                ...style,
-              }}
-            >
-              <Stack direction="column" justifyContent="space-between" alignItems="center">
-                <img
-                  src={player.urlCampioncinoSmall}
-                  key={player.idGiocatore}
-                  width={48}
-                  height={48}
-                  alt={player.nomeSquadraSerieA ?? ''}
-                  title={player.nomeSquadraSerieA ?? ''}
-                />
-                <Typography
-                  variant="body2"
-                  sx={{
-                    color: 'white',
-                    backgroundColor: '#2e865f',
-                    opacity: 0.8,
-                    padding: '2px',
-                  }}
-                >
-                  {player.nome}
-                </Typography>
-              </Stack>
-            </div>
-          )
-        })}
-      </>
-    )
-  }
+  const modalWidth = isDesktop ? '1266px' : '98%'
 
   return (
     <>
-      <Grid container spacing={0}>
+      <Grid container spacing={1}>
         {isLoading && (
           <Grid item xs={12}>
             <Box
@@ -258,104 +173,100 @@ function Formazione() {
         )}
         {enableRosa ? (
           <>
-            <Grid item xs={6}>
-              <Typography variant="h4">
-                Formazione {squadra}{' '}
-                {giornate.length === 1 && ` - ${giornate[0]?.Title}`}
-              </Typography>
-            </Grid>
-            <Grid item xs={6} justifyItems="end">
+            <Grid item xs={12}>
               <Stack
-                direction="row"
-                justifyContent="flex-end"
-                alignItems="center"
-                sx={{ pb: '5px' }}
+                direction={{ xs: 'column', md: 'row' }}
+                justifyContent="space-between"
+                alignItems={{ xs: 'flex-start', md: 'center' }}
+                spacing={1}
               >
-                {giornate.length > 1 && (
-                  <Select
-                    size="small"
-                    variant="outlined"
-                    labelId="select-label-giornata"
-                    margin="dense"
-                    required
-                    sx={{ ml: '10px' }}
-                    name="giornata"
-                    onChange={(e) =>
-                      e.target.value !== 0
-                        ? setIdTorneo(e.target.value as number)
-                        : setIdPartita(0)
-                    }
-                    defaultValue={giornate[0]?.idTorneo}
-                  >
-                    <MenuItem value={0} key="giornata_0">
-                      Salva entrambe le formazioni
-                    </MenuItem>
-                    {giornate.map((g, index) => (
-                      <MenuItem
-                        value={g.idTorneo}
-                        key={`giornata_${g.idTorneo}`}
-                        selected={index === 0}
-                      >
-                        {g.Title}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
-
-                <Box component="form" onSubmit={handleSave} noValidate>
-                  <Button
-                    type="button"
-                    endIcon={<ResetTv />}
-                    variant="contained"
-                    onClick={() => resetFormazione()}
-                    color="info"
-                    size="medium"
-                    sx={{ mr: 1 }}
-                  >
-                    Reset
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="contained"
-                    color="primary"
-                    size="medium"
-                    onClick={() => openStatisticaSquadra()}
-                    endIcon={<SportsSoccer />}
-                    sx={{ mr: 1, ml: 1 }}
-                  >
-                    Andamento
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={saving}
-                    endIcon={!saving ? <Save /> : <HourglassTop />}
-                    variant="contained"
-                    color="success"
-                    size="medium"
-                    sx={{ ml: 1 }}
-                  >
-                    {saving ? 'Attendere...' : 'Salva'}
-                  </Button>
+                <Box>
+                  {squadra && (
+                    <Typography variant={isDesktop ? 'h4' : 'h6'} fontWeight="bold">
+                      {squadra}
+                    </Typography>
+                  )}
+                  <Typography variant={giornate.length > 0 ? 'h6' : 'h5'} sx={{ lineHeight: 2 }}>
+                    <b>{giornate.length > 1 ? `${giornate[0]?.Title} / ${giornate[1]?.Title}` : giornate[0]?.Title}</b>
+                  </Typography>
                 </Box>
+                <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+                  {giornate.length > 1 && (
+                    <Select
+                      size="small"
+                      variant="outlined"
+                      labelId="select-label-giornata"
+                      margin="dense"
+                      required
+                      name="giornata"
+                      onChange={(e) =>
+                        e.target.value !== 0
+                          ? resetFormazione(e.target.value as number)
+                          : setIdPartita(0)
+                      }
+                      defaultValue={giornate[0]?.idTorneo}
+                    >
+                      <MenuItem value={0} key="giornata_0">
+                        Salva entrambe le formazioni
+                      </MenuItem>
+                      {giornate.map((g, index) => (
+                        <MenuItem
+                          value={g.idTorneo}
+                          key={`giornata_${g.idTorneo}`}
+                          selected={index === 0}
+                        >
+                          {`Salva solo ${g.Title}`}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                  <Box component="form" onSubmit={handleSave} noValidate>
+                    <Stack direction="row" spacing={1}>
+                      <Button
+                        type="button"
+                        variant="contained"
+                        color="primary"
+                        size="medium"
+                        onClick={() => openStatisticaSquadra()}
+                        endIcon={<SportsSoccer />}
+                        sx={{ fontSize: { xs: '11px', md: '14px' } }}
+                      >
+                        Andamento
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={saving}
+                        endIcon={!saving ? <Save /> : <HourglassTop />}
+                        variant="contained"
+                        color="success"
+                        size="medium"
+                        sx={{ fontSize: { xs: '11px', md: '14px' } }}
+                      >
+                        {saving ? 'Attendere...' : 'Salva'}
+                      </Button>
+                    </Stack>
+                  </Box>
+                </Stack>
               </Stack>
             </Grid>
-            <Grid item xs={12} minHeight={5} />
-            <Grid item sm={4}>
-              <Grid container spacing={0} sx={styleRosa} padding={1}>
-                {renderRosa(['P'], 6, 'Portieri')}
-                {renderRosa(['D'], 6, 'Difensori')}
-              </Grid>
+            <Grid item xs={12}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography variant="h5">
+                  Rosa ({rosa.length}) / Panchina ({panca.length})
+                </Typography>
+                <Typography variant="h5">{`Modulo: ${modulo}`}</Typography>
+              </Stack>
             </Grid>
-            <Grid item sm={4} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Box sx={styleCampo}>
-                {renderCampo(['P'])}
-                {renderCampo(['D'])}
-                {renderCampo(['C'])}
-                {renderCampo(['A'])}
-              </Box>
+            <Grid item xs={12}>
+              <Grid container spacing={0}>
+                {renderRosa(['P'], 'Portieri')}
+                {renderRosa(['D'], 'Difensori')}
+                {renderRosa(['C'], 'Centrocampisti')}
+                {renderRosa(['A'], 'Attaccanti')}
+              </Grid>
               <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                sx={{ height: '60%' }}
+                sx={{ height: '30%' }}
                 open={openAlert}
                 autoHideDuration={3000}
                 onClose={() => setOpenAlert(false)}
@@ -370,11 +281,18 @@ function Formazione() {
                 </Alert>
               </Snackbar>
             </Grid>
-            <Grid item sm={4}>
-              <Grid container spacing={0} sx={styleRosa} padding={1}>
-                {renderRosa(['C'], 6, 'Centrocampisti')}
-                {renderRosa(['A'], 6, 'Attaccanti')}
-              </Grid>
+            <Grid item xs={12} minHeight={100}>
+              <Button
+                type="button"
+                endIcon={<ResetTv />}
+                variant="contained"
+                onClick={() => resetFormazione()}
+                color="info"
+                size="medium"
+                sx={{ fontSize: { xs: '10px', md: '14px' } }}
+              >
+                Reset
+              </Button>
             </Grid>
           </>
         ) : (
@@ -385,7 +303,7 @@ function Formazione() {
             justifyContent="center"
             sx={{ mt: '30px' }}
           >
-            <Typography variant="h3" color="error">
+            <Typography variant={isDesktop ? 'h3' : 'h4'} color="error">
               {message}
             </Typography>
           </Grid>
@@ -396,7 +314,8 @@ function Formazione() {
         title="Statistica giocatore"
         open={openModalCalendario}
         onClose={handleModalCalendarioClose}
-        width="1266px"
+        width={modalWidth}
+        height="98%"
       >
         <Divider />
         <Box sx={{ mt: 1, gap: '0px', flexWrap: 'wrap' }}>
@@ -410,8 +329,8 @@ function Formazione() {
         title="Statistica squadra"
         open={openModalStatistica}
         onClose={handleModalStatisticaClose}
-        width="1266px"
-        height="80%"
+        width={modalWidth}
+        height="98%"
       >
         <Divider />
         <Box sx={{ mt: 1, gap: '0px', flexWrap: 'wrap' }}>
