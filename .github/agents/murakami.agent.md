@@ -30,14 +30,14 @@ Each specialist is a dedicated sub-agent. Delegate to them via the `task` tool u
 
 | Agent | Role | Domain |
 |---|---|---|
-| `bjorn-larsson` | Design System Engineer | MUI theme, design tokens, component overrides |
-| `cixin-liu` | Database Engineer | TypeORM entities, migrations, PostgreSQL schema |
-| `cormac-mccarthy` | Backend / API Engineer | tRPC routers, procedures, server business logic |
+| `asimov` | Design System Engineer | MUI theme, design tokens, component overrides |
+| `dostojevskij` | Database Engineer | TypeORM entities, migrations, PostgreSQL schema |
+| `mccarthy` | Backend / API Engineer | tRPC routers, procedures, server business logic |
 | `dick` | QA / Test Engineer | Vitest tests, coverage, scoring logic validation |
 | `ishiguro` | Validation & Schema Engineer | Zod schemas, tRPC contracts, env validation |
-| `jonathan-coe` | Frontend Engineer | Next.js pages, React components, tRPC client |
+| `coe` | Frontend Engineer | Next.js pages, React components, tRPC client |
 | `pasolini` | DevOps / Platform Engineer | Deployment, migrations on prod, Vercel, infra |
-| `william-gibson` | Auth Engineer | NextAuth v5, JWT, session, tRPC auth middleware |
+| `gibson` | Auth Engineer | NextAuth v5, JWT, session, tRPC auth middleware |
 
 ## Delegation Model
 
