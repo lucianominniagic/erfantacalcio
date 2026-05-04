@@ -14,6 +14,7 @@ import {
   Typography,
 } from '@mui/material'
 import { alpha, useTheme } from '@mui/material/styles'
+import { useMediaQuery } from '@mui/material'
 import { api } from '~/utils/api'
 
 interface HeadToHeadMatrixProps {
@@ -22,6 +23,7 @@ interface HeadToHeadMatrixProps {
 
 export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
   const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const h2h = api.statisticheSquadre.headToHead.useQuery(
     { idTornei },
     {
@@ -67,7 +69,23 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
         Bilancio scontri diretti (riga = squadra di casa). Verde =
         bilancio favorevole, giallo = pareggio, rosso = sfavorevole.
       </Typography>
-      <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+      <TableContainer
+        component={Paper}
+        sx={{
+          overflowX: 'auto',
+          WebkitOverflowScrolling: 'touch',
+          // shadow gradient to hint scrollability on mobile
+          background: `
+            linear-gradient(to right, ${theme.palette.background.paper} 30%, transparent),
+            linear-gradient(to right, transparent, ${theme.palette.background.paper} 70%) 100% 0,
+            radial-gradient(farthest-side at 0 50%, rgba(0,0,0,.15), transparent),
+            radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.15), transparent) 100% 0
+          `,
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: '40px 100%, 40px 100%, 14px 100%, 14px 100%',
+          backgroundAttachment: 'local, local, scroll, scroll',
+        }}
+      >
         <Table size="small" sx={{ minWidth: 'max-content' }}>
           <TableHead>
             <TableRow>
@@ -77,8 +95,9 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
                   left: 0,
                   zIndex: 2,
                   fontWeight: 700,
-                  background: headerBg,
+                  backgroundColor: headerBg,
                   color: headerColor,
+                  whiteSpace: 'nowrap',
                 }}
               >
                 Squadra
@@ -87,9 +106,7 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
                 <TableCell
                   key={s.idSquadra}
                   align="center"
-                  sx={{
-                    minWidth: 90,
-                  }}
+                  sx={{ minWidth: 90 }}
                 >
                   <Tooltip title={s.squadra}>
                     <Box
@@ -106,7 +123,6 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
                       <Typography
                         component="span"
                         sx={{
-                          fontSize: '0.7rem',
                           maxWidth: 80,
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -133,13 +149,14 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
                     fontWeight: 600,
                     minWidth: 160,
                     zIndex: 1,
+                    borderRight: `2px solid ${alpha(theme.palette.divider, 0.4)}`,
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     {rowSquadra.foto ? (
                       <Avatar src={rowSquadra.foto} sx={{ width: 22, height: 22 }} />
                     ) : null}
-                    <Typography sx={{ fontSize: '0.85rem' }}>
+                    <Typography sx={{ whiteSpace: 'nowrap' }}>
                       {rowSquadra.squadra}
                     </Typography>
                   </Box>
@@ -194,7 +211,15 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
           </TableBody>
         </Table>
       </TableContainer>
+      {isMobile && (
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ display: 'block', textAlign: 'center', mt: 1 }}
+        >
+          ← scorri per vedere tutto →
+        </Typography>
+      )}
     </Box>
   )
 }
-
