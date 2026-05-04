@@ -85,7 +85,7 @@ export default function Squadre() {
                       />
                     </Box>
                     <CardContent sx={{ paddingBottom: '1px', paddingLeft: '3px' }}>
-                      <Typography variant="body2">{squadra.squadra}</Typography>
+                      <Typography variant="body2"><h5>{squadra.squadra}</h5></Typography>
                     </CardContent>
                   </CardActionArea>
                 </Card>
