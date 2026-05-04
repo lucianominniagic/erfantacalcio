@@ -87,7 +87,12 @@ export function useFormazioneState() {
           calendarioProssima.data[0]
         setIdTorneo(campionato?.idTorneo)
       } else {
-        setMessage('Formazione non rilasciabile')
+        const dataFine = calendarioProssima.data[0]?.dataFine
+        if (dataFine && checkDataFormazione(dataFine)) {
+          setMessage('Formazione non rilasciabile, è stata confermata la precedente formazione')
+        } else {
+          setMessage('Formazione non rilasciabile')
+        }
       }
       setGiornate(calendarioProssima.data)
     }
