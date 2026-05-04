@@ -20,12 +20,10 @@ import GenericAutocomplete, {
 import Image from 'next/image'
 import { type Ruoli } from '~/types/common'
 import { getRuoloEsteso } from '~/utils/helper'
-import { BarChartOutlined } from '@mui/icons-material'
 import Modal from '../modal/Modal'
 import Giocatore from './Giocatore'
 import {
   DataGrid,
-  GridActionsCellItem,
   type GridColDef,
 } from '@mui/x-data-grid'
 import { createSkeletonRows } from '~/utils/datatable'
@@ -85,6 +83,19 @@ function Giocatori() {
       renderHeader: () => <strong>Nome</strong>,
       flex: isXs ? 0 : 1,
       sortable: true,
+      renderCell: (params) => (
+        <Typography
+          sx={{
+            cursor: 'pointer',
+            color: 'primary.main',
+            textDecoration: 'underline',
+            fontSize: 'inherit',
+          }}
+          onClick={() => handleGiocatoreSelected(params.row.id as number)}
+        >
+          {params.value as string}
+        </Typography>
+      ),
     },
     {
       field: 'squadra',
@@ -137,19 +148,6 @@ function Giocatori() {
       renderHeader: () => <strong>Giocate</strong>,
       width: 100,
       sortable: true,
-    },
-    {
-      field: 'actions',
-      type: 'actions',
-      getActions: (params) => [
-        <GridActionsCellItem
-          key={params.id}
-          icon={<BarChartOutlined color="success" />}
-          label="Vedi giocatore"
-          onClick={() => handleGiocatoreSelected(params.id as number)}
-        />,
-      ],
-      width: isXs ? 90 : 100,
     },
   ]
 
