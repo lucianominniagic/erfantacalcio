@@ -395,12 +395,12 @@ function ViewTabellini() {
                 </Grid>
               </Grid>
 
-              <Grid item xs={12} sm={3} display={'flex'}>
+              <Grid item xs={12} sm={4} display={'flex'}>
                 <Typography variant={'h6'} sx={{ m: '5px' }}>
                   Fantapunti: <b>{tabellino.fantapuntiTotale}</b>
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm={3}>
+              <Grid item xs={12} sm={4}>
                 <Typography variant={'h6'} sx={{ m: '5px' }}>
                   {tabellino.fattoreCasalingo > 0 ? (
                     <>
@@ -411,7 +411,7 @@ function ViewTabellini() {
                   )}
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm={3}>
+              <Grid item xs={12} sm={4}>
                 <Typography variant={'h6'} sx={{ m: '5px' }}>
                   {tabellino.bonusSenzaVoto > 0 && (
                     <>
@@ -420,7 +420,7 @@ function ViewTabellini() {
                   )}
                 </Typography>
               </Grid>
-              <Grid item xs={12} sm={3}>
+              <Grid item xs={12}>
                 <Typography variant={'h6'} sx={{ m: '5px' }}>
                   {tabellino.bonusModulo > 0 && (
                     <>
