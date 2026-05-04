@@ -97,92 +97,102 @@ export default function Squadra({ idSquadra }: SquadraProps) {
         }}
       />
 
-      {/* Watermark maglia */}
-      {maglia && (
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: -10,
-            right: -10,
-            zIndex: 1,
-            pointerEvents: 'none',
-          }}
-        >
-          <ShirtSVG
-            template={maglia.selectedTemplate as ShirtTemplate}
-            mainColor={maglia.mainColor}
-            secondaryColor={maglia.secondaryColor}
-            thirdColor={maglia.thirdColor}
-            textColor={maglia.textColor}
-            size={160}
-            number={maglia.shirtNumber}
-          />
-        </Box>
-      )}
-
       {/* Contenuto */}
       <Box sx={{ position: 'relative', zIndex: 2, p: { xs: 2, md: 3 } }}>
-        <Grid container spacing={2} alignItems="center">
 
-          {/* Foto presidente */}
+        {/* Riga avatar + nome/presidente + maglia */}
+        <Grid container spacing={2} alignItems="center" wrap="nowrap">
           <Grid item xs="auto">
             <Avatar
               src={datiSquadra.foto ?? ''}
               sx={{
-                width: { xs: 90, md: 130 },
-                height: { xs: 90, md: 130 },
+                width: { xs: 72, md: 130 },
+                height: { xs: 72, md: 130 },
                 border: '3px solid rgba(255,255,255,0.85)',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                flexShrink: 0,
               }}
             />
           </Grid>
-
-          {/* Nome squadra + presidente + trofei */}
-          <Grid item xs>
+          <Grid item xs sx={{ minWidth: 0 }}>
             <Typography
               variant="h4"
-              sx={{ color: 'white', fontWeight: 'bold', lineHeight: 1.2, textShadow: '0 2px 6px rgba(0,0,0,0.5)' }}
+              sx={{
+                color: 'white',
+                fontWeight: 'bold',
+                lineHeight: 1.2,
+                textShadow: '0 2px 6px rgba(0,0,0,0.5)',
+                fontSize: { xs: '1rem', sm: '1.25rem', md: '1.4rem' },
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
             >
               {datiSquadra.squadra}
             </Typography>
             <Typography
               variant="subtitle1"
-              sx={{ color: 'rgba(255,255,255,0.8)', mt: 0.5, mb: 2 }}
+              sx={{
+                color: 'rgba(255,255,255,0.8)',
+                mt: 0.5,
+                fontSize: { xs: '0.8rem', md: '0.875rem' },
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
             >
               {datiSquadra.presidente}
             </Typography>
-
-            {hasTrofei ? (
-              <Stack direction="row" flexWrap="wrap" gap={0.75}>
-                <TrophyBadge
-                  count={datiAlbo.campionato}
-                  label="Campionato"
-                  icon={<EmojiEvents fontSize="small" />}
-                />
-                <TrophyBadge
-                  count={datiAlbo.champions}
-                  label="Champions"
-                  icon={<Stars fontSize="small" />}
-                />
-                <TrophyBadge
-                  count={datiAlbo.secondo}
-                  label="2° posto"
-                  icon={<WorkspacePremium fontSize="small" />}
-                />
-                <TrophyBadge
-                  count={datiAlbo.terzo}
-                  label="3° posto"
-                  icon={<MilitaryTech fontSize="small" />}
-                />
-              </Stack>
-            ) : (
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>
-                Nessun trofeo ancora
-              </Typography>
-            )}
           </Grid>
 
+          {/* Maglia — solo desktop, allineata con avatar+testo */}
+          {maglia && (
+            <Grid item xs="auto" sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', pointerEvents: 'none' }}>
+              <ShirtSVG
+                template={maglia.selectedTemplate as ShirtTemplate}
+                mainColor={maglia.mainColor}
+                secondaryColor={maglia.secondaryColor}
+                thirdColor={maglia.thirdColor}
+                textColor={maglia.textColor}
+                size={160}
+                number={maglia.shirtNumber}
+              />
+            </Grid>
+          )}
         </Grid>
+
+        {/* Riga trofei — sotto avatar+testo */}
+        <Box sx={{ mt: 1.5 }}>
+          {hasTrofei ? (
+            <Stack direction="row" flexWrap={{ xs: 'wrap', md: 'nowrap' }} gap={0.75}>
+              <TrophyBadge
+                count={datiAlbo.campionato}
+                label="Campionato"
+                icon={<EmojiEvents fontSize="small" />}
+              />
+              <TrophyBadge
+                count={datiAlbo.champions}
+                label="Champions"
+                icon={<Stars fontSize="small" />}
+              />
+              <TrophyBadge
+                count={datiAlbo.secondo}
+                label="2° posto"
+                icon={<WorkspacePremium fontSize="small" />}
+              />
+              <TrophyBadge
+                count={datiAlbo.terzo}
+                label="3° posto"
+                icon={<MilitaryTech fontSize="small" />}
+              />
+            </Stack>
+          ) : (
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>
+              Nessun trofeo ancora
+            </Typography>
+          )}
+        </Box>
+
       </Box>
     </Box>
   )

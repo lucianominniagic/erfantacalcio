@@ -2,6 +2,7 @@
 import {
   Avatar,
   Box,
+  Chip,
   CircularProgress,
   Divider,
   Typography,
@@ -11,11 +12,6 @@ import { useMemo } from 'react'
 import { api } from '~/utils/api'
 import { useTheme } from '@mui/material/styles'
 import { type GiocatoreType } from '~/types/squadre'
-import {
-  DataGrid,
-  type GridColDef,
-  type GridRenderCellParams,
-} from '@mui/x-data-grid'
 import Modal from '../modal/Modal'
 import Giocatore from '../giocatori/Giocatore'
 import { useGiocatoreModal } from '../cardPartite/usePartitaParams'
@@ -26,6 +22,84 @@ type RosaProps = {
 }
 
 const RUOLO_ORDER: Record<string, number> = { A: 0, C: 1, D: 2, P: 3 }
+
+const RUOLO_COLOR: Record<string, 'error' | 'success' | 'info' | 'default'> = {
+  A: 'error',
+  C: 'success',
+  D: 'info',
+  P: 'default',
+}
+
+interface RosaListProps {
+  giocatori: GiocatoreType[]
+  onSelect: (id: number) => void
+  dimmed?: boolean
+  truncateSquad?: boolean
+}
+
+function RosaList({ giocatori, onSelect, dimmed = false, truncateSquad = false }: RosaListProps) {
+  return (
+    <Box>
+      {giocatori.map((g, i) => (
+        <Box
+          key={g.idGiocatore}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            py: 0.75,
+            px: 0.5,
+            borderBottom: i < giocatori.length - 1 ? '1px solid' : 'none',
+            borderColor: 'divider',
+            opacity: dimmed ? 0.5 : 1,
+          }}
+        >
+          <Avatar
+            src={g.urlCampioncinoSmall}
+            alt={g.nome}
+            variant="square"
+            sx={{ width: 28, height: 28, flexShrink: 0 }}
+          />
+          <Chip
+            label={g.ruolo}
+            size="small"
+            color={RUOLO_COLOR[g.ruolo] ?? 'default'}
+            sx={{ width: 36, flexShrink: 0, fontSize: '0.65rem', fontWeight: 700 }}
+          />
+          <Typography
+            variant="body2"
+            sx={{
+              flex: 1,
+              cursor: 'pointer',
+              color: 'primary.main',
+              fontWeight: 500,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+            onClick={() => onSelect(g.idGiocatore)}
+          >
+            {g.nome}
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{ flexShrink: 0, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.04em' }}
+          >
+            {truncateSquad
+              ? (g.nomeSquadraSerieA ?? '').slice(0, 3)
+              : (g.nomeSquadraSerieA ?? '')}
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{ flexShrink: 0, color: 'text.secondary' }}
+          >
+            {g.costo.toFixed(0)} M€
+          </Typography>
+        </Box>
+      ))}
+    </Box>
+  )
+}
 
 function Rosa({ idSquadra, squadra }: RosaProps) {
   const theme = useTheme()
@@ -58,76 +132,7 @@ function Rosa({ idSquadra, squadra }: RosaProps) {
     return { rosaAttiva: attiva, rosaVenduta: venduta }
   }, [rosaList.data])
 
-  const columns: GridColDef[] = [
-    {
-      field: 'urlCampioncinoSmall',
-      headerName: '',
-      width: 40,
-      sortable: false,
-      filterable: false,
-      hideable: false,
-      renderCell: (params: GridRenderCellParams) => (
-        <Avatar
-          src={params.value as string}
-          alt={params.row.nome as string}
-          variant="square"
-          sx={{ width: 28, height: 28 }}
-        />
-      ),
-    },
-    {
-      field: 'ruolo',
-      headerName: 'Ruolo',
-      width: 90,
-      sortable: false,
-      filterable: false,
-      hideable: false,
-    },
-    {
-      field: 'nome',
-      headerName: 'Giocatore',
-      flex: 1,
-      minWidth: 120,
-      sortable: false,
-      filterable: false,
-      hideable: false,
-      renderCell: (params: GridRenderCellParams) => (
-        <Typography
-          variant="body2"
-          sx={{ cursor: 'pointer', color: 'primary.main', fontWeight: 500 }}
-          onClick={() => handleGiocatoreSelected(params.row.idGiocatore as number)}
-        >
-          {params.value as string}
-        </Typography>
-      ),
-    },
-    {
-      field: 'nomeSquadraSerieA',
-      headerName: 'Squadra',
-      flex: 1,
-      minWidth: 100,
-      sortable: false,
-      filterable: false,
-      hideable: false,
-    },
-    {
-      field: 'costo',
-      headerName: 'Costo',
-      width: 80,
-      type: 'number',
-      sortable: false,
-      filterable: false,
-      hideable: false,
-      valueFormatter: (value: number) => `${value.toFixed(0)} M€`,
-    },
-  ]
 
-  const gridSx = {
-    border: 'none',
-    '& .MuiDataGrid-columnHeaders': { bgcolor: 'action.hover' },
-    '& .MuiDataGrid-row:hover': { cursor: 'default' },
-    '& .MuiDataGrid-cell': { alignItems: 'center', display: 'flex' },
-  }
 
   return (
     <>
@@ -140,41 +145,22 @@ function Rosa({ idSquadra, squadra }: RosaProps) {
           </Box>
         ) : (
           <>
-            <DataGrid
-              rows={rosaAttiva}
-              columns={columns}
-              getRowId={(row: GiocatoreType) => row.idGiocatore}
-              disableRowSelectionOnClick
-              disableColumnSorting
-              hideFooter={rosaAttiva.length <= 100}
-              rowHeight={36}
-              sx={gridSx}
-              initialState={{
-                sorting: { sortModel: [{ field: 'ruolo', sort: 'desc' }] },
-              }}
+            <RosaList
+              giocatori={rosaAttiva}
+              onSelect={handleGiocatoreSelected}
+              truncateSquad={isXs}
             />
-
             {rosaVenduta.length > 0 && (
-              <Box sx={{ mt: 4 }}>
+              <Box sx={{ mt: 3 }}>
                 <Typography variant="h5" color="text.secondary" sx={{ mb: 1 }}>
                   Giocatori ceduti
                 </Typography>
                 <Divider sx={{ mb: 1 }} />
-                <DataGrid
-                  rows={rosaVenduta}
-                  columns={columns}
-                  getRowId={(row: GiocatoreType) => row.idGiocatore}
-                  disableRowSelectionOnClick
-                  disableColumnSorting
-                  hideFooter={rosaVenduta.length <= 100}
-                  rowHeight={36}
-                  sx={{
-                    ...gridSx,
-                    '& .MuiDataGrid-row': { color: 'text.disabled' },
-                  }}
-                  initialState={{
-                    sorting: { sortModel: [{ field: 'ruolo', sort: 'asc' }] },
-                  }}
+                <RosaList
+                  giocatori={rosaVenduta}
+                  onSelect={handleGiocatoreSelected}
+                  dimmed
+                  truncateSquad={isXs}
                 />
               </Box>
             )}
