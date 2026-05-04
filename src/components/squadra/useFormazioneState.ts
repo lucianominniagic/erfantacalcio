@@ -34,7 +34,6 @@ export function useFormazioneState() {
 
   const [idGiocatoreStat, setIdGiocatoreStat] = useState<number>()
   const [openModalCalendario, setOpenModalCalendario] = useState(false)
-  const [openModalStatistica, setOpenModalStatistica] = useState(false)
   const [enableRosa, setEnableRosa] = useState(false)
   const [message, setMessage] = useState('')
   const [giornate, setGiornate] = useState<z.infer<typeof giornataSchema>[]>([])
@@ -237,9 +236,7 @@ export function useFormazioneState() {
   }
 
   const handleModalCalendarioClose = () => setOpenModalCalendario(false)
-  const handleModalStatisticaClose = () => setOpenModalStatistica(false)
-  const openStatisticaSquadra = () => setOpenModalStatistica(true)
-
+  
   const resetFormazione = (newIdTorneo?: number) => {
     setModulo(moduloDefault)
     setCampo([])
@@ -273,7 +270,6 @@ export function useFormazioneState() {
     setIdGiocatoreStat,
     openModalCalendario,
     setOpenModalCalendario,
-    openModalStatistica,
     openAlert,
     setOpenAlert,
     saving,
@@ -296,8 +292,6 @@ export function useFormazioneState() {
     handleClickPlayer,
     handleSave,
     handleModalCalendarioClose,
-    handleModalStatisticaClose,
-    openStatisticaSquadra,
     resetFormazione,
   }
 }

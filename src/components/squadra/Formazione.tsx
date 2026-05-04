@@ -32,7 +32,6 @@ import { type GiocatoreFormazioneType } from '~/types/squadre'
 import Modal from '../modal/Modal'
 import Giocatore from '../giocatori/Giocatore'
 import { getMatch } from './utils'
-import Statistica from './Statistica'
 import { useFormazioneState } from './useFormazioneState'
 
 function Formazione() {
@@ -43,7 +42,6 @@ function Formazione() {
     setIdGiocatoreStat,
     openModalCalendario,
     setOpenModalCalendario,
-    openModalStatistica,
     openAlert,
     setOpenAlert,
     saving,
@@ -62,8 +60,6 @@ function Formazione() {
     handleClickPlayer,
     handleSave,
     handleModalCalendarioClose,
-    handleModalStatisticaClose,
-    openStatisticaSquadra,
     resetFormazione,
   } = useFormazioneState()
 
@@ -223,17 +219,6 @@ function Formazione() {
                   <Box component="form" onSubmit={handleSave} noValidate>
                     <Stack direction="row" spacing={1}>
                       <Button
-                        type="button"
-                        variant="contained"
-                        color="primary"
-                        size="medium"
-                        onClick={() => openStatisticaSquadra()}
-                        endIcon={<SportsSoccer />}
-                        sx={{ fontSize: { xs: '11px', md: '14px' } }}
-                      >
-                        Andamento
-                      </Button>
-                      <Button
                         type="submit"
                         disabled={saving}
                         endIcon={!saving ? <Save /> : <HourglassTop />}
@@ -322,19 +307,6 @@ function Formazione() {
           {idGiocatoreStat !== undefined && (
             <Giocatore idGiocatore={idGiocatoreStat} />
           )}
-        </Box>
-      </Modal>
-
-      <Modal
-        title="Statistica squadra"
-        open={openModalStatistica}
-        onClose={handleModalStatisticaClose}
-        width={modalWidth}
-        height="98%"
-      >
-        <Divider />
-        <Box sx={{ mt: 1, gap: '0px', flexWrap: 'wrap' }}>
-          <Statistica idSquadra={idSquadra} />
         </Box>
       </Modal>
     </>
