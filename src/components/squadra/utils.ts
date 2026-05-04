@@ -99,7 +99,7 @@ function findModuloCompatibile(modulo: string): Moduli {
 }
 
 export function checkDataFormazione(dataIso: string | undefined) {
-  return true//dayjs(dataIso).toDate() >= dayjs(new Date()).toDate()
+  return dayjs(dataIso).toDate() >= dayjs(new Date()).toDate()
 }
 
 
