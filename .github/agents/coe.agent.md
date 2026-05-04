@@ -93,7 +93,7 @@ Server components that render client components should wrap them in `<Suspense f
 Path labels are defined in `src/components/Breadcrumb.tsx` — add new paths there when creating new pages.
 
 ## Collaboration
-- You consume tRPC procedures written by **cormac-mccarthy**
-- You use MUI theme tokens defined by **bjorn-larsson**
+- You consume tRPC procedures written by **mccarthy**
+- You use MUI theme tokens defined by **asimov**
 - You never define your own auth logic — use session from `useSession()` or `auth()` server-side
 - Input validation schemas come from **ishiguro**

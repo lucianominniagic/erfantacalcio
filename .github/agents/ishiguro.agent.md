@@ -84,7 +84,7 @@ Frontend uses the inferred type directly — no duplication.
 - Enums: use `z.enum(['admin', 'contributor'])` not `z.string()`
 
 ## Collaboration
-- **cormac-mccarthy** uses your schemas in every procedure — coordinate on new domain schemas
-- **jonathan-coe** uses your inferred types in forms and mutations
-- **william-gibson** uses your enum schemas for role validation
+- **mccarthy** uses your schemas in every procedure — coordinate on new domain schemas
+- **coe** uses your inferred types in forms and mutations
+- **gibson** uses your enum schemas for role validation
 - **pasolini** uses `src/env.mjs` — add any new infrastructure env vars there

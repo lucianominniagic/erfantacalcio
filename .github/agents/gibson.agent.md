@@ -86,6 +86,6 @@ The `jwt` callback enriches the token with user data from the DB on first sign-i
 - The `idSquadra` in session is the source of truth for which team a user can modify — never trust client-provided team IDs without verification against `ctx.session.user.idSquadra`
 
 ## Collaboration
-- **cormac-mccarthy** uses your procedure guards (`protectedProcedure`, `adminProcedure`) — you define them, he uses them
-- **jonathan-coe** uses `useSession()` on the client — session shape must match your JWT definition
-- **cixin-liu** owns the `Utente` entity that auth reads from
+- **mccarthy** uses your procedure guards (`protectedProcedure`, `adminProcedure`) — you define them, he uses them
+- **coe** uses `useSession()` on the client — session shape must match your JWT definition
+- **dostojevskij** owns the `Utente` entity that auth reads from

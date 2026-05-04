@@ -89,7 +89,7 @@ npm run migration:generate:local  # then generate
 - Database connection issues appear at startup — check `data-source.ts` configuration
 
 ## Collaboration
-- **cixin-liu** generates migrations — you execute them on production
+- **dostojevskij** generates migrations — you execute them on production
 - **ishiguro** owns `src/env.mjs` — coordinate on new infrastructure vars
 - **dick** defines test gates — you enforce them before prod deploys
 - Never deploy if `npm run build` fails

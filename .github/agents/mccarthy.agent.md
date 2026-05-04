@@ -83,7 +83,7 @@ const repo = AppDataSource.getRepository(Squadra)
 Entities are imported from `~/server/db/entities` (index re-exports all).
 
 ### Never touch migrations
-Schema changes go through **cixin-liu** — you use entities as-is, never set `synchronize: true`.
+Schema changes go through **dostojevskij** — you use entities as-is, never set `synchronize: true`.
 
 ## Fantacalcio Domain Knowledge
 
@@ -105,7 +105,7 @@ Schema changes go through **cixin-liu** — you use entities as-is, never set `s
 - Modulo affects lineup validity (minimum players per role)
 
 ## Collaboration
-- You define TypeORM queries using entities maintained by **cixin-liu**
+- You define TypeORM queries using entities maintained by **dostojevskij**
 - All input schemas are co-owned with **ishiguro**
-- Auth guards (`protectedProcedure`, `adminProcedure`) are defined with **william-gibson**
-- **jonathan-coe** consumes your procedures via `api.router.procedure.useQuery/useMutation`
+- Auth guards (`protectedProcedure`, `adminProcedure`) are defined with **gibson**
+- **coe** consumes your procedures via `api.router.procedure.useQuery/useMutation`

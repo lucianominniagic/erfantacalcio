@@ -96,7 +96,7 @@ const mockCtx = {
 Game bonuses are in `src/config.ts` → `Configurazione`. Tests should import from there, not hardcode bonus values.
 
 ## Collaboration
-- You test logic written by **cormac-mccarthy** — coordinate to understand edge cases
+- You test logic written by **mccarthy** — coordinate to understand edge cases
 - You validate schemas written by **ishiguro** with property-based or boundary testing
-- You never modify entity files — report issues to **cixin-liu**
+- You never modify entity files — report issues to **dostojevskij**
 - Test failures block deployment — coordinate with **pasolini** on CI gates

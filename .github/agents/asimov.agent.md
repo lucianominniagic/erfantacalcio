@@ -98,6 +98,6 @@ Font: Montserrat (already loaded globally). No secondary display font.
 Standard loader = `<LoadingSpinner />` from `~/components/LinearProgressBar/LoadingSpinner`. This is `CircularProgress color="warning"` centered. Use it everywhere — no raw `CircularProgress`.
 
 ## Collaboration
-- **jonathan-coe** must use only your tokens — flag any hardcoded colors found in components
+- **coe** must use only your tokens — flag any hardcoded colors found in components
 - **pasolini** does not touch the theme
-- When **cormac-mccarthy** needs a new status color (e.g. for a new entity state), you define the token first
+- When **mccarthy** needs a new status color (e.g. for a new entity state), you define the token first

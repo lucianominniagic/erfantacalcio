@@ -103,7 +103,7 @@ costo: number
 Use TypeORM relation decorators (`@ManyToOne`, `@OneToMany`, etc.) with explicit `onDelete` behavior. Always define the inverse side.
 
 ## Collaboration
-- You define the schema; **cormac-mccarthy** queries it via Active Record
+- You define the schema; **mccarthy** queries it via Active Record
 - Never let the backend set `synchronize: true` — enforce this
 - Coordinate with **pasolini** for migration execution on production
-- New entities must be communicated to **cormac-mccarthy** before use
+- New entities must be communicated to **mccarthy** before use
