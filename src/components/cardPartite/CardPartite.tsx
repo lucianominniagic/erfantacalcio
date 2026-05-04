@@ -88,7 +88,7 @@ export default function CardPartite({
                       xs={withAvatar ? (!isXs ? 4 : 3.7) : 5}
                       alignSelf={'center'}
                     >
-                      <Typography variant="h6">
+                      <Typography variant="h6" sx={{ fontSize: '0.75rem'}}>
                         {partita.squadraHome}
                         {partita.multaHome ?? (
                           <Tooltip title="Multa">
@@ -114,7 +114,7 @@ export default function CardPartite({
                       paddingRight={2}
                       alignSelf={'center'}
                     >
-                      <Typography variant="h6">
+                      <Typography variant="h6" sx={{ fontSize: '0.75rem'}}>
                         {partita.squadraAway}
                         {partita.multaAway ?? (
                           <Tooltip title="Multa">
