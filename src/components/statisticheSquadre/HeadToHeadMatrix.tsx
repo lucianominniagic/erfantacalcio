@@ -7,7 +7,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Tooltip,
@@ -69,28 +68,11 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
         Bilancio scontri diretti (riga = squadra di casa). Verde =
         bilancio favorevole, giallo = pareggio, rosso = sfavorevole.
       </Typography>
-      {/* Wrapper handles the scroll shadow trick without interfering with sticky stacking context */}
-      <Box
-        sx={{
-          position: 'relative',
-          // right shadow: appears when there is content to scroll right
-          '&::after': {
-            content: '""',
-            pointerEvents: 'none',
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            bottom: 0,
-            width: 24,
-            background: `linear-gradient(to right, transparent, ${alpha(theme.palette.common.black, 0.08)})`,
-            zIndex: 3,
-          },
-        }}
-      >
-        <TableContainer
-          component={Paper}
+      {/* Paper is a visual wrapper only — scroll is handled by the inner Box to avoid sticky conflicts */}
+      <Paper>
+        <Box
           sx={{
-            overflowX: 'auto',
+            overflow: 'auto',
             WebkitOverflowScrolling: 'touch',
           }}
         >
@@ -217,9 +199,9 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
               </TableRow>
             ))}
           </TableBody>
-        </Table>
-        </TableContainer>
-      </Box>
+          </Table>
+        </Box>
+      </Paper>
       {isMobile && (
         <Typography
           variant="caption"
