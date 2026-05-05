@@ -3,269 +3,28 @@ import * as React from 'react'
 import { usePathname } from 'next/navigation'
 import { signIn, signOut, useSession } from 'next-auth/react'
 import {
+  Avatar,
   Box,
-  Collapse,
+  Button,
+  Divider,
   Drawer,
   IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-  Avatar,
-  Divider,
   Tooltip,
-  Button,
+  Typography,
 } from '@mui/material'
-import ExpandLess from '@mui/icons-material/ExpandLess'
-import ExpandMore from '@mui/icons-material/ExpandMore'
+import { DarkMode, LightMode, Login, Logout, SportsSoccer } from '@mui/icons-material'
 import { useTheme } from '@mui/material/styles'
-import {
-  AddAPhoto,
-  AssignmentInd,
-  Badge,
-  Calculate,
-  CalendarMonth,
-  DarkMode,
-  Euro,
-  FiberNew,
-  Group,
-  Groups,
-  LightMode,
-  ListAlt,
-  ManageAccounts,
-  Portrait,
-  ThumbsUpDown,
-  UploadFile,
-  SportsSoccer,
-  EmojiEvents,
-  Login,
-  Logout,
-} from '@mui/icons-material'
 import { RuoloUtente } from '~/utils/enums'
 import { Configurazione } from '~/config'
 import { useThemeMode } from '~/theme/themeContext'
+import { legaItems, profiloItems, adminItems } from './sidebarConfig'
+import { SidebarSection } from './SidebarSection'
 
 export const SIDEBAR_WIDTH = 240
 
 interface SidebarProps {
   mobileOpen: boolean
   onMobileClose: () => void
-}
-
-interface NavItem {
-  key: string
-  label: string
-  href: string
-  icon: React.ReactNode
-  authRequired?: boolean
-  adminRequired?: boolean
-}
-
-const legaItems: NavItem[] = [
-  {
-    key: 'statisticheSquadre',
-    label: 'Statistiche squadre',
-    href: '/statistiche_squadre',
-    icon: <Groups />,
-  },
-  {
-    key: 'statistiche',
-    label: 'Statistiche giocatori',
-    href: '/statistiche_giocatori',
-    icon: <Portrait />,
-  },
-  {
-    key: 'economia',
-    label: 'Economia e premi',
-    href: '/economia',
-    icon: <Euro />,
-  },
-  { key: 'albo', label: "Albo d'oro", href: '/albo', icon: <EmojiEvents /> },
-  {
-    key: 'documenti',
-    label: 'Documenti',
-    href: '/documenti',
-    icon: <ListAlt />,
-  },
-]
-
-const profiloItems: NavItem[] = [
-  {
-    key: 'formazione',
-    label: 'Formazione',
-    href: '/formazione',
-    icon: <FiberNew color="success" />,
-  },
-  {
-    key: 'maglia',
-    label: 'Maglia',
-    href: '/maglia',
-    icon: <AssignmentInd color="info" />,
-  },
-  {
-    key: 'foto',
-    label: 'Foto profilo',
-    href: '/foto',
-    icon: <Badge color="success" />,
-  },
-]
-
-const adminItems: NavItem[] = [
-  {
-    key: 'uploadVoti',
-    label: 'Carica voti',
-    href: '/uploadVoti',
-    icon: <UploadFile />,
-  },
-  {
-    key: 'risultati',
-    label: 'Risultati',
-    href: '/risultati',
-    icon: <Calculate />,
-  },
-  {
-    key: 'calendario',
-    label: 'Calendario',
-    href: '/calendario',
-    icon: <CalendarMonth />,
-  },
-  { key: 'presidenti', label: 'Squadre', href: '/presidenti', icon: <Group /> },
-  {
-    key: 'giocatori',
-    label: 'Giocatori',
-    href: '/giocatori',
-    icon: <ManageAccounts />,
-  },
-  { key: 'voti', label: 'Voti', href: '/voti', icon: <ThumbsUpDown /> },
-  {
-    key: 'avvioStagione',
-    label: 'Nuova stagione',
-    href: '/avvioStagione',
-    icon: <FiberNew />,
-  },
-]
-
-function SidebarNavItem({
-  item,
-  isActive,
-}: {
-  item: NavItem
-  isActive: boolean
-}) {
-  const theme = useTheme()
-  return (
-    <ListItem disablePadding sx={{ mb: 0.5 }}>
-      <ListItemButton
-        href={item.href}
-        sx={{
-          borderRadius: '8px',
-          mx: 1,
-          py: 0.75,
-          px: 1.5,
-          transition: 'all 0.15s ease',
-          ...(isActive
-            ? {
-                background: `linear-gradient(135deg, ${theme.palette.action.hover} 0%, ${theme.palette.action.hover} 100%)`,
-                borderLeft: `3px solid ${theme.palette.primary.main}`,
-                '& .MuiListItemIcon-root': {
-                  color: theme.palette.primary.main,
-                },
-                '& .MuiListItemText-secondary': {
-                  color: `${theme.palette.primary.light} !important`,
-                },
-              }
-            : {
-                '&:hover': {
-                  backgroundColor: theme.palette.action.hover,
-                  '& .MuiListItemIcon-root': {
-                    color: theme.palette.primary.main,
-                  },
-                },
-              }),
-        }}
-      >
-        <ListItemIcon
-          sx={{
-            minWidth: 36,
-            color: isActive ? 'primary.main' : 'text.secondary',
-            fontSize: '1.1rem',
-            '& .MuiSvgIcon-root': { fontSize: '1.1rem' },
-          }}
-        >
-          {item.icon}
-        </ListItemIcon>
-        <ListItemText
-          secondary={item.label}
-          secondaryTypographyProps={{
-            sx: {
-              fontSize: '0.78rem',
-              fontWeight: isActive ? 600 : 400,
-              color: isActive ? theme.palette.primary.light : 'text.secondary',
-            },
-          }}
-        />
-      </ListItemButton>
-    </ListItem>
-  )
-}
-
-function SidebarSection({
-  title,
-  items,
-  pathname,
-  defaultOpen = true,
-}: {
-  title: string
-  items: NavItem[]
-  pathname: string
-  defaultOpen?: boolean
-}) {
-  const hasActiveItem = items.some((item) => pathname === item.href)
-  const [open, setOpen] = React.useState(defaultOpen || hasActiveItem)
-  return (
-    <Box sx={{ mb: 0.5 }}>
-      <ListItemButton
-        onClick={() => setOpen((v) => !v)}
-        sx={{ py: 0.4, px: 2, borderRadius: '6px', mx: 1 }}
-      >
-        <Typography
-          variant="overline"
-          sx={{
-            flex: 1,
-            fontSize: '0.65rem',
-            fontWeight: 700,
-            letterSpacing: '0.12em',
-            color: 'text.secondary',
-            opacity: 0.7,
-          }}
-        >
-          {title}
-        </Typography>
-        {open ? (
-          <ExpandLess
-            sx={{ fontSize: '0.9rem', color: 'text.secondary', opacity: 0.5 }}
-          />
-        ) : (
-          <ExpandMore
-            sx={{ fontSize: '0.9rem', color: 'text.secondary', opacity: 0.5 }}
-          />
-        )}
-      </ListItemButton>
-      <Collapse in={open} timeout="auto" unmountOnExit>
-        <List dense disablePadding>
-          {items.map((item) => (
-            <SidebarNavItem
-              key={item.key}
-              item={item}
-              isActive={pathname === item.href}
-            />
-          ))}
-        </List>
-      </Collapse>
-    </Box>
-  )
 }
 
 function SidebarContent() {
@@ -383,11 +142,7 @@ function SidebarContent() {
         {session?.user && (
           <>
             <Divider sx={{ mx: 2, my: 0.5 }} />
-            <SidebarSection
-              title="Il mio profilo"
-              items={profiloItems}
-              pathname={pathname}
-            />
+            <SidebarSection title="Il mio profilo" items={profiloItems} pathname={pathname} />
           </>
         )}
         <SidebarSection title="Lega" items={legaItems} pathname={pathname} />
@@ -414,32 +169,13 @@ function SidebarContent() {
           gap: 1,
         }}
       >
-        {/* Theme toggle */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Typography variant="caption" color="text.secondary">
             {mode === 'dark' ? 'Tema scuro' : 'Tema chiaro'}
           </Typography>
-          <Tooltip
-            title={
-              mode === 'dark' ? 'Passa al tema chiaro' : 'Passa al tema scuro'
-            }
-          >
-            <IconButton
-              size="small"
-              onClick={toggleMode}
-              sx={{ color: 'primary.main' }}
-            >
-              {mode === 'dark' ? (
-                <LightMode fontSize="small" />
-              ) : (
-                <DarkMode fontSize="small" />
-              )}
+          <Tooltip title={mode === 'dark' ? 'Passa al tema chiaro' : 'Passa al tema scuro'}>
+            <IconButton size="small" onClick={toggleMode} sx={{ color: 'primary.main' }}>
+              {mode === 'dark' ? <LightMode fontSize="small" /> : <DarkMode fontSize="small" />}
             </IconButton>
           </Tooltip>
         </Box>
@@ -500,7 +236,6 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       >
         <SidebarContent />
       </Drawer>
-
       {/* Mobile temporary drawer */}
       <Drawer
         variant="temporary"
