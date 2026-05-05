@@ -200,7 +200,11 @@ export default function Calendario() {
       )
     } else {
       try {
-        await updateCalendario.mutateAsync(calendarioInModifica)
+        const payload = {
+          ...calendarioInModifica,
+          dataFine: calendarioInModifica.dataFine || calendarioInModifica.data,
+        }
+        await updateCalendario.mutateAsync(payload)
         setMessageModal('Salvataggio completato')
         handleModalClose()
       } catch (error) {
@@ -375,6 +379,7 @@ export default function Calendario() {
                 adapterLocale="it"
               >
                 <MobileDateTimePicker
+                  label="Data inizio"
                   value={dayjs(calendarioInModifica.data)}
                   onChange={(newValue) =>
                     setCalendarioInModifica({
@@ -382,6 +387,19 @@ export default function Calendario() {
                       data: newValue?.toISOString() ?? new Date().toISOString(),
                     })
                   }
+                />
+                <MobileDateTimePicker
+                  label="Data fine (opzionale)"
+                  value={calendarioInModifica.dataFine ? dayjs(calendarioInModifica.dataFine) : null}
+                  onChange={(newValue) =>
+                    setCalendarioInModifica({
+                      ...calendarioInModifica,
+                      dataFine: newValue?.toISOString() ?? '',
+                    })
+                  }
+                  slotProps={{
+                    textField: { helperText: 'Se vuoto, usa la data di inizio', size: 'small' },
+                  }}
                 />
               </LocalizationProvider>
 
