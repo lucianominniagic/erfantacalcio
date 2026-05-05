@@ -65,6 +65,7 @@ function Formazione() {
     canConfirmPrecedente,
     confirmingPrecedente,
     handleConfirmPrecedente,
+    formazioneGiaRilasciata,
   } = useFormazioneState()
 
   const theme = useTheme()
@@ -294,7 +295,7 @@ function Formazione() {
             sx={{ mt: '30px', gap: 3 }}
           >
             <Typography variant={isDesktop ? 'h3' : 'h4'} color="error" textAlign="center">
-              {message}
+              {formazioneGiaRilasciata ? 'Formazione già rilasciata fuori orario consentito' : message}
             </Typography>
             {canConfirmPrecedente && (
               <Button

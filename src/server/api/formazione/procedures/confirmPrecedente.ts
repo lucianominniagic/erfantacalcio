@@ -30,6 +30,17 @@ export const confirmPrecedente = protectedProcedure.mutation(async (opts) => {
       .map((partita) => partita.idPartita),
   )
 
+  // 2b. Verifica che l'utente non abbia già una formazione per le partite correnti
+  const formazioniEsistenti = await Formazioni.count({
+    where: { idSquadra: idSquadra, idPartita: In(idPartiteCorrente) },
+  })
+  if (formazioniEsistenti > 0) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: 'Hai già inserito la formazione per questa giornata',
+    })
+  }
+
   // 3. Recupera l'ultima formazione precedente (escludendo le partite correnti)
   const lastFormazione = await Formazioni.findOne({
     where: {

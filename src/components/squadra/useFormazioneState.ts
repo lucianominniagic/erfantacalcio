@@ -94,6 +94,12 @@ export function useFormazioneState() {
         } else {
           setMessage('Formazione non rilasciabile')
         }
+        // Setta idTorneo anche nel branch B per attivare formazioneList
+        // e verificare se esiste già una formazione per la giornata corrente
+        const campionato =
+          calendarioProssima.data.find((g) => g.girone === null) ??
+          calendarioProssima.data[0]
+        setIdTorneo(campionato?.idTorneo)
       }
       setGiornate(calendarioProssima.data)
     }
@@ -245,13 +251,21 @@ export function useFormazioneState() {
     setOpenAlert(true)
   }
 
+  const formazioneGiaRilasciata =
+    message === 'Formazione non rilasciabile, vuoi confermare la precedente formazione?' &&
+    !formazioneList.isLoading &&
+    !!formazioneList.data?.giocatori.some((g) => g.titolare)
+
   const canConfirmPrecedente =
-    message === 'Formazione non rilasciabile, vuoi confermare la precedente formazione?'
+    message === 'Formazione non rilasciabile, vuoi confermare la precedente formazione?' &&
+    !formazioneList.isLoading &&
+    !formazioneList.data?.giocatori.some((g) => g.titolare)
   const confirmingPrecedente = confirmPrecedenteMutation.isPending
 
   const handleConfirmPrecedente = async () => {
     try {
       await confirmPrecedenteMutation.mutateAsync()
+      await formazioneList.refetch()
       setAlertMessage('Formazione precedente confermata con successo')
       setAlertSeverity('success')
     } catch (e: unknown) {
@@ -324,5 +338,6 @@ export function useFormazioneState() {
     canConfirmPrecedente,
     confirmingPrecedente,
     handleConfirmPrecedente,
+    formazioneGiaRilasciata,
   }
 }
