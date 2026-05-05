@@ -53,4 +53,77 @@ export const lightThemeOptions: ThemeOptions = {
       contrastText: '#fff',
     },
   },
+  typography: {
+    h1: {
+      color: '#1a1a2e',
+      fontWeight: 700,
+      fontSize: '2.0rem',
+      lineHeight: 1.21,
+      letterSpacing: '-0.02em',
+    },
+    h2: {
+      color: '#E65100',
+      fontWeight: 700,
+      fontSize: '1.675rem',
+      lineHeight: 1.27,
+      letterSpacing: '-0.01em',
+    },
+    h3: {
+      color: '#E65100',
+      fontWeight: 600,
+      fontSize: '1.4rem',
+      lineHeight: 1.33,
+    },
+    h4: {
+      // titolo classifica — gradient più scuro su sfondo chiaro
+      background: 'linear-gradient(135deg, #E65100 0%, #FF8F00 100%)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      fontWeight: 700,
+      fontSize: '1.1rem',
+      lineHeight: 1.4,
+      letterSpacing: '0.02em',
+    },
+    h5: {
+      // titolo card partite
+      color: '#E65100',
+      fontWeight: 600,
+      fontSize: '0.9rem',
+      lineHeight: 1.5,
+    },
+    h6: {
+      color: '#4a4a6a',
+      fontWeight: 400,
+      fontSize: '0.875rem',
+      lineHeight: 1.57,
+    },
+    caption: {
+      color: '#4a4a6a',
+      fontWeight: 400,
+      fontSize: '0.75rem',
+      lineHeight: 1.66,
+    },
+    body1: {
+      color: '#1a1a2e',
+      fontSize: '0.75rem',
+      lineHeight: 1.57,
+    },
+    body2: {
+      color: '#1a1a2e',
+      fontSize: '0.75rem',
+      lineHeight: 1.66,
+    },
+    subtitle1: {
+      color: '#1a1a2e',
+      fontSize: '0.875rem',
+      fontWeight: 600,
+      lineHeight: 1.57,
+    },
+    subtitle2: {
+      color: '#4a4a6a',
+      fontSize: '0.75rem',
+      fontWeight: 500,
+      lineHeight: 1.66,
+    },
+  },
 }
