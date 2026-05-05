@@ -1,3 +1,6 @@
+import { z } from 'zod'
+import { uploadVotoGiocatoreSchema } from '~/schemas/giocatore'
+
 export interface votoType {
   idVoto: number
   nome: string
@@ -26,18 +29,8 @@ export interface votoListType {
   gruppoFase: string | null
 }
 
-export interface iVotoGiocatore {
-  id_pf: number | null
-  Nome: string
-  Ammonizione: number
-  Assist: number
-  Autogol: number
-  Espulsione: number
-  GolSegnati: number
-  GolSubiti: number
-  RigoriErrati: number
-  RigoriParati: number
-  Ruolo: string
-  Squadra: string
-  Voto: number | null
-}
+/**
+ * Derivato dallo schema Zod `uploadVotoGiocatoreSchema`.
+ * Usare `uploadVotoGiocatoreSchema.parse(...)` per validare prima dell'uso.
+ */
+export type iVotoGiocatore = z.infer<typeof uploadVotoGiocatoreSchema>
