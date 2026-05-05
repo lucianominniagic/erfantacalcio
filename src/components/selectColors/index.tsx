@@ -25,15 +25,9 @@ import {
 import { api } from '~/utils/api'
 import { HourglassTop, Save } from '@mui/icons-material'
 import { ShirtSVG } from './shirtSVG'
+import { type MagliaType } from '~/schemas/maglia'
 
-export interface magliaType {
-  mainColor: string
-  secondaryColor: string
-  thirdColor: string
-  textColor: string
-  shirtNumber: number
-  selectedTemplate: string
-}
+export type { MagliaType as magliaType } from '~/schemas/maglia'
 
 const shirtCollections = [
   'solid',
@@ -66,9 +60,11 @@ export type ShirtTemplate = (typeof shirtCollections)[number]
  * Se il valore non è riconosciuto, torna al default 'solid'.
  */
 export function toShirtTemplate(val: string): ShirtTemplate {
-  return (shirtCollections as readonly string[]).includes(val)
-    ? (val as ShirtTemplate)
-    : 'solid'
+  if (!(shirtCollections as readonly string[]).includes(val)) {
+    console.warn(`[toShirtTemplate] valore non riconosciuto "${val}", fallback a 'solid'`)
+    return 'solid'
+  }
+  return val as ShirtTemplate
 }
 
 const ShirtSelector = () => {
@@ -82,7 +78,7 @@ const ShirtSelector = () => {
   const [shirtNumber, setShirtNumber] = useState(10)
   const [selectedTemplate, setSelectedTemplate] =
     useState<ShirtTemplate>('solid')
-  const [maglia, setMaglia] = useState<magliaType | undefined>({
+  const [maglia, setMaglia] = useState<MagliaType | undefined>({
     mainColor: '#ff0000',
     secondaryColor: '#ffffff',
     thirdColor: '#000000',
