@@ -110,14 +110,17 @@ Obiettivo: ridurre cast/any e centralizzare config.
 
 ---
 
-### FASE 2 — Auth & route group hardening
+### FASE 2 — Auth & route group hardening ✅ COMPLETATA
 
 **Owner:** `gibson`
+**Branch:** `refactor/fase-2` | **Commits:** 3 atomici
 
-1. Creare `src/app/(admin)/layout.tsx` con server-side guard (`auth()` → redirect se `!adminLevel`).
-2. Creare `src/app/(user)/layout.tsx` con server-side guard (`auth()` → redirect se non autenticato).
-3. Audit di ogni pagina admin/user per rimuovere check duplicati ora coperti dal layout.
-4. Verifica `Utente.pwd varchar(50)`: confermare che MD5 è una scelta consapevole o pianificare migrazione a bcrypt (richiede migration + reset password flow).
+1. ✅ `src/app/(admin)/layout.tsx` — Server Component guard: `!session || !session.user || session.user.ruolo !== 'admin'` → `redirect('/login')`
+2. ✅ `src/app/(user)/layout.tsx` — Server Component guard: `!session` → `redirect('/login')`
+3. ✅ Audit pagine — nessun check manuale ridondante trovato nelle 18 pagine `(admin)`/`(user)`
+4. ✅ `docs/ADR/001-password-hashing.md` creato — decisione MD5 vs bcrypt **aperta** (vedi Decisioni aperte)
+
+**Nota:** pattern corretto per guard che leggono `session.user`: `!session || !session.user || session.user.ruolo !== 'admin'` (NextAuth tipizza `session.user` come potenzialmente undefined).
 
 **Done quando:** un utente non admin che apre `/giocatori` viene redirectato lato server; nessun flicker client-side.
 
