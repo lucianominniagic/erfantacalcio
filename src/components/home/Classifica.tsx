@@ -77,7 +77,8 @@ export default function Classifica({
       type: 'number',
       align: 'right',
       renderHeader: () => <strong>{isXs ? 'FP.' : 'Fantapunti'}</strong>,
-      valueFormatter: (value: number) => value != null ? value.toFixed(2) : '',
+      valueFormatter: (value: number) =>
+        value != null ? value.toFixed(2) : '',
       flex: isXs ? 3 : 2,
     },
   ]
@@ -115,7 +116,7 @@ export default function Classifica({
           overflow: 'hidden',
           border: '1px solid rgba(255,193,7,0.12)',
           borderTop: 'none',
-              }}
+        }}
       >
         <DataGrid
           columnHeaderHeight={40}
@@ -151,7 +152,7 @@ export default function Classifica({
           autosizeOptions={autosizeOptions}
           sx={{
             borderRadius: '0 0 12px 12px',
-              }}
+          }}
         />
       </Box>
     </>

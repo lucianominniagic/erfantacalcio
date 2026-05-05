@@ -105,7 +105,9 @@ export function normalizeNomeGiocatore(nome: string): string {
     .replace('Ù', "O'")
 }
 
-export function getIdNextGiornata(calendarioList: z.infer<typeof calendarioSchema>[]) {
+export function getIdNextGiornata(
+  calendarioList: z.infer<typeof calendarioSchema>[],
+) {
   return calendarioList?.find((item) => item.isSelected)?.id ?? undefined
 }
 

@@ -1,9 +1,16 @@
 'use client'
 import React, { useEffect, useState, useMemo } from 'react'
 import { api } from '~/utils/api'
-import { Alert, Box, Skeleton, Stack, Typography, Tabs, Tab } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Skeleton,
+  Stack,
+  Typography,
+  Tabs,
+  Tab,
+} from '@mui/material'
 import CardPartite from '../cardPartite/CardPartite'
-
 
 interface CalendarioProps {
   prefixTitle: string
@@ -11,7 +18,11 @@ interface CalendarioProps {
   enableTabs?: boolean
 }
 
-export default function Calendario({ prefixTitle, tipo, enableTabs = false }: CalendarioProps) {
+export default function Calendario({
+  prefixTitle,
+  tipo,
+  enableTabs = false,
+}: CalendarioProps) {
   const calendarioList =
     tipo === 'prossima'
       ? api.calendario.getProssimeGiornate.useQuery(undefined, {
@@ -47,7 +58,11 @@ export default function Calendario({ prefixTitle, tipo, enableTabs = false }: Ca
         map.set(key, { name, items: [g] })
       }
     }
-    return Array.from(map.entries()).map(([key, v]) => ({ key, name: v.name, items: v.items }))
+    return Array.from(map.entries()).map(([key, v]) => ({
+      key,
+      name: v.name,
+      items: v.items,
+    }))
   }, [calendarioList.data])
 
   useEffect(() => {
@@ -126,9 +141,7 @@ export default function Calendario({ prefixTitle, tipo, enableTabs = false }: Ca
       )}
       {errorMessage && (
         <Stack sx={{ width: '100%' }} spacing={0}>
-          <Alert severity="error">
-            {errorMessage}
-          </Alert>
+          <Alert severity="error">{errorMessage}</Alert>
         </Stack>
       )}
     </>

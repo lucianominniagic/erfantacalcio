@@ -69,10 +69,7 @@ export async function chiudiTrasferimentoGiocatore(
         where: {
           idGiocatore: idGiocatore,
           Calendario: {
-            data: Between(
-              toUtcDate(new Date()),
-              oldTrasferimento.dataAcquisto,
-            ),
+            data: Between(toUtcDate(new Date()), oldTrasferimento.dataAcquisto),
           },
           voto: MoreThan(0),
           Giocatore: { Trasferimenti: { dataCessione: IsNull() } },

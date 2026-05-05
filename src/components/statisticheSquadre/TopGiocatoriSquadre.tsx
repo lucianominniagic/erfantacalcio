@@ -42,7 +42,9 @@ function StatRow({ icon, label, entry, formatValue }: RowProps) {
       spacing={1}
       sx={{ py: 0.5, minHeight: 44 }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
+      <Box
+        sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}
+      >
         {icon}
       </Box>
       <Box sx={{ minWidth: 70 }}>
@@ -94,7 +96,9 @@ function StatRow({ icon, label, entry, formatValue }: RowProps) {
   )
 }
 
-export default function TopGiocatoriSquadre({ idTornei }: TopGiocatoriSquadreProps) {
+export default function TopGiocatoriSquadre({
+  idTornei,
+}: TopGiocatoriSquadreProps) {
   const top = api.statisticheSquadre.topGiocatori.useQuery(
     { idTornei },
     {
@@ -132,7 +136,12 @@ export default function TopGiocatoriSquadre({ idTornei }: TopGiocatoriSquadrePro
           <Grid item xs={12} sm={6} md={4} key={s.idSquadra}>
             <Card sx={{ height: '100%' }}>
               <CardContent>
-                <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={1.5}
+                  sx={{ mb: 1 }}
+                >
                   {s.foto ? (
                     <Avatar src={s.foto} sx={{ width: 32, height: 32 }} />
                   ) : (
@@ -140,25 +149,40 @@ export default function TopGiocatoriSquadre({ idTornei }: TopGiocatoriSquadrePro
                       {s.squadra.charAt(0)}
                     </Avatar>
                   )}
-                  <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 600 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{ fontSize: '1rem', fontWeight: 600 }}
+                  >
                     {s.squadra}
                   </Typography>
                 </Stack>
                 <Divider sx={{ mb: 1 }} />
                 <StatRow
-                  icon={<StarOutlined fontSize="small" sx={{ color: 'primary.main' }} />}
+                  icon={
+                    <StarOutlined
+                      fontSize="small"
+                      sx={{ color: 'primary.main' }}
+                    />
+                  }
                   label="Top media"
                   entry={s.topMedia}
                   formatValue={(n) => n.toFixed(2)}
                 />
                 <StatRow
-                  icon={<ScoreOutlined fontSize="small" sx={{ color: 'success.main' }} />}
+                  icon={
+                    <ScoreOutlined
+                      fontSize="small"
+                      sx={{ color: 'success.main' }}
+                    />
+                  }
                   label="Top bomber"
                   entry={s.topBomber}
                   formatValue={(n) => `${n} gol`}
                 />
                 <StatRow
-                  icon={<EmojiEvents fontSize="small" sx={{ color: 'info.main' }} />}
+                  icon={
+                    <EmojiEvents fontSize="small" sx={{ color: 'info.main' }} />
+                  }
                   label="Top assist"
                   entry={s.topAssist}
                   formatValue={(n) => `${n} ass.`}
@@ -171,4 +195,3 @@ export default function TopGiocatoriSquadre({ idTornei }: TopGiocatoriSquadrePro
     </Box>
   )
 }
-

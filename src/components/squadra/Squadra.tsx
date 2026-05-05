@@ -64,7 +64,9 @@ export default function Squadra({ idSquadra }: SquadraProps) {
 
   if (apiSquadra.isLoading || apiAlbo.isLoading) {
     return (
-      <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', py: 4 }}>
+      <Box
+        sx={{ width: '100%', display: 'flex', justifyContent: 'center', py: 4 }}
+      >
         <CircularProgress color="warning" />
       </Box>
     )
@@ -72,7 +74,11 @@ export default function Squadra({ idSquadra }: SquadraProps) {
 
   if (!datiSquadra || !datiAlbo) return null
 
-  const hasTrofei = datiAlbo.campionato || datiAlbo.champions || datiAlbo.secondo || datiAlbo.terzo
+  const hasTrofei =
+    datiAlbo.campionato ||
+    datiAlbo.champions ||
+    datiAlbo.secondo ||
+    datiAlbo.terzo
   const bgColor = maglia?.mainColor ?? '#1a237e'
 
   return (
@@ -99,7 +105,6 @@ export default function Squadra({ idSquadra }: SquadraProps) {
 
       {/* Contenuto */}
       <Box sx={{ position: 'relative', zIndex: 2, p: { xs: 2, md: 3 } }}>
-
         {/* Riga avatar + nome/presidente + maglia */}
         <Grid container spacing={2} alignItems="center" wrap="nowrap">
           <Grid item xs="auto">
@@ -147,7 +152,15 @@ export default function Squadra({ idSquadra }: SquadraProps) {
 
           {/* Maglia — solo desktop, allineata con avatar+testo */}
           {maglia && (
-            <Grid item xs="auto" sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', pointerEvents: 'none' }}>
+            <Grid
+              item
+              xs="auto"
+              sx={{
+                display: { xs: 'none', sm: 'flex' },
+                alignItems: 'center',
+                pointerEvents: 'none',
+              }}
+            >
               <ShirtSVG
                 template={maglia.selectedTemplate as ShirtTemplate}
                 mainColor={maglia.mainColor}
@@ -164,7 +177,11 @@ export default function Squadra({ idSquadra }: SquadraProps) {
         {/* Riga trofei — sotto avatar+testo */}
         <Box sx={{ mt: 1.5 }}>
           {hasTrofei ? (
-            <Stack direction="row" flexWrap={{ xs: 'wrap', md: 'nowrap' }} gap={0.75}>
+            <Stack
+              direction="row"
+              flexWrap={{ xs: 'wrap', md: 'nowrap' }}
+              gap={0.75}
+            >
               <TrophyBadge
                 count={datiAlbo.campionato}
                 label="Campionato"
@@ -187,12 +204,14 @@ export default function Squadra({ idSquadra }: SquadraProps) {
               />
             </Stack>
           ) : (
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>
+            <Typography
+              variant="body2"
+              sx={{ color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}
+            >
               Nessun trofeo ancora
             </Typography>
           )}
         </Box>
-
       </Box>
     </Box>
   )

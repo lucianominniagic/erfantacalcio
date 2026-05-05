@@ -62,7 +62,12 @@ export default function Breadcrumb() {
 
   return (
     <Breadcrumbs
-      separator={<NavigateNext fontSize="small" sx={{ color: 'primary.main', opacity: 0.5 }} />}
+      separator={
+        <NavigateNext
+          fontSize="small"
+          sx={{ color: 'primary.main', opacity: 0.5 }}
+        />
+      }
       aria-label="breadcrumb"
       sx={{ mb: 1, mt: 0.5 }}
     >
@@ -85,7 +90,14 @@ export default function Breadcrumb() {
         Home
       </Link>
       {isAdmin && (
-        <Typography sx={{ fontSize: '0.75rem', fontWeight: 500, color: 'primary.main', opacity: 0.6 }}>
+        <Typography
+          sx={{
+            fontSize: '0.75rem',
+            fontWeight: 500,
+            color: 'primary.main',
+            opacity: 0.6,
+          }}
+        >
           Admin
         </Typography>
       )}

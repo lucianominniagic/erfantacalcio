@@ -15,7 +15,6 @@ import { z } from 'zod'
 import { giornataSchema } from '~/schemas/calendario'
 import { GenericCard } from '~/components/cards'
 
-
 interface GiornataCardProps {
   prefixTitle: string
   giornata: z.infer<typeof giornataSchema>[]
@@ -75,7 +74,12 @@ export default function CardPartite({
                     }}
                   >
                     {withAvatar && (
-                      <Grid item xs={!isXs ? 1 : 1.5} alignSelf={'center'} sx={{pr:1}}>
+                      <Grid
+                        item
+                        xs={!isXs ? 1 : 1.5}
+                        alignSelf={'center'}
+                        sx={{ pr: 1 }}
+                      >
                         <Avatar
                           alt={partita.squadraHome ?? ''}
                           src={partita.fotoHome ?? ''}
@@ -88,7 +92,7 @@ export default function CardPartite({
                       xs={withAvatar ? (!isXs ? 4 : 3.7) : 5}
                       alignSelf={'center'}
                     >
-                      <Typography variant="h6" sx={{ fontSize: '0.75rem'}}>
+                      <Typography variant="h6" sx={{ fontSize: '0.75rem' }}>
                         {partita.squadraHome}
                         {partita.multaHome ?? (
                           <Tooltip title="Multa">
@@ -114,7 +118,7 @@ export default function CardPartite({
                       paddingRight={2}
                       alignSelf={'center'}
                     >
-                      <Typography variant="h6" sx={{ fontSize: '0.75rem'}}>
+                      <Typography variant="h6" sx={{ fontSize: '0.75rem' }}>
                         {partita.squadraAway}
                         {partita.multaAway ?? (
                           <Tooltip title="Multa">

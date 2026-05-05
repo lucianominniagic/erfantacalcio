@@ -217,7 +217,11 @@ describe('getIdNextGiornata', () => {
     }) as z.infer<typeof calendarioSchema>
 
   it('returns the id of the selected giornata', () => {
-    const list = [makeCalendario(1, false), makeCalendario(2, true), makeCalendario(3, false)]
+    const list = [
+      makeCalendario(1, false),
+      makeCalendario(2, true),
+      makeCalendario(3, false),
+    ]
     expect(getIdNextGiornata(list)).toBe(2)
   })
 

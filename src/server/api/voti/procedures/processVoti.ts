@@ -47,15 +47,17 @@ export const processVotiProcedure = adminProcedure
             console.log(
               `Processing voto for player: ${votoGiocatore.Nome} ${votoGiocatore.Squadra}`,
             )
-            const idGiocatore =
-              giocatori.find(
-                (g) =>
-                  g !== null &&
-                  (g.id_pf === votoGiocatore.id_pf ||
-                    g.nome.toLowerCase() === votoGiocatore.Nome.toLowerCase()),
-              )?.idGiocatore
+            const idGiocatore = giocatori.find(
+              (g) =>
+                g !== null &&
+                (g.id_pf === votoGiocatore.id_pf ||
+                  g.nome.toLowerCase() === votoGiocatore.Nome.toLowerCase()),
+            )?.idGiocatore
 
-            if (idGiocatore && (await findLastTrasferimento(trx, idGiocatore)) === null) {
+            if (
+              idGiocatore &&
+              (await findLastTrasferimento(trx, idGiocatore)) === null
+            ) {
               console.log(
                 `No trasferimento found for player id: ${idGiocatore}, creating one...`,
               )
@@ -118,8 +120,6 @@ export const processVotiProcedure = adminProcedure
               })
             }
             console.log(`Processed voto for player: ${votoGiocatore.Nome}`)
-          
-            
           }),
         )
 

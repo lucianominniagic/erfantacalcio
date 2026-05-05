@@ -129,7 +129,6 @@ export default function Giocatori() {
       await trasferimentiList.refetch()
     },
   })
-  
 
   const columns: GridColDef[] = [
     { field: 'id', hideable: true },
@@ -207,13 +206,11 @@ export default function Giocatori() {
               key={params.id}
               icon={<BarChartOutlined color="success" />}
               label="Vedi giocatore"
-              onClick={() =>
-                handleEditTrasferimento(params.id as number)
-              }
+              onClick={() => handleEditTrasferimento(params.id as number)}
             />,
-          ];
+          ]
         }
-        return []; // Nessuna azione se la stagione non è quella specificata
+        return [] // Nessuna azione se la stagione non è quella specificata
       },
       width: 100,
     },
@@ -377,11 +374,9 @@ export default function Giocatori() {
     document?.getElementById('search_items')?.focus()
   }
 
-  const handleEditTrasferimento = async (
-    _idTrasferimento: number
-  ) => {
+  const handleEditTrasferimento = async (_idTrasferimento: number) => {
     setSelectedTrasferimentoId(_idTrasferimento)
-    
+
     document?.getElementById('costo')?.focus()
   }
 
@@ -513,343 +508,320 @@ export default function Giocatori() {
       <GenericCard
         title="Anagrafica giocatore"
         subtitle="Inserisci/aggiorna giocatore"
-        titleVariant='h4'
+        titleVariant="h4"
         sx={{ p: 0 }}
       >
-          <Box
-            component="form"
-            onSubmit={handleUpsertGiocatore}
-            noValidate
-            sx={{ mt: 1 }}
-          >
-            <Grid container spacing={0}>
-              <Grid item xs={8}>
-                <Stack direction="row" spacing={1} justifyContent="flex-start">
-                  <TextField
-                    margin="normal"
+        <Box
+          component="form"
+          onSubmit={handleUpsertGiocatore}
+          noValidate
+          sx={{ mt: 1 }}
+        >
+          <Grid container spacing={0}>
+            <Grid item xs={8}>
+              <Stack direction="row" spacing={1} justifyContent="flex-start">
+                <TextField
+                  margin="normal"
+                  size="small"
+                  variant="outlined"
+                  required
+                  sx={{ m: 2 }}
+                  label="Nome"
+                  name="nome"
+                  value={giocatore?.nome ?? selectedGiocatore}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    handleInputChange(event, 'anagrafica')
+                  }
+                />
+                <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                  <InputLabel id="select-label-ruolo">Ruolo</InputLabel>
+                  <Select
                     size="small"
                     variant="outlined"
-                    required
-                    sx={{ m: 2 }}
-                    label="Nome"
-                    name="nome"
-                    value={giocatore?.nome ?? selectedGiocatore}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange(event, 'anagrafica')
+                    labelId="select-label-ruolo"
+                    label="Ruolo"
+                    sx={{ m: 0 }}
+                    name="ruolo"
+                    value={giocatore?.ruolo ?? 'P'}
+                    onChange={(event: SelectChangeEvent) =>
+                      handleSelectChange(event, 'anagrafica')
                     }
-                  />
-                  <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                    <InputLabel id="select-label-ruolo">Ruolo</InputLabel>
-                    <Select
-                      size="small"
-                      variant="outlined"
-                      labelId="select-label-ruolo"
-                      label="Ruolo"
-                      sx={{ m: 0 }}
-                      name="ruolo"
-                      value={giocatore?.ruolo ?? 'P'}
-                      onChange={(event: SelectChangeEvent) =>
-                        handleSelectChange(event, 'anagrafica')
-                      }
-                    >
-                      {ruoliList.map((item) => (
-                        <MenuItem
-                          key={item}
-                          value={item}
-                          
-                        >
-                          {getRuoloEsteso(item)}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <TextField
-                    margin="normal"
-                    size="small"
-                    variant="outlined"
-                    required
-                    sx={{ m: 2 }}
-                    label="Nome fantagazzetta"
-                    name="nomeFantagazzetta"
-                    value={giocatore?.nomeFantagazzetta ?? ''}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                      handleInputChange(event, 'anagrafica')
-                    }
-                  />
-                </Stack>
-              </Grid>
-              <Grid item xs={4}>
-                <Stack direction="row" spacing={1} justifyContent="flex-end">
+                  >
+                    {ruoliList.map((item) => (
+                      <MenuItem key={item} value={item}>
+                        {getRuoloEsteso(item)}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <TextField
+                  margin="normal"
+                  size="small"
+                  variant="outlined"
+                  required
+                  sx={{ m: 2 }}
+                  label="Nome fantagazzetta"
+                  name="nomeFantagazzetta"
+                  value={giocatore?.nomeFantagazzetta ?? ''}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                    handleInputChange(event, 'anagrafica')
+                  }
+                />
+              </Stack>
+            </Grid>
+            <Grid item xs={4}>
+              <Stack direction="row" spacing={1} justifyContent="flex-end">
+                <Button
+                  type="button"
+                  onClick={handleCancelGiocatore}
+                  variant="outlined"
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  Annulla
+                </Button>
+                {selectedGiocatoreId !== undefined && (
                   <Button
                     type="button"
-                    onClick={handleCancelGiocatore}
+                    onClick={handleDeleteGiocatore}
+                    color="error"
                     variant="outlined"
                     sx={{ mt: 3, mb: 2 }}
                   >
-                    Annulla
+                    Elimina
                   </Button>
-                  {selectedGiocatoreId !== undefined && (
-                    <Button
-                      type="button"
-                      onClick={handleDeleteGiocatore}
-                      color="error"
-                      variant="outlined"
-                      sx={{ mt: 3, mb: 2 }}
-                    >
-                      Elimina
-                    </Button>
-                  )}
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
-                  >
-                    {selectedGiocatoreId
-                      ? 'Aggiorna giocatore'
-                      : 'Aggiungi giocatore'}
-                  </Button>
-                </Stack>
-              </Grid>
-              <Grid item xs={12}>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  justifyContent="space-between"
-                >
-                  {messageGiocatore && (
-                    <Stack sx={{ width: '100%' }} spacing={0}>
-                      <Alert
-                        icon={<CheckIcon fontSize="inherit" />}
-                        severity="success"
-                      >
-                        {messageGiocatore}
-                      </Alert>
-                    </Stack>
-                  )}
-                  {errorMessageGiocatore && (
-                    <Stack sx={{ width: '100%' }} spacing={0}>
-                      <Alert
-                        icon={<CheckIcon fontSize="inherit" />}
-                        severity="error"
-                      >
-                        {errorMessageGiocatore}
-                      </Alert>
-                    </Stack>
-                  )}
-                </Stack>
-              </Grid>
+                )}
+                <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
+                  {selectedGiocatoreId
+                    ? 'Aggiorna giocatore'
+                    : 'Aggiungi giocatore'}
+                </Button>
+              </Stack>
             </Grid>
-          </Box>
-        </GenericCard>
+            <Grid item xs={12}>
+              <Stack direction="row" spacing={1} justifyContent="space-between">
+                {messageGiocatore && (
+                  <Stack sx={{ width: '100%' }} spacing={0}>
+                    <Alert
+                      icon={<CheckIcon fontSize="inherit" />}
+                      severity="success"
+                    >
+                      {messageGiocatore}
+                    </Alert>
+                  </Stack>
+                )}
+                {errorMessageGiocatore && (
+                  <Stack sx={{ width: '100%' }} spacing={0}>
+                    <Alert
+                      icon={<CheckIcon fontSize="inherit" />}
+                      severity="error"
+                    >
+                      {errorMessageGiocatore}
+                    </Alert>
+                  </Stack>
+                )}
+              </Stack>
+            </Grid>
+          </Grid>
+        </Box>
+      </GenericCard>
       {selectedGiocatoreId !== undefined && (
         <Paper elevation={3}>
           <GenericCard
             title="Trasferimento giocatore"
             subtitle="Inserisci/aggiorna trasferimento"
-            titleVariant='h4'
+            titleVariant="h4"
             sx={{ p: 0 }}
           >
-              <Box
-                component="form"
-                onSubmit={handleUpsertTrasferimento}
-                noValidate
-                sx={{ mt: 1 }}
-              >
-                <Grid container spacing={0}>
-                  <Grid item xs={8}>
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      justifyContent="flex-start"
-                    >
-                      <TextField
-                        margin="normal"
+            <Box
+              component="form"
+              onSubmit={handleUpsertTrasferimento}
+              noValidate
+              sx={{ mt: 1 }}
+            >
+              <Grid container spacing={0}>
+                <Grid item xs={8}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    justifyContent="flex-start"
+                  >
+                    <TextField
+                      margin="normal"
+                      size="small"
+                      variant="outlined"
+                      required
+                      sx={{ m: 2 }}
+                      id="costo"
+                      label="Costo"
+                      name="costo"
+                      type="number"
+                      value={trasferimento.costo}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                        handleInputChange(event, 'trasferimento')
+                      }
+                    />
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <InputLabel id="select-label-fantasquadra">
+                        Fantasquadra
+                      </InputLabel>
+                      <Select
                         size="small"
                         variant="outlined"
-                        required
-                        sx={{ m: 2 }}
-                        id="costo"
-                        label="Costo"
-                        name="costo"
-                        type="number"
-                        value={trasferimento.costo}
-                        onChange={(
-                          event: React.ChangeEvent<HTMLInputElement>,
-                        ) => handleInputChange(event, 'trasferimento')}
-                      />
-                      <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                        <InputLabel id="select-label-fantasquadra">
-                          Fantasquadra
-                        </InputLabel>
-                        <Select
-                          size="small"
-                          variant="outlined"
-                          labelId="select-label-fantasquadra"
-                          label="Fantasquadra"
-                          sx={{ m: 0 }}
-                          id="idSquadra"
-                          name="idSquadra"
-                          value={
-                            trasferimento.idSquadra?.toLocaleString() ?? '0'
-                          }
-                          onChange={(event: SelectChangeEvent) =>
-                            handleSelectChange(event, 'trasferimento')
-                          }
-                        >
-                          {squadre.map((item) => (
-                            <MenuItem
-                              key={item.id}
-                              value={item.id?.toLocaleString()}
-                              
-                            >
-                              {item.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                      <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                        <InputLabel id="select-label-squadra">
-                          Squadra
-                        </InputLabel>
-                        <Select
-                          size="small"
-                          variant="outlined"
-                          labelId="select-label-squadra"
-                          label="Squadra"
-                          sx={{ m: 0 }}
-                          id="idSquadraSerieA"
-                          name="idSquadraSerieA"
-                          value={
-                            trasferimento.idSquadraSerieA?.toLocaleString() ??
-                            '0'
-                          }
-                          onChange={(event: SelectChangeEvent) =>
-                            handleSelectChange(event, 'trasferimento')
-                          }
-                        >
-                          {squadreSerieA.map((item) => (
-                            <MenuItem
-                              key={item.id}
-                              value={item.id?.toLocaleString()}
-                              
-                            >
-                              {item.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                      <TextField
-                        margin="normal"
-                        size="small"
-                        variant="outlined"
-                        required
-                        type="datetime-local"
-                        sx={{ m: 2 }}
-                        id="dataAcquisto"
-                        label="Data Acquisto"
-                        name="dataAcquisto"
-                        value={convertFromIsoToDatetimeMUI(
-                          dayjs(trasferimento.dataAcquisto).toISOString(),
-                        )}
-                        onChange={(
-                          event: React.ChangeEvent<HTMLInputElement>,
-                        ) => handleInputChange(event, 'trasferimento')}
-                      />
-                      <TextField
-                        margin="normal"
-                        size="small"
-                        variant="outlined"
-                        required
-                        type="datetime-local"
-                        sx={{ m: 2 }}
-                        id="dataCessione"
-                        //label='Data Cessione'
-                        name="dataCessione"
-                        value={
-                          trasferimento.dataCessione !== null
-                            ? convertFromIsoToDatetimeMUI(
-                                dayjs(trasferimento.dataCessione).toISOString(),
-                              )
-                            : null
+                        labelId="select-label-fantasquadra"
+                        label="Fantasquadra"
+                        sx={{ m: 0 }}
+                        id="idSquadra"
+                        name="idSquadra"
+                        value={trasferimento.idSquadra?.toLocaleString() ?? '0'}
+                        onChange={(event: SelectChangeEvent) =>
+                          handleSelectChange(event, 'trasferimento')
                         }
-                        onChange={(
-                          event: React.ChangeEvent<HTMLInputElement>,
-                        ) => handleInputChange(event, 'trasferimento')}
-                      />
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      justifyContent="flex-end"
-                    >
-                      <Button
-                        type="button"
-                        onClick={handleCancelTrasferimento}
-                        variant="outlined"
-                        sx={{ mt: 3, mb: 2 }}
                       >
-                        Annulla
-                      </Button>
-                      {selectedTrasferimentoId !== undefined &&
-                        selectedTrasferimentoStagione ===
-                          Configurazione.stagione && (
-                          <Button
-                            type="button"
-                            onClick={handleDeleteTrasferimento}
-                            color="error"
-                            variant="outlined"
-                            sx={{ mt: 3, mb: 2 }}
+                        {squadre.map((item) => (
+                          <MenuItem
+                            key={item.id}
+                            value={item.id?.toLocaleString()}
                           >
-                            Elimina
-                          </Button>
-                        )}
-                      {selectedTrasferimentoStagione ===
+                            {item.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                      <InputLabel id="select-label-squadra">Squadra</InputLabel>
+                      <Select
+                        size="small"
+                        variant="outlined"
+                        labelId="select-label-squadra"
+                        label="Squadra"
+                        sx={{ m: 0 }}
+                        id="idSquadraSerieA"
+                        name="idSquadraSerieA"
+                        value={
+                          trasferimento.idSquadraSerieA?.toLocaleString() ?? '0'
+                        }
+                        onChange={(event: SelectChangeEvent) =>
+                          handleSelectChange(event, 'trasferimento')
+                        }
+                      >
+                        {squadreSerieA.map((item) => (
+                          <MenuItem
+                            key={item.id}
+                            value={item.id?.toLocaleString()}
+                          >
+                            {item.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                    <TextField
+                      margin="normal"
+                      size="small"
+                      variant="outlined"
+                      required
+                      type="datetime-local"
+                      sx={{ m: 2 }}
+                      id="dataAcquisto"
+                      label="Data Acquisto"
+                      name="dataAcquisto"
+                      value={convertFromIsoToDatetimeMUI(
+                        dayjs(trasferimento.dataAcquisto).toISOString(),
+                      )}
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                        handleInputChange(event, 'trasferimento')
+                      }
+                    />
+                    <TextField
+                      margin="normal"
+                      size="small"
+                      variant="outlined"
+                      required
+                      type="datetime-local"
+                      sx={{ m: 2 }}
+                      id="dataCessione"
+                      //label='Data Cessione'
+                      name="dataCessione"
+                      value={
+                        trasferimento.dataCessione !== null
+                          ? convertFromIsoToDatetimeMUI(
+                              dayjs(trasferimento.dataCessione).toISOString(),
+                            )
+                          : null
+                      }
+                      onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                        handleInputChange(event, 'trasferimento')
+                      }
+                    />
+                  </Stack>
+                </Grid>
+                <Grid item xs={4}>
+                  <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    <Button
+                      type="button"
+                      onClick={handleCancelTrasferimento}
+                      variant="outlined"
+                      sx={{ mt: 3, mb: 2 }}
+                    >
+                      Annulla
+                    </Button>
+                    {selectedTrasferimentoId !== undefined &&
+                      selectedTrasferimentoStagione ===
                         Configurazione.stagione && (
                         <Button
-                          type="submit"
-                          variant="contained"
+                          type="button"
+                          onClick={handleDeleteTrasferimento}
+                          color="error"
+                          variant="outlined"
                           sx={{ mt: 3, mb: 2 }}
                         >
-                          {selectedTrasferimentoId
-                            ? 'Aggiorna trasferimento'
-                            : 'Aggiungi trasferimento'}
+                          Elimina
                         </Button>
                       )}
-                    </Stack>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      justifyContent="space-between"
-                    >
-                      {messageTrasferimento && (
-                        <Stack sx={{ width: '100%' }} spacing={0}>
-                          <Alert
-                            icon={<CheckIcon fontSize="inherit" />}
-                            severity="success"
-                          >
-                            {messageTrasferimento}
-                          </Alert>
-                        </Stack>
-                      )}
-                      {errorMessageTrasferimento && (
-                        <Stack sx={{ width: '100%' }} spacing={0}>
-                          <Alert
-                            icon={<CheckIcon fontSize="inherit" />}
-                            severity="error"
-                          >
-                            {errorMessageTrasferimento}
-                          </Alert>
-                        </Stack>
-                      )}
-                    </Stack>
-                  </Grid>
+                    {selectedTrasferimentoStagione ===
+                      Configurazione.stagione && (
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                      >
+                        {selectedTrasferimentoId
+                          ? 'Aggiorna trasferimento'
+                          : 'Aggiungi trasferimento'}
+                      </Button>
+                    )}
+                  </Stack>
                 </Grid>
-              </Box>
-            </GenericCard>
+                <Grid item xs={12}>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    justifyContent="space-between"
+                  >
+                    {messageTrasferimento && (
+                      <Stack sx={{ width: '100%' }} spacing={0}>
+                        <Alert
+                          icon={<CheckIcon fontSize="inherit" />}
+                          severity="success"
+                        >
+                          {messageTrasferimento}
+                        </Alert>
+                      </Stack>
+                    )}
+                    {errorMessageTrasferimento && (
+                      <Stack sx={{ width: '100%' }} spacing={0}>
+                        <Alert
+                          icon={<CheckIcon fontSize="inherit" />}
+                          severity="error"
+                        >
+                          {errorMessageTrasferimento}
+                        </Alert>
+                      </Stack>
+                    )}
+                  </Stack>
+                </Grid>
+              </Grid>
+            </Box>
+          </GenericCard>
         </Paper>
       )}
       {trasferimentiList.isLoading &&

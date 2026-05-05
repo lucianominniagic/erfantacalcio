@@ -23,4 +23,3 @@ export interface iGiocatoreStats {
   squadra: string | null
   idSquadra: number | null
 }
-

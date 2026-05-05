@@ -28,15 +28,27 @@ export const statsStagioniProcedure = publicProcedure
           SquadraSerieA: { idSquadraSerieA: true, nome: true },
         },
         relations: { Utente: true, Giocatore: true, SquadraSerieA: true },
-        where: { idGiocatore: idGiocatore , stagione: Not(Configurazione.stagione), hasRitirato: false },
-        order: { stagione: 'desc' , dataAcquisto: 'desc' },
+        where: {
+          idGiocatore: idGiocatore,
+          stagione: Not(Configurazione.stagione),
+          hasRitirato: false,
+        },
+        order: { stagione: 'desc', dataAcquisto: 'desc' },
       })
 
-      const aggregatedStats: Record<string, { media: number; gol: number; assist: number; giocate: number }> = {}
+      const aggregatedStats: Record<
+        string,
+        { media: number; gol: number; assist: number; giocate: number }
+      > = {}
 
       query.forEach(({ stagione, media, gol, assist, giocate }) => {
         if (!aggregatedStats[stagione]) {
-          aggregatedStats[stagione] = { media: 0, gol: 0, assist: 0, giocate: 0 }
+          aggregatedStats[stagione] = {
+            media: 0,
+            gol: 0,
+            assist: 0,
+            giocate: 0,
+          }
         }
         const currentStats = aggregatedStats[stagione]
         const gamesPlayed = giocate ?? 0

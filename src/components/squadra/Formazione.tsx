@@ -73,12 +73,20 @@ function Formazione() {
 
   const renderRosa = (roles: string[], title: string) => {
     const mergedPlayers = [
-      ...rosa.filter((p) => roles.includes(p.ruolo)).map((p) => ({ ...p, status: 'rosa' as const })),
-      ...campo.filter((p) => roles.includes(p.ruolo)).map((p) => ({ ...p, status: 'campo' as const })),
-      ...panca.filter((p) => roles.includes(p.ruolo)).map((p) => ({ ...p, status: 'panca' as const })),
+      ...rosa
+        .filter((p) => roles.includes(p.ruolo))
+        .map((p) => ({ ...p, status: 'rosa' as const })),
+      ...campo
+        .filter((p) => roles.includes(p.ruolo))
+        .map((p) => ({ ...p, status: 'campo' as const })),
+      ...panca
+        .filter((p) => roles.includes(p.ruolo))
+        .map((p) => ({ ...p, status: 'panca' as const })),
     ]
 
-    const renderStatusIcon = (player: GiocatoreFormazioneType & { status: 'rosa' | 'campo' | 'panca' }) => {
+    const renderStatusIcon = (
+      player: GiocatoreFormazioneType & { status: 'rosa' | 'campo' | 'panca' },
+    ) => {
       if (player.status === 'campo') {
         return (
           <Tooltip title="Titolare">
@@ -127,7 +135,10 @@ function Formazione() {
                         primary={getShortName(player.nome)}
                         secondary={`(${player.nomeSquadraSerieA
                           ?.toUpperCase()
-                          .substring(0, 3)}) - ${getMatch(giornate[0], player, false)}`}
+                          .substring(
+                            0,
+                            3,
+                          )}) - ${getMatch(giornate[0], player, false)}`}
                       />
                     </ListItem>
                   </div>
@@ -183,15 +194,30 @@ function Formazione() {
               >
                 <Box>
                   {squadra && (
-                    <Typography variant={isDesktop ? 'h4' : 'h6'} fontWeight="bold">
+                    <Typography
+                      variant={isDesktop ? 'h4' : 'h6'}
+                      fontWeight="bold"
+                    >
                       {squadra}
                     </Typography>
                   )}
-                  <Typography variant={giornate.length > 0 ? 'h6' : 'h5'} sx={{ lineHeight: 2 }}>
-                    <b>{giornate.length > 1 ? `${giornate[0]?.Title} / ${giornate[1]?.Title}` : giornate[0]?.Title}</b>
+                  <Typography
+                    variant={giornate.length > 0 ? 'h6' : 'h5'}
+                    sx={{ lineHeight: 2 }}
+                  >
+                    <b>
+                      {giornate.length > 1
+                        ? `${giornate[0]?.Title} / ${giornate[1]?.Title}`
+                        : giornate[0]?.Title}
+                    </b>
                   </Typography>
                 </Box>
-                <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                  flexWrap="wrap"
+                >
                   {giornate.length > 1 && (
                     <Select
                       size="small"
@@ -205,7 +231,9 @@ function Formazione() {
                           ? resetFormazione(e.target.value as number)
                           : setIdPartita(0)
                       }
-                      defaultValue={giornate.length > 1 ? 0 : giornate[0]?.idTorneo}
+                      defaultValue={
+                        giornate.length > 1 ? 0 : giornate[0]?.idTorneo
+                      }
                     >
                       <MenuItem value={0} key="giornata_0">
                         Salva entrambe le formazioni
@@ -240,7 +268,11 @@ function Formazione() {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 <Typography variant="h5">
                   Rosa ({rosa.length}) / Panchina ({panca.length})
                 </Typography>
@@ -294,18 +326,28 @@ function Formazione() {
             alignItems="center"
             sx={{ mt: '30px', gap: 3 }}
           >
-            <Typography variant={isDesktop ? 'h3' : 'h4'} color="error" textAlign="center">
-              {formazioneGiaRilasciata ? 'Formazione già rilasciata fuori orario consentito' : message}
+            <Typography
+              variant={isDesktop ? 'h3' : 'h4'}
+              color="error"
+              textAlign="center"
+            >
+              {formazioneGiaRilasciata
+                ? 'Formazione già rilasciata fuori orario consentito'
+                : message}
             </Typography>
             {canConfirmPrecedente && (
               <Button
                 variant="contained"
                 size="large"
                 disabled={confirmingPrecedente}
-                endIcon={confirmingPrecedente ? <HourglassTop /> : <CheckCircle />}
+                endIcon={
+                  confirmingPrecedente ? <HourglassTop /> : <CheckCircle />
+                }
                 onClick={handleConfirmPrecedente}
               >
-                {confirmingPrecedente ? 'Attendere...' : 'Conferma formazione precedente'}
+                {confirmingPrecedente
+                  ? 'Attendere...'
+                  : 'Conferma formazione precedente'}
               </Button>
             )}
             <Snackbar

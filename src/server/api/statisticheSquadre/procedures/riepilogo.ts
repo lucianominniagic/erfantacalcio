@@ -29,7 +29,11 @@ interface SquadraStats {
   peggioreSconfittaLabel: string | null
 }
 
-const initStats = (idSquadra: number, squadra: string, foto: string | null): SquadraStats => ({
+const initStats = (
+  idSquadra: number,
+  squadra: string,
+  foto: string | null,
+): SquadraStats => ({
   idSquadra,
   squadra,
   foto,
@@ -126,11 +130,17 @@ export const riepilogoProcedure = publicProcedure
           if (golS === 0) s.cleanSheet += 1
           if (golF === 0) s.partiteSenzaGol += 1
 
-          if (s.miglioreFantapunti == null || fantapunti > s.miglioreFantapunti) {
+          if (
+            s.miglioreFantapunti == null ||
+            fantapunti > s.miglioreFantapunti
+          ) {
             s.miglioreFantapunti = fantapunti
             s.miglioreGiornata = giornata
           }
-          if (s.peggioreFantapunti == null || fantapunti < s.peggioreFantapunti) {
+          if (
+            s.peggioreFantapunti == null ||
+            fantapunti < s.peggioreFantapunti
+          ) {
             s.peggioreFantapunti = fantapunti
             s.peggioreGiornata = giornata
           }
@@ -176,15 +186,20 @@ export const riepilogoProcedure = publicProcedure
           mediaFantapunti: round2(s.fantapuntiTot / s.giocate),
           mediaGolFatti: round2(s.golFatti / s.giocate),
           mediaGolSubiti: round2(s.golSubiti / s.giocate),
-          miglioreFantapunti: s.miglioreFantapunti != null ? round2(s.miglioreFantapunti) : null,
+          miglioreFantapunti:
+            s.miglioreFantapunti != null ? round2(s.miglioreFantapunti) : null,
           miglioreGiornata: s.miglioreGiornata,
-          peggioreFantapunti: s.peggioreFantapunti != null ? round2(s.peggioreFantapunti) : null,
+          peggioreFantapunti:
+            s.peggioreFantapunti != null ? round2(s.peggioreFantapunti) : null,
           peggioreGiornata: s.peggioreGiornata,
           miglioreVittoria: s.miglioreVittoriaLabel,
           peggioreSconfitta: s.peggioreSconfittaLabel,
           cleanSheet: s.cleanSheet,
           partiteSenzaGol: s.partiteSenzaGol,
-          percVittorieCasa: s.giocateCasa > 0 ? round2((s.vittorieCasa / s.giocateCasa) * 100) : 0,
+          percVittorieCasa:
+            s.giocateCasa > 0
+              ? round2((s.vittorieCasa / s.giocateCasa) * 100)
+              : 0,
           percVittorieTrasferta:
             s.giocateTrasferta > 0
               ? round2((s.vittorieTrasferta / s.giocateTrasferta) * 100)

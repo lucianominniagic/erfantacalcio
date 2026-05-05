@@ -67,11 +67,19 @@ export default function FotoProfilo() {
 
   const loadFile = (file: File) => {
     if (file.size > 4.5 * 1024 * 1024) {
-      setAlert({ severity: 'error', title: 'File troppo grande', message: 'Dimensione massima: 4.5 MB' })
+      setAlert({
+        severity: 'error',
+        title: 'File troppo grande',
+        message: 'Dimensione massima: 4.5 MB',
+      })
       return
     }
     if (!file.type.startsWith('image/')) {
-      setAlert({ severity: 'error', title: 'Formato non valido', message: 'Seleziona un file immagine (JPG, PNG, GIF)' })
+      setAlert({
+        severity: 'error',
+        title: 'Formato non valido',
+        message: 'Seleziona un file immagine (JPG, PNG, GIF)',
+      })
       return
     }
     setAlert(null)
@@ -114,7 +122,11 @@ export default function FotoProfilo() {
       setCroppedImageUrl(url)
       setStep('upload')
     } catch {
-      setAlert({ severity: 'error', title: 'Errore', message: 'Impossibile applicare il ritaglio' })
+      setAlert({
+        severity: 'error',
+        title: 'Errore',
+        message: 'Impossibile applicare il ritaglio',
+      })
     }
   }
 
@@ -138,22 +150,42 @@ export default function FotoProfilo() {
         setProgress(60)
 
         try {
-          const serverPath = await uploadFileVercel.mutateAsync({ fileName: filename, fileData })
+          const serverPath = await uploadFileVercel.mutateAsync({
+            fileName: filename,
+            fileData,
+          })
           setProgress(85)
-          const filePath = await updateFotoProfilo.mutateAsync({ fileName: serverPath })
+          const filePath = await updateFotoProfilo.mutateAsync({
+            fileName: serverPath,
+          })
           setProgress(100)
-          await update({ ...session, user: { ...session?.user, image: filePath } })
+          await update({
+            ...session,
+            user: { ...session?.user, image: filePath },
+          })
           setUploading(false)
-          setAlert({ severity: 'success', title: 'Caricamento completato', message: 'La tua foto profilo è stata aggiornata!' })
+          setAlert({
+            severity: 'success',
+            title: 'Caricamento completato',
+            message: 'La tua foto profilo è stata aggiornata!',
+          })
         } catch {
           setUploading(false)
-          setAlert({ severity: 'error', title: 'Errore upload', message: 'Si è verificato un errore durante il caricamento.' })
+          setAlert({
+            severity: 'error',
+            title: 'Errore upload',
+            message: 'Si è verificato un errore durante il caricamento.',
+          })
         }
       }
       reader.readAsArrayBuffer(croppedBlob)
     } catch {
       setUploading(false)
-      setAlert({ severity: 'error', title: 'Errore', message: 'Impossibile leggere il file.' })
+      setAlert({
+        severity: 'error',
+        title: 'Errore',
+        message: 'Impossibile leggere il file.',
+      })
     }
   }
 
@@ -177,7 +209,11 @@ export default function FotoProfilo() {
         <Avatar
           src={session?.user?.image?.toString() ?? ''}
           alt={session?.user?.squadra ?? ''}
-          sx={{ width: 52, height: 52, border: '2px solid rgba(255,193,7,0.35)' }}
+          sx={{
+            width: 52,
+            height: 52,
+            border: '2px solid rgba(255,193,7,0.35)',
+          }}
         />
         <Box>
           <Typography variant="h2" sx={{ fontSize: '1.1rem', mb: 0 }}>
@@ -194,14 +230,25 @@ export default function FotoProfilo() {
             <Box
               key={s}
               sx={{
-                width: 28, height: 28, borderRadius: '50%',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '0.7rem', fontWeight: 700,
+                width: 28,
+                height: 28,
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '0.7rem',
+                fontWeight: 700,
                 ...(step === s
-                  ? { background: 'linear-gradient(135deg,#FF8F00,#FFC107)', color: '#0d0d14' }
+                  ? {
+                      background: 'linear-gradient(135deg,#FF8F00,#FFC107)',
+                      color: '#0d0d14',
+                    }
                   : i < ['select', 'crop', 'upload'].indexOf(step)
                     ? { background: 'rgba(255,193,7,0.2)', color: '#FFD54F' }
-                    : { background: 'rgba(255,255,255,0.05)', color: 'text.disabled' }),
+                    : {
+                        background: 'rgba(255,255,255,0.05)',
+                        color: 'text.disabled',
+                      }),
               }}
             >
               {i + 1}
@@ -213,7 +260,10 @@ export default function FotoProfilo() {
       {/* ── STEP 1: Selezione ── */}
       {step === 'select' && (
         <Box
-          onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
+          onDragOver={(e) => {
+            e.preventDefault()
+            setIsDragging(true)
+          }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           sx={{
@@ -226,22 +276,40 @@ export default function FotoProfilo() {
             gap: 2,
             cursor: 'pointer',
             transition: 'border-color 0.2s, background 0.2s',
-            background: isDragging ? 'rgba(255,193,7,0.05)' : 'rgba(255,255,255,0.02)',
-            '&:hover': { borderColor: 'rgba(255,193,7,0.5)', background: 'rgba(255,193,7,0.03)' },
+            background: isDragging
+              ? 'rgba(255,193,7,0.05)'
+              : 'rgba(255,255,255,0.02)',
+            '&:hover': {
+              borderColor: 'rgba(255,193,7,0.5)',
+              background: 'rgba(255,193,7,0.03)',
+            },
           }}
           onClick={() => document.getElementById('upload-input')?.click()}
         >
-          <PhotoCamera sx={{ fontSize: '3rem', color: isDragging ? '#FFC107' : 'rgba(255,193,7,0.4)' }} />
+          <PhotoCamera
+            sx={{
+              fontSize: '3rem',
+              color: isDragging ? '#FFC107' : 'rgba(255,193,7,0.4)',
+            }}
+          />
           <Typography variant="subtitle1" sx={{ textAlign: 'center' }}>
             Trascina una foto qui
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ textAlign: 'center' }}
+          >
             oppure clicca per selezionare un file
           </Typography>
           <Chip
             label="JPG · PNG · GIF · max 4.5 MB"
             size="small"
-            sx={{ color: 'text.secondary', bgcolor: 'rgba(255,255,255,0.04)', fontSize: '0.65rem' }}
+            sx={{
+              color: 'text.secondary',
+              bgcolor: 'rgba(255,255,255,0.04)',
+              fontSize: '0.65rem',
+            }}
           />
           <input
             accept="image/png, image/jpeg, image/gif"
@@ -259,8 +327,10 @@ export default function FotoProfilo() {
           {/* Crop area */}
           <Box
             sx={{
-              position: 'relative', height: 340,
-              borderRadius: '12px', overflow: 'hidden',
+              position: 'relative',
+              height: 340,
+              borderRadius: '12px',
+              overflow: 'hidden',
               border: '1px solid rgba(255,193,7,0.15)',
               background: '#000',
             }}
@@ -279,7 +349,10 @@ export default function FotoProfilo() {
               onCropComplete={onCropComplete}
               style={{
                 containerStyle: { borderRadius: '12px' },
-                cropAreaStyle: { border: '2px solid #FFC107', boxShadow: '0 0 0 9999px rgba(0,0,0,0.6)' },
+                cropAreaStyle: {
+                  border: '2px solid #FFC107',
+                  boxShadow: '0 0 0 9999px rgba(0,0,0,0.6)',
+                },
               }}
             />
           </Box>
@@ -290,7 +363,9 @@ export default function FotoProfilo() {
               <ZoomOut sx={{ color: 'text.secondary', fontSize: '1.1rem' }} />
               <Slider
                 value={zoom}
-                min={1} max={3} step={0.05}
+                min={1}
+                max={3}
+                step={0.05}
                 onChange={(_, v) => setZoom(v as number)}
                 sx={{
                   color: '#FFC107',
@@ -299,7 +374,14 @@ export default function FotoProfilo() {
                 }}
               />
               <ZoomIn sx={{ color: 'text.secondary', fontSize: '1.1rem' }} />
-              <Typography variant="caption" sx={{ minWidth: 32, textAlign: 'right', color: 'text.secondary' }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  minWidth: 32,
+                  textAlign: 'right',
+                  color: 'text.secondary',
+                }}
+              >
                 {zoom.toFixed(1)}×
               </Typography>
             </Stack>
@@ -308,10 +390,14 @@ export default function FotoProfilo() {
           {/* Controlli Rotazione */}
           <Box sx={{ mt: 0.5 }}>
             <Stack direction="row" alignItems="center" spacing={1}>
-              <RotateLeft sx={{ color: 'text.secondary', fontSize: '1.1rem' }} />
+              <RotateLeft
+                sx={{ color: 'text.secondary', fontSize: '1.1rem' }}
+              />
               <Slider
                 value={rotation}
-                min={-180} max={180} step={1}
+                min={-180}
+                max={180}
+                step={1}
                 onChange={(_, v) => setRotation(v as number)}
                 sx={{
                   color: '#FFC107',
@@ -319,8 +405,17 @@ export default function FotoProfilo() {
                   '& .MuiSlider-rail': { opacity: 0.2 },
                 }}
               />
-              <RotateRight sx={{ color: 'text.secondary', fontSize: '1.1rem' }} />
-              <Typography variant="caption" sx={{ minWidth: 32, textAlign: 'right', color: 'text.secondary' }}>
+              <RotateRight
+                sx={{ color: 'text.secondary', fontSize: '1.1rem' }}
+              />
+              <Typography
+                variant="caption"
+                sx={{
+                  minWidth: 32,
+                  textAlign: 'right',
+                  color: 'text.secondary',
+                }}
+              >
                 {rotation}°
               </Typography>
             </Stack>
@@ -361,7 +456,8 @@ export default function FotoProfilo() {
               <Avatar
                 src={croppedImageUrl}
                 sx={{
-                  width: 160, height: 160,
+                  width: 160,
+                  height: 160,
                   border: '3px solid rgba(255,193,7,0.35)',
                   boxShadow: '0 8px 32px rgba(255,193,7,0.15)',
                 }}
@@ -369,9 +465,13 @@ export default function FotoProfilo() {
               {alert?.severity === 'success' && (
                 <CheckCircle
                   sx={{
-                    position: 'absolute', bottom: 4, right: 4,
-                    color: '#4caf50', fontSize: '2rem',
-                    background: '#0d0d14', borderRadius: '50%',
+                    position: 'absolute',
+                    bottom: 4,
+                    right: 4,
+                    color: '#4caf50',
+                    fontSize: '2rem',
+                    background: '#0d0d14',
+                    borderRadius: '50%',
                   }}
                 />
               )}
@@ -384,7 +484,11 @@ export default function FotoProfilo() {
               <Chip
                 label={`${originalFile.name} · ${(originalFile.size / 1024).toFixed(0)} KB`}
                 size="small"
-                sx={{ color: 'text.secondary', bgcolor: 'rgba(255,255,255,0.04)', fontSize: '0.65rem' }}
+                sx={{
+                  color: 'text.secondary',
+                  bgcolor: 'rgba(255,255,255,0.04)',
+                  fontSize: '0.65rem',
+                }}
               />
             </Box>
           )}
@@ -398,7 +502,11 @@ export default function FotoProfilo() {
 
           {/* Alert */}
           {alert && (
-            <Alert severity={alert.severity} onClose={() => setAlert(null)} sx={{ mb: 2 }}>
+            <Alert
+              severity={alert.severity}
+              onClose={() => setAlert(null)}
+              sx={{ mb: 2 }}
+            >
               <AlertTitle>{alert.title}</AlertTitle>
               {alert.message}
             </Alert>
@@ -447,7 +555,11 @@ export default function FotoProfilo() {
 
       {/* Alert globale (step select) */}
       {step === 'select' && alert && (
-        <Alert severity={alert.severity} onClose={() => setAlert(null)} sx={{ mt: 2 }}>
+        <Alert
+          severity={alert.severity}
+          onClose={() => setAlert(null)}
+          sx={{ mt: 2 }}
+        >
           <AlertTitle>{alert.title}</AlertTitle>
           {alert.message}
         </Alert>

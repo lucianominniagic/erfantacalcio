@@ -32,7 +32,9 @@ describe('utenteSchema', () => {
   })
 
   it('rejects an invalid email', () => {
-    expect(() => utenteSchema.parse({ ...valid, email: 'not-an-email' })).toThrow()
+    expect(() =>
+      utenteSchema.parse({ ...valid, email: 'not-an-email' }),
+    ).toThrow()
   })
 
   it('rejects a non-boolean isAdmin', () => {
@@ -50,12 +52,17 @@ describe('utenteSchema', () => {
 // ---------------------------------------------------------------------------
 describe('loginFormSchema', () => {
   it('parses valid credentials', () => {
-    const result = loginFormSchema.parse({ username: 'mario123', password: 'secret99' })
+    const result = loginFormSchema.parse({
+      username: 'mario123',
+      password: 'secret99',
+    })
     expect(result.username).toBe('mario123')
   })
 
   it('rejects username shorter than 3 characters', () => {
-    expect(() => loginFormSchema.parse({ username: 'ab', password: 'secret99' })).toThrow()
+    expect(() =>
+      loginFormSchema.parse({ username: 'ab', password: 'secret99' }),
+    ).toThrow()
   })
 
   it('rejects username longer than 20 characters', () => {
@@ -65,7 +72,9 @@ describe('loginFormSchema', () => {
   })
 
   it('rejects password shorter than 6 characters', () => {
-    expect(() => loginFormSchema.parse({ username: 'mario123', password: '123' })).toThrow()
+    expect(() =>
+      loginFormSchema.parse({ username: 'mario123', password: '123' }),
+    ).toThrow()
   })
 
   it('rejects missing password', () => {

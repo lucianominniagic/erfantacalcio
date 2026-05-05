@@ -6,5 +6,9 @@ export const chiudiTrasferimentoProcedure = adminProcedure
   .input((val: unknown) => Number(val))
   .mutation(async (opts) => {
     const idGiocatore = +opts.input
-    return await chiudiTrasferimentoGiocatore(AppDataSource.manager, idGiocatore, false)
+    return await chiudiTrasferimentoGiocatore(
+      AppDataSource.manager,
+      idGiocatore,
+      false,
+    )
   })

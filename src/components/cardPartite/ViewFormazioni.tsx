@@ -17,7 +17,10 @@ import { Configurazione } from '~/config'
 import Image from 'next/image'
 import { Fragment, useMemo } from 'react'
 import Modal from '../modal/Modal'
-import { usePartitaFromSearchParams, useGiocatoreModal } from './usePartitaParams'
+import {
+  usePartitaFromSearchParams,
+  useGiocatoreModal,
+} from './usePartitaParams'
 import Giocatore from '../giocatori/Giocatore'
 import { magliaType, ShirtTemplate } from '../selectColors'
 import { ShirtSVG } from '../selectColors/shirtSVG'
@@ -25,11 +28,16 @@ import { GenericCard } from '~/components/cards'
 
 function ViewFormazioni() {
   const [partita, setPartita] = usePartitaFromSearchParams()
-  const { idGiocatore, openModalCalendario, handleStatGiocatore, handleModalClose } = useGiocatoreModal()
+  const {
+    idGiocatore,
+    openModalCalendario,
+    handleStatGiocatore,
+    handleModalClose,
+  } = useGiocatoreModal()
 
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
-  
+
   const formazioniList = api.partita.getFormazioni.useQuery(
     { idPartita: partita! },
     {
@@ -46,11 +54,17 @@ function ViewFormazioni() {
   const formazioneAway = formazioniList.data?.FormazioneAway
 
   const magliaHome = useMemo(
-    () => infoPartita?.magliaHome ? JSON.parse(infoPartita.magliaHome) as magliaType : undefined,
+    () =>
+      infoPartita?.magliaHome
+        ? (JSON.parse(infoPartita.magliaHome) as magliaType)
+        : undefined,
     [infoPartita?.magliaHome],
   )
   const magliaAway = useMemo(
-    () => infoPartita?.magliaAway ? JSON.parse(infoPartita.magliaAway) as magliaType : undefined,
+    () =>
+      infoPartita?.magliaAway
+        ? (JSON.parse(infoPartita.magliaAway) as magliaType)
+        : undefined,
     [infoPartita?.magliaAway],
   )
 
@@ -77,10 +91,13 @@ function ViewFormazioni() {
               {calendario && (
                 <GenericCard
                   title={infoPartita?.squadraHome}
-                  titleVariant='h4'
+                  titleVariant="h4"
                   subtitle={
                     formazioneHome
-                      ? formatDateFromIso(formazioneHome?.dataOra.toString(), 'DD-MM-YYYY HH:mm')
+                      ? formatDateFromIso(
+                          formazioneHome?.dataOra.toString(),
+                          'DD-MM-YYYY HH:mm',
+                        )
                       : `Formazione non rilasciata, multa di ${Configurazione.importoMulta} €`
                   }
                   avatar={
@@ -91,48 +108,47 @@ function ViewFormazioni() {
                     ></Avatar>
                   }
                 >
-                    {formazioneHome && (
-                      <>
-                        <Grid container spacing={0}>
-                          {magliaHome && (
-                            <Grid
-                              item
-                              xs={12}
-                              justifyContent={'center'}
-                              display={'flex'}
-                            >
-                              <ShirtSVG
-                                template={
-                                  magliaHome.selectedTemplate as ShirtTemplate
-                                }
-                                mainColor={magliaHome.mainColor}
-                                secondaryColor={magliaHome.secondaryColor}
-                                thirdColor={magliaHome.thirdColor}
-                                textColor={magliaHome.textColor}
-                                size={100}
-                                number={magliaHome.shirtNumber}
-                              />
-                            </Grid>
-                          )}
-                          <Grid item xs={12} sm={7}>
-                            <Typography variant={'h6'} sx={{ m: '3px' }}>
-                              <b>Modulo: {formazioneHome.modulo}</b>
-                            </Typography>
-                          </Grid>
+                  {formazioneHome && (
+                    <>
+                      <Grid container spacing={0}>
+                        {magliaHome && (
                           <Grid
                             item
-                            sm={5}
-                            sx={{ display: { xs: 'none', sm: 'block' } }}
+                            xs={12}
+                            justifyContent={'center'}
+                            display={'flex'}
                           >
-                            <Typography variant={'h6'}>
-                              <b>Panchina</b>
-                            </Typography>
+                            <ShirtSVG
+                              template={
+                                magliaHome.selectedTemplate as ShirtTemplate
+                              }
+                              mainColor={magliaHome.mainColor}
+                              secondaryColor={magliaHome.secondaryColor}
+                              thirdColor={magliaHome.thirdColor}
+                              textColor={magliaHome.textColor}
+                              size={100}
+                              number={magliaHome.shirtNumber}
+                            />
                           </Grid>
-                          <Grid item xs={12} sm={7}>
-                            <Grid container spacing={0}>
-                              {formazioneHome.Voti.filter(
-                                (g) => g.titolare,
-                              ).map((g) => (
+                        )}
+                        <Grid item xs={12} sm={7}>
+                          <Typography variant={'h6'} sx={{ m: '3px' }}>
+                            <b>Modulo: {formazioneHome.modulo}</b>
+                          </Typography>
+                        </Grid>
+                        <Grid
+                          item
+                          sm={5}
+                          sx={{ display: { xs: 'none', sm: 'block' } }}
+                        >
+                          <Typography variant={'h6'}>
+                            <b>Panchina</b>
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={7}>
+                          <Grid container spacing={0}>
+                            {formazioneHome.Voti.filter((g) => g.titolare).map(
+                              (g) => (
                                 <Fragment key={g.Giocatore.idGiocatore}>
                                   <Grid item xs={2} sm={1}>
                                     <Tooltip
@@ -172,23 +188,23 @@ function ViewFormazioni() {
                                     </Typography>
                                   </Grid>
                                 </Fragment>
-                              ))}
-                            </Grid>
+                              ),
+                            )}
                           </Grid>
-                          <Grid
-                            item
-                            xs={12}
-                            sx={{ display: { xs: 'block', sm: 'none' } }}
-                          >
-                            <Typography variant={'h6'}>
-                              <b>Panchina</b>
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={5}>
-                            <Grid container spacing={0}>
-                              {formazioneHome.Voti.filter(
-                                (g) => !g.titolare,
-                              ).map((g) => (
+                        </Grid>
+                        <Grid
+                          item
+                          xs={12}
+                          sx={{ display: { xs: 'block', sm: 'none' } }}
+                        >
+                          <Typography variant={'h6'}>
+                            <b>Panchina</b>
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={5}>
+                          <Grid container spacing={0}>
+                            {formazioneHome.Voti.filter((g) => !g.titolare).map(
+                              (g) => (
                                 <Fragment key={g.Giocatore.idGiocatore}>
                                   <Grid item xs={2} sm={2}>
                                     <Tooltip
@@ -228,12 +244,13 @@ function ViewFormazioni() {
                                     </Typography>
                                   </Grid>
                                 </Fragment>
-                              ))}
-                            </Grid>
+                              ),
+                            )}
                           </Grid>
                         </Grid>
-                      </>
-                    )}
+                      </Grid>
+                    </>
+                  )}
                 </GenericCard>
               )}
             </Grid>
@@ -241,10 +258,13 @@ function ViewFormazioni() {
               {calendario && (
                 <GenericCard
                   title={infoPartita?.squadraAway}
-                  titleVariant='h4'
+                  titleVariant="h4"
                   subtitle={
                     formazioneAway
-                      ? formatDateFromIso(formazioneAway?.dataOra.toString(), 'DD-MM-YYYY HH:mm')
+                      ? formatDateFromIso(
+                          formazioneAway?.dataOra.toString(),
+                          'DD-MM-YYYY HH:mm',
+                        )
                       : `Formazione non rilasciata, prevista multa di ${Configurazione.importoMulta} €`
                   }
                   avatar={
@@ -255,48 +275,47 @@ function ViewFormazioni() {
                     ></Avatar>
                   }
                 >
-                    {formazioneAway && (
-                      <>
-                        <Grid container spacing={0}>
-                          {magliaAway && (
-                            <Grid
-                              item
-                              xs={12}
-                              justifyContent={'center'}
-                              display={'flex'}
-                            >
-                              <ShirtSVG
-                                template={
-                                  magliaAway.selectedTemplate as ShirtTemplate
-                                }
-                                mainColor={magliaAway.mainColor}
-                                secondaryColor={magliaAway.secondaryColor}
-                                thirdColor={magliaAway.thirdColor}
-                                textColor={magliaAway.textColor}
-                                size={100}
-                                number={magliaAway.shirtNumber}
-                              />
-                            </Grid>
-                          )}
-                          <Grid item xs={12} sm={7}>
-                            <Typography variant={'h6'} sx={{ m: '3px' }}>
-                              <b>Modulo: {formazioneAway.modulo}</b>
-                            </Typography>
-                          </Grid>
+                  {formazioneAway && (
+                    <>
+                      <Grid container spacing={0}>
+                        {magliaAway && (
                           <Grid
                             item
-                            sm={5}
-                            sx={{ display: { xs: 'none', sm: 'block' } }}
+                            xs={12}
+                            justifyContent={'center'}
+                            display={'flex'}
                           >
-                            <Typography variant={'h6'}>
-                              <b>Panchina</b>
-                            </Typography>
+                            <ShirtSVG
+                              template={
+                                magliaAway.selectedTemplate as ShirtTemplate
+                              }
+                              mainColor={magliaAway.mainColor}
+                              secondaryColor={magliaAway.secondaryColor}
+                              thirdColor={magliaAway.thirdColor}
+                              textColor={magliaAway.textColor}
+                              size={100}
+                              number={magliaAway.shirtNumber}
+                            />
                           </Grid>
-                          <Grid item xs={12} sm={7}>
-                            <Grid container spacing={0}>
-                              {formazioneAway.Voti.filter(
-                                (g) => g.titolare,
-                              ).map((g) => (
+                        )}
+                        <Grid item xs={12} sm={7}>
+                          <Typography variant={'h6'} sx={{ m: '3px' }}>
+                            <b>Modulo: {formazioneAway.modulo}</b>
+                          </Typography>
+                        </Grid>
+                        <Grid
+                          item
+                          sm={5}
+                          sx={{ display: { xs: 'none', sm: 'block' } }}
+                        >
+                          <Typography variant={'h6'}>
+                            <b>Panchina</b>
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={7}>
+                          <Grid container spacing={0}>
+                            {formazioneAway.Voti.filter((g) => g.titolare).map(
+                              (g) => (
                                 <Fragment key={g.Giocatore.idGiocatore}>
                                   <Grid item xs={2} sm={1}>
                                     <Tooltip
@@ -336,23 +355,23 @@ function ViewFormazioni() {
                                     </Typography>
                                   </Grid>
                                 </Fragment>
-                              ))}
-                            </Grid>
+                              ),
+                            )}
                           </Grid>
-                          <Grid
-                            item
-                            xs={12}
-                            sx={{ display: { xs: 'block', sm: 'none' } }}
-                          >
-                            <Typography variant={'h6'}>
-                              <b>Panchina</b>
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={5}>
-                            <Grid container spacing={0}>
-                              {formazioneAway.Voti.filter(
-                                (g) => !g.titolare,
-                              ).map((g) => (
+                        </Grid>
+                        <Grid
+                          item
+                          xs={12}
+                          sx={{ display: { xs: 'block', sm: 'none' } }}
+                        >
+                          <Typography variant={'h6'}>
+                            <b>Panchina</b>
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12} sm={5}>
+                          <Grid container spacing={0}>
+                            {formazioneAway.Voti.filter((g) => !g.titolare).map(
+                              (g) => (
                                 <Fragment key={g.Giocatore.idGiocatore}>
                                   <Grid item xs={2} sm={2}>
                                     <Tooltip
@@ -392,12 +411,13 @@ function ViewFormazioni() {
                                     </Typography>
                                   </Grid>
                                 </Fragment>
-                              ))}
-                            </Grid>
+                              ),
+                            )}
                           </Grid>
                         </Grid>
-                      </>
-                    )}
+                      </Grid>
+                    </>
+                  )}
                 </GenericCard>
               )}
             </Grid>

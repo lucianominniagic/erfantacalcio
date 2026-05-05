@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, type Relation, BaseEntity } from 'typeorm'
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  type Relation,
+  BaseEntity,
+} from 'typeorm'
 import { Calendario } from './Calendario'
 import { Classifica } from './Classifica'
 

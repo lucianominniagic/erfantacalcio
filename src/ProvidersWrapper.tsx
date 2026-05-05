@@ -17,17 +17,20 @@ function ThemedApp({ children }: { children: ReactNode }) {
   const { mode } = useThemeMode()
 
   const myCustomTheme = useMemo(() => {
-    const base = mode === 'dark' ? themeOptions : { ...themeOptions, ...lightThemeOptions, palette: lightThemeOptions.palette }
+    const base =
+      mode === 'dark'
+        ? themeOptions
+        : {
+            ...themeOptions,
+            ...lightThemeOptions,
+            palette: lightThemeOptions.palette,
+          }
     const defaultTheme = createTheme(base)
     const components = componentsOverride(defaultTheme)
     return createTheme({ ...base, components })
   }, [mode])
 
-  return (
-    <ThemeProvider theme={myCustomTheme}>
-      {children}
-    </ThemeProvider>
-  )
+  return <ThemeProvider theme={myCustomTheme}>{children}</ThemeProvider>
 }
 
 export default function ProvidersWrapper({

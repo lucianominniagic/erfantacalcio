@@ -58,8 +58,8 @@ try {
 
 // Persist DataSource and initialization promise across module reloads (Next.js HMR)
 export const initializeDBConnection = async (): Promise<DataSource> => {
-    if (!AppDataSource.isInitialized) {
-        await AppDataSource.initialize();
-    }
-    return AppDataSource;
-};
+  if (!AppDataSource.isInitialized) {
+    await AppDataSource.initialize()
+  }
+  return AppDataSource
+}

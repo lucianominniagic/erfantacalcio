@@ -26,18 +26,18 @@ interface AutocompleteOption {
 }
 
 interface GenericAutocompleteProps<T extends AutocompleteOption> {
-  items: T[]                           // Array di elementi da visualizzare
-  onItemSelected: (id, text) => void  // Callback quando un elemento è selezionato
-  label?: string                       // Label del campo (default: "Cerca")
-  placeholder?: string                 // Placeholder text
-  size?: 'small' | 'medium'           // Dimensione (default: 'small')
-  width?: number | string             // Larghezza (default: 300)
-  freeSolo?: boolean                  // Input libero (default: true)
-  allowCustomInput?: boolean          // Suggerimenti custom (default: true)
-  disabled?: boolean                  // Disabilita il componente
-  loading?: boolean                   // Stato di caricamento
-  sx?: SxProps<Theme>                 // Stili custom
-  textFieldProps?: TextFieldProps     // Props da passare al TextField
+  items: T[] // Array di elementi da visualizzare
+  onItemSelected: (id, text) => void // Callback quando un elemento è selezionato
+  label?: string // Label del campo (default: "Cerca")
+  placeholder?: string // Placeholder text
+  size?: 'small' | 'medium' // Dimensione (default: 'small')
+  width?: number | string // Larghezza (default: 300)
+  freeSolo?: boolean // Input libero (default: true)
+  allowCustomInput?: boolean // Suggerimenti custom (default: true)
+  disabled?: boolean // Disabilita il componente
+  loading?: boolean // Stato di caricamento
+  sx?: SxProps<Theme> // Stili custom
+  textFieldProps?: TextFieldProps // Props da passare al TextField
   // ... altre props
 }
 ```
@@ -45,7 +45,10 @@ interface GenericAutocompleteProps<T extends AutocompleteOption> {
 #### Esempio Base
 
 ```tsx
-import { GenericAutocomplete, AutocompleteOption } from '~/components/autocomplete'
+import {
+  GenericAutocomplete,
+  AutocompleteOption,
+} from '~/components/autocomplete'
 
 interface Player extends AutocompleteOption {
   id: number
@@ -59,7 +62,10 @@ function PlayerSelector() {
     { id: 2, label: 'Luigi Verdi', team: 'Team B' },
   ]
 
-  const handleSelect = (id: number | string | null | undefined, text: string | undefined) => {
+  const handleSelect = (
+    id: number | string | null | undefined,
+    text: string | undefined,
+  ) => {
     if (id) {
       console.log('Selected player ID:', id)
     } else if (text) {
@@ -123,7 +129,10 @@ function GiocatoriPage() {
     { id: 2, label: 'Luigi Verdi' },
   ]
 
-  const handleSelect = (idGiocatore: number | undefined, inputValue: string | undefined) => {
+  const handleSelect = (
+    idGiocatore: number | undefined,
+    inputValue: string | undefined,
+  ) => {
     if (idGiocatore) {
       console.log('Selected player ID:', idGiocatore)
     } else if (inputValue) {
@@ -147,10 +156,16 @@ Il file `index.ts` esporta tutti i componenti e tipi:
 
 ```typescript
 // Import del componente generico
-import { GenericAutocomplete, AutocompleteOption } from '~/components/autocomplete'
+import {
+  GenericAutocomplete,
+  AutocompleteOption,
+} from '~/components/autocomplete'
 
 // Import del componente specifico per giocatori
-import { AutocompleteGiocatore, AutocompleteTextbox } from '~/components/autocomplete'
+import {
+  AutocompleteGiocatore,
+  AutocompleteTextbox,
+} from '~/components/autocomplete'
 ```
 
 ## Migrazione
@@ -194,7 +209,7 @@ export default function AutocompleteSquadra({
       const numericId = typeof id === 'number' ? id : undefined
       onSquadraSelected(numericId)
     },
-    [onSquadraSelected]
+    [onSquadraSelected],
   )
 
   return (

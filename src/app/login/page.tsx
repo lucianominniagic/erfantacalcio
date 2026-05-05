@@ -13,7 +13,8 @@ export default function LoginPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'radial-gradient(ellipse at 50% 0%, rgba(255,193,7,0.06) 0%, transparent 70%)',
+        background:
+          'radial-gradient(ellipse at 50% 0%, rgba(255,193,7,0.06) 0%, transparent 70%)',
       }}
     >
       <Container maxWidth="xs">
@@ -25,9 +26,11 @@ export default function LoginPage() {
             p: { xs: 3, sm: 4 },
             borderRadius: '16px',
             border: '1px solid rgba(255,193,7,0.18)',
-            background: 'linear-gradient(160deg, rgba(26,18,8,0.95) 0%, rgba(22,22,31,0.98) 100%)',
+            background:
+              'linear-gradient(160deg, rgba(26,18,8,0.95) 0%, rgba(22,22,31,0.98) 100%)',
             backdropFilter: 'blur(16px)',
-            boxShadow: '0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,193,7,0.06)',
+            boxShadow:
+              '0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,193,7,0.06)',
           }}
         >
           {/* Logo */}
@@ -76,4 +79,3 @@ export default function LoginPage() {
     </Box>
   )
 }
-

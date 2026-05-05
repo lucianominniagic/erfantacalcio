@@ -46,7 +46,9 @@ export function useFormazioneState() {
   const [openAlert, setOpenAlert] = useState(false)
   const [saving, setSaving] = useState(false)
   const [alertMessage, setAlertMessage] = useState('')
-  const [alertSeverity, setAlertSeverity] = useState<'success' | 'error'>('success')
+  const [alertSeverity, setAlertSeverity] = useState<'success' | 'error'>(
+    'success',
+  )
 
   const calendarioProssima = api.formazione.getGiornateDaGiocare.useQuery(
     undefined,
@@ -57,7 +59,8 @@ export function useFormazioneState() {
       setAlertSeverity('success')
     },
   })
-  const confirmPrecedenteMutation = api.formazione.confirmPrecedente.useMutation()
+  const confirmPrecedenteMutation =
+    api.formazione.confirmPrecedente.useMutation()
   const formazioneList = api.formazione.get.useQuery(
     { idTorneo: idTorneo! },
     {
@@ -90,7 +93,9 @@ export function useFormazioneState() {
       } else {
         const dataFine = calendarioProssima.data[0]?.dataFine
         if (dataFine && checkDataFormazione(dataFine)) {
-          setMessage('Formazione non rilasciabile, vuoi confermare la precedente formazione?')
+          setMessage(
+            'Formazione non rilasciabile, vuoi confermare la precedente formazione?',
+          )
         } else {
           setMessage('Formazione non rilasciabile')
         }
@@ -190,7 +195,10 @@ export function useFormazioneState() {
 
     const canAdd = canAddPlayer(playerClicked.ruolo)
 
-    if (rosa.some((c) => c.idGiocatore === playerClicked.idGiocatore) && canAdd) {
+    if (
+      rosa.some((c) => c.idGiocatore === playerClicked.idGiocatore) &&
+      canAdd
+    ) {
       playerClicked.titolare = true
       updateLists(playerClicked, campo, setCampo, rosa, setRosa, false)
     } else if (rosa.some((c) => c.idGiocatore === playerClicked.idGiocatore)) {
@@ -252,12 +260,14 @@ export function useFormazioneState() {
   }
 
   const formazioneGiaRilasciata =
-    message === 'Formazione non rilasciabile, vuoi confermare la precedente formazione?' &&
+    message ===
+      'Formazione non rilasciabile, vuoi confermare la precedente formazione?' &&
     !formazioneList.isLoading &&
     !!formazioneList.data?.giocatori.some((g) => g.titolare)
 
   const canConfirmPrecedente =
-    message === 'Formazione non rilasciabile, vuoi confermare la precedente formazione?' &&
+    message ===
+      'Formazione non rilasciabile, vuoi confermare la precedente formazione?' &&
     !formazioneList.isLoading &&
     !formazioneList.data?.giocatori.some((g) => g.titolare)
   const confirmingPrecedente = confirmPrecedenteMutation.isPending
@@ -270,7 +280,9 @@ export function useFormazioneState() {
       setAlertSeverity('success')
     } catch (e: unknown) {
       const msg =
-        e instanceof Error ? e.message : 'Errore durante la conferma della formazione'
+        e instanceof Error
+          ? e.message
+          : 'Errore durante la conferma della formazione'
       setAlertMessage(msg)
       setAlertSeverity('error')
     }
@@ -278,7 +290,7 @@ export function useFormazioneState() {
   }
 
   const handleModalCalendarioClose = () => setOpenModalCalendario(false)
-  
+
   const resetFormazione = (newIdTorneo?: number) => {
     setModulo(moduloDefault)
     setCampo([])

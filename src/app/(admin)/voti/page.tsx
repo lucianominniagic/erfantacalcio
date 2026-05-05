@@ -357,11 +357,7 @@ export default function Voti() {
                     }}
                   >
                     {[...Array(6).keys()].map((i) => (
-                      <MenuItem
-                        key={`slc_gol_${i}`}
-                        value={i}
-                        
-                      >
+                      <MenuItem key={`slc_gol_${i}`} value={i}>
                         {i}
                       </MenuItem>
                     ))}
@@ -389,11 +385,7 @@ export default function Voti() {
                     }}
                   >
                     {[...Array(6).keys()].map((i) => (
-                      <MenuItem
-                        key={`slc_gol_${i}`}
-                        value={i}
-                        
-                      >
+                      <MenuItem key={`slc_gol_${i}`} value={i}>
                         {i}
                       </MenuItem>
                     ))}
@@ -465,11 +457,7 @@ export default function Voti() {
                     }}
                   >
                     {[...Array(2).keys()].map((i) => (
-                      <MenuItem
-                        key={`slc_gol_${i}`}
-                        value={i}
-                        
-                      >
+                      <MenuItem key={`slc_gol_${i}`} value={i}>
                         {i}
                       </MenuItem>
                     ))}
@@ -496,11 +484,13 @@ export default function Voti() {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 2 }}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                >
+              <Stack
+                direction="row"
+                spacing={2}
+                justifyContent="flex-end"
+                sx={{ mt: 2 }}
+              >
+                <Button type="submit" variant="contained">
                   Aggiorna dati
                 </Button>
                 <Button

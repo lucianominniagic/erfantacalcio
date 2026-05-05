@@ -5,7 +5,10 @@ import { env } from 'process'
 import { protectedProcedure } from '../../trpc'
 import { AppDataSource } from '~/data-source'
 import { Formazioni, Partite, Utenti, Voti } from '~/server/db/entities'
-import { getProssimaGiornata, getProssimaGiornataSerieA } from '~/server/utils/common'
+import {
+  getProssimaGiornata,
+  getProssimaGiornataSerieA,
+} from '~/server/utils/common'
 import { ReSendMailAsync } from '~/service/mailSender'
 import { formatDateTime, nowInItalyIso } from '~/utils/dateUtils'
 import { getDescrizioneGiornata } from '~/utils/helper'
@@ -26,7 +29,10 @@ export const confirmPrecedente = protectedProcedure.mutation(async (opts) => {
   // 2. Calcola gli idPartita correnti dell'utente
   const idPartiteCorrente: number[] = giornateFiltrate.flatMap((giornata) =>
     giornata.partite
-      .filter((partita) => partita.idHome === idSquadra || partita.idAway === idSquadra)
+      .filter(
+        (partita) =>
+          partita.idHome === idSquadra || partita.idAway === idSquadra,
+      )
       .map((partita) => partita.idPartita),
   )
 
@@ -76,15 +82,28 @@ export const confirmPrecedente = protectedProcedure.mutation(async (opts) => {
           idFormazione: In(formazioniIds.map((f) => f.idFormazione)),
         })
       }
-      await trx.delete(Formazioni, { idPartita: idPartita, idSquadra: idSquadra })
+      await trx.delete(Formazioni, {
+        idPartita: idPartita,
+        idSquadra: idSquadra,
+      })
 
       // Recupera i dettagli della partita corrente
       const partita = await trx.findOne(Partite, {
         select: {
           idCalendario: true,
           idPartita: true,
-          SquadraHome: { nomeSquadra: true, presidente: true, idUtente: true, mail: true },
-          SquadraAway: { nomeSquadra: true, presidente: true, idUtente: true, mail: true },
+          SquadraHome: {
+            nomeSquadra: true,
+            presidente: true,
+            idUtente: true,
+            mail: true,
+          },
+          SquadraAway: {
+            nomeSquadra: true,
+            presidente: true,
+            idUtente: true,
+            mail: true,
+          },
           Calendario: {
             idCalendario: true,
             giornata: true,
@@ -94,7 +113,11 @@ export const confirmPrecedente = protectedProcedure.mutation(async (opts) => {
             Torneo: { idTorneo: true, nome: true, gruppoFase: true },
           },
         },
-        relations: { Calendario: { Torneo: true }, SquadraHome: true, SquadraAway: true },
+        relations: {
+          Calendario: { Torneo: true },
+          SquadraHome: true,
+          SquadraAway: true,
+        },
         where: { idPartita: idPartita },
       })
 
@@ -109,7 +132,8 @@ export const confirmPrecedente = protectedProcedure.mutation(async (opts) => {
         dataOra: dataInserimento,
         hasBloccata: false,
       })
-      const idFormazione = formazioneResult.identifiers[0].idFormazione as number
+      const idFormazione = formazioneResult.identifiers[0]
+        .idFormazione as number
 
       // Clona i voti dalla formazione precedente
       await Promise.all(

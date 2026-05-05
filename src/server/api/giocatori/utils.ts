@@ -1,7 +1,11 @@
 import { Configurazione } from '~/config'
 import { StatsA, StatsC, StatsD, StatsP } from '~/server/db/entities'
 
-export type StatsEntity = typeof StatsP | typeof StatsD | typeof StatsC | typeof StatsA
+export type StatsEntity =
+  | typeof StatsP
+  | typeof StatsD
+  | typeof StatsC
+  | typeof StatsA
 
 export const roleEntityMap: Record<string, StatsEntity> = {
   P: StatsP,
@@ -40,5 +44,7 @@ export const getSogliaGiocate = async (): Promise<number> => {
     .select('MAX(s.giocate)', 'max')
     .getRawOne<{ max: string | null }>()
   const maxGiocate = Number(maxGiocateRow?.max ?? 0)
-  return Math.floor(maxGiocate * (Configurazione.percentualeMinimaGiocate / 100))
+  return Math.floor(
+    maxGiocate * (Configurazione.percentualeMinimaGiocate / 100),
+  )
 }

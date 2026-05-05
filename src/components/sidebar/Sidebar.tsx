@@ -64,30 +64,96 @@ interface NavItem {
 }
 
 const legaItems: NavItem[] = [
-  { key: 'statisticheSquadre', label: 'Statistiche squadre', href: '/statistiche_squadre', icon: <Groups /> },
-  { key: 'statistiche', label: 'Statistiche giocatori', href: '/statistiche_giocatori', icon: <Portrait /> },
-  { key: 'economia', label: 'Economia e premi', href: '/economia', icon: <Euro /> },
+  {
+    key: 'statisticheSquadre',
+    label: 'Statistiche squadre',
+    href: '/statistiche_squadre',
+    icon: <Groups />,
+  },
+  {
+    key: 'statistiche',
+    label: 'Statistiche giocatori',
+    href: '/statistiche_giocatori',
+    icon: <Portrait />,
+  },
+  {
+    key: 'economia',
+    label: 'Economia e premi',
+    href: '/economia',
+    icon: <Euro />,
+  },
   { key: 'albo', label: "Albo d'oro", href: '/albo', icon: <EmojiEvents /> },
-  { key: 'documenti', label: 'Documenti', href: '/documenti', icon: <ListAlt /> },
+  {
+    key: 'documenti',
+    label: 'Documenti',
+    href: '/documenti',
+    icon: <ListAlt />,
+  },
 ]
 
 const profiloItems: NavItem[] = [
-  { key: 'formazione', label: 'Formazione', href: '/formazione', icon: <FiberNew color="success" /> },
-  { key: 'maglia', label: 'Maglia', href: '/maglia', icon: <AssignmentInd color="info" /> },
-  { key: 'foto', label: 'Foto profilo', href: '/foto', icon: <Badge color="success" /> },
+  {
+    key: 'formazione',
+    label: 'Formazione',
+    href: '/formazione',
+    icon: <FiberNew color="success" />,
+  },
+  {
+    key: 'maglia',
+    label: 'Maglia',
+    href: '/maglia',
+    icon: <AssignmentInd color="info" />,
+  },
+  {
+    key: 'foto',
+    label: 'Foto profilo',
+    href: '/foto',
+    icon: <Badge color="success" />,
+  },
 ]
 
 const adminItems: NavItem[] = [
-  { key: 'uploadVoti', label: 'Carica voti', href: '/uploadVoti', icon: <UploadFile /> },
-  { key: 'risultati', label: 'Risultati', href: '/risultati', icon: <Calculate /> },
-  { key: 'calendario', label: 'Calendario', href: '/calendario', icon: <CalendarMonth /> },
+  {
+    key: 'uploadVoti',
+    label: 'Carica voti',
+    href: '/uploadVoti',
+    icon: <UploadFile />,
+  },
+  {
+    key: 'risultati',
+    label: 'Risultati',
+    href: '/risultati',
+    icon: <Calculate />,
+  },
+  {
+    key: 'calendario',
+    label: 'Calendario',
+    href: '/calendario',
+    icon: <CalendarMonth />,
+  },
   { key: 'presidenti', label: 'Squadre', href: '/presidenti', icon: <Group /> },
-  { key: 'giocatori', label: 'Giocatori', href: '/giocatori', icon: <ManageAccounts /> },
+  {
+    key: 'giocatori',
+    label: 'Giocatori',
+    href: '/giocatori',
+    icon: <ManageAccounts />,
+  },
   { key: 'voti', label: 'Voti', href: '/voti', icon: <ThumbsUpDown /> },
-  { key: 'avvioStagione', label: 'Nuova stagione', href: '/avvioStagione', icon: <FiberNew /> },
+  {
+    key: 'avvioStagione',
+    label: 'Nuova stagione',
+    href: '/avvioStagione',
+    icon: <FiberNew />,
+  },
 ]
 
-function SidebarNavItem({ item, isActive }: { item: NavItem; isActive: boolean }) {
+function SidebarNavItem({
+  item,
+  isActive,
+}: {
+  item: NavItem
+  isActive: boolean
+}) {
   const theme = useTheme()
   return (
     <ListItem disablePadding sx={{ mb: 0.5 }}>
@@ -103,13 +169,19 @@ function SidebarNavItem({ item, isActive }: { item: NavItem; isActive: boolean }
             ? {
                 background: `linear-gradient(135deg, ${theme.palette.action.hover} 0%, ${theme.palette.action.hover} 100%)`,
                 borderLeft: `3px solid ${theme.palette.primary.main}`,
-                '& .MuiListItemIcon-root': { color: theme.palette.primary.main },
-                '& .MuiListItemText-secondary': { color: `${theme.palette.primary.light} !important` },
+                '& .MuiListItemIcon-root': {
+                  color: theme.palette.primary.main,
+                },
+                '& .MuiListItemText-secondary': {
+                  color: `${theme.palette.primary.light} !important`,
+                },
               }
             : {
                 '&:hover': {
                   backgroundColor: theme.palette.action.hover,
-                  '& .MuiListItemIcon-root': { color: theme.palette.primary.main },
+                  '& .MuiListItemIcon-root': {
+                    color: theme.palette.primary.main,
+                  },
                 },
               }),
         }}
@@ -172,15 +244,23 @@ function SidebarSection({
           {title}
         </Typography>
         {open ? (
-          <ExpandLess sx={{ fontSize: '0.9rem', color: 'text.secondary', opacity: 0.5 }} />
+          <ExpandLess
+            sx={{ fontSize: '0.9rem', color: 'text.secondary', opacity: 0.5 }}
+          />
         ) : (
-          <ExpandMore sx={{ fontSize: '0.9rem', color: 'text.secondary', opacity: 0.5 }} />
+          <ExpandMore
+            sx={{ fontSize: '0.9rem', color: 'text.secondary', opacity: 0.5 }}
+          />
         )}
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List dense disablePadding>
           {items.map((item) => (
-            <SidebarNavItem key={item.key} item={item} isActive={pathname === item.href} />
+            <SidebarNavItem
+              key={item.key}
+              item={item}
+              isActive={pathname === item.href}
+            />
           ))}
         </List>
       </Collapse>
@@ -263,7 +343,12 @@ function SidebarContent() {
           <Avatar
             src={session.user.image?.toString()}
             alt={session.user.squadra}
-            sx={{ width: 36, height: 36, border: `2px solid ${theme.palette.primary.main}`, opacity: 0.5 }}
+            sx={{
+              width: 36,
+              height: 36,
+              border: `2px solid ${theme.palette.primary.main}`,
+              opacity: 0.5,
+            }}
           />
           <Box sx={{ overflow: 'hidden' }}>
             <Typography
@@ -298,14 +383,23 @@ function SidebarContent() {
         {session?.user && (
           <>
             <Divider sx={{ mx: 2, my: 0.5 }} />
-            <SidebarSection title="Il mio profilo" items={profiloItems} pathname={pathname} />
+            <SidebarSection
+              title="Il mio profilo"
+              items={profiloItems}
+              pathname={pathname}
+            />
           </>
         )}
         <SidebarSection title="Lega" items={legaItems} pathname={pathname} />
         {session?.user?.ruolo === RuoloUtente.admin && (
           <>
             <Divider sx={{ mx: 2, my: 0.5 }} />
-            <SidebarSection title="Admin" items={adminItems} pathname={pathname} defaultOpen={false} />
+            <SidebarSection
+              title="Admin"
+              items={adminItems}
+              pathname={pathname}
+              defaultOpen={false}
+            />
           </>
         )}
       </Box>
@@ -321,13 +415,31 @@ function SidebarContent() {
         }}
       >
         {/* Theme toggle */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}
+        >
           <Typography variant="caption" color="text.secondary">
             {mode === 'dark' ? 'Tema scuro' : 'Tema chiaro'}
           </Typography>
-          <Tooltip title={mode === 'dark' ? 'Passa al tema chiaro' : 'Passa al tema scuro'}>
-            <IconButton size="small" onClick={toggleMode} sx={{ color: 'primary.main' }}>
-              {mode === 'dark' ? <LightMode fontSize="small" /> : <DarkMode fontSize="small" />}
+          <Tooltip
+            title={
+              mode === 'dark' ? 'Passa al tema chiaro' : 'Passa al tema scuro'
+            }
+          >
+            <IconButton
+              size="small"
+              onClick={toggleMode}
+              sx={{ color: 'primary.main' }}
+            >
+              {mode === 'dark' ? (
+                <LightMode fontSize="small" />
+              ) : (
+                <DarkMode fontSize="small" />
+              )}
             </IconButton>
           </Tooltip>
         </Box>

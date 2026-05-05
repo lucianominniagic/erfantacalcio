@@ -35,6 +35,7 @@
 ## 🛠️ Stack Tecnologico
 
 ### Frontend
+
 - **[Next.js 16.0.8](https://nextjs.org)** - Framework React con App Router e Turbopack
 - **[React 19.2.1](https://react.dev)** - Libreria per interfacce utente
 - **[TypeScript 5.8](https://www.typescriptlang.org/)** - Linguaggio tipizzato
@@ -43,6 +44,7 @@
 - **[MUI X Charts 8.21.0](https://mui.com/x/react-charts/)** - Grafici e visualizzazioni
 
 ### Backend
+
 - **[tRPC 11.7.2](https://trpc.io)** - API type-safe end-to-end
 - **[NextAuth.js 5.0.0-beta.30](https://next-auth.js.org)** - Sistema di autenticazione
 - **[TypeORM](https://typeorm.io)** - ORM per PostgreSQL
@@ -50,6 +52,7 @@
 - **[Zod](https://zod.dev/)** - Validazione e schema dei dati
 
 ### Utilità
+
 - **[TanStack Query 5.90.12](https://tanstack.com/query)** - Data fetching e caching
 - **[Day.js](https://day.js.org/)** - Manipolazione date
 - **[Lodash](https://lodash.com/)** - Utility functions
@@ -287,41 +290,48 @@ RESEND_API_KEY="your-resend-api-key"
 ### Area Amministrazione (Admin)
 
 #### 🏁 Avvio Stagione
+
 - Creazione nuova stagione
 - Importazione giocatori Serie A da CSV
 - Configurazione tornei
 - Assegnazione squadre ai presidenti
 
 #### 📅 Gestione Calendario
+
 - Generazione automatica calendario con algoritmo Berger
 - Gestione giornate e turni
 - Calendario andata e ritorno
 
 #### ⚽ Gestione Giocatori
+
 - CRUD completo giocatori
 - Importazione massiva da CSV
 - Aggiornamento statistiche
 - Gestione trasferimenti
 
 #### 👥 Gestione Presidenti
+
 - Creazione e gestione utenti
 - Assegnazione ruoli (Admin/Presidente)
 - Reset password
 - Gestione permessi
 
 #### 📊 Gestione Risultati
+
 - Inserimento risultati partite
 - Calcolo automatico punteggi
 - Aggiornamento classifiche
 - Gestione bonus/malus
 
 #### 📤 Upload Voti
+
 - Caricamento voti da file CSV
 - Upload file su Vercel Blob Storage
 - Validazione e parsing dati
 - Associazione automatica voti-giocatori
 
 #### ✏️ Gestione Voti
+
 - Modifica manuale voti
 - Correzione errori
 - Statistiche voti per giornata
@@ -330,65 +340,77 @@ RESEND_API_KEY="your-resend-api-key"
 ### Area Utente (Presidente)
 
 #### 🏠 Homepage
+
 - Classifica in tempo reale
 - Prossime partite
 - Risultati recenti
 - Squadre partecipanti
 
 #### 🏆 Albo d'Oro
+
 - Storico vincitori
 - Statistiche stagioni precedenti
 - Record e primati
 
 #### 📄 Documenti
+
 - Regolamento
 - Guide
 - Documentazione varia
 
 #### 💰 Economia
+
 - Budget disponibile
 - Storico trasferimenti
 - Saldo cassa
 - Multe e bonus
 
 #### 📋 Formazione
+
 - Creazione formazione settimanale
 - Drag & drop giocatori
 - Validazione modulo
 - Preview punteggio stimato
 
 #### 👀 Visualizza Formazioni
+
 - Formazioni di tutte le squadre
 - Confronto formazioni
 - Statistiche formazione
 
 #### 📸 Galleria Foto
+
 - Album fotografici
 - Upload immagini
 - Condivisione momenti
 
 #### 👕 Editor Maglia
+
 - Personalizzazione maglia squadra
 - Scelta colori
 - Preview in tempo reale
 
 #### 🏃 Rosa Squadra
+
 - Lista giocatori di proprietà
 - Statistiche individuali
 - Valori di mercato
 
 #### 📈 Statistiche Giocatore
+
 - Dettaglio prestazioni singolo giocatore
 - Grafici andamento
 - Storico voti
 
 #### 📊 Statistiche Giocatori
+
 - Classifica marcatori
 - Migliori/peggiori per ruolo
 - Medie voto
 - Presenze
 
 #### 📋 Tabellini
+
 - Dettaglio partite giocate
 - Formazioni utilizzate
 - Eventi partita (gol, assist, ammonizioni)
@@ -471,6 +493,7 @@ appRouter
 ### tRPC Procedures
 
 Ogni router espone procedure di tipo:
+
 - **query** - Lettura dati (GET-like)
 - **mutation** - Modifica dati (POST/PUT/DELETE-like)
 
@@ -555,6 +578,7 @@ npm run migration:show:prod
 ## 👨‍💻 Autore
 
 **Luciano Minni**
+
 - GitHub: [@lukmin77](https://github.com/lukmin77)
 - Email: lucianominni@gmail.com
 
@@ -575,4 +599,3 @@ Questo è un progetto privato. Per suggerimenti o segnalazioni contattare l'auto
 ## 📞 Supporto
 
 Per assistenza o domande, contattare l'amministratore del sistema.
-

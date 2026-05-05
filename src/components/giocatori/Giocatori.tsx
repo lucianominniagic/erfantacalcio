@@ -22,10 +22,7 @@ import { type Ruoli } from '~/types/common'
 import { getRuoloEsteso } from '~/utils/helper'
 import Modal from '../modal/Modal'
 import Giocatore from './Giocatore'
-import {
-  DataGrid,
-  type GridColDef,
-} from '@mui/x-data-grid'
+import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { createSkeletonRows } from '~/utils/datatable'
 
 function Giocatori() {

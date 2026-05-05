@@ -79,7 +79,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
     setRisultati(updatedResults)
   }
 
-  const handleSubmit= async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setMessage('')
     setErrorMessage('')
@@ -138,10 +138,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
       withPaper={false}
       contentSx={{ paddingBottom: '3px', paddingTop: '10px' }}
       actions={
-        <Button
-          type="submit"
-          variant="contained"
-        >
+        <Button type="submit" variant="contained">
           Aggiorna dati
         </Button>
       }
@@ -150,11 +147,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
       {risultati.length > 0 ? (
         risultati.map((partita) => (
           <span key={`span_${partita.idPartita}`}>
-            <Stack
-              direction="row"
-              spacing={0}
-              justifyContent="space-between"
-            >
+            <Stack direction="row" spacing={0} justifyContent="space-between">
               <Typography variant="h5" component="div" color="text.secondary">
                 {partita.squadraHome} - {partita.squadraAway}
               </Typography>
@@ -206,11 +199,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
                 label="Escludi partita"
               />
             </Stack>
-            <Stack
-              direction="row"
-              spacing={0}
-              justifyContent="space-between"
-            >
+            <Stack direction="row" spacing={0} justifyContent="space-between">
               <TextField
                 margin="normal"
                 size="small"

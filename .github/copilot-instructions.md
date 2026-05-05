@@ -51,11 +51,11 @@ Browser component
 
 ### Route groups
 
-| Group | Path | Access |
-|---|---|---|
-| `(admin)` | `src/app/(admin)/` | `adminProcedure` only |
-| `(user)` | `src/app/(user)/` | `protectedProcedure` |
-| Public | `src/app/login`, `src/app/page.tsx` | `publicProcedure` |
+| Group     | Path                                | Access                |
+| --------- | ----------------------------------- | --------------------- |
+| `(admin)` | `src/app/(admin)/`                  | `adminProcedure` only |
+| `(user)`  | `src/app/(user)/`                   | `protectedProcedure`  |
+| Public    | `src/app/login`, `src/app/page.tsx` | `publicProcedure`     |
 
 ### Auth & session
 
@@ -75,6 +75,7 @@ Browser component
 ### tRPC router structure
 
 Each domain router lives in `src/server/api/<domain>/`:
+
 - `index.ts` — creates the router and wires procedures
 - `procedures/` — one file per procedure (query or mutation)
 
@@ -111,13 +112,13 @@ Input validation schemas for tRPC procedures live in `src/schemas/` (grouped by 
 
 ### Fantacalcio-specific domain terms
 
-| Term | Meaning |
-|---|---|
-| `giornata` | Matchday (round) |
-| `partita` | Individual match |
-| `formazione` | Weekly lineup submitted by a president |
-| `voto` | Player grade for a matchday |
-| `presidente` | Fantasy team owner (regular user) |
-| `tornei` | Tournaments within a season |
-| `trasferimento` | Transfer / market transaction |
-| `modulo` | Formation scheme (e.g. 4-3-3) — affects scoring bonus |
+| Term            | Meaning                                               |
+| --------------- | ----------------------------------------------------- |
+| `giornata`      | Matchday (round)                                      |
+| `partita`       | Individual match                                      |
+| `formazione`    | Weekly lineup submitted by a president                |
+| `voto`          | Player grade for a matchday                           |
+| `presidente`    | Fantasy team owner (regular user)                     |
+| `tornei`        | Tournaments within a season                           |
+| `trasferimento` | Transfer / market transaction                         |
+| `modulo`        | Formation scheme (e.g. 4-3-3) — affects scoring bonus |

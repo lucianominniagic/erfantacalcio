@@ -1,9 +1,8 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm'
 
 export class CreateFunctionA1764065060285 implements MigrationInterface {
-
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`CREATE OR REPLACE FUNCTION public.sp_refreshstats_a(
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`CREATE OR REPLACE FUNCTION public.sp_refreshstats_a(
             p_ruolo character varying,
             p_stagione character varying)
             RETURNS void
@@ -58,11 +57,14 @@ export class CreateFunctionA1764065060285 implements MigrationInterface {
         END;
         $BODY$`)
 
-        await queryRunner.query(`ALTER FUNCTION public.sp_refreshstats_a(character varying, character varying) OWNER TO "default"`)
-    }
+    await queryRunner.query(
+      `ALTER FUNCTION public.sp_refreshstats_a(character varying, character varying) OWNER TO "default"`,
+    )
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`DROP FUNCTION IF EXISTS public.sp_refreshstats_a(character varying, character varying)`)
-    }
-
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `DROP FUNCTION IF EXISTS public.sp_refreshstats_a(character varying, character varying)`,
+    )
+  }
 }

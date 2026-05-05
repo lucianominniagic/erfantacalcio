@@ -200,9 +200,7 @@ export async function getAltrePartite(idCalendario: number | undefined) {
   })
 }
 
-export async function getFormazioni(
-  idPartita: number
-) {
+export async function getFormazioni(idPartita: number) {
   const formazioni = await Formazioni.find({
     select: {
       idFormazione: true,

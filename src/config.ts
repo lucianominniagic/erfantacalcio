@@ -7,7 +7,10 @@ export const Configurazione = {
     10,
   ),
   importoMulta: parseInt(process.env.NEXT_PUBLIC_MULTA ?? '10', 10),
-  importoQuotaAnnuale: parseInt(process.env.NEXT_PUBLIC_QUOTA_ANNUALE ?? '120', 10),
+  importoQuotaAnnuale: parseInt(
+    process.env.NEXT_PUBLIC_QUOTA_ANNUALE ?? '120',
+    10,
+  ),
   urlCampioncino: process.env.NEXT_PUBLIC_CAMPIONCINO ?? '',
   urlCampioncinoSmall: process.env.NEXT_PUBLIC_CAMPIONCINO_SMALL ?? '',
   locale: process.env.NEXT_PUBLIC_LOCALE ?? 'it-IT',
@@ -59,6 +62,10 @@ export const Configurazione = {
   pfColumnRigErrato: parseInt(process.env.NEXT_PUBLIC_PF_RIGERRATO ?? '0'),
   pfColumnRigParato: parseInt(process.env.NEXT_PUBLIC_PF_RIGPARATO ?? '0'),
   pfColumnAutogol: parseInt(process.env.NEXT_PUBLIC_PF_AUTOGOL ?? '0'),
-  dataGiornata1SerieA: new Date(process.env.NEXT_PUBLIC_DATA_GIORNATA_1_SERIEA as string) ?? new Date(),
-  mercatoSettembre: new Date(process.env.NEXT_PUBLIC_DATA_MERCATO_SETTEMBRE as string) ?? new Date(),
+  dataGiornata1SerieA:
+    new Date(process.env.NEXT_PUBLIC_DATA_GIORNATA_1_SERIEA as string) ??
+    new Date(),
+  mercatoSettembre:
+    new Date(process.env.NEXT_PUBLIC_DATA_MERCATO_SETTEMBRE as string) ??
+    new Date(),
 }

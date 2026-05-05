@@ -29,13 +29,15 @@ import PageHeader from '~/components/PageHeader'
 export default function UploadVoti() {
   //#region select calendario
   const [selectedIdCalendario, setSelectedIdCalendario] = useState<number>()
-  const [selectedGiornataSerieA, setSelectedGiornataSerieA] = useState<number>(0)
-  const [calendario, setCalendario] = useState<z.infer<typeof calendarioSchema>[]>([])
+  const [selectedGiornataSerieA, setSelectedGiornataSerieA] =
+    useState<number>(0)
+  const [calendario, setCalendario] = useState<
+    z.infer<typeof calendarioSchema>[]
+  >([])
   const calendarioList = api.calendario.list.useQuery(undefined, {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   })
-  
 
   const getGiornataSerieA = useCallback(
     (idCalendario: number | undefined) => {
@@ -141,7 +143,10 @@ export default function UploadVoti() {
                   setProgress(0)
                   setAlert({
                     severity: 'error',
-                    message: error instanceof Error ? error.message : 'Errore sconosciuto durante il processamento dei voti',
+                    message:
+                      error instanceof Error
+                        ? error.message
+                        : 'Errore sconosciuto durante il processamento dei voti',
                     title: 'Errore',
                   })
                   return

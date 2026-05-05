@@ -1,7 +1,4 @@
-
-import {
-  createTRPCRouter,
-} from '~/server/api/trpc'
+import { createTRPCRouter } from '~/server/api/trpc'
 import { createOrUpdatePlayer } from './procedures/createOrUpdatePlayer'
 import { removeGiocatore } from './procedures/removeGiocatore'
 import { showAll } from './procedures/showAll'
@@ -19,4 +16,3 @@ export const giocatoriRouter = createTRPCRouter({
   listStatisticheSquadra: listStatisticheSquadra,
   getStatistica: showStatistica,
 })
-

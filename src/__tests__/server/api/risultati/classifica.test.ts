@@ -83,7 +83,13 @@ describe('UpdateClassifica', () => {
 
   it('counts away wins correctly', async () => {
     const partite = [
-      makePartita({ idSquadraH: 2, idSquadraA: 1, golH: 0, golA: 2, puntiA: 3 }),
+      makePartita({
+        idSquadraH: 2,
+        idSquadraA: 1,
+        golH: 0,
+        golA: 2,
+        puntiA: 3,
+      }),
     ]
     const trx = makeEntityManager(partite)
 
@@ -132,7 +138,13 @@ describe('UpdateClassifica', () => {
 
   it('excludes points for a multa home', async () => {
     const partite = [
-      makePartita({ idSquadraH: 1, golH: 3, golA: 0, puntiH: 3, hasMultaH: true }),
+      makePartita({
+        idSquadraH: 1,
+        golH: 3,
+        golA: 0,
+        puntiH: 3,
+        hasMultaH: true,
+      }),
     ]
     const trx = makeEntityManager(partite)
 
@@ -148,8 +160,20 @@ describe('UpdateClassifica', () => {
 
   it('calculates differenzaReti correctly', async () => {
     const partite = [
-      makePartita({ idSquadraH: 1, idSquadraA: 2, golH: 3, golA: 1, puntiH: 3 }),
-      makePartita({ idSquadraH: 2, idSquadraA: 1, golH: 1, golA: 2, puntiA: 3 }),
+      makePartita({
+        idSquadraH: 1,
+        idSquadraA: 2,
+        golH: 3,
+        golA: 1,
+        puntiH: 3,
+      }),
+      makePartita({
+        idSquadraH: 2,
+        idSquadraA: 1,
+        golH: 1,
+        golA: 2,
+        puntiA: 3,
+      }),
     ]
     const trx = makeEntityManager(partite)
 
@@ -172,9 +196,9 @@ describe('UpdateClassifica', () => {
 
     await UpdateClassifica(trx, ID_SQUADRA, ID_TORNEO)
 
-    const utentiUpdateCall = (trx.update as ReturnType<typeof vi.fn>).mock.calls.find(
-      (c) => c[0] === Utenti,
-    )
+    const utentiUpdateCall = (
+      trx.update as ReturnType<typeof vi.fn>
+    ).mock.calls.find((c) => c[0] === Utenti)
     // 2 multe × 10 = 20
     expect(utentiUpdateCall![2].importoMulte).toBe(20)
   })

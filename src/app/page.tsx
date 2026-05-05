@@ -63,7 +63,7 @@ export default function HomePage() {
             refetchOnReconnect: false,
           })
         : isChampions
-          ? api.calendario.listByTorneo.useQuery([2,3,4,5,6], {
+          ? api.calendario.listByTorneo.useQuery([2, 3, 4, 5, 6], {
               enabled: isChampions,
               refetchOnWindowFocus: false,
               refetchOnReconnect: false,
@@ -115,26 +115,25 @@ export default function HomePage() {
     <>
       <Grid container spacing={0}>
         <Slide direction={'down'} in={true}>
-            <Grid item xs={12}>
-              <Squadre />
-            </Grid>
-          </Slide>
+          <Grid item xs={12}>
+            <Squadre />
+          </Grid>
+        </Slide>
         {!torneiList.isLoading && (
           <>
             {new Date() >= Configurazione.dataGiornata1SerieA && (
               <>
-                <Grid
-                  item
-                  xs={12}
-                  sm={6}
-                  sx={!isXs ? { pt: '15px' } : {}}
-                >
+                <Grid item xs={12} sm={6} sx={!isXs ? { pt: '15px' } : {}}>
                   <Calendario
                     tipo={'risultati'}
                     prefixTitle="Risultati:"
                     enableTabs={true}
                   ></Calendario>
-                  <Calendario tipo={'prossima'} prefixTitle="" enableTabs={true}></Calendario>
+                  <Calendario
+                    tipo={'prossima'}
+                    prefixTitle=""
+                    enableTabs={true}
+                  ></Calendario>
                   <Box
                     sx={{
                       display: 'flex',

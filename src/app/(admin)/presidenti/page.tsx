@@ -169,9 +169,7 @@ export default function Presidenti() {
   return (
     <>
       <PageHeader title="Squadre / Presidenti" Icon={Groups} />
-      <Box
-        sx={{ width: '100%', overflowX: 'auto', contain: 'inline-size' }}
-      >
+      <Box sx={{ width: '100%', overflowX: 'auto', contain: 'inline-size' }}>
         <DataGrid
           columnHeaderHeight={45}
           rowHeight={40}
@@ -330,7 +328,12 @@ export default function Presidenti() {
               />
             </Grid>
             <Grid item xs={12}>
-              <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 2 }}>
+              <Stack
+                direction="row"
+                spacing={2}
+                justifyContent="flex-end"
+                sx={{ mt: 2 }}
+              >
                 <Button
                   type="button"
                   onClick={handleModalClose}
@@ -339,11 +342,7 @@ export default function Presidenti() {
                 >
                   Chiudi
                 </Button>
-                <Button
-                  type="submit"
-          color="primary"
-          variant="contained"
-                >
+                <Button type="submit" color="primary" variant="contained">
                   Aggiorna dati
                 </Button>
               </Stack>

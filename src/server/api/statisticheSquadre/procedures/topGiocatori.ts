@@ -75,7 +75,12 @@ export const topGiocatoriProcedure = publicProcedure
         }),
       ])
 
-      const allPlayers: PlayerRow[] = [...statsP, ...statsD, ...statsC, ...statsA]
+      const allPlayers: PlayerRow[] = [
+        ...statsP,
+        ...statsD,
+        ...statsC,
+        ...statsA,
+      ]
       const bomberPool: PlayerRow[] = [...statsD, ...statsC, ...statsA]
       const assistPool: PlayerRow[] = [...statsD, ...statsC, ...statsA]
 
@@ -96,7 +101,8 @@ export const topGiocatoriProcedure = publicProcedure
           if (p.idSquadra !== idSquadra) continue
           const val = Number(p.golfatti ?? 0)
           if (val <= 0) continue
-          if (!topBomber || val > topBomber.value) topBomber = buildEntry(p, val)
+          if (!topBomber || val > topBomber.value)
+            topBomber = buildEntry(p, val)
         }
 
         let topAssist: TopEntry | null = null
@@ -104,7 +110,8 @@ export const topGiocatoriProcedure = publicProcedure
           if (p.idSquadra !== idSquadra) continue
           const val = Number(p.assist ?? 0)
           if (val <= 0) continue
-          if (!topAssist || val > topAssist.value) topAssist = buildEntry(p, val)
+          if (!topAssist || val > topAssist.value)
+            topAssist = buildEntry(p, val)
         }
 
         return {
@@ -123,4 +130,3 @@ export const topGiocatoriProcedure = publicProcedure
       throw error
     }
   })
-

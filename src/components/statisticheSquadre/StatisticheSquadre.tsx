@@ -29,7 +29,9 @@ export default function StatisticheSquadre() {
     refetchOnReconnect: false,
   })
 
-  const [selectedNome, setSelectedNome] = useState<string | undefined>(undefined)
+  const [selectedNome, setSelectedNome] = useState<string | undefined>(
+    undefined,
+  )
   const [tab, setTab] = useState(0)
 
   const tornei = useMemo<Torneo[]>(
@@ -50,13 +52,17 @@ export default function StatisticheSquadre() {
     return map
   }, [tornei])
 
-  const groupNames = useMemo(() => Array.from(torneiGroups.keys()), [torneiGroups])
+  const groupNames = useMemo(
+    () => Array.from(torneiGroups.keys()),
+    [torneiGroups],
+  )
 
   useEffect(() => {
     if (selectedNome === undefined && groupNames.length > 0) {
       // Prefer "campionato"-named group, else first
       const def =
-        groupNames.find((n) => n.toLowerCase().includes('campionato')) ?? groupNames[0]
+        groupNames.find((n) => n.toLowerCase().includes('campionato')) ??
+        groupNames[0]
       if (def) setSelectedNome(def)
     }
   }, [groupNames, selectedNome])
@@ -76,7 +82,9 @@ export default function StatisticheSquadre() {
         <ToggleButtonGroup
           value={selectedNome ?? null}
           exclusive
-          onChange={(_, val: string | null) => { if (val !== null) setSelectedNome(val) }}
+          onChange={(_, val: string | null) => {
+            if (val !== null) setSelectedNome(val)
+          }}
           size="small"
           disabled={groupNames.length === 0}
         >

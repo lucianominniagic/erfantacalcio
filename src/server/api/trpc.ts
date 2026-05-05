@@ -38,7 +38,10 @@ interface CreateContextOptions {
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
-const createInnerTRPCContext = ({ session, dataSource }: CreateContextOptions & { dataSource?: unknown }) => {
+const createInnerTRPCContext = ({
+  session,
+  dataSource,
+}: CreateContextOptions & { dataSource?: unknown }) => {
   return {
     session,
     dataSource,
@@ -54,7 +57,7 @@ const createInnerTRPCContext = ({ session, dataSource }: CreateContextOptions & 
 export const createTRPCContext = async (opts?: FetchCreateContextFnOptions) => {
   const session = await auth()
   const datasource = await initializeDBConnection()
-  
+
   return createInnerTRPCContext({
     session,
     dataSource: datasource,

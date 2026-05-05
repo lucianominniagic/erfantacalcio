@@ -45,9 +45,27 @@ export interface GenericCardProps {
   /** Show divider before actions */
   showActionsDivider?: boolean
   /** Title typography variant */
-  titleVariant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'subtitle1' | 'subtitle2'
+  titleVariant?:
+    | 'h1'
+    | 'h2'
+    | 'h3'
+    | 'h4'
+    | 'h5'
+    | 'h6'
+    | 'subtitle1'
+    | 'subtitle2'
   /** Subtitle typography variant */
-  subtitleVariant?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'subtitle1' | 'subtitle2' | 'body1' | 'body2'
+  subtitleVariant?:
+    | 'h1'
+    | 'h2'
+    | 'h3'
+    | 'h4'
+    | 'h5'
+    | 'h6'
+    | 'subtitle1'
+    | 'subtitle2'
+    | 'body1'
+    | 'body2'
   /** Content padding */
   contentPadding?: number | string
   /** onClick handler for the entire card */
@@ -61,14 +79,14 @@ export interface GenericCardProps {
 /**
  * Generic Card component with configurable header, content, and actions.
  * Built on top of Material-UI Card components.
- * 
+ *
  * @example Basic card
  * ```tsx
  * <GenericCard title="My Card" subtitle="Card subtitle">
  *   <Typography>Card content here</Typography>
  * </GenericCard>
  * ```
- * 
+ *
  * @example Card with avatar and actions
  * ```tsx
  * <GenericCard
@@ -85,7 +103,7 @@ export interface GenericCardProps {
  *   <Typography>User details...</Typography>
  * </GenericCard>
  * ```
- * 
+ *
  * @example Clickable card
  * ```tsx
  * <GenericCard

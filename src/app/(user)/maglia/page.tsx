@@ -6,5 +6,5 @@ export default function HomePage() {
     <main style={{ padding: 32 }}>
       <ShirtSelector />
     </main>
-  );
+  )
 }

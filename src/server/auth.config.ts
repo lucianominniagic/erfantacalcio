@@ -21,7 +21,7 @@ async function authenticate(input: { username: string; password: string }) {
   console.info('authenticate: ' + input.username)
   try {
     await initializeDBConnection()
-    
+
     const hashedPassword = computeMD5Hash(input.password)
     const utente = await Utenti.findOne({
       where: {

@@ -36,7 +36,12 @@ interface RosaListProps {
   truncateSquad?: boolean
 }
 
-function RosaList({ giocatori, onSelect, dimmed = false, truncateSquad = false }: RosaListProps) {
+function RosaList({
+  giocatori,
+  onSelect,
+  dimmed = false,
+  truncateSquad = false,
+}: RosaListProps) {
   return (
     <Box>
       {giocatori.map((g, i) => (
@@ -63,7 +68,12 @@ function RosaList({ giocatori, onSelect, dimmed = false, truncateSquad = false }
             label={g.ruolo}
             size="small"
             color={RUOLO_COLOR[g.ruolo] ?? 'default'}
-            sx={{ width: 36, flexShrink: 0, fontSize: '0.65rem', fontWeight: 700 }}
+            sx={{
+              width: 36,
+              flexShrink: 0,
+              fontSize: '0.65rem',
+              fontWeight: 700,
+            }}
           />
           <Typography
             variant="body2"
@@ -82,7 +92,12 @@ function RosaList({ giocatori, onSelect, dimmed = false, truncateSquad = false }
           </Typography>
           <Typography
             variant="caption"
-            sx={{ flexShrink: 0, color: 'text.disabled', textTransform: 'uppercase', letterSpacing: '0.04em' }}
+            sx={{
+              flexShrink: 0,
+              color: 'text.disabled',
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+            }}
           >
             {truncateSquad
               ? (g.nomeSquadraSerieA ?? '').slice(0, 3)
@@ -120,23 +135,27 @@ function Rosa({ idSquadra }: RosaProps) {
     if (!rosaList.data) return { rosaAttiva: [], rosaVenduta: [] }
     const attiva = rosaList.data
       .filter((g: GiocatoreType) => !g.isVenduto)
-      .sort((a: GiocatoreType, b: GiocatoreType) =>
-        (RUOLO_ORDER[b.ruolo] ?? 9) - (RUOLO_ORDER[a.ruolo] ?? 9) || b.costo - a.costo,
+      .sort(
+        (a: GiocatoreType, b: GiocatoreType) =>
+          (RUOLO_ORDER[b.ruolo] ?? 9) - (RUOLO_ORDER[a.ruolo] ?? 9) ||
+          b.costo - a.costo,
       )
     const venduta = rosaList.data
       .filter((g: GiocatoreType) => g.isVenduto)
-      .sort((a: GiocatoreType, b: GiocatoreType) =>
-        (RUOLO_ORDER[b.ruolo] ?? 9) - (RUOLO_ORDER[a.ruolo] ?? 9) || b.costo - a.costo,
+      .sort(
+        (a: GiocatoreType, b: GiocatoreType) =>
+          (RUOLO_ORDER[b.ruolo] ?? 9) - (RUOLO_ORDER[a.ruolo] ?? 9) ||
+          b.costo - a.costo,
       )
     return { rosaAttiva: attiva, rosaVenduta: venduta }
   }, [rosaList.data])
 
-
-
   return (
     <>
       <Box>
-        <Typography variant="h4" sx={{ mb: 2 }}>Rosa</Typography>
+        <Typography variant="h4" sx={{ mb: 2 }}>
+          Rosa
+        </Typography>
 
         {rosaList.isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>

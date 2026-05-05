@@ -79,7 +79,11 @@ export default function AvvioStagione() {
   const handleNext = async () => {
     setMessage('')
     setDisableButton(true)
-    let message: z.infer<typeof messageSchema> = { isError: false, isComplete: false, message: '' }
+    let message: z.infer<typeof messageSchema> = {
+      isError: false,
+      isComplete: false,
+      message: '',
+    }
 
     switch (activeStep) {
       case 0:
@@ -148,7 +152,15 @@ export default function AvvioStagione() {
             </>
           )}
           {disableButton && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, mt: 2 }}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 1,
+                mt: 2,
+              }}
+            >
               <Typography variant="h5">Elaborazione in corso...</Typography>
               <LoadingSpinner />
             </Box>

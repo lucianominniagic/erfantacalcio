@@ -28,7 +28,7 @@ export const getSquadraProcedure = publicProcedure
           id: utente.idUtente,
           isAdmin: utente.adminLevel,
           isLockLevel: utente.lockLevel,
-            presidente: utente.presidente,
+          presidente: utente.presidente,
           email: utente.mail,
           squadra: utente.nomeSquadra,
           maglia: utente.maglia,

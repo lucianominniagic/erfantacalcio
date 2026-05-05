@@ -3,7 +3,6 @@ import { calendarioSchema } from '~/schemas/calendario'
 import { z } from 'zod'
 import { getCalendario } from '~/server/utils/common'
 
-
 export const listCalendarioProcedure = adminProcedure.query(async () => {
   try {
     const result = await getCalendario({})
@@ -17,13 +16,13 @@ export const listCalendarioProcedure = adminProcedure.query(async () => {
       const allFalse = result.every((r) => !r.hasGiocata)
       const allTrue = result.every((r) => r.hasGiocata)
       if (allFalse) {
-      indexSelected = 0
+        indexSelected = 0
       } else if (allTrue) {
-      indexSelected = result.length - 1
+        indexSelected = result.length - 1
       } else {
-      // campionato in corso -> prima partita non giocata
-      indexSelected = result.findIndex((r) => !r.hasGiocata)
-      if (indexSelected === -1) indexSelected = 0
+        // campionato in corso -> prima partita non giocata
+        indexSelected = result.findIndex((r) => !r.hasGiocata)
+        if (indexSelected === -1) indexSelected = 0
       }
     }
 

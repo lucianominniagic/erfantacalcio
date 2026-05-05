@@ -3,7 +3,9 @@ import { z } from 'zod'
 import { calendarioSchema } from '~/schemas/calendario'
 import { Calendario } from '~/server/db/entities'
 
-function mapCalendarioResult(result: Calendario): z.infer<typeof calendarioSchema> {
+function mapCalendarioResult(
+  result: Calendario,
+): z.infer<typeof calendarioSchema> {
   return {
     id: result.idCalendario,
     idTorneo: result.Torneo.idTorneo,

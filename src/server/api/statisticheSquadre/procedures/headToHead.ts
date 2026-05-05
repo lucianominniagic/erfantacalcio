@@ -37,7 +37,8 @@ export const headToHeadProcedure = publicProcedure
       const ensure = (a: number, b: number) => {
         if (!matrice[a]) matrice[a] = {}
         const row = matrice[a]!
-        if (!row[b]) row[b] = { v: 0, n: 0, p: 0, golFatti: 0, golSubiti: 0, partite: 0 }
+        if (!row[b])
+          row[b] = { v: 0, n: 0, p: 0, golFatti: 0, golSubiti: 0, partite: 0 }
         return row[b]!
       }
 
@@ -80,4 +81,3 @@ export const headToHeadProcedure = publicProcedure
       throw error
     }
   })
-

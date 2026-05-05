@@ -39,7 +39,6 @@ import { autosizeOptions } from '~/utils/datatable'
 import { Edit } from '@mui/icons-material'
 import { calendarioSchema } from '~/schemas/calendario'
 
-
 export default function Calendario() {
   const [idCalendario, setIdCalendario] = useState<number>()
   const calendarioList = api.calendario.list.useQuery()
@@ -58,7 +57,9 @@ export default function Calendario() {
   const [messageModal, setMessageModal] = useState('')
   const [data, setData] = useState<z.infer<typeof calendarioSchema>[]>([])
   const [openModalEdit, setOpenModalEdit] = useState(false)
-  const [calendarioInModifica, setCalendarioInModifica] = useState<z.infer<typeof calendarioSchema>>({
+  const [calendarioInModifica, setCalendarioInModifica] = useState<
+    z.infer<typeof calendarioSchema>
+  >({
     id: 0,
     idTorneo: 1,
     nome: '',
@@ -72,7 +73,7 @@ export default function Calendario() {
     dataFine: '',
     girone: null,
     isSelected: false,
-  }) 
+  })
 
   useEffect(() => {
     if (calendarioList.data) {
@@ -242,9 +243,7 @@ export default function Calendario() {
   return (
     <>
       <PageHeader title="Gestione calendario" Icon={CalendarMonth} />
-      <Box
-        sx={{ width: '100%', overflowX: 'auto', contain: 'inline-size' }}
-      >
+      <Box sx={{ width: '100%', overflowX: 'auto', contain: 'inline-size' }}>
         <DataGrid
           columnHeaderHeight={45}
           rowHeight={40}
@@ -390,7 +389,11 @@ export default function Calendario() {
                 />
                 <MobileDateTimePicker
                   label="Data fine (opzionale)"
-                  value={calendarioInModifica.dataFine ? dayjs(calendarioInModifica.dataFine) : null}
+                  value={
+                    calendarioInModifica.dataFine
+                      ? dayjs(calendarioInModifica.dataFine)
+                      : null
+                  }
                   onChange={(newValue) =>
                     setCalendarioInModifica({
                       ...calendarioInModifica,
@@ -398,7 +401,10 @@ export default function Calendario() {
                     })
                   }
                   slotProps={{
-                    textField: { helperText: 'Se vuoto, usa la data di inizio', size: 'small' },
+                    textField: {
+                      helperText: 'Se vuoto, usa la data di inizio',
+                      size: 'small',
+                    },
                   }}
                 />
               </LocalizationProvider>
@@ -433,7 +439,12 @@ export default function Calendario() {
               />
             </Grid>
             <Grid item xs={12}>
-              <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 2 }}>
+              <Stack
+                direction="row"
+                spacing={2}
+                justifyContent="flex-end"
+                sx={{ mt: 2 }}
+              >
                 <Button
                   type="button"
                   onClick={handleModalClose}
@@ -442,11 +453,7 @@ export default function Calendario() {
                 >
                   Chiudi
                 </Button>
-                <Button
-                  type="submit"
-                  color="primary"
-                  variant="contained"
-                >
+                <Button type="submit" color="primary" variant="contained">
                   Aggiorna dati
                 </Button>
               </Stack>

@@ -85,8 +85,12 @@ export default function Squadre() {
                         }}
                       />
                     </Box>
-                    <CardContent sx={{ paddingBottom: '1px', paddingLeft: '3px' }}>
-                      <Typography variant="body2"><h5>{squadra.squadra}</h5></Typography>
+                    <CardContent
+                      sx={{ paddingBottom: '1px', paddingLeft: '3px' }}
+                    >
+                      <Typography variant="body2">
+                        <h5>{squadra.squadra}</h5>
+                      </Typography>
                     </CardContent>
                   </CardActionArea>
                 </Card>
@@ -121,7 +125,8 @@ export default function Squadre() {
               maxWidth: 110,
               marginBottom: '0px',
               cursor: 'pointer',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+              transition:
+                'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
               '&:hover': {
                 transform: 'translateY(-3px)',
                 borderColor: 'rgba(255,193,7,0.5)',
@@ -148,7 +153,12 @@ export default function Squadre() {
               <CardContent sx={{ p: '6px 8px', '&:last-child': { pb: '6px' } }}>
                 <Typography
                   variant="h5"
-                  sx={{ fontSize: '0.7rem', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}
+                  sx={{
+                    fontSize: '0.7rem',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                  }}
                 >
                   {squadra.squadra}
                 </Typography>

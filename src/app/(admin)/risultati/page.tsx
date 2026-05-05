@@ -113,7 +113,9 @@ export default function Risultati() {
                   </Stack>
                 </Box>
                 {selectedIdCalendario !== selectedGiornata?.idCalendario ? (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
+                  <Box
+                    sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}
+                  >
                     <LoadingSpinner />
                   </Box>
                 ) : (

@@ -18,7 +18,10 @@ export interface GenericAutocompleteProps<T extends AutocompleteOption> {
   /** Array of items to display in the autocomplete */
   items: T[]
   /** Callback invoked when an item is selected or text is entered */
-  onItemSelected: (selectedId: T['id'] | undefined, inputValue: string | undefined) => void
+  onItemSelected: (
+    selectedId: T['id'] | undefined,
+    inputValue: string | undefined,
+  ) => void
   /** Label for the text field */
   label?: string
   /** Placeholder text */
@@ -69,8 +72,11 @@ export default function GenericAutocomplete<T extends AutocompleteOption>({
 }: GenericAutocompleteProps<T>) {
   const defaultFilterOptions = React.useCallback(
     (options: T[], params: FilterParams<T>) => {
-      const filtered = filter(options as AutocompleteOption[], params as any) as T[]
-      
+      const filtered = filter(
+        options as AutocompleteOption[],
+        params as any,
+      ) as T[]
+
       if (
         allowCustomInput &&
         params.inputValue !== '' &&
@@ -84,7 +90,7 @@ export default function GenericAutocomplete<T extends AutocompleteOption>({
 
       return filtered
     },
-    [items, allowCustomInput]
+    [items, allowCustomInput],
   )
 
   const handleChange = React.useCallback(
@@ -92,7 +98,11 @@ export default function GenericAutocomplete<T extends AutocompleteOption>({
       if (typeof newValue === 'string') {
         // Free text input
         onItemSelected(undefined, newValue)
-      } else if (newValue && 'label' in newValue && (newValue.id === 0 || newValue.id === '0')) {
+      } else if (
+        newValue &&
+        'label' in newValue &&
+        (newValue.id === 0 || newValue.id === '0')
+      ) {
         // Custom input suggestion
         onItemSelected(undefined, newValue.label)
       } else if (newValue && 'id' in newValue && newValue.id) {
@@ -103,7 +113,7 @@ export default function GenericAutocomplete<T extends AutocompleteOption>({
         onItemSelected(undefined, undefined)
       }
     },
-    [onItemSelected]
+    [onItemSelected],
   )
 
   const getOptionLabel = React.useCallback((option: T | string) => {

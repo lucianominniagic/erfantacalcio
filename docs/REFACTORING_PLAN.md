@@ -13,6 +13,7 @@
 ### File più grandi / più critici
 
 **Pagine (`src/app/`)**
+
 - `app/(admin)/giocatori/page.tsx` — **897 righe** ⚠️
 - `app/(admin)/voti/page.tsx` — 515
 - `app/(admin)/calendario/page.tsx` — 452
@@ -21,6 +22,7 @@
 - `app/(admin)/uploadVoti/page.tsx` — 305
 
 **Componenti (`src/components/`)**
+
 - `selectColors/shirtSVG.tsx` — 879 ⚠️
 - `cardPartite/ViewTabellini.tsx` — 531
 - `cardPartite/ViewFormazioni.tsx` — 445
@@ -31,6 +33,7 @@
 - `squadra/useFormazioneState.ts` — 319
 
 **Procedure tRPC (`src/server/api/`)** — 70 procedure totali
+
 - `voti/procedures/processVoti.ts` — 323 ⚠️
 - `partita/procedures/getTabellini.ts` — 275
 - `statisticheSquadre/procedures/riepilogo.ts` — 183
@@ -69,6 +72,7 @@
 > Ogni fase ha owner consigliato (sub-agent), file impattati, criteri di completamento.
 
 ### FASE 0 — Baseline e safety net
+
 **Owner:** `dick` + `pasolini`
 
 - Verificare che `npm run build`, `npm run lint`, `npm run format -- --check` passino.
@@ -80,6 +84,7 @@
 ---
 
 ### FASE 1 — Fondamenta tipi & config
+
 **Owner:** `ishiguro` (lead) + `mccarthy`
 
 Obiettivo: ridurre cast/any e centralizzare config.
@@ -94,6 +99,7 @@ Obiettivo: ridurre cast/any e centralizzare config.
 ---
 
 ### FASE 2 — Auth & route group hardening
+
 **Owner:** `gibson`
 
 1. Creare `src/app/(admin)/layout.tsx` con server-side guard (`auth()` → redirect se `!adminLevel`).
@@ -106,6 +112,7 @@ Obiettivo: ridurre cast/any e centralizzare config.
 ---
 
 ### FASE 3 — Service layer backend (procedure grandi)
+
 **Owner:** `mccarthy` + `dick` (test caratterizzanti prima)
 
 Target principali (in ordine):
@@ -123,6 +130,7 @@ Target principali (in ordine):
 ---
 
 ### FASE 4 — Componenti grandi: split & extract hook
+
 **Owner:** `coe` + `asimov` (per token tema)
 
 Per ciascun componente >300 righe:
@@ -140,6 +148,7 @@ Per ciascun componente >300 righe:
 ---
 
 ### FASE 5 — Pagine admin pesanti
+
 **Owner:** `coe` (con `mccarthy` per procedure se servono)
 
 1. **`(admin)/giocatori/page.tsx` (897 righe)** ⚠️ — split in:
@@ -157,6 +166,7 @@ Per ciascun componente >300 righe:
 ---
 
 ### FASE 6 — Theme & styling consistency
+
 **Owner:** `asimov`
 
 1. Audit `sx={{ ... }}` ricorrenti: spostare in `theme/overrides/` o creare componenti `Styled*`.
@@ -169,6 +179,7 @@ Per ciascun componente >300 righe:
 ---
 
 ### FASE 7 — Entità & DB hygiene
+
 **Owner:** `dostojevskij`
 
 1. **`Utente`**: rinominare `Campionato`/`Champions`/`Secondo`/`Terzo` in camelCase (campionato, champions, secondo, terzo) → migrazione TypeORM con rename column.
@@ -181,9 +192,11 @@ Per ciascun componente >300 righe:
 ---
 
 ### FASE 8 — Testing coverage
+
 **Owner:** `dick` (in parallelo alle fasi 3-5 dove possibile)
 
 Aree critiche prioritarie:
+
 1. **Calcolo fantapunti** (`votiService` post fase 3) — test su giornata storica.
 2. **Logica formazione** (`utils.ts`, `formazioneService`) — moduli ammessi, calcolo codice formazione.
 3. **`confirmPrecedente`** — clone + esistenza + giornate correnti.
@@ -194,6 +207,7 @@ Aree critiche prioritarie:
 ---
 
 ### FASE 9 — Documentazione & DX
+
 **Owner:** Murakami (orchestrazione) + tutti
 
 1. `CONTEXT.md` (root) con glossario domain (giornata, partita, formazione, voto, ...).

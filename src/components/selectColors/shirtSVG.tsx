@@ -1,20 +1,25 @@
-'use client';
-import React from 'react';
-import { ShirtTemplate } from '.';
-
+'use client'
+import React from 'react'
+import { ShirtTemplate } from '.'
 
 export const ShirtSVG = ({
-  template, mainColor, secondaryColor, thirdColor, textColor = 'black', size = 200, number = 10,
+  template,
+  mainColor,
+  secondaryColor,
+  thirdColor,
+  textColor = 'black',
+  size = 200,
+  number = 10,
 }: {
-  template: ShirtTemplate;
-  mainColor: string;
-  secondaryColor: string;
-  thirdColor: string;
-  textColor: string;
-  size?: number;
-  number?: number;
+  template: ShirtTemplate
+  mainColor: string
+  secondaryColor: string
+  thirdColor: string
+  textColor: string
+  size?: number
+  number?: number
 }) => {
-  const collar = <rect x="90" y="35" width="20" height="10" fill="white" />;
+  const collar = <rect x="90" y="35" width="20" height="10" fill="white" />
 
   switch (template) {
     case 'solid':
@@ -27,7 +32,8 @@ export const ShirtSVG = ({
             {/* corpo con arrotondamento solo in basso */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
             {collar}
           </g>
           {/* numero */}
@@ -42,7 +48,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'stripes':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -51,7 +57,8 @@ export const ShirtSVG = ({
             <rect x="150" y="40" width="30" height="40" fill={thirdColor} />
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
             {/* stripes */}
             {[60, 80, 100, 120, 140].map((x) => (
               <rect
@@ -60,7 +67,8 @@ export const ShirtSVG = ({
                 y="40"
                 width="10"
                 height="110"
-                fill={secondaryColor} />
+                fill={secondaryColor}
+              />
             ))}
             {collar}
           </g>
@@ -75,7 +83,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'centerLine':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -84,7 +92,8 @@ export const ShirtSVG = ({
             <rect x="150" y="40" width="30" height="40" fill={thirdColor} />
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
             {/* center stripe */}
             <rect x="95" y="40" width="10" height="120" fill={secondaryColor} />
             {collar}
@@ -100,7 +109,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'bicolor':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -111,12 +120,14 @@ export const ShirtSVG = ({
             {/* left half with bottom-left rounded corner */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
 
             {/* right half with bottom-right rounded corner */}
             <path
               d="M100 40 H150 V140 Q150 150 140 150 H100 Z"
-              fill={secondaryColor} />
+              fill={secondaryColor}
+            />
             {collar}
           </g>
           <text
@@ -130,7 +141,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'ajax':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -143,7 +154,8 @@ export const ShirtSVG = ({
             {/* sinistra - bianca */}
             <path
               d="M50 40 H80 V160 H60 Q50 160 50 150 Z"
-              fill={secondaryColor} />
+              fill={secondaryColor}
+            />
 
             {/* centro - rossa */}
             <path d="M80 40 H120 V160 H80 Z" fill={mainColor} />
@@ -151,7 +163,8 @@ export const ShirtSVG = ({
             {/* destra - bianca */}
             <path
               d="M120 40 H150 V150 Q150 160 140 160 H120 Z"
-              fill={secondaryColor} />
+              fill={secondaryColor}
+            />
             {collar}
           </g>
           {/* numero */}
@@ -166,7 +179,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'samp':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -178,7 +191,8 @@ export const ShirtSVG = ({
             {/* Corpo con arrotondamento solo in basso */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
 
             {/* Bande orizzontali centrali sulle maniche */}
             <rect x="20" y="60" width="30" height="8" fill={secondaryColor} />
@@ -204,7 +218,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'diagonal':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -216,13 +230,15 @@ export const ShirtSVG = ({
             {/* corpo con arrotondamento solo in basso */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
 
             {/* fascia diagonale */}
             <path
               d="M50 45 L70 40 L150 145 L130 150 Z"
               fill={secondaryColor}
-              stroke="none" />
+              stroke="none"
+            />
 
             {collar}
           </g>
@@ -239,7 +255,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'inter':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -251,11 +267,12 @@ export const ShirtSVG = ({
             {/* corpo con arrotondamento solo in basso */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
 
             {/* bande zig-zag */}
             {Array.from({ length: 5 }).map((_, i) => {
-              const yStart = 40 + i * 20;
+              const yStart = 40 + i * 20
               const zigzag = `
             M55 ${yStart}
             L75 ${yStart + 10}
@@ -270,10 +287,10 @@ export const ShirtSVG = ({
             L75 ${yStart + 20}
             L55 ${yStart + 10}
             Z
-          `;
+          `
               return (
                 <path key={i} d={zigzag} fill={secondaryColor} stroke="none" />
-              );
+              )
             })}
 
             {collar}
@@ -291,7 +308,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'celtic':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -313,7 +330,8 @@ export const ShirtSVG = ({
                   y={40 + i * 18}
                   width={100}
                   height={18}
-                  fill={i % 2 === 0 ? mainColor : secondaryColor} />
+                  fill={i % 2 === 0 ? mainColor : secondaryColor}
+                />
               ))}
             </g>
 
@@ -322,7 +340,8 @@ export const ShirtSVG = ({
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
               fill="none"
               stroke="black"
-              strokeWidth={2} />
+              strokeWidth={2}
+            />
 
             {collar}
           </g>
@@ -339,7 +358,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'roma':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -364,7 +383,8 @@ export const ShirtSVG = ({
                   width={100}
                   height={5}
                   fill={secondaryColor}
-                  opacity={0.2} />
+                  opacity={0.2}
+                />
               ))}
             </g>
 
@@ -373,7 +393,8 @@ export const ShirtSVG = ({
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
               fill="none"
               stroke="black"
-              strokeWidth={2} />
+              strokeWidth={2}
+            />
 
             {collar}
           </g>
@@ -390,7 +411,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'america':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -402,10 +423,12 @@ export const ShirtSVG = ({
             {/* corpo con motivo a V */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
             <path
               d="M50 40 L100 100 L150 40 L140 40 L100 90 L60 40 Z"
-              fill={secondaryColor} />
+              fill={secondaryColor}
+            />
 
             {collar}
           </g>
@@ -422,7 +445,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'palmeiras':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -434,7 +457,8 @@ export const ShirtSVG = ({
             {/* corpo base */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
 
             {/* croce centrale */}
             <rect x="95" y="40" width="10" height="110" fill={secondaryColor} />
@@ -455,7 +479,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'germany':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -467,7 +491,8 @@ export const ShirtSVG = ({
             {/* corpo con zig-zag */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
 
             {/* zig-zag pattern */}
             <path
@@ -485,7 +510,8 @@ export const ShirtSVG = ({
             L70 120 
             L50 150
             Z"
-              fill={secondaryColor} />
+              fill={secondaryColor}
+            />
 
             {collar}
           </g>
@@ -502,7 +528,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'veneziaFC':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -514,7 +540,8 @@ export const ShirtSVG = ({
             {/* corpo base con arrotondamento in basso */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
 
             {/* triangoli decorativi */}
             <polygon points="50,40 75,70 50,100" fill={secondaryColor} />
@@ -537,7 +564,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'manUnited':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -549,24 +576,28 @@ export const ShirtSVG = ({
             {/* corpo base con arrotondamento in basso */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
 
             {/* pattern astratto: curve sovrapposte */}
             <path
               d="M60 60 C90 80, 110 40, 140 70"
               stroke={secondaryColor}
               strokeWidth={5}
-              fill="none" />
+              fill="none"
+            />
             <path
               d="M60 90 C90 110, 110 70, 140 100"
               stroke={secondaryColor}
               strokeWidth={5}
-              fill="none" />
+              fill="none"
+            />
             <path
               d="M60 120 C90 140, 110 100, 140 130"
               stroke={secondaryColor}
               strokeWidth={5}
-              fill="none" />
+              fill="none"
+            />
 
             {collar}
           </g>
@@ -583,7 +614,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'manCity':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -600,10 +631,11 @@ export const ShirtSVG = ({
             {/* corpo base */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
             {/* strisce verticali sottili sfumate */}
             {[...Array(10)].map((_, i) => {
-              const x = 50 + i * 10;
+              const x = 50 + i * 10
               return (
                 <rect
                   key={`stripe-${i}`}
@@ -612,8 +644,9 @@ export const ShirtSVG = ({
                   width={i % 2 === 0 ? 6 : 4}
                   height="110"
                   fill={i % 2 === 0 ? 'url(#stripeGradient)' : secondaryColor}
-                  opacity={i % 2 === 0 ? 1 : 0.8} />
-              );
+                  opacity={i % 2 === 0 ? 1 : 0.8}
+                />
+              )
             })}
             {collar}
           </g>
@@ -630,7 +663,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'chelsea':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -647,10 +680,11 @@ export const ShirtSVG = ({
             {/* corpo con arrotondamento in basso */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
             {/* strisce orizzontali sfumate */}
             {[...Array(7)].map((_, i) => {
-              const y = 40 + i * 15;
+              const y = 40 + i * 15
               return (
                 <rect
                   key={`stripe-${i}`}
@@ -659,8 +693,9 @@ export const ShirtSVG = ({
                   width="100"
                   height="10"
                   fill="url(#horizontalGradient)"
-                  opacity={i % 2 === 0 ? 1 : 0.6} />
-              );
+                  opacity={i % 2 === 0 ? 1 : 0.6}
+                />
+              )
             })}
             {collar}
           </g>
@@ -677,7 +712,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'juventus':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -691,7 +726,8 @@ export const ShirtSVG = ({
               <stop
                 offset="100%"
                 stopColor={secondaryColor}
-                stopOpacity="0.4" />
+                stopOpacity="0.4"
+              />
             </linearGradient>
           </defs>
           <g stroke="black" strokeWidth={2}>
@@ -701,10 +737,11 @@ export const ShirtSVG = ({
             {/* corpo con arrotondamento in basso */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
             {/* strisce verticali sfumate */}
             {[...Array(7)].map((_, i) => {
-              const x = 50 + i * 15;
+              const x = 50 + i * 15
               return (
                 <rect
                   key={`stripe-${i}`}
@@ -712,10 +749,13 @@ export const ShirtSVG = ({
                   y={40}
                   width={10}
                   height={110}
-                  fill={i % 2 === 0
-                    ? 'url(#stripeGradient)'
-                    : 'url(#altStripeGradient)'} />
-              );
+                  fill={
+                    i % 2 === 0
+                      ? 'url(#stripeGradient)'
+                      : 'url(#altStripeGradient)'
+                  }
+                />
+              )
             })}
             {/* colletto */}
             {collar}
@@ -733,7 +773,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'lazio':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -743,7 +783,8 @@ export const ShirtSVG = ({
               <stop
                 offset="100%"
                 stopColor={secondaryColor}
-                stopOpacity="0.7" />
+                stopOpacity="0.7"
+              />
             </linearGradient>
           </defs>
           <g stroke="black" strokeWidth={2}>
@@ -753,7 +794,8 @@ export const ShirtSVG = ({
             {/* corpo con arrotondamento in basso */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill="url(#lazioGrad)" />
+              fill="url(#lazioGrad)"
+            />
             {/* pattern diagonale sottile */}
             {[...Array(10)].map((_, i) => (
               <line
@@ -764,7 +806,8 @@ export const ShirtSVG = ({
                 y2="150"
                 stroke={secondaryColor}
                 strokeWidth="1"
-                opacity="0.5" />
+                opacity="0.5"
+              />
             ))}
 
             {/* colletto */}
@@ -783,7 +826,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'barcelona':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -793,7 +836,8 @@ export const ShirtSVG = ({
               <stop
                 offset="100%"
                 stopColor={secondaryColor}
-                stopOpacity="0.7" />
+                stopOpacity="0.7"
+              />
             </linearGradient>
             <linearGradient id="barcaGrad2" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={secondaryColor} stopOpacity="1" />
@@ -807,7 +851,8 @@ export const ShirtSVG = ({
             {/* corpo con arrotondamento in basso */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill="none" />
+              fill="none"
+            />
             {/* bande verticali sfumate */}
             {[...Array(5)].map((_, i) => (
               <rect
@@ -816,7 +861,8 @@ export const ShirtSVG = ({
                 y={40}
                 width={10}
                 height={110}
-                fill={i % 2 === 0 ? 'url(#barcaGrad1)' : 'url(#barcaGrad2)'} />
+                fill={i % 2 === 0 ? 'url(#barcaGrad1)' : 'url(#barcaGrad2)'}
+              />
             ))}
 
             {/* colletto */}
@@ -835,7 +881,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'milan':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -845,7 +891,8 @@ export const ShirtSVG = ({
               <stop
                 offset="100%"
                 stopColor={secondaryColor}
-                stopOpacity="0.6" />
+                stopOpacity="0.6"
+              />
             </linearGradient>
             <linearGradient id="milanGradBlack" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={secondaryColor} stopOpacity="1" />
@@ -859,7 +906,8 @@ export const ShirtSVG = ({
             {/* corpo con righe verticali larghe */}
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill="none" />
+              fill="none"
+            />
             {[...Array(3)].map((_, i) => (
               <rect
                 key={`milanStripe-${i}`}
@@ -867,7 +915,10 @@ export const ShirtSVG = ({
                 y={40}
                 width={20}
                 height={110}
-                fill={i % 2 === 0 ? 'url(#milanGradRed)' : 'url(#milanGradBlack)'} />
+                fill={
+                  i % 2 === 0 ? 'url(#milanGradRed)' : 'url(#milanGradBlack)'
+                }
+              />
             ))}
 
             {/* colletto */}
@@ -886,7 +937,7 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
     case 'tottenham':
       return (
         <svg viewBox="0 0 200 200" width={size} height={size}>
@@ -896,7 +947,8 @@ export const ShirtSVG = ({
               <stop
                 offset="100%"
                 stopColor={secondaryColor}
-                stopOpacity="0.7" />
+                stopOpacity="0.7"
+              />
             </linearGradient>
           </defs>
           <g stroke="black" strokeWidth={2}>
@@ -909,10 +961,12 @@ export const ShirtSVG = ({
               y="80"
               width="100"
               height="20"
-              fill="url(#tottenhamGrad)" />
+              fill="url(#tottenhamGrad)"
+            />
             <path
               d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
-              fill={mainColor} />
+              fill={mainColor}
+            />
             {/* colletto */}
             {collar}
           </g>
@@ -929,9 +983,9 @@ export const ShirtSVG = ({
             {number}
           </text>
         </svg>
-      );
+      )
 
     default:
-      return null;
+      return null
   }
-};
+}

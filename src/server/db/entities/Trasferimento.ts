@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, type Relation, JoinColumn, BaseEntity } from 'typeorm'
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  type Relation,
+  JoinColumn,
+  BaseEntity,
+} from 'typeorm'
 import { Giocatore } from './Giocatore'
 import { SquadraSerieA } from './SquadraSerieA'
 import { Utente } from './Utente'
@@ -14,7 +22,11 @@ export class Trasferimento extends BaseEntity {
   @Column({ name: 'id_squadra_serie_a', type: 'int', nullable: true })
   idSquadraSerieA!: number | null
 
-  @Column({ name: 'data_acquisto', type: 'timestamptz', default: () => "CURRENT_TIMESTAMP" })
+  @Column({
+    name: 'data_acquisto',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   dataAcquisto!: Date
 
   @Column({ name: 'data_cessione', type: 'timestamptz', nullable: true })
