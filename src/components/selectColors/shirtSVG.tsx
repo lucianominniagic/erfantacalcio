@@ -23,6 +23,7 @@ import {
   LazioShirt,
   BarcelonaShirt,
   MilanShirt,
+  TottenhamShirt,
 } from './templates'
 import type { ShirtTemplateProps } from './templates'
 
@@ -50,6 +51,7 @@ const TEMPLATE_MAP: Partial<Record<ShirtTemplate, TemplateComponent>> = {
   lazio: LazioShirt,
   barcelona: BarcelonaShirt,
   milan: MilanShirt,
+  tottenham: TottenhamShirt,
 }
 
 export const ShirtSVG = ({

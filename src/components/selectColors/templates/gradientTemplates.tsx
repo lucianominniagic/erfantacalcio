@@ -279,3 +279,43 @@ export function MilanShirt({
     </svg>
   )
 }
+
+export function TottenhamShirt({
+  mainColor,
+  secondaryColor,
+  thirdColor,
+  textColor,
+  size,
+  number,
+}: ShirtTemplateProps) {
+  return (
+    <svg viewBox="0 0 200 200" width={size} height={size}>
+      <defs>
+        <linearGradient id="tottenhamGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={mainColor} stopOpacity="1" />
+          <stop offset="100%" stopColor={secondaryColor} stopOpacity="0.7" />
+        </linearGradient>
+      </defs>
+      <g stroke="black" strokeWidth={2}>
+        <rect x="20" y="40" width="30" height="40" fill={thirdColor} />
+        <rect x="150" y="40" width="30" height="40" fill={thirdColor} />
+        <rect x="50" y="80" width="100" height="20" fill="url(#tottenhamGrad)" />
+        <path
+          d="M50 40 H150 V150 Q150 160 140 160 H60 Q50 160 50 150 Z"
+          fill={mainColor}
+        />
+        {collar}
+      </g>
+      <text
+        x="140"
+        y="155"
+        fontSize="20"
+        fontWeight="bold"
+        textAnchor="end"
+        fill={textColor}
+      >
+        {number}
+      </text>
+    </svg>
+  )
+}
