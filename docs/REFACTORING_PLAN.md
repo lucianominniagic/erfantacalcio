@@ -95,13 +95,14 @@
 ### FASE 1 — Fondamenta tipi & config
 
 **Owner:** `ishiguro` (lead) + `mccarthy`
+**Branch:** `refactor/fase-1` | **Commit:** `af767ee`
 
 Obiettivo: ridurre cast/any e centralizzare config.
 
-1. **`src/config.ts`** → spezzare in moduli (`config/bonus.ts`, `config/pf.ts`, `config/dates.ts`, `config/urls.ts`); validare ogni gruppo con Zod; rimuovere parsing inline.
-2. **Tipi da Zod**: per ogni schema in `src/schemas/**`, esportare `z.infer` e usarlo lato client al posto dei tipi manuali in `src/types/`.
-3. **Eliminare `any`** in `src/components/squadra/utils.ts` (`getOpponent`, `getMatch`) — tipare con `Partita`/`GiocatoreFormazione`.
-4. **Sostituire `JSON.parse(...) as X`** con parsing tipato Zod (`schema.parse(JSON.parse(...))`).
+1. ✅ **`src/config.ts`** → spezzato in 5 moduli (`config/bonus.ts`, `config/pf.ts`, `config/dates.ts`, `config/urls.ts`, `config/season.ts`) con schema Zod per gruppo; 2 bug fix al parsing env (Date invalide, Number con virgola).
+2. ✅ **Tipi da Zod**: `iVotoGiocatore` convertito a `z.infer`; altri 2 skippati (shape divergente, documentati).
+3. ✅ **Eliminare `any`** in `src/components/squadra/utils.ts` — `getOpponent`/`getMatch` tipati con `z.infer<giornataSchema>` e `Pick<GiocatoreType>`; `as ShirtTemplate` sostituito con `toShirtTemplate()` type-safe in 4 file.
+4. ✅ **Sostituire `JSON.parse(...) as X`** — nuovo `src/schemas/maglia/index.ts` con `parseMaglia()` safe; 4 file aggiornati.
 
 **Done quando:** `tsc --noEmit` zero errori, ricerca `as any` ridotta del 80%.
 
