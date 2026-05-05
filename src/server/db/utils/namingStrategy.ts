@@ -4,13 +4,13 @@ export class NamingStrategy extends DefaultNamingStrategy {
   foreignKeyName(
     tableOrName: string | Table,
     columnNames: string[],
-    referencedTablePath?: string | Table | undefined,
-    referencedColumnNames?: string[] | undefined,
+    referencedTablePath?: string | Table  ,
+    referencedColumnNames?: string[]  ,
   ): string {
     // Produce FK_<Table>_<ReferencedTable>
     const tableName = this.getTableName(tableOrName).replace('.', '_')
     const refName = referencedTablePath
-      ? this.getTableName(referencedTablePath as any).replace('.', '_')
+      ? this.getTableName(referencedTablePath).replace('.', '_')
       : referencedColumnNames
         ? referencedColumnNames.join('_')
         : ''

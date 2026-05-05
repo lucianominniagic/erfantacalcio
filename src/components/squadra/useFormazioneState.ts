@@ -242,7 +242,7 @@ export function useFormazioneState() {
           giornate.map(async (g) => {
             const idP = g.partite
               .filter((c) => c.idHome === idSquadra || c.idAway === idSquadra)
-              .map((p) => p.idPartita)[0]!
+              .map((p) => p.idPartita)[0]
             await saveFormazione.mutateAsync({
               idPartita: idP,
               modulo,

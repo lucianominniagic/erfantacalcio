@@ -93,7 +93,7 @@ function findModuloCompatibile(modulo: string): Moduli {
   return (
     moduliList.find((m) => {
       const [modD, modC, modA] = m.split('-').map(Number)
-      return D! <= modD! && C! <= modC! && A! <= modA!
+      return D <= modD && C <= modC && A <= modA
     }) ?? '3-4-3'
   )
 }

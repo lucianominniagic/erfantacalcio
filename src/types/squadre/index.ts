@@ -1,4 +1,4 @@
-export type SquadraType = {
+export interface SquadraType {
   id: number
   isAdmin: boolean
   isLockLevel: boolean
@@ -11,7 +11,7 @@ export type SquadraType = {
   fantamilioni: number
 }
 
-export type GiocatoreType = {
+export interface GiocatoreType {
   idGiocatore: number
   nome: string
   nomeFantagazzetta: string | null

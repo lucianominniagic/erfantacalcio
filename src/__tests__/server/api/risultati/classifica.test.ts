@@ -21,7 +21,7 @@ import { Classifiche, Utenti } from '~/server/db/entities'
 // Helper factories
 // ---------------------------------------------------------------------------
 
-type PartitaStub = {
+interface PartitaStub {
   idSquadraH: number
   idSquadraA: number
   golH: number | null

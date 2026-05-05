@@ -89,11 +89,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         ...session,
         user: {
           ...session.user,
-          id: token.sub as string,
+          id: token.sub!,
           ruolo: token.ruolo as RuoloUtente,
           idSquadra: token.idSquadra as number,
           squadra: token.squadra as string,
-          email: token.email as string,
+          email: token.email!,
           presidente: token.presidente as string,
           image: token.image?.toString(),
         },

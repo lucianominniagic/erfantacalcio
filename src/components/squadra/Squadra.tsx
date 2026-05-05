@@ -18,11 +18,11 @@ import { api } from '~/utils/api'
 import { magliaType, ShirtTemplate } from '../selectColors'
 import { ShirtSVG } from '../selectColors/shirtSVG'
 
-type SquadraProps = {
+interface SquadraProps {
   idSquadra: number
 }
 
-type TrophyBadgeProps = {
+interface TrophyBadgeProps {
   count: number
   label: string
   icon: React.ReactNode

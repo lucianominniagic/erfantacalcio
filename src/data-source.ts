@@ -52,7 +52,7 @@ try {
 } catch (error) {
   // If pg is not present or parser cannot be set, ignore silently.
   // This shouldn't happen in normal runtime.
-  // eslint-disable-next-line no-console
+   
   console.debug('pg.types.setTypeParser not applied:', error)
 }
 

@@ -65,10 +65,10 @@ export const confirmPrecedente = protectedProcedure.mutation(async (opts) => {
   }
 
   // 4. Per ogni partita corrente, replica la formazione precedente in transazione
-  const partiteConDettagli: Array<{
+  const partiteConDettagli: {
     partita: Partite
     descrizioneGiornata: string
-  }> = []
+  }[] = []
 
   for (const idPartita of idPartiteCorrente) {
     await AppDataSource.transaction(async (trx) => {

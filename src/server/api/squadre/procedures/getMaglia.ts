@@ -10,7 +10,7 @@ export const getMagliaProcedure = protectedProcedure.query(
         where: { idUtente: opts.ctx.session.user.idSquadra },
       })
 
-      if (!utente || !utente.maglia) {
+      if (!utente?.maglia) {
         return null
       }
 

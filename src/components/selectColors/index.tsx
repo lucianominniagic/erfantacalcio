@@ -26,7 +26,7 @@ import { api } from '~/utils/api'
 import { HourglassTop, Save } from '@mui/icons-material'
 import { ShirtSVG } from './shirtSVG'
 
-export type magliaType = {
+export interface magliaType {
   mainColor: string
   secondaryColor: string
   thirdColor: string
@@ -111,7 +111,7 @@ const ShirtSelector = () => {
       secondaryColor: secondaryColor,
       thirdColor: thirdColor,
       textColor: textColor,
-      shirtNumber: shirtNumber as number,
+      shirtNumber: shirtNumber,
       selectedTemplate: selectedTemplate,
     })
     setOpenAlert(true)
@@ -215,7 +215,7 @@ const ShirtSelector = () => {
               sx={{ minWidth: 120 }}
             >
               {Array.from({ length: 11 }, (_, i) => (
-                <MenuItem key={i + 1} value={(i + 1) as number}>
+                <MenuItem key={i + 1} value={(i + 1)}>
                   {i + 1}
                 </MenuItem>
               ))}

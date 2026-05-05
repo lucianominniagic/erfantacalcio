@@ -63,9 +63,9 @@ export const Configurazione = {
   pfColumnRigParato: parseInt(process.env.NEXT_PUBLIC_PF_RIGPARATO ?? '0'),
   pfColumnAutogol: parseInt(process.env.NEXT_PUBLIC_PF_AUTOGOL ?? '0'),
   dataGiornata1SerieA:
-    new Date(process.env.NEXT_PUBLIC_DATA_GIORNATA_1_SERIEA as string) ??
+    new Date(process.env.NEXT_PUBLIC_DATA_GIORNATA_1_SERIEA!) ??
     new Date(),
   mercatoSettembre:
-    new Date(process.env.NEXT_PUBLIC_DATA_MERCATO_SETTEMBRE as string) ??
+    new Date(process.env.NEXT_PUBLIC_DATA_MERCATO_SETTEMBRE!) ??
     new Date(),
 }

@@ -73,7 +73,7 @@ export default function GenericAutocomplete<T extends AutocompleteOption>({
   const defaultFilterOptions = React.useCallback(
     (options: T[], params: FilterParams<T>) => {
       const filtered = filter(
-        options as AutocompleteOption[],
+        options,
         params as any,
       ) as T[]
 

@@ -16,7 +16,7 @@ import TopGiocatoriSquadre from './TopGiocatoriSquadre'
 
 const ALLOWED_NAMES = ['campionato', 'champions']
 
-type Torneo = {
+interface Torneo {
   idTorneo: number
   nome: string
   gruppoFase: string | null

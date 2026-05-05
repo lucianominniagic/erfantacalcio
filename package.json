@@ -6,7 +6,7 @@
     "dev": "next dev -p 8080",
     "build": "next build",
     "start": "next start -p 8080",
-    "lint": "next lint",
+    "lint": "eslint .",
     "format": "prettier --write .",
     "build:ts": "tsc -p tsconfig.typeorm.json",
     "migration:create": "npm run build:ts && cross-env node ./node_modules/typeorm/cli.js -d dist/data-source.js migration:create",
@@ -73,6 +73,7 @@
     "prettier": "^3.7.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.59.2",
     "vitest": "^2.1.9"
   },
   "ct3aMetadata": {

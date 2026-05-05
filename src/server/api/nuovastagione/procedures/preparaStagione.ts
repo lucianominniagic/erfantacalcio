@@ -20,7 +20,7 @@ import {
 export const preparaStagioneProcedure = adminProcedure.mutation<
   z.infer<typeof messageSchema>
 >(async () => {
-  let message = {
+  const message = {
     isError: false,
     isComplete: true,
     message: `Azzeramento dati della scorsa stagione ${Configurazione.stagione}`,

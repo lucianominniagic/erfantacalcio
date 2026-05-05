@@ -320,7 +320,7 @@ export default function Calendario() {
                   name="idTorneo"
                   onChange={handleSelectChange}
                   value={
-                    torneiList && torneiList.data
+                    torneiList?.data
                       ? calendarioInModifica.idTorneo.toString()
                       : ''
                   }

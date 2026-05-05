@@ -200,7 +200,7 @@ export default function Giocatori() {
       field: 'actions',
       type: 'actions',
       getActions: (params) => {
-        if (params.row['stagione'] === Configurazione.stagione) {
+        if (params.row.stagione === Configurazione.stagione) {
           return [
             <GridActionsCellItem
               key={params.id}

@@ -32,7 +32,7 @@ export const getTabelliniProcedure = publicProcedure
 
         if (calendario) {
           const result = (await mapCalendario(calendario))[0]
-          if (result && result.partite.length === 1) {
+          if (result?.partite.length === 1) {
             const partita = result.partite[0]
 
             const formazioni = await getFormazioni(idPartita)

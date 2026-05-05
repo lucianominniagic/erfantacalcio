@@ -1,4 +1,4 @@
-export type votoType = {
+export interface votoType {
   idVoto: number
   nome: string
   voto: number | null
@@ -11,7 +11,7 @@ export type votoType = {
   altriBonus: number | null
 }
 
-export type votoListType = {
+export interface votoListType {
   id: number
   nome: string
   ruolo: string

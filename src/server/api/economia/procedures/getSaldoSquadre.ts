@@ -14,7 +14,7 @@ export const getSaldoSquadreProcedure = publicProcedure.query(async () => {
 
   if (campionatoIds.length === 0) {
     return {
-      classificaMap: {} as Record<string, number>,
+      classificaMap: {},
       idVincitriceChampions: null,
       finaleGiocata: false,
     }
@@ -52,7 +52,7 @@ export const getSaldoSquadreProcedure = publicProcedure.query(async () => {
     })
 
     if (calendariChampions.length > 0) {
-      const maxGiornata = calendariChampions[0]!.giornata
+      const maxGiornata = calendariChampions[0].giornata
       const finaleCalendari = calendariChampions.filter(
         (c) => c.giornata === maxGiornata,
       )

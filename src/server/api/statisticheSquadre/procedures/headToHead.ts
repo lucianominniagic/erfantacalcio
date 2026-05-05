@@ -36,10 +36,10 @@ export const headToHeadProcedure = publicProcedure
       const matrice: Record<number, Record<number, H2HCell>> = {}
       const ensure = (a: number, b: number) => {
         if (!matrice[a]) matrice[a] = {}
-        const row = matrice[a]!
+        const row = matrice[a]
         if (!row[b])
           row[b] = { v: 0, n: 0, p: 0, golFatti: 0, golSubiti: 0, partite: 0 }
-        return row[b]!
+        return row[b]
       }
 
       partite.forEach((p) => {

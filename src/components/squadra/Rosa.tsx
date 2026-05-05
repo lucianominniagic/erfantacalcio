@@ -16,7 +16,7 @@ import Modal from '../modal/Modal'
 import Giocatore from '../giocatori/Giocatore'
 import { useGiocatoreModal } from '../cardPartite/usePartitaParams'
 
-type RosaProps = {
+interface RosaProps {
   idSquadra: number
 }
 
