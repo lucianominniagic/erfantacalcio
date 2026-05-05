@@ -57,6 +57,7 @@ export function useFormazioneState() {
       setAlertSeverity('success')
     },
   })
+  const confirmPrecedenteMutation = api.formazione.confirmPrecedente.useMutation()
   const formazioneList = api.formazione.get.useQuery(
     { idTorneo: idTorneo! },
     {
@@ -244,6 +245,24 @@ export function useFormazioneState() {
     setOpenAlert(true)
   }
 
+  const canConfirmPrecedente =
+    message === 'Formazione non rilasciabile, vuoi confermare la precedente formazione?'
+  const confirmingPrecedente = confirmPrecedenteMutation.isPending
+
+  const handleConfirmPrecedente = async () => {
+    try {
+      await confirmPrecedenteMutation.mutateAsync()
+      setAlertMessage('Formazione precedente confermata con successo')
+      setAlertSeverity('success')
+    } catch (e: unknown) {
+      const msg =
+        e instanceof Error ? e.message : 'Errore durante la conferma della formazione'
+      setAlertMessage(msg)
+      setAlertSeverity('error')
+    }
+    setOpenAlert(true)
+  }
+
   const handleModalCalendarioClose = () => setOpenModalCalendario(false)
   
   const resetFormazione = (newIdTorneo?: number) => {
@@ -302,5 +321,8 @@ export function useFormazioneState() {
     handleSave,
     handleModalCalendarioClose,
     resetFormazione,
+    canConfirmPrecedente,
+    confirmingPrecedente,
+    handleConfirmPrecedente,
   }
 }

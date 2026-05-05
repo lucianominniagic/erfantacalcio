@@ -1,6 +1,7 @@
 'use client'
 import {
   Analytics,
+  CheckCircle,
   HourglassTop,
   ResetTv,
   Save,
@@ -61,6 +62,9 @@ function Formazione() {
     handleSave,
     handleModalCalendarioClose,
     resetFormazione,
+    canConfirmPrecedente,
+    confirmingPrecedente,
+    handleConfirmPrecedente,
   } = useFormazioneState()
 
   const theme = useTheme()
@@ -285,12 +289,40 @@ function Formazione() {
             item
             xs={12}
             display="flex"
-            justifyContent="center"
-            sx={{ mt: '30px' }}
+            flexDirection="column"
+            alignItems="center"
+            sx={{ mt: '30px', gap: 3 }}
           >
-            <Typography variant={isDesktop ? 'h3' : 'h4'} color="error">
+            <Typography variant={isDesktop ? 'h3' : 'h4'} color="error" textAlign="center">
               {message}
             </Typography>
+            {canConfirmPrecedente && (
+              <Button
+                variant="contained"
+                size="large"
+                disabled={confirmingPrecedente}
+                endIcon={confirmingPrecedente ? <HourglassTop /> : <CheckCircle />}
+                onClick={handleConfirmPrecedente}
+              >
+                {confirmingPrecedente ? 'Attendere...' : 'Conferma formazione precedente'}
+              </Button>
+            )}
+            <Snackbar
+              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+              sx={{ height: '30%' }}
+              open={openAlert}
+              autoHideDuration={3000}
+              onClose={() => setOpenAlert(false)}
+            >
+              <Alert
+                onClose={() => setOpenAlert(false)}
+                severity={alertSeverity}
+                variant="filled"
+                sx={{ width: '100%' }}
+              >
+                {alertMessage}
+              </Alert>
+            </Snackbar>
           </Grid>
         )}
       </Grid>
