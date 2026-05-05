@@ -19,7 +19,7 @@ export class Utente extends BaseEntity {
   @Column({ name: 'username', type: 'varchar', length: 50 })
   username!: string
 
-  @Column({ name: 'pwd', type: 'varchar', length: 50 })
+  @Column({ name: 'pwd', type: 'varchar', length: 100 })
   pwd!: string
 
   @Column({ name: 'admin_level', type: 'boolean', default: false })
