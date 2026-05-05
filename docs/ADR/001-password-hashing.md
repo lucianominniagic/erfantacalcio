@@ -1,7 +1,7 @@
 # ADR 001 — Password Hashing Strategy
 
-**Status:** Decisione aperta (da confermare con Luciano)  
-**Data:** 2026-05-05  
+**Status:** ✅ Decisione presa  
+**Data:** 2025-07-14  
 **Autore:** gibson (Auth Engineer)
 
 ---
@@ -115,7 +115,37 @@ if (!bcryptMatch) {
 
 ## Decisione
 
-⏳ **Aperta** — da discutere e confermare con Luciano.
+✅ **Presa** — confermata da Luciano.
+
+### Strategia adottata: Lazy migration MD5 → bcrypt
+
+**Data decisione:** 2025-07-14
+
+**Libreria:** `bcryptjs` (pure JS, nessuna dipendenza nativa), `rounds: 10`
+
+**Implementazione:**
+
+1. **`src/utils/hashPassword.ts`** espone tre funzioni pubbliche:
+   - `computeMD5Hash(pwd)` / `hashMD5(pwd)` — MD5 legacy, mantenuto per la migration e i test
+   - `hashPassword(pwd): Promise<string>` — hasha con bcrypt (rounds 10)
+   - `verifyPassword(pwd, hash): Promise<boolean>` — tenta bcrypt; se l'hash sembra MD5 (32 hex uppercase), fallback MD5
+
+2. **`src/server/auth.config.ts`** — lazy migration nel `authorize` callback:
+   - Recupera l'utente per username
+   - Chiama `verifyPassword()` che gestisce automaticamente bcrypt vs MD5
+   - Se l'hash corrente è MD5 → re-hash bcrypt → `Utenti.update()` in background (best-effort, non blocca il login)
+
+3. **`src/server/api/profilo/procedures/changePassword.ts`**:
+   - Verifica vecchia password con `verifyPassword()` (supporta utenti con hash MD5 o bcrypt)
+   - Salva nuova password con `hashPassword()` → sempre bcrypt
+
+4. **Schema DB:** `utente.pwd` esteso da `varchar(50)` a `varchar(100)` — migrazione gestita da dostojevskij.
+
+**Distinguere hash bcrypt da MD5:**
+- Bcrypt: inizia con `$2b$` o `$2a$`, lunghezza 60 chars
+- MD5: 32 caratteri hex uppercase (`/^[0-9A-F]{32}$/`)
+
+**Cleanup futuro:** rimuovere il ramo MD5 in `verifyPassword()` quando tutti gli utenti avranno eseguito almeno un login successivo a questa release (monitorare via log `"lazy migration MD5→bcrypt completata"`).
 
 Vedi sezione "Decisioni aperte" nel `docs/REFACTORING_PLAN.md`.
 
