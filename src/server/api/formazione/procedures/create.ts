@@ -7,6 +7,11 @@ import { Formazioni, Partite, Voti } from '~/server/db/entities'
 import { AppDataSource } from '~/data-source'
 import { In } from 'typeorm'
 import { getDescrizioneGiornata } from '~/utils/helper'
+import {
+  buildFormazioneInsertData,
+  buildVotiInsertData,
+} from '~/server/services/formazioneService'
+import { buildFormazioneCreatedHtml } from '~/server/services/mailTemplates'
 
 export const create = protectedProcedure
   .input(
@@ -87,13 +92,15 @@ export const create = protectedProcedure
         )
 
         const dataInserimentoFormazione = nowInItalyIso()
-        const formazione = await trx.insert(Formazioni, {
-          idPartita: idPartita,
-          idSquadra: idSquadra,
-          modulo: modulo,
-          dataOra: dataInserimentoFormazione,
-          hasBloccata: false,
-        })
+        const formazione = await trx.insert(
+          Formazioni,
+          buildFormazioneInsertData(
+            idPartita,
+            idSquadra,
+            modulo,
+            dataInserimentoFormazione,
+          ),
+        )
         console.log(
           `Creazione nuova formazione`,
           formazione.identifiers[0].idFormazione,
@@ -102,15 +109,12 @@ export const create = protectedProcedure
 
         if (partita) {
           await Promise.all(
-            giocatori.map(async (c) => {
-              await trx.insert(Voti, {
-                idGiocatore: c.idGiocatore,
-                idCalendario: partita.idCalendario,
-                idFormazione: idFormazione,
-                titolare: c.titolare,
-                riserva: c.riserva,
-                voto: 0,
-              })
+            buildVotiInsertData(
+              giocatori,
+              idFormazione,
+              partita.idCalendario,
+            ).map(async (votoData) => {
+              await trx.insert(Voti, votoData)
             }),
           )
           console.log(
@@ -141,14 +145,16 @@ export const create = protectedProcedure
               partita.Calendario.giornata,
               partita.Calendario.Torneo.gruppoFase,
             )
-            const htmlMessage = `Notifica automatica da erFantacalcio.com<br><br>
-              Il tuo avversario, l'infame ${avversario}, ha inserito la formazione per la prossima partita <br> <br>
-              <b>Dettagli partita:</b><br>
-              Giornata: ${descrizioneGiornata}<br>
-              Data inserimento formazione: ${formatDateTime(dataInserimentoFormazione)}<br>
-              Calcio d'inizio: ${formatDateTime(partita.Calendario.data ?? new Date())}<br> <br>
-              https://www.erfantacalcio.com <br> <br>
-              Saluti dal Vostro immenso Presidente`
+            const htmlMessage = buildFormazioneCreatedHtml({
+              avversarioPresidente: avversario,
+              descrizioneGiornata,
+              dataInserimentoFormazione: formatDateTime(
+                dataInserimentoFormazione,
+              ),
+              dataCalcioInizio: formatDateTime(
+                partita.Calendario.data ?? new Date(),
+              ),
+            })
 
             if (to && cc) await ReSendMailAsync(to, cc, subject, htmlMessage)
             else {

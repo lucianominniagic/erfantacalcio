@@ -13,6 +13,14 @@ import { ReSendMailAsync } from '~/service/mailSender'
 import { formatDateTime, nowInItalyIso } from '~/utils/dateUtils'
 import { getDescrizioneGiornata } from '~/utils/helper'
 import { Configurazione } from '~/config'
+import {
+  buildFormazioneInsertData,
+  buildVotiInsertData,
+} from '~/server/services/formazioneService'
+import {
+  buildConfermaPrecedenteHtml,
+  buildConfermaPrecedenteAdminHtml,
+} from '~/server/services/mailTemplates'
 
 export const confirmPrecedente = protectedProcedure.mutation(async (opts) => {
   const idSquadra = opts.ctx.session.user.idSquadra
@@ -125,27 +133,26 @@ export const confirmPrecedente = protectedProcedure.mutation(async (opts) => {
 
       // Inserisce la nuova formazione (stesso modulo di quella precedente)
       const dataInserimento = nowInItalyIso()
-      const formazioneResult = await trx.insert(Formazioni, {
-        idPartita: idPartita,
-        idSquadra: idSquadra,
-        modulo: lastFormazione.modulo,
-        dataOra: dataInserimento,
-        hasBloccata: false,
-      })
+      const formazioneResult = await trx.insert(
+        Formazioni,
+        buildFormazioneInsertData(
+          idPartita,
+          idSquadra,
+          lastFormazione.modulo,
+          dataInserimento,
+        ),
+      )
       const idFormazione = formazioneResult.identifiers[0]
         .idFormazione as number
 
       // Clona i voti dalla formazione precedente
       await Promise.all(
-        lastFormazione.Voti.map(async (v) => {
-          await trx.insert(Voti, {
-            idGiocatore: v.idGiocatore,
-            idCalendario: partita.idCalendario,
-            idFormazione: idFormazione,
-            titolare: v.titolare,
-            riserva: v.riserva,
-            voto: 0,
-          })
+        buildVotiInsertData(
+          lastFormazione.Voti,
+          idFormazione,
+          partita.idCalendario,
+        ).map(async (votoData) => {
+          await trx.insert(Voti, votoData)
         }),
       )
 
@@ -195,15 +202,15 @@ export const confirmPrecedente = protectedProcedure.mutation(async (opts) => {
 
       // Mail all'avversario (to) e copia al presidente che ha confermato (cc)
       if (to && cc) {
-        const htmlMessage = `Notifica automatica da erFantacalcio.com<br><br>
-          Il tuo avversario, l'infame ${avversarioPresidente}, ha confermato automaticamente la formazione della giornata precedente per la prossima partita.<br><br>
-          <b>Dettagli partita:</b><br>
-          Giornata: ${descrizioneGiornata}<br>
-          Data conferma formazione: ${formatDateTime(nowInItalyIso())}<br>
-          Calcio d'inizio: ${formatDateTime(partita.Calendario.data ?? new Date())}<br><br>
-          ⚠️ <b>Attenzione:</b> per il ritardo nell'inserimento della formazione verrà applicata una multa di <b>€${Configurazione.importoMulta}</b>.<br><br>
-          https://www.erfantacalcio.com <br><br>
-          Saluti dal Vostro immenso Presidente`
+        const htmlMessage = buildConfermaPrecedenteHtml({
+          avversarioPresidente,
+          descrizioneGiornata,
+          dataConferma: formatDateTime(nowInItalyIso()),
+          dataCalcioInizio: formatDateTime(
+            partita.Calendario.data ?? new Date(),
+          ),
+          importoMulta: Configurazione.importoMulta,
+        })
 
         await ReSendMailAsync(to, cc, subject, htmlMessage)
       }
@@ -212,15 +219,18 @@ export const confirmPrecedente = protectedProcedure.mutation(async (opts) => {
       for (const admin of admins) {
         if (!admin.mail) continue
         const subjectAdmin = `[Admin] ErFantacalcio: Conferma automatica formazione – ${partita.SquadraHome?.nomeSquadra} - ${partita.SquadraAway?.nomeSquadra}`
-        const htmlAdmin = `Notifica automatica da erFantacalcio.com<br><br>
-          Riepilogo operazione di conferma formazione precedente:<br><br>
-          <b>Chi ha confermato:</b> ${presidenteCorrente} (${nomeSquadraCorrente})<br>
-          <b>Giornata:</b> ${descrizioneGiornata}<br>
-          <b>Partita:</b> ${partita.SquadraHome?.nomeSquadra} - ${partita.SquadraAway?.nomeSquadra}<br>
-          <b>Data conferma:</b> ${formatDateTime(nowInItalyIso())}<br>
-          <b>Calcio d'inizio:</b> ${formatDateTime(partita.Calendario.data ?? new Date())}<br>
-          <b>Multa applicata:</b> €${Configurazione.importoMulta}<br><br>
-          https://www.erfantacalcio.com`
+        const htmlAdmin = buildConfermaPrecedenteAdminHtml({
+          presidenteCorrente,
+          nomeSquadraCorrente,
+          nomeSquadraHome: partita.SquadraHome?.nomeSquadra,
+          nomeSquadraAway: partita.SquadraAway?.nomeSquadra,
+          descrizioneGiornata,
+          dataConferma: formatDateTime(nowInItalyIso()),
+          dataCalcioInizio: formatDateTime(
+            partita.Calendario.data ?? new Date(),
+          ),
+          importoMulta: Configurazione.importoMulta,
+        })
 
         await ReSendMailAsync(admin.mail, admin.mail, subjectAdmin, htmlAdmin)
       }
