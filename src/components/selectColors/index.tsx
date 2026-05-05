@@ -61,6 +61,16 @@ const shirtCollections = [
 ] as const
 export type ShirtTemplate = (typeof shirtCollections)[number]
 
+/**
+ * Converte una stringa grezza (es. dal DB) in ShirtTemplate validato.
+ * Se il valore non è riconosciuto, torna al default 'solid'.
+ */
+export function toShirtTemplate(val: string): ShirtTemplate {
+  return (shirtCollections as readonly string[]).includes(val)
+    ? (val as ShirtTemplate)
+    : 'solid'
+}
+
 const ShirtSelector = () => {
   const [alertMessage, setAlertMessage] = useState('')
   const [openAlert, setOpenAlert] = useState(false)
@@ -98,7 +108,7 @@ const ShirtSelector = () => {
       setThirdColor(squadra.data.thirdColor)
       setTextColor(squadra.data.textColor)
       setShirtNumber(squadra.data.shirtNumber)
-      setSelectedTemplate(squadra.data.selectedTemplate as ShirtTemplate)
+      setSelectedTemplate(toShirtTemplate(squadra.data.selectedTemplate))
     }
   }, [squadra.data, squadra.isSuccess, squadra.isFetching])
 
@@ -295,7 +305,7 @@ const ShirtSelector = () => {
                   Maglia attuale
                 </Typography>
                 <ShirtSVG
-                  template={maglia.selectedTemplate as ShirtTemplate}
+                  template={toShirtTemplate(maglia.selectedTemplate)}
                   mainColor={maglia.mainColor}
                   secondaryColor={maglia.secondaryColor}
                   thirdColor={maglia.thirdColor}

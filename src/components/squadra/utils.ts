@@ -1,6 +1,8 @@
 import dayjs from 'dayjs'
+import { type z } from 'zod'
+import { type giornataSchema } from '~/schemas/calendario'
 import { type Moduli } from '~/types/common'
-import { type GiocatoreFormazioneType } from '~/types/squadre'
+import { type GiocatoreFormazioneType, type GiocatoreType } from '~/types/squadre'
 import {
   convertiStringaInRuolo,
   moduliList,
@@ -102,13 +104,16 @@ export function checkDataFormazione(dataIso: string | undefined) {
   return dayjs(dataIso).toDate() >= dayjs(new Date()).toDate()
 }
 
-export function getOpponent(giornata: any, player: any) {
+export function getOpponent(
+  giornata: z.infer<typeof giornataSchema>,
+  player: Pick<GiocatoreType, 'nomeSquadraSerieA'>,
+) {
   if (!giornata?.SerieA) return null
 
   const playerTeam = player.nomeSquadraSerieA?.toLowerCase()
 
   const match = giornata.SerieA.find(
-    (c: any) =>
+    (c) =>
       c.squadraHome?.toLowerCase().trim() === playerTeam ||
       c.squadraAway?.toLowerCase().trim() === playerTeam,
   )
@@ -120,13 +125,17 @@ export function getOpponent(giornata: any, player: any) {
     : match.squadraHome.toUpperCase().trim()
 }
 
-export function getMatch(giornata: any, player: any, withSubstring: boolean) {
+export function getMatch(
+  giornata: z.infer<typeof giornataSchema>,
+  player: Pick<GiocatoreType, 'nomeSquadraSerieA'>,
+  withSubstring: boolean,
+) {
   if (!giornata?.SerieA) return null
 
   const playerTeam = player.nomeSquadraSerieA?.toLowerCase()
 
   const match = giornata.SerieA.find(
-    (c: any) =>
+    (c) =>
       c.squadraHome?.toLowerCase().trim() === playerTeam ||
       c.squadraAway?.toLowerCase().trim() === playerTeam,
   )

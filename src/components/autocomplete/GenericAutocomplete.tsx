@@ -74,6 +74,10 @@ export default function GenericAutocomplete<T extends AutocompleteOption>({
     (options: T[], params: FilterParams<T>) => {
       const filtered = filter(
         options,
+        // TODO: `filter` è creato con `createFilterOptions<AutocompleteOption>()` quindi
+        // il suo secondo param attende `FilterOptionsState<AutocompleteOption>` di MUI,
+        // che ha più campi rispetto al nostro `FilterParams<T>`. Il cast è necessario per
+        // compatibilità MUI finché non si allinea `FilterParams` a `FilterOptionsState`.
         params as any,
       ) as T[]
 

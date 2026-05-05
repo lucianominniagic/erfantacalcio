@@ -15,7 +15,8 @@ import {
   WorkspacePremium,
 } from '@mui/icons-material'
 import { api } from '~/utils/api'
-import { magliaType, ShirtTemplate } from '../selectColors'
+import { toShirtTemplate } from '../selectColors'
+import { parseMaglia } from '~/schemas/maglia'
 import { ShirtSVG } from '../selectColors/shirtSVG'
 
 interface SquadraProps {
@@ -58,9 +59,7 @@ export default function Squadra({ idSquadra }: SquadraProps) {
 
   const datiSquadra = apiSquadra.data
   const datiAlbo = apiAlbo.data
-  const maglia = datiSquadra
-    ? (JSON.parse(datiSquadra.maglia ?? '{}') as magliaType)
-    : null
+  const maglia = datiSquadra ? parseMaglia(datiSquadra.maglia) : null
 
   if (apiSquadra.isLoading || apiAlbo.isLoading) {
     return (
@@ -162,7 +161,7 @@ export default function Squadra({ idSquadra }: SquadraProps) {
               }}
             >
               <ShirtSVG
-                template={maglia.selectedTemplate as ShirtTemplate}
+                template={toShirtTemplate(maglia.selectedTemplate)}
                 mainColor={maglia.mainColor}
                 secondaryColor={maglia.secondaryColor}
                 thirdColor={maglia.thirdColor}

@@ -27,7 +27,8 @@ import {
   useGiocatoreModal,
 } from './usePartitaParams'
 import Giocatore from '../giocatori/Giocatore'
-import { ShirtTemplate, magliaType } from '../selectColors'
+import { magliaType, toShirtTemplate } from '../selectColors'
+import { parseMaglia } from '~/schemas/maglia'
 import { ShirtSVG } from '../selectColors/shirtSVG'
 import { GenericCard } from '~/components/cards'
 
@@ -127,7 +128,7 @@ function ViewTabellini() {
             {maglia && (
               <Grid item xs={12} justifyContent={'center'} display={'flex'}>
                 <ShirtSVG
-                  template={maglia.selectedTemplate as ShirtTemplate}
+                  template={toShirtTemplate(maglia.selectedTemplate)}
                   mainColor={maglia.mainColor}
                   secondaryColor={maglia.secondaryColor}
                   thirdColor={maglia.thirdColor}
@@ -487,7 +488,7 @@ function ViewTabellini() {
                 tabellinoHome,
                 infoPartita?.squadraHome,
                 infoPartita?.fotoHome,
-                JSON.parse(infoPartita?.magliaHome ?? '{}') as magliaType,
+                parseMaglia(infoPartita?.magliaHome),
                 infoPartita?.multaHome,
               )}
             </Grid>
@@ -496,7 +497,7 @@ function ViewTabellini() {
                 tabellinoAway,
                 infoPartita?.squadraAway,
                 infoPartita?.fotoAway,
-                JSON.parse(infoPartita?.magliaAway ?? '{}') as magliaType,
+                parseMaglia(infoPartita?.magliaAway),
                 infoPartita?.multaAway,
               )}
             </Grid>

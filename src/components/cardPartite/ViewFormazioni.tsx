@@ -22,7 +22,8 @@ import {
   useGiocatoreModal,
 } from './usePartitaParams'
 import Giocatore from '../giocatori/Giocatore'
-import { magliaType, ShirtTemplate } from '../selectColors'
+import { toShirtTemplate } from '../selectColors'
+import { parseMaglia } from '~/schemas/maglia'
 import { ShirtSVG } from '../selectColors/shirtSVG'
 import { GenericCard } from '~/components/cards'
 
@@ -54,17 +55,11 @@ function ViewFormazioni() {
   const formazioneAway = formazioniList.data?.FormazioneAway
 
   const magliaHome = useMemo(
-    () =>
-      infoPartita?.magliaHome
-        ? (JSON.parse(infoPartita.magliaHome) as magliaType)
-        : undefined,
+    () => parseMaglia(infoPartita?.magliaHome) ?? undefined,
     [infoPartita?.magliaHome],
   )
   const magliaAway = useMemo(
-    () =>
-      infoPartita?.magliaAway
-        ? (JSON.parse(infoPartita.magliaAway) as magliaType)
-        : undefined,
+    () => parseMaglia(infoPartita?.magliaAway) ?? undefined,
     [infoPartita?.magliaAway],
   )
 
@@ -120,7 +115,7 @@ function ViewFormazioni() {
                           >
                             <ShirtSVG
                               template={
-                                magliaHome.selectedTemplate as ShirtTemplate
+                                toShirtTemplate(magliaHome.selectedTemplate)
                               }
                               mainColor={magliaHome.mainColor}
                               secondaryColor={magliaHome.secondaryColor}
@@ -287,7 +282,7 @@ function ViewFormazioni() {
                           >
                             <ShirtSVG
                               template={
-                                magliaAway.selectedTemplate as ShirtTemplate
+                                toShirtTemplate(magliaAway.selectedTemplate)
                               }
                               mainColor={magliaAway.mainColor}
                               secondaryColor={magliaAway.secondaryColor}

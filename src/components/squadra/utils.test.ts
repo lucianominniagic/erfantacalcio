@@ -19,9 +19,9 @@ describe('squadra/utils — Pure Functions', () => {
 
     it('should calculate formation code correctly with multiple players', () => {
       const campo: GiocatoreFormazioneType[] = [
-        { ruolo: 'D', nome: 'Player1', costo: 1, riserva: null } as any,
-        { ruolo: 'D', nome: 'Player2', costo: 1, riserva: null } as any,
-        { ruolo: 'C', nome: 'Player3', costo: 1, riserva: null } as any,
+        { ruolo: 'D', nome: 'Player1', costo: 1, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Player2', costo: 1, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'C', nome: 'Player3', costo: 1, riserva: null } as GiocatoreFormazioneType,
       ]
       const result = calcolaCodiceFormazione(campo, 'A')
       // P=0, D=2, C=1, A=1 (adding 1 for A) -> "0211"
@@ -30,7 +30,7 @@ describe('squadra/utils — Pure Functions', () => {
 
     it('should increment count for ruoloGiocatore only', () => {
       const campo: GiocatoreFormazioneType[] = [
-        { ruolo: 'D', nome: 'Player1', costo: 1, riserva: null } as any,
+        { ruolo: 'D', nome: 'Player1', costo: 1, riserva: null } as GiocatoreFormazioneType,
       ]
       const result = calcolaCodiceFormazione(campo, 'D')
       // P=0, D=2 (1 existing + 1 for D), C=0, A=0 -> "0200"
@@ -39,16 +39,16 @@ describe('squadra/utils — Pure Functions', () => {
 
     it('should handle formation code with all player types', () => {
       const campo: GiocatoreFormazioneType[] = [
-        { ruolo: 'P', nome: 'GK', costo: 1, riserva: null } as any,
-        { ruolo: 'D', nome: 'Defender1', costo: 1, riserva: null } as any,
-        { ruolo: 'D', nome: 'Defender2', costo: 1, riserva: null } as any,
-        { ruolo: 'D', nome: 'Defender3', costo: 1, riserva: null } as any,
-        { ruolo: 'C', nome: 'Mid1', costo: 1, riserva: null } as any,
-        { ruolo: 'C', nome: 'Mid2', costo: 1, riserva: null } as any,
-        { ruolo: 'C', nome: 'Mid3', costo: 1, riserva: null } as any,
-        { ruolo: 'C', nome: 'Mid4', costo: 1, riserva: null } as any,
-        { ruolo: 'A', nome: 'Forward1', costo: 1, riserva: null } as any,
-        { ruolo: 'A', nome: 'Forward2', costo: 1, riserva: null } as any,
+        { ruolo: 'P', nome: 'GK', costo: 1, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender1', costo: 1, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender2', costo: 1, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender3', costo: 1, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'C', nome: 'Mid1', costo: 1, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'C', nome: 'Mid2', costo: 1, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'C', nome: 'Mid3', costo: 1, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'C', nome: 'Mid4', costo: 1, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'A', nome: 'Forward1', costo: 1, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'A', nome: 'Forward2', costo: 1, riserva: null } as GiocatoreFormazioneType,
       ]
       const result = calcolaCodiceFormazione(campo, 'P')
       // P=2 (1 existing + 1 for P), D=3, C=4, A=2 -> "2342"
@@ -118,10 +118,10 @@ describe('squadra/utils — Pure Functions', () => {
   describe('sortPlayersByRoleDescThenCostoDesc', () => {
     it('should sort players by role descending then cost descending', () => {
       const players: GiocatoreFormazioneType[] = [
-        { ruolo: 'A', nome: 'Forward', costo: 5, riserva: null } as any,
-        { ruolo: 'C', nome: 'Mid', costo: 3, riserva: null } as any,
-        { ruolo: 'D', nome: 'Defender', costo: 2, riserva: null } as any,
-        { ruolo: 'P', nome: 'Keeper', costo: 1, riserva: null } as any,
+        { ruolo: 'A', nome: 'Forward', costo: 5, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'C', nome: 'Mid', costo: 3, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender', costo: 2, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'P', nome: 'Keeper', costo: 1, riserva: null } as GiocatoreFormazioneType,
       ]
 
       const sorted = sortPlayersByRoleDescThenCostoDesc(players)
@@ -134,9 +134,9 @@ describe('squadra/utils — Pure Functions', () => {
 
     it('should sort same roles by cost descending', () => {
       const players: GiocatoreFormazioneType[] = [
-        { ruolo: 'D', nome: 'Defender1', costo: 2, riserva: null } as any,
-        { ruolo: 'D', nome: 'Defender2', costo: 5, riserva: null } as any,
-        { ruolo: 'D', nome: 'Defender3', costo: 3, riserva: null } as any,
+        { ruolo: 'D', nome: 'Defender1', costo: 2, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender2', costo: 5, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender3', costo: 3, riserva: null } as GiocatoreFormazioneType,
       ]
 
       const sorted = sortPlayersByRoleDescThenCostoDesc(players)
@@ -148,9 +148,9 @@ describe('squadra/utils — Pure Functions', () => {
 
     it('should sort same role and cost by name alphabetically', () => {
       const players: GiocatoreFormazioneType[] = [
-        { ruolo: 'D', nome: 'Zebra', costo: 5, riserva: null } as any,
-        { ruolo: 'D', nome: 'Alice', costo: 5, riserva: null } as any,
-        { ruolo: 'D', nome: 'Bob', costo: 5, riserva: null } as any,
+        { ruolo: 'D', nome: 'Zebra', costo: 5, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Alice', costo: 5, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Bob', costo: 5, riserva: null } as GiocatoreFormazioneType,
       ]
 
       const sorted = sortPlayersByRoleDescThenCostoDesc(players)
@@ -162,10 +162,10 @@ describe('squadra/utils — Pure Functions', () => {
 
     it('should handle mixed roles and costs', () => {
       const players: GiocatoreFormazioneType[] = [
-        { ruolo: 'A', nome: 'Forward1', costo: 3, riserva: null } as any,
-        { ruolo: 'D', nome: 'Defender1', costo: 5, riserva: null } as any,
-        { ruolo: 'A', nome: 'Forward2', costo: 5, riserva: null } as any,
-        { ruolo: 'D', nome: 'Defender2', costo: 2, riserva: null } as any,
+        { ruolo: 'A', nome: 'Forward1', costo: 3, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender1', costo: 5, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'A', nome: 'Forward2', costo: 5, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender2', costo: 2, riserva: null } as GiocatoreFormazioneType,
       ]
 
       const sorted = sortPlayersByRoleDescThenCostoDesc(players)
@@ -189,10 +189,10 @@ describe('squadra/utils — Pure Functions', () => {
 
     it('should sort players by role then riserva', () => {
       const players: GiocatoreFormazioneType[] = [
-        { ruolo: 'A', nome: 'Forward', costo: 5, riserva: 1 } as any,
-        { ruolo: 'D', nome: 'Defender', costo: 2, riserva: null } as any,
-        { ruolo: 'C', nome: 'Mid', costo: 3, riserva: 1 } as any,
-        { ruolo: 'P', nome: 'Keeper', costo: 1, riserva: null } as any,
+        { ruolo: 'A', nome: 'Forward', costo: 5, riserva: 1 } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender', costo: 2, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'C', nome: 'Mid', costo: 3, riserva: 1 } as GiocatoreFormazioneType,
+        { ruolo: 'P', nome: 'Keeper', costo: 1, riserva: null } as GiocatoreFormazioneType,
       ]
 
       const sorted = sortPlayersByRoleDescThenRiserva(players)
@@ -205,9 +205,9 @@ describe('squadra/utils — Pure Functions', () => {
 
     it('should place null riserva before numbered riserva within same role', () => {
       const players: GiocatoreFormazioneType[] = [
-        { ruolo: 'D', nome: 'Defender1', costo: 5, riserva: 2 } as any,
-        { ruolo: 'D', nome: 'Defender2', costo: 4, riserva: null } as any,
-        { ruolo: 'D', nome: 'Defender3', costo: 3, riserva: 1 } as any,
+        { ruolo: 'D', nome: 'Defender1', costo: 5, riserva: 2 } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender2', costo: 4, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender3', costo: 3, riserva: 1 } as GiocatoreFormazioneType,
       ]
 
       const sorted = sortPlayersByRoleDescThenRiserva(players)
@@ -222,11 +222,11 @@ describe('squadra/utils — Pure Functions', () => {
 
     it('should reassign riserva indices for each role', () => {
       const players: GiocatoreFormazioneType[] = [
-        { ruolo: 'D', nome: 'Defender1', costo: 5, riserva: null } as any,
-        { ruolo: 'D', nome: 'Defender2', costo: 4, riserva: 5 } as any,
-        { ruolo: 'D', nome: 'Defender3', costo: 3, riserva: 10 } as any,
-        { ruolo: 'C', nome: 'Mid1', costo: 5, riserva: null } as any,
-        { ruolo: 'C', nome: 'Mid2', costo: 4, riserva: 8 } as any,
+        { ruolo: 'D', nome: 'Defender1', costo: 5, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender2', costo: 4, riserva: 5 } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender3', costo: 3, riserva: 10 } as GiocatoreFormazioneType,
+        { ruolo: 'C', nome: 'Mid1', costo: 5, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'C', nome: 'Mid2', costo: 4, riserva: 8 } as GiocatoreFormazioneType,
       ]
 
       const sorted = sortPlayersByRoleDescThenRiserva(players)
@@ -246,8 +246,8 @@ describe('squadra/utils — Pure Functions', () => {
 
     it('should handle players with all null riserva', () => {
       const players: GiocatoreFormazioneType[] = [
-        { ruolo: 'D', nome: 'Defender1', costo: 5, riserva: null } as any,
-        { ruolo: 'D', nome: 'Defender2', costo: 4, riserva: null } as any,
+        { ruolo: 'D', nome: 'Defender1', costo: 5, riserva: null } as GiocatoreFormazioneType,
+        { ruolo: 'D', nome: 'Defender2', costo: 4, riserva: null } as GiocatoreFormazioneType,
       ]
 
       const sorted = sortPlayersByRoleDescThenRiserva(players)
