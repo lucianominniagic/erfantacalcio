@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import {
   Box,
   ToggleButton,
@@ -12,7 +12,6 @@ import {
   OutlinedInput,
   Select,
   MenuItem,
-  FormLabel,
   FormControlLabel,
   Radio,
   RadioGroup,
@@ -22,10 +21,10 @@ import {
   Grid,
   CircularProgress,
 } from '@mui/material'
-import { api } from '~/utils/api'
 import { HourglassTop, Save } from '@mui/icons-material'
 import { ShirtSVG } from './shirtSVG'
 import { type MagliaType } from '~/schemas/maglia'
+import { useShirtSelector } from './useShirtSelector'
 
 export type { MagliaType as magliaType } from '~/schemas/maglia'
 
@@ -67,62 +66,26 @@ export function toShirtTemplate(val: string): ShirtTemplate {
   return val as ShirtTemplate
 }
 
+const colorPickerSx = {
+  width: 84,
+  height: 36,
+  padding: 0,
+  borderRadius: 2,
+  '& input': { padding: 1, width: '90%', height: '90%', cursor: 'pointer' },
+}
+
 const ShirtSelector = () => {
-  const [alertMessage, setAlertMessage] = useState('')
-  const [openAlert, setOpenAlert] = useState(false)
-  const [saving, setSaving] = useState(false)
-  const [mainColor, setMainColor] = useState('#ff0000')
-  const [secondaryColor, setSecondaryColor] = useState('#ffffff')
-  const [thirdColor, setThirdColor] = useState('#000000')
-  const [textColor, setTextColor] = useState('#000000')
-  const [shirtNumber, setShirtNumber] = useState(10)
-  const [selectedTemplate, setSelectedTemplate] =
-    useState<ShirtTemplate>('solid')
-  const [maglia, setMaglia] = useState<MagliaType | undefined>({
-    mainColor: '#ff0000',
-    secondaryColor: '#ffffff',
-    thirdColor: '#000000',
-    textColor: '#000000',
-    shirtNumber: 10,
-    selectedTemplate: 'solid',
-  })
-
-  const squadra = api.squadre.getMaglia.useQuery()
-
-  const updateMaglia = api.squadre.updateMaglia.useMutation({
-    onSuccess: async () => {
-      setAlertMessage('Salvataggio completato')
-      squadra.refetch()
-    },
-  })
-
-  useEffect(() => {
-    if (!squadra.isFetching && squadra.isSuccess && squadra.data) {
-      setMaglia(squadra.data)
-      setMainColor(squadra.data.mainColor)
-      setSecondaryColor(squadra.data.secondaryColor)
-      setThirdColor(squadra.data.thirdColor)
-      setTextColor(squadra.data.textColor)
-      setShirtNumber(squadra.data.shirtNumber)
-      setSelectedTemplate(toShirtTemplate(squadra.data.selectedTemplate))
-    }
-  }, [squadra.data, squadra.isSuccess, squadra.isFetching])
-
-  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setSaving(true)
-
-    updateMaglia.mutate({
-      mainColor: mainColor,
-      secondaryColor: secondaryColor,
-      thirdColor: thirdColor,
-      textColor: textColor,
-      shirtNumber: shirtNumber,
-      selectedTemplate: selectedTemplate,
-    })
-    setOpenAlert(true)
-    setSaving(false)
-  }
+  const {
+    mainColor, setMainColor,
+    secondaryColor, setSecondaryColor,
+    thirdColor, setThirdColor,
+    textColor, setTextColor,
+    shirtNumber, setShirtNumber,
+    selectedTemplate, setSelectedTemplate,
+    maglia, isLoadingMaglia,
+    saving, handleSave,
+    alertMessage, openAlert, setOpenAlert,
+  } = useShirtSelector()
 
   return (
     <Box component="form" onSubmit={handleSave} noValidate>
@@ -130,85 +93,30 @@ const ShirtSelector = () => {
         <Grid item xs={12} height={20} sx={{ mb: 2 }}>
           <Typography variant="h6">Scegli i colori sociali</Typography>
         </Grid>
-        <Grid item xs={4}>
-          <FormControl>
-            <InputLabel shrink htmlFor="main-color">
-              1° Colore
-            </InputLabel>
-            <OutlinedInput
-              id="main-color"
-              type="color"
-              value={mainColor}
-              onChange={(e) => setMainColor(e.target.value)}
-              sx={{
-                width: 84,
-                height: 36,
-                padding: 0,
-                borderRadius: 2,
-                '& input': {
-                  padding: 1,
-                  width: '90%',
-                  height: '90%',
-                  cursor: 'pointer',
-                },
-              }}
-            />
-          </FormControl>
-        </Grid>
-        <Grid item xs={4}>
-          <FormControl>
-            <InputLabel shrink htmlFor="secondary-color">
-              2° Colore
-            </InputLabel>
-            <OutlinedInput
-              id="secondary-color"
-              type="color"
-              value={secondaryColor}
-              onChange={(e) => setSecondaryColor(e.target.value)}
-              sx={{
-                width: 84,
-                height: 36,
-                padding: 0,
-                borderRadius: 1,
-                '& input': {
-                  padding: 1,
-                  width: '90%',
-                  height: '90%',
-                  cursor: 'pointer',
-                },
-              }}
-            />
-          </FormControl>
-        </Grid>
-        <Grid item xs={4}>
-          <FormControl>
-            <InputLabel shrink htmlFor="third-color">
-              Maniche
-            </InputLabel>
-            <OutlinedInput
-              id="third-color"
-              type="color"
-              value={thirdColor}
-              onChange={(e) => setThirdColor(e.target.value)}
-              sx={{
-                width: 84,
-                height: 36,
-                padding: 0,
-                borderRadius: 2,
-                '& input': {
-                  padding: 1,
-                  width: '90%',
-                  height: '90%',
-                  cursor: 'pointer',
-                },
-              }}
-            />
-          </FormControl>
-        </Grid>
+
+        {/* Color pickers */}
+        {[
+          { id: 'main-color', label: '1° Colore', value: mainColor, onChange: setMainColor },
+          { id: 'secondary-color', label: '2° Colore', value: secondaryColor, onChange: setSecondaryColor },
+          { id: 'third-color', label: 'Maniche', value: thirdColor, onChange: setThirdColor },
+        ].map(({ id, label, value, onChange }) => (
+          <Grid item xs={4} key={id}>
+            <FormControl>
+              <InputLabel shrink htmlFor={id}>{label}</InputLabel>
+              <OutlinedInput
+                id={id}
+                type="color"
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                sx={colorPickerSx}
+              />
+            </FormControl>
+          </Grid>
+        ))}
+
+        {/* Number + text color */}
         <Grid item xs={12} height={20} sx={{ mb: 2, mt: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Seleziona numero maglia
-          </Typography>
+          <Typography variant="h6" gutterBottom>Seleziona numero maglia</Typography>
         </Grid>
         <Grid item xs={6}>
           <FormControl>
@@ -221,45 +129,23 @@ const ShirtSelector = () => {
               sx={{ minWidth: 120 }}
             >
               {Array.from({ length: 11 }, (_, i) => (
-                <MenuItem key={i + 1} value={(i + 1)}>
-                  {i + 1}
-                </MenuItem>
+                <MenuItem key={i + 1} value={i + 1}>{i + 1}</MenuItem>
               ))}
             </Select>
           </FormControl>
         </Grid>
         <Grid item xs={6}>
-          <FormControl
-            component="fieldset"
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}
-          >
-            <RadioGroup
-              row
-              value={textColor}
-              onChange={(e) => setTextColor(e.target.value)}
-              name="jersey-text-color"
-            >
-              <FormControlLabel
-                value="black"
-                control={<Radio />}
-                label="Nero"
-              />
-              <FormControlLabel
-                value="white"
-                control={<Radio />}
-                label="Bianco"
-              />
+          <FormControl component="fieldset" sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+            <RadioGroup row value={textColor} onChange={(e) => setTextColor(e.target.value)} name="jersey-text-color">
+              <FormControlLabel value="black" control={<Radio />} label="Nero" />
+              <FormControlLabel value="white" control={<Radio />} label="Bianco" />
             </RadioGroup>
           </FormControl>
         </Grid>
+
+        {/* Template selector */}
         <Grid item xs={12} height={20} sx={{ mb: 2, mt: 2 }}>
-          <Typography variant="h6" gutterBottom>
-            Seleziona una tipologia di maglia
-          </Typography>
+          <Typography variant="h6" gutterBottom>Seleziona una tipologia di maglia</Typography>
         </Grid>
         <Grid item xs={12}>
           <ToggleButtonGroup
@@ -270,13 +156,7 @@ const ShirtSelector = () => {
           >
             {shirtCollections.map((template) => (
               <ToggleButton key={template} value={template} sx={{ width: 100 }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                  }}
-                >
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <ShirtSVG
                     template={template}
                     mainColor={mainColor}
@@ -286,20 +166,19 @@ const ShirtSelector = () => {
                     size={60}
                     number={shirtNumber}
                   />
-
                   <Typography variant="caption">{template}</Typography>
                 </Box>
               </ToggleButton>
             ))}
           </ToggleButtonGroup>
         </Grid>
-        {!squadra.isLoading && maglia ? (
+
+        {/* Current + preview + save */}
+        {!isLoadingMaglia && maglia ? (
           <>
             <Grid item xs={6} sm={4} sx={{ mt: 2 }}>
               <Box>
-                <Typography variant="h6" gutterBottom>
-                  Maglia attuale
-                </Typography>
+                <Typography variant="h6" gutterBottom>Maglia attuale</Typography>
                 <ShirtSVG
                   template={toShirtTemplate(maglia.selectedTemplate)}
                   mainColor={maglia.mainColor}
@@ -313,9 +192,7 @@ const ShirtSelector = () => {
             </Grid>
             <Grid item xs={6} sm={4} sx={{ mt: 2 }}>
               <Box>
-                <Typography variant="h6" gutterBottom>
-                  Anteprima
-                </Typography>
+                <Typography variant="h6" gutterBottom>Anteprima</Typography>
                 <ShirtSVG
                   template={selectedTemplate}
                   mainColor={mainColor}
