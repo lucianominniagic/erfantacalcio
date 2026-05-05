@@ -137,16 +137,18 @@ Obiettivo: ridurre cast/any e centralizzare config.
 
 **Owner:** `mccarthy` + `dick`
 **Branch:** `refactor/fase-3` | **Commits:** 4 atomici (mccarthy) + test caratterizzanti (dick)
+**Review:** ✅ Zero problemi — logica identica verificata line-by-line
 
 - ✅ **332 test caratterizzanti** scritti da dick prima del refactor (18+51+64+46+74+74)
 - ✅ **5 service creati** in `src/server/services/`:
   1. `votiService.ts` — `calcBonusVoto()`: -20 righe da `processVoti.ts`
-  2. `tabelliniService.ts` — `mapVotoToTabellinoEntry()`: -60 righe da `getTabellini.ts`
+  2. `tabelliniService.ts` — `mapVotoToTabellinoEntry()`: -60 righe da `getTabellini.ts` + ottimizzazione 3 `.find()` → 1
   3. `statisticheService.ts` — `initStats()`, `accumulate()`, `round2()`: -100 righe da `riepilogo.ts`
   4. `formazioneService.ts` — `buildFormazioneInsertData()`, `buildVotiInsertData()`: condiviso tra `create` + `confirmPrecedente`
   5. `mailTemplates.ts` — 3 template HTML estratti: -60 righe inline
 - ✅ 332/332 test verdi post-refactor
 - ✅ Build TypeScript zero errori
+- ✅ Tutti i service sono pure functions (zero `ctx` tRPC, zero TypeORM diretto)
 
 **Done quando:** ogni procedure target sotto le ~80 righe, logica pura testata.
 
