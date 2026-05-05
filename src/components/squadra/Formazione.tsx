@@ -1,11 +1,8 @@
 'use client'
 import {
-  Analytics,
-  CheckCircle,
   HourglassTop,
   ResetTv,
   Save,
-  SportsSoccer,
 } from '@mui/icons-material'
 import {
   Alert,
@@ -14,30 +11,24 @@ import {
   CircularProgress,
   Divider,
   Grid,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
   MenuItem,
   Select,
   Snackbar,
   Stack,
-  Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material'
 import React from 'react'
-import { getShortName } from '~/utils/helper'
-import { type GiocatoreFormazioneType } from '~/types/squadre'
 import Modal from '../modal/Modal'
 import Giocatore from '../giocatori/Giocatore'
-import { getMatch } from './utils'
+import { FormazioneRosaSection } from './FormazioneRosaSection'
+import { FormazioneDisabilitata } from './FormazioneDisabilitata'
 import { useFormazioneState } from './useFormazioneState'
 
 function Formazione() {
   const {
-    idSquadra,
+    idSquadra: _idSquadra,
     squadra,
     idGiocatoreStat,
     setIdGiocatoreStat,
@@ -71,97 +62,15 @@ function Formazione() {
   const theme = useTheme()
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'))
 
-  const renderRosa = (roles: string[], title: string) => {
-    const mergedPlayers = [
-      ...rosa
-        .filter((p) => roles.includes(p.ruolo))
-        .map((p) => ({ ...p, status: 'rosa' as const })),
-      ...campo
-        .filter((p) => roles.includes(p.ruolo))
-        .map((p) => ({ ...p, status: 'campo' as const })),
-      ...panca
-        .filter((p) => roles.includes(p.ruolo))
-        .map((p) => ({ ...p, status: 'panca' as const })),
-    ]
-
-    const renderStatusIcon = (
-      player: GiocatoreFormazioneType & { status: 'rosa' | 'campo' | 'panca' },
-    ) => {
-      if (player.status === 'campo') {
-        return (
-          <Tooltip title="Titolare">
-            <IconButton>
-              <SportsSoccer color="success" />
-            </IconButton>
-          </Tooltip>
-        )
-      }
-      if (player.status === 'panca') {
-        return (
-          <Tooltip title={`Riserva ${player.riserva}`}>
-            <IconButton>{filterIcons[(player.riserva ?? 7) - 1]}</IconButton>
-          </Tooltip>
-        )
-      }
-      return null
-    }
-
-    return (
-      <Grid item xs={12} md={6}>
-        <Box>
-          <Typography variant="h5">{title}</Typography>
-          <List sx={{ bgcolor: 'background.paper' }}>
-            {mergedPlayers.map((player) => (
-              <Grid container spacing={0} key={player.idGiocatore}>
-                <Grid item xs={9}>
-                  <div onClick={() => handleClickPlayer(player)}>
-                    <ListItem
-                      sx={{
-                        cursor: 'pointer',
-                        zIndex: 2,
-                        paddingTop: '0px',
-                        paddingBottom: '0px',
-                        paddingLeft: '0px',
-                      }}
-                    >
-                      <img
-                        src={player.urlCampioncinoSmall}
-                        width={42}
-                        height={42}
-                        alt={player.nomeSquadraSerieA ?? ''}
-                        title={player.nomeSquadraSerieA ?? ''}
-                      />
-                      <ListItemText
-                        primary={getShortName(player.nome)}
-                        secondary={`(${player.nomeSquadraSerieA
-                          ?.toUpperCase()
-                          .substring(
-                            0,
-                            3,
-                          )}) - ${getMatch(giornate[0], player, false)}`}
-                      />
-                    </ListItem>
-                  </div>
-                </Grid>
-                <Grid item xs={3} display="flex" justifyContent="flex-end">
-                  {renderStatusIcon(player)}
-                  <Tooltip title="Statistiche giocatore">
-                    <IconButton
-                      onClick={() => {
-                        setIdGiocatoreStat(player.idGiocatore)
-                        setOpenModalCalendario(true)
-                      }}
-                    >
-                      <Analytics color="info" />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-              </Grid>
-            ))}
-          </List>
-        </Box>
-      </Grid>
-    )
+  const rosaProps = {
+    rosa,
+    campo,
+    panca,
+    filterIcons,
+    giornate,
+    handleClickPlayer,
+    setIdGiocatoreStat,
+    setOpenModalCalendario,
   }
 
   const modalWidth = isDesktop ? '1266px' : '98%'
@@ -281,10 +190,10 @@ function Formazione() {
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={0}>
-                {renderRosa(['P'], 'Portieri')}
-                {renderRosa(['D'], 'Difensori')}
-                {renderRosa(['C'], 'Centrocampisti')}
-                {renderRosa(['A'], 'Attaccanti')}
+                <FormazioneRosaSection {...rosaProps} roles={['P']} title="Portieri" />
+                <FormazioneRosaSection {...rosaProps} roles={['D']} title="Difensori" />
+                <FormazioneRosaSection {...rosaProps} roles={['C']} title="Centrocampisti" />
+                <FormazioneRosaSection {...rosaProps} roles={['A']} title="Attaccanti" />
               </Grid>
               <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
@@ -318,55 +227,17 @@ function Formazione() {
             </Grid>
           </>
         ) : (
-          <Grid
-            item
-            xs={12}
-            display="flex"
-            flexDirection="column"
-            alignItems="center"
-            sx={{ mt: '30px', gap: 3 }}
-          >
-            <Typography
-              variant={isDesktop ? 'h3' : 'h4'}
-              color="error"
-              textAlign="center"
-            >
-              {formazioneGiaRilasciata
-                ? 'Formazione già rilasciata fuori orario consentito'
-                : message}
-            </Typography>
-            {canConfirmPrecedente && (
-              <Button
-                variant="contained"
-                size="large"
-                disabled={confirmingPrecedente}
-                endIcon={
-                  confirmingPrecedente ? <HourglassTop /> : <CheckCircle />
-                }
-                onClick={handleConfirmPrecedente}
-              >
-                {confirmingPrecedente
-                  ? 'Attendere...'
-                  : 'Conferma formazione precedente'}
-              </Button>
-            )}
-            <Snackbar
-              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-              sx={{ height: '30%' }}
-              open={openAlert}
-              autoHideDuration={3000}
-              onClose={() => setOpenAlert(false)}
-            >
-              <Alert
-                onClose={() => setOpenAlert(false)}
-                severity={alertSeverity}
-                variant="filled"
-                sx={{ width: '100%' }}
-              >
-                {alertMessage}
-              </Alert>
-            </Snackbar>
-          </Grid>
+          <FormazioneDisabilitata
+            message={message}
+            formazioneGiaRilasciata={formazioneGiaRilasciata}
+            canConfirmPrecedente={canConfirmPrecedente}
+            confirmingPrecedente={confirmingPrecedente}
+            handleConfirmPrecedente={handleConfirmPrecedente}
+            openAlert={openAlert}
+            setOpenAlert={setOpenAlert}
+            alertMessage={alertMessage}
+            alertSeverity={alertSeverity}
+          />
         )}
       </Grid>
 
