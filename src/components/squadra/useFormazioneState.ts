@@ -89,7 +89,7 @@ export function useFormazioneState() {
       } else {
         const dataFine = calendarioProssima.data[0]?.dataFine
         if (dataFine && checkDataFormazione(dataFine)) {
-          setMessage('Formazione non rilasciabile, è stata confermata la precedente formazione')
+          setMessage('Formazione non rilasciabile, vuoi confermare la precedente formazione?')
         } else {
           setMessage('Formazione non rilasciabile')
         }

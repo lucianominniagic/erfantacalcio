@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { api } from '~/utils/api'
 import { Avatar, Box, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { getNomeTorneo } from '~/utils/helper'
@@ -42,13 +42,13 @@ export default function Classifica({
       type: 'string',
       align: 'left',
       renderHeader: () => <strong>Squadra</strong>,
-      flex: 4,
+      flex: isXs ? 5 : 4,
     },
     {
       field: 'punti',
       type: 'number',
       align: 'right',
-      renderHeader: () => <strong>Punti</strong>,
+      renderHeader: () => <strong>{isXs ? 'P.' : 'Punti'}</strong>,
       flex: 1,
     },
     {
@@ -69,15 +69,16 @@ export default function Classifica({
       field: 'giocate',
       type: 'number',
       align: 'right',
-      renderHeader: () => <strong>Giocate</strong>,
+      renderHeader: () => <strong>{isXs ? 'G.' : 'Giocate'}</strong>,
       flex: 1,
     },
     {
       field: 'fantapunti',
       type: 'number',
       align: 'right',
-      renderHeader: () => <strong>Fantapunti</strong>,
-      flex: 2,
+      renderHeader: () => <strong>{isXs ? 'FP.' : 'Fantapunti'}</strong>,
+      valueFormatter: (value: number) => value != null ? value.toFixed(2) : '',
+      flex: isXs ? 3 : 2,
     },
   ]
 
