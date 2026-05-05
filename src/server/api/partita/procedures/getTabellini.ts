@@ -11,6 +11,7 @@ import {
 import { Configurazione } from '~/config'
 import { Formazioni, Partite } from '~/server/db/entities'
 import { IsNull, LessThan, MoreThan, Not } from 'typeorm'
+import { mapVotoToTabellinoEntry } from '~/server/services/tabelliniService'
 
 export const getTabelliniProcedure = publicProcedure
   .input(z.object({ idPartita: z.number() }))
@@ -96,36 +97,9 @@ export const getTabelliniProcedure = publicProcedure
                   (partita?.isFattoreHome === true
                     ? Configurazione.bonusFattoreCasalingo
                     : 0),
-                Voti: datiHome.Voti.map((voto) => ({
-                  nome: voto.Giocatore.nome,
-                  idGiocatore: voto.Giocatore.idGiocatore,
-                  titolare: voto.titolare,
-                  riserva: voto.riserva,
-                  nomeSquadraSerieA:
-                    voto.Giocatore.Trasferimenti[0]?.SquadraSerieA?.nome,
-                  magliaSquadraSerieA:
-                    voto.Giocatore.Trasferimenti[0]?.SquadraSerieA?.maglia,
-                  ruolo: voto.Giocatore.ruolo,
-                  voto: voto.voto ?? 0,
-                  ammonizione: voto.ammonizione ?? 0,
-                  espulsione: voto.espulsione ?? 0,
-                  gol: voto.gol ?? 0,
-                  assist: voto.assist ?? 0,
-                  autogol: voto.autogol ?? 0,
-                  altriBonus: voto.altriBonus ?? 0,
-                  votoBonus:
-                    giocatoriInfluentiHome.find(
-                      (gi) => gi.idVoto === voto.idVoto,
-                    )?.votoBonus ?? 0,
-                  isSostituito:
-                    giocatoriInfluentiHome.find(
-                      (gi) => gi.idVoto === voto.idVoto,
-                    )?.isSostituito ?? false,
-                  isVotoInfluente:
-                    giocatoriInfluentiHome.find(
-                      (gi) => gi.idVoto === voto.idVoto,
-                    )?.isVotoInfluente ?? false,
-                })),
+                Voti: datiHome.Voti.map((voto) =>
+                  mapVotoToTabellinoEntry(voto, giocatoriInfluentiHome),
+                ),
               },
               TabellinoAway: datiAway && {
                 dataOra: datiAway?.dataOra,
@@ -150,33 +124,9 @@ export const getTabelliniProcedure = publicProcedure
                   getBonusSenzaVoto(
                     getGiocatoriVotoInfluente(giocatoriInfluentiAway).length,
                   ),
-                Voti: datiAway.Voti.map((c) => ({
-                  nome: c.Giocatore.nome,
-                  idGiocatore: c.Giocatore.idGiocatore,
-                  titolare: c.titolare,
-                  riserva: c.riserva,
-                  nomeSquadraSerieA:
-                    c.Giocatore.Trasferimenti[0]?.SquadraSerieA?.nome,
-                  magliaSquadraSerieA:
-                    c.Giocatore.Trasferimenti[0]?.SquadraSerieA?.maglia,
-                  ruolo: c.Giocatore.ruolo,
-                  voto: c.voto ?? 0,
-                  ammonizione: c.ammonizione ?? 0,
-                  espulsione: c.espulsione ?? 0,
-                  gol: c.gol ?? 0,
-                  assist: c.assist ?? 0,
-                  autogol: c.autogol ?? 0,
-                  altriBonus: c.altriBonus ?? 0,
-                  votoBonus:
-                    giocatoriInfluentiAway.find((gi) => gi.idVoto === c.idVoto)
-                      ?.votoBonus ?? 0,
-                  isSostituito:
-                    giocatoriInfluentiAway.find((gi) => gi.idVoto === c.idVoto)
-                      ?.isSostituito ?? false,
-                  isVotoInfluente:
-                    giocatoriInfluentiAway.find((gi) => gi.idVoto === c.idVoto)
-                      ?.isVotoInfluente ?? false,
-                })),
+                Voti: datiAway.Voti.map((voto) =>
+                  mapVotoToTabellinoEntry(voto, giocatoriInfluentiAway),
+                ),
               },
             }
           }
