@@ -52,6 +52,15 @@ export const themeOptions: ThemeOptions = {
       dark: '#9333ea',
       contrastText: '#fff',
     },
+    // ── Token semantici di dominio ────────────────────────────────────────────
+    // Colori ruolo giocatore: P=portiere, D=difensore, C=centrocampista, A=attaccante
+    // Usare sempre theme.palette.ruolo.X — mai hardcoded nei componenti.
+    ruolo: {
+      P: '#9e9e9e', // grigio neutro — portiere
+      D: '#448aff', // blu — difensore (allineato a info.main)
+      C: '#FFC107', // ambra brand — centrocampista (allineato a primary.main)
+      A: '#e53935', // rosso — attaccante (allineato a error.main)
+    },
   },
   breakpoints: {
     values: {
