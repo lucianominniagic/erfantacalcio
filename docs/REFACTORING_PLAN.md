@@ -71,13 +71,22 @@
 
 > Ogni fase ha owner consigliato (sub-agent), file impattati, criteri di completamento.
 
-### FASE 0 — Baseline e safety net
+### FASE 0 — Baseline e safety net ✅ COMPLETATA
 
 **Owner:** `dick` + `pasolini`
+**Branch:** `refactor/fase-0` | **Commits:** `d89877c`, `9eecc6d`
 
-- Verificare che `npm run build`, `npm run lint`, `npm run format -- --check` passino.
-- Configurare Vitest (smoke test) con un primo test sulle pure functions di `src/components/squadra/utils.ts` (`calcolaCodiceFormazione`, `formatModulo`, `allowedFormations`, `sortPlayersBy*`).
-- Documentare in `docs/TESTING.md` come scrivere/runnare test.
+- ✅ `npm run build` — PASS
+- ✅ `npm run format -- --check` — PASS (285 file formattati)
+- ✅ `npm run lint` — funzionante; 360 problemi pre-esistenti documentati come baseline per FASE 1
+  - Fix: `next lint` rimosso in Next.js 16 → script aggiornato a `eslint .`
+  - Fix: `eslint.config.js` → `eslint.config.mjs` (ESM flat config)
+  - Fix: `eslint-config-next` → `@next/eslint-plugin-next` (flatConfig API)
+  - Fix: installato `typescript-eslint` (mancante da devDeps)
+  - 133 problemi auto-fixati con `eslint --fix`
+- ✅ Vitest v2.1.9 configurato — 25 test verdi su `src/components/squadra/utils.ts`
+  - 3 bug documentati nei test (non fixati): `formatModulo`, `sortPlayersByRoleDescThenRiserva`, `checkDataFormazione`
+- ✅ `docs/TESTING.md` creato con guida completa
 
 **Done quando:** `npm test` runna almeno 1 file con N test verdi; CI baseline documentata.
 
