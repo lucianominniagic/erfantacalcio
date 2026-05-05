@@ -13,6 +13,7 @@ import {
   Voti,
 } from '~/server/db/entities'
 import { AppDataSource } from '~/data-source'
+import { calcBonusVoto } from '~/server/services/votiService'
 
 export const processVotiProcedure = adminProcedure
   .input(
@@ -76,28 +77,8 @@ export const processVotiProcedure = adminProcedure
             }
 
             // Upsert con update e create uguali
-            const votoSave = trx.create(Voti, {
-              voto: votoGiocatore.Voto ?? 0,
-              ammonizione:
-                votoGiocatore.Ammonizione === 1
-                  ? Configurazione.bonusAmmonizione
-                  : 0,
-              espulsione:
-                votoGiocatore.Espulsione === 1
-                  ? Configurazione.bonusEspulsione
-                  : 0,
-              gol:
-                votoGiocatore.Ruolo === 'P'
-                  ? votoGiocatore.GolSubiti * Configurazione.bonusGolSubito
-                  : votoGiocatore.GolSegnati * Configurazione.bonusGol,
-              assist: votoGiocatore.Assist * Configurazione.bonusAssist,
-              autogol: votoGiocatore.Autogol * Configurazione.bonusAutogol,
-              altriBonus:
-                (votoGiocatore.RigoriParati ?? 0) *
-                  Configurazione.bonusRigoreParato +
-                (votoGiocatore.RigoriErrati ?? 0) *
-                  Configurazione.bonusRigoreSbagliato,
-            })
+            const bonusData = calcBonusVoto(votoGiocatore, Configurazione)
+            const votoSave = trx.create(Voti, bonusData)
 
             const criteria = {
               idGiocatore: idGiocatore,
