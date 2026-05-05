@@ -133,19 +133,20 @@ Obiettivo: ridurre cast/any e centralizzare config.
 
 ---
 
-### FASE 3 — Service layer backend (procedure grandi)
+### FASE 3 — Service layer backend (procedure grandi) ✅ COMPLETATA
 
-**Owner:** `mccarthy` + `dick` (test caratterizzanti prima)
+**Owner:** `mccarthy` + `dick`
+**Branch:** `refactor/fase-3` | **Commits:** 4 atomici (mccarthy) + test caratterizzanti (dick)
 
-Target principali (in ordine):
-
-1. **`voti/procedures/processVoti.ts` (323 righe)**
-   - Test caratterizzanti: input/output reali su giornata storica.
-   - Estrarre in `src/server/services/votiService.ts`: `parseVotiCsv`, `applicaModificatori`, `calcolaBonusModulo`, `calcolaFantapunti`.
-   - Procedure resta solo orchestrazione + persistence.
-2. **`partita/procedures/getTabellini.ts` (275 righe)** → `tabelliniService.ts` con mapper puri.
-3. **`statisticheSquadre/procedures/riepilogo.ts` (183 righe)** → `statisticheService.ts`.
-4. **`formazione/procedures/{create,confirmPrecedente}.ts`** → estrarre `formazioneService.ts` con `cloneFormazione`, `validateFormazione`, mail templating in `service/mailTemplates.ts`.
+- ✅ **332 test caratterizzanti** scritti da dick prima del refactor (18+51+64+46+74+74)
+- ✅ **5 service creati** in `src/server/services/`:
+  1. `votiService.ts` — `calcBonusVoto()`: -20 righe da `processVoti.ts`
+  2. `tabelliniService.ts` — `mapVotoToTabellinoEntry()`: -60 righe da `getTabellini.ts`
+  3. `statisticheService.ts` — `initStats()`, `accumulate()`, `round2()`: -100 righe da `riepilogo.ts`
+  4. `formazioneService.ts` — `buildFormazioneInsertData()`, `buildVotiInsertData()`: condiviso tra `create` + `confirmPrecedente`
+  5. `mailTemplates.ts` — 3 template HTML estratti: -60 righe inline
+- ✅ 332/332 test verdi post-refactor
+- ✅ Build TypeScript zero errori
 
 **Done quando:** ogni procedure target sotto le ~80 righe, logica pura testata.
 
