@@ -112,15 +112,22 @@ Obiettivo: ridurre cast/any e centralizzare config.
 
 ### FASE 2 — Auth & route group hardening ✅ COMPLETATA
 
-**Owner:** `gibson`
-**Branch:** `refactor/fase-2` | **Commits:** 3 atomici
+**Owner:** `gibson` + `dostojevskij`
+**Branch:** `refactor/fase-2` | **Commits:** 5 atomici
 
 1. ✅ `src/app/(admin)/layout.tsx` — Server Component guard: `!session || !session.user || session.user.ruolo !== 'admin'` → `redirect('/login')`
 2. ✅ `src/app/(user)/layout.tsx` — Server Component guard: `!session` → `redirect('/login')`
 3. ✅ Audit pagine — nessun check manuale ridondante trovato nelle 18 pagine `(admin)`/`(user)`
-4. ✅ `docs/ADR/001-password-hashing.md` creato — decisione MD5 vs bcrypt **aperta** (vedi Decisioni aperte)
+4. ✅ **Bcrypt lazy migration** (decisione presa: bcrypt con lazy migration):
+   - `hashPassword.ts`: `hashPassword()` bcrypt + `verifyPassword()` auto-detect MD5/bcrypt + `hashMD5()` legacy
+   - `auth.config.ts`: al login MD5 match → re-hash bcrypt → aggiorna DB best-effort
+   - `changePassword.ts`: nuove password sempre bcrypt
+   - 14 test verdi
+5. ✅ `docs/ADR/001-password-hashing.md` — decisione documentata
+6. ✅ `Utente.pwd` varchar(50) → varchar(100); migration `AlterUtentePwdLength` generata (applicare al prossimo deploy)
 
-**Nota:** pattern corretto per guard che leggono `session.user`: `!session || !session.user || session.user.ruolo !== 'admin'` (NextAuth tipizza `session.user` come potenzialmente undefined).
+**Nota:** pattern corretto per guard: `!session || !session.user || session.user.ruolo !== 'admin'`
+**Deploy:** eseguire `npm run migration:run:prod` prima di deployare in produzione.
 
 **Done quando:** un utente non admin che apre `/giocatori` viene redirectato lato server; nessun flicker client-side.
 
@@ -234,9 +241,9 @@ Aree critiche prioritarie:
 
 ## Decisioni aperte (da concordare con Luciano)
 
-- [ ] **Password hashing**: tenere MD5 o migrare a bcrypt? (impatta fase 2 e fase 7)
+- [x] **Password hashing**: ✅ Migrazione a bcrypt con lazy migration (FASE 2). `docs/ADR/001-password-hashing.md`.
 - [ ] **Entità Squadra separata**: oggi `Partita` punta a `Utente` per home/away. Estraiamo `Squadra`? (impatta fase 7, refactor pesante)
-- [ ] **Branch strategy**: una PR per fase o sotto-PR per file?
+- [x] **Branch strategy**: ✅ Una branch per fase (`refactor/fase-N`)
 - [ ] **Ordine reale di esecuzione**: l'ordine attuale è "rischio crescente". Si può anticipare la fase 5 (giocatori 897 righe) se urgente.
 
 ---
