@@ -92,10 +92,11 @@
 
 ---
 
-### FASE 1 — Fondamenta tipi & config
+### FASE 1 — Fondamenta tipi & config ✅ COMPLETATA
 
 **Owner:** `ishiguro` (lead) + `mccarthy`
-**Branch:** `refactor/fase-1` | **Commit:** `af767ee`
+**Branch:** `refactor/fase-1` | **Commits:** `af767ee`, `37ad700`
+**Review:** 2 problemi trovati e fixati (commit `37ad700`)
 
 Obiettivo: ridurre cast/any e centralizzare config.
 
@@ -103,6 +104,7 @@ Obiettivo: ridurre cast/any e centralizzare config.
 2. ✅ **Tipi da Zod**: `iVotoGiocatore` convertito a `z.infer`; altri 2 skippati (shape divergente, documentati).
 3. ✅ **Eliminare `any`** in `src/components/squadra/utils.ts` — `getOpponent`/`getMatch` tipati con `z.infer<giornataSchema>` e `Pick<GiocatoreType>`; `as ShirtTemplate` sostituito con `toShirtTemplate()` type-safe in 4 file.
 4. ✅ **Sostituire `JSON.parse(...) as X`** — nuovo `src/schemas/maglia/index.ts` con `parseMaglia()` safe; 4 file aggiornati.
+5. ✅ **Review fix**: `interface magliaType` duplicata rimossa da `selectColors/index.tsx`, ora re-esporta `MagliaType` da `~/schemas/maglia`; `toShirtTemplate()` ora logga `console.warn` su valori non riconosciuti.
 
 **Done quando:** `tsc --noEmit` zero errori, ricerca `as any` ridotta del 80%.
 
