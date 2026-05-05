@@ -154,19 +154,24 @@ Obiettivo: ridurre cast/any e centralizzare config.
 
 ---
 
-### FASE 4 — Componenti grandi: split & extract hook
+### FASE 4 — Componenti grandi: split & extract hook ✅ COMPLETATA
 
-**Owner:** `coe` + `asimov` (per token tema)
+**Owner:** `coe` + `asimov`
+**Branch:** `refactor/fase-4` | **Commits:** 6 atomici (coe) + token tema (asimov) + review fix
+**Review:** 1 bug critico trovato e fixato — `TottenhamShirt` mancante dal `TEMPLATE_MAP` (commit `ebaa5e3`)
 
-Per ciascun componente >300 righe:
+| Componente | Prima | Dopo | Sub-componenti |
+|---|---|---|---|
+| `shirtSVG.tsx` | 934 | 85 | 4 file template (basic/pattern/gradient) + `TEMPLATE_MAP` |
+| `ViewTabellini.tsx` | 538 | 116 | `TabellinoCard`, `TabellinoVotiList`, `tabellinoHelpers` |
+| `ViewFormazioni.tsx` | 459 | 138 | `FormazioneSquadra` |
+| `Sidebar.tsx` | 501 | 243 | `SidebarNavItem`, `SidebarSection`, `sidebarConfig` |
+| `Giocatore.tsx` | 384 | 63 | `GiocatoreProfile`, `GiocatoreStats`, `GiocatoreStorico` |
+| `selectColors/index.tsx` | 356 | 234 | `useShirtSelector` hook |
+| `useFormazioneState.ts` | 330 | 75 | `useFormazioneData`, `useFormazioneActions`, `useFormazionePrecedente` |
+| `Formazione.tsx` | 382 | 255 | `FormazioneRosaSection`, `FormazioneDisabilitata` |
 
-1. **`selectColors/shirtSVG.tsx` (879 righe)** — è probabilmente un asset SVG: valutare estrazione in file `.svg` + import oppure split per template.
-2. **`cardPartite/ViewTabellini.tsx` (531)** — split: header / lista voti / footer; estrarre mapper in hook `useTabellinoView`.
-3. **`cardPartite/ViewFormazioni.tsx` (445)** — analogo.
-4. **`sidebar/Sidebar.tsx` (389)** — estrarre menu items in config + sub-components.
-5. **`giocatori/Giocatore.tsx` (384)** — separare profile/stats/storico in tab components.
-6. **`selectColors/index.tsx` (351)** — split form/preview/persist.
-7. **`squadra/Formazione.tsx` (340)** + **`useFormazioneState.ts` (319)** — già hook-driven, ma il file hook è grande: spezzare in `useFormazioneData`, `useFormazioneActions`, `useFormazionePrecedente`.
+**asimov:** `palette.ruolo` token semantici (P/D/C/A) + `mui.d.ts` augmentato + `docs/DESIGN_SYSTEM.md` (340 righe, base per FASE 6)
 
 **Output target:** nessun file UI > ~250 righe.
 
