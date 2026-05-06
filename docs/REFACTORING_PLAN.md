@@ -177,21 +177,20 @@ Obiettivo: ridurre cast/any e centralizzare config.
 
 ---
 
-### FASE 5 — Pagine admin pesanti
+### FASE 5 — Pagine admin pesanti ✅ COMPLETATA
 
-**Owner:** `coe` (con `mccarthy` per procedure se servono)
+**Owner:** `coe`
+**Branch:** `refactor/fase-5` | **Commits:** 5 atomici (`61842dc`, `1456618`, `9add224`, `7583057`, `54ebb97`)
 
-1. **`(admin)/giocatori/page.tsx` (897 righe)** ⚠️ — split in:
-   - `GiocatoriTable.tsx` (data grid)
-   - `GiocatoreFormModal.tsx` (form crea/modifica)
-   - `GiocatoriFilters.tsx`
-   - `useGiocatoriAdmin.ts` (data fetching + mutations)
-2. **`(admin)/voti/page.tsx` (515)** — split form upload / lista / preview.
-3. **`(admin)/calendario/page.tsx` (452)** — già parzialmente modulare; estrarre `CalendarioForm.tsx` modale.
-4. **`(admin)/presidenti/page.tsx` (353)** — split tabella / form.
-5. **`(admin)/uploadVoti/page.tsx` (305)** — estrarre logica parsing in service condiviso con processVoti.
+| Pagina | Prima | Dopo | Sub-componenti |
+|---|---|---|---|
+| `giocatori/page.tsx` | 897 | 99 | `GiocatoriTable`, `GiocatoreFormModal`, `GiocatoriFilters`, `useGiocatoriAdmin` |
+| `voti/page.tsx` | 515 | 56 | `VotiUploadForm`, `VotiList`, `useVotiAdmin` |
+| `calendario/page.tsx` | 452 | 149 | `CalendarioForm`, `useCalendarioAdmin` |
+| `presidenti/page.tsx` | 353 | 39 | `PresidentiTable`, `PresidenteFormModal` |
+| `uploadVoti/page.tsx` | 305 | 54 | logica parsing in service condiviso |
 
-**Output target:** nessuna pagina > ~200 righe (solo composizione).
+**Output target:** nessuna pagina > ~200 righe (solo composizione). ✅
 
 ---
 
