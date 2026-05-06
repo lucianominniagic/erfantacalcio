@@ -57,40 +57,34 @@ describe('squadra/utils — Pure Functions', () => {
   })
 
   describe('formatModulo', () => {
-    // BUG: formatModulo splits on empty string instead of '-', causing NaN values
+    // BUG FIXED: formatModulo now correctly splits on '-' instead of ''
     // Expected: formatModulo('13-4-3') -> '3-4-3'
-    // Actual: formatModulo('13-4-3') -> '3-NaN-4-NaN-3'
-    // Root cause: .split('') splits every character, parseInt('-') returns NaN
-    // Fix needed: Change split('') to split('-')
+    // Root cause was: .split('') splits every character, parseInt('-') returns NaN
+    // Fix applied: Changed split('') to split('-')
 
     it('should format modulo string correctly', () => {
-      // BUG: Current implementation returns '3-NaN-4-NaN-3' instead of '3-4-3'
       const result = formatModulo('13-4-3')
-      expect(result).toBe('3-NaN-4-NaN-3')
+      expect(result).toBe('3-4-3')
     })
 
     it('should handle different modulo formats', () => {
-      // BUG: Current implementation returns '1-NaN-4-NaN-4-NaN-1' instead of '4-4-1'
       const result = formatModulo('11-4-4-1')
-      expect(result).toBe('1-NaN-4-NaN-4-NaN-1')
+      expect(result).toBe('1-4-4-1')
     })
 
     it('should format modulo with single digit', () => {
-      // BUG: Current implementation returns '3-NaN-5-NaN-2' instead of '3-5-2'
       const result = formatModulo('13-5-2')
-      expect(result).toBe('3-NaN-5-NaN-2')
+      expect(result).toBe('3-5-2')
     })
 
     it('should handle modulo with leading 1', () => {
-      // BUG: Current implementation returns '5-NaN-3-NaN-2' instead of '5-3-2'
       const result = formatModulo('15-3-2')
-      expect(result).toBe('5-NaN-3-NaN-2')
+      expect(result).toBe('5-3-2')
     })
 
     it('should work with 3-4-3 standard formation', () => {
-      // BUG: Current implementation returns '3-NaN-4-NaN-3' instead of '3-4-3'
       const result = formatModulo('13-4-3')
-      expect(result).toBe('3-NaN-4-NaN-3')
+      expect(result).toBe('3-4-3')
     })
   })
 
@@ -183,9 +177,8 @@ describe('squadra/utils — Pure Functions', () => {
   })
 
   describe('sortPlayersByRoleDescThenRiserva', () => {
-    // NOTE: This function mutates the input array by reassigning riserva indices.
-    // It also filters players by unique ruoli but doesn't sort the ruoli themselves.
-    // The sort order of roles depends on Set order, which may not be descending P > D > C > A
+    // FIXED: Now correctly sorts roles in order P > D > C > A
+    // The function maintains this order explicitly rather than relying on Set insertion order
 
     it('should sort players by role then riserva', () => {
       const players: GiocatoreFormazioneType[] = [
@@ -197,10 +190,11 @@ describe('squadra/utils — Pure Functions', () => {
 
       const sorted = sortPlayersByRoleDescThenRiserva(players)
 
-      // NOTE: Current implementation doesn't guarantee P, D, C, A order
-      // It processes ruoli in Set order (insertion order)
-      expect(sorted).toHaveLength(4)
-      expect(sorted.every((p) => p !== null)).toBe(true)
+      // NOW: P > D > C > A guaranteed order
+      expect(sorted[0].ruolo).toBe('P')
+      expect(sorted[1].ruolo).toBe('D')
+      expect(sorted[2].ruolo).toBe('C')
+      expect(sorted[3].ruolo).toBe('A')
     })
 
     it('should place null riserva before numbered riserva within same role', () => {
@@ -213,11 +207,9 @@ describe('squadra/utils — Pure Functions', () => {
       const sorted = sortPlayersByRoleDescThenRiserva(players)
 
       // Within same role, null riserva should come first
-      const defendersWithRiserva = sorted.filter((p) => p.riserva !== null)
-      const defendersWithoutRiserva = sorted.filter((p) => p.riserva === null)
-
-      expect(defendersWithoutRiserva.length).toBeGreaterThan(0)
-      expect(defendersWithRiserva.length).toBeGreaterThan(0)
+      expect(sorted[0].riserva).toBeNull()
+      expect(sorted[1].riserva).toBe(1)
+      expect(sorted[2].riserva).toBe(2)
     })
 
     it('should reassign riserva indices for each role', () => {
@@ -235,13 +227,13 @@ describe('squadra/utils — Pure Functions', () => {
       const defenders = sorted.filter((p) => p.ruolo === 'D')
       const mids = sorted.filter((p) => p.ruolo === 'C')
 
-      // First element with null riserva, rest numbered sequentially
-      if (defenders[0]?.riserva === null && defenders[1]?.riserva !== null) {
-        expect(defenders[1].riserva).toBeGreaterThanOrEqual(1)
-      }
-      if (mids[0]?.riserva === null && mids[1]?.riserva !== null) {
-        expect(mids[1].riserva).toBeGreaterThanOrEqual(1)
-      }
+      // First element with null riserva, then 1, 2
+      expect(defenders[0].riserva).toBeNull()
+      expect(defenders[1].riserva).toBe(1)
+      expect(defenders[2].riserva).toBe(2)
+
+      expect(mids[0].riserva).toBeNull()
+      expect(mids[1].riserva).toBe(1)
     })
 
     it('should handle players with all null riserva', () => {
@@ -264,7 +256,6 @@ describe('squadra/utils — Pure Functions', () => {
       const isoString = futureDate.toISOString()
 
       const result = checkDataFormazione(isoString)
-      // BUG: Logic compares >= instead of >, so future dates should work
       expect(result).toBe(true)
     })
 
@@ -282,24 +273,29 @@ describe('squadra/utils — Pure Functions', () => {
       const isoString = today.toISOString()
 
       const result = checkDataFormazione(isoString)
-      // Date comparison without time component might be true or false depending on time
-      // This is expected behavior - it depends on current time
+      // Date comparison should work - exact time matching
       expect(typeof result).toBe('boolean')
     })
 
     it('should handle undefined input gracefully', () => {
       const result = checkDataFormazione(undefined)
-      // dayjs(undefined) behaves like dayjs(new Date()) - creates today's date
+      // undefined creates today, so should be around now
       expect(typeof result).toBe('boolean')
     })
 
     it('should handle valid ISO date string correctly', () => {
-      // BUG: Date comparison is using toDate() which may lose timezone info
-      // ISO 2025-12-31 is future but comparison fails
-      const result = checkDataFormazione('2025-12-31T23:59:59Z')
-      // The function compares dataIso >= today, so future date should be true
-      // But current implementation may have timezone issues
-      expect(typeof result).toBe('boolean')
+      // Create a date far in the future to avoid timezone edge cases
+      const futureDate = new Date()
+      futureDate.setFullYear(futureDate.getFullYear() + 1)
+      const result = checkDataFormazione(futureDate.toISOString())
+      // Future date should return true
+      expect(result).toBe(true)
+    })
+
+    it('should handle past ISO date string correctly', () => {
+      const result = checkDataFormazione('2020-01-01T00:00:00Z')
+      // Past date should return false
+      expect(result).toBe(false)
     })
   })
 })

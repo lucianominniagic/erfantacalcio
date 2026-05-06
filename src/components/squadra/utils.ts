@@ -16,7 +16,7 @@ export const allowedFormations: number[] = [
 export function formatModulo(moduloStr: string): string {
   return moduloStr
     .substring(1)
-    .split('')
+    .split('-')
     .map((num) => parseInt(num, 10))
     .join('-')
 }
@@ -52,9 +52,10 @@ export const sortPlayersByRoleDescThenRiserva = (
   players: GiocatoreFormazioneType[],
 ) => {
   const playersSorted: GiocatoreFormazioneType[] = []
-  const ruoliUnici = [...new Set(players.map((player) => player.ruolo))]
+  // Ensure fixed order: P > D > C > A
+  const ruoliOrder = ['P', 'D', 'C', 'A']
 
-  ruoliUnici.forEach((ruolo) => {
+  ruoliOrder.forEach((ruolo) => {
     const playersForRuolo = players.filter((player) => player.ruolo === ruolo)
     const playersSortedForRuolo = playersForRuolo.sort((a, b) => {
       if (a.riserva === null && b.riserva === null) {
@@ -67,9 +68,12 @@ export const sortPlayersByRoleDescThenRiserva = (
       return a.riserva - b.riserva
     })
 
-    playersSortedForRuolo.forEach((player, index) => {
+    // Renumber riserva indices sequentially for non-null values
+    let riservaIndex = 0
+    playersSortedForRuolo.forEach((player) => {
       if (player.riserva !== null) {
-        player.riserva = index + 1
+        riservaIndex += 1
+        player.riserva = riservaIndex
       }
       playersSorted.push(player)
     })
@@ -101,7 +105,10 @@ function findModuloCompatibile(modulo: string): Moduli {
 }
 
 export function checkDataFormazione(dataIso: string | undefined) {
-  return dayjs(dataIso).toDate() >= dayjs(new Date()).toDate()
+  // Parse ISO date strings directly to ensure consistent timezone handling
+  const targetDate = new Date(dataIso ?? new Date()).getTime()
+  const now = new Date().getTime()
+  return targetDate >= now
 }
 
 export function getOpponent(

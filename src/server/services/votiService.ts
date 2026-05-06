@@ -62,7 +62,7 @@ export function calcBonusVoto(
         ? input.GolSubiti * config.bonusGolSubito
         : input.GolSegnati * config.bonusGol,
     assist: input.Assist * config.bonusAssist,
-    autogol: input.Autogol * config.bonusAutogol,
+    autogol: (input.Autogol * config.bonusAutogol) || 0, // Ensure +0, not -0
     altriBonus:
       (input.RigoriParati ?? 0) * config.bonusRigoreParato +
       (input.RigoriErrati ?? 0) * config.bonusRigoreSbagliato,
