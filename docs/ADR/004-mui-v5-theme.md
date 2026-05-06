@@ -54,7 +54,7 @@ MUI provides `DataGrid`, `Charts`, `DatePicker` and other complex components out
 
 - **Complete component library**: buttons, cards, dialogs, data grids, charts, autocomplete, tabs — all from one source.
 - **Centralized theming**: all design tokens (colors, typography, spacing, shadows) live in `src/theme/`. Global changes require editing one file.
-- **Semantic palette tokens**: custom tokens like `custom.win`, `custom.lose`, `custom.draw`, `custom.portiere`, `custom.difensore`, etc. are defined in the MUI palette augmentation (`src/theme/mui.d.ts`) for type-safe access.
+- **Semantic palette tokens**: custom tokens `champions` (Champions League accent color) and `ruolo.{P,D,C,A}` (player role colors) are defined in the MUI palette augmentation (`src/theme/mui.d.ts`) for type-safe access.
 - **Dark mode first**: the dark theme (`src/theme/index.ts`) is the primary theme; the light theme (`src/theme/lightTheme.ts`) is a secondary option toggled via `ThemeContext` (stored in `localStorage`).
 - **Component overrides**: global overrides for MUI components (buttons, cards, DataGrid, chips, tabs, table cells) are centralized in `src/theme/overrides/` and merged in `src/theme/overrides/index.ts`. No inline `sx` overrides for global styles.
 
@@ -91,7 +91,7 @@ src/theme/
 
 ## Conventions
 
-1. **Never use hardcoded color strings** in component files. Use `theme.palette.*` or semantic tokens from `custom.*`.
+1. **Never use hardcoded color strings** in component files. Use `theme.palette.*` or semantic tokens (`ruolo.*`, `champions`).
 2. **One-off layout adjustments** → use `sx` prop.
 3. **Repeated style patterns** → add a component override in `src/theme/overrides/<Component>.ts`.
 4. **New design tokens** → augment `src/theme/mui.d.ts` and add the value to both `index.ts` (dark) and `lightTheme.ts` (light).

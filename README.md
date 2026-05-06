@@ -122,7 +122,7 @@ erfantacalcio/
 │   │   │   └── trpc.ts          # tRPC setup
 │   │   ├── db/                  # Database entities (TypeORM)
 │   │   │   └── entities/        # Entità database
-│   │   ├── auth.ts              # Configurazione NextAuth
+│   │   ├── auth.config.ts       # Configurazione NextAuth
 │   │   └── utils/               # Utility server-side
 │   ├── schemas/                 # Zod schemas per validazione
 │   │   ├── calendario/
