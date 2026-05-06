@@ -194,33 +194,23 @@ Obiettivo: ridurre cast/any e centralizzare config.
 
 ---
 
-### FASE 6 — Theme & styling consistency
+### FASE 6 — Theme & styling consistency ✅ COMPLETATA
 
 **Owner:** `asimov`
+**Branch:** `refactor/fase-6` | **Commits:** 4 atomici (`4ccde95`, `eba5000`, `d05694e`, `86872d5`)
 
-1. Audit `sx={{ ... }}` ricorrenti: spostare in `theme/overrides/` o creare componenti `Styled*`.
-2. Audit colori hardcoded (es. `#1a1a2e`, `#E65100`): consolidare in `palette` semantica.
-3. Verificare contrast ratio light/dark.
-4. Documentare design tokens in `docs/DESIGN_SYSTEM.md`.
+1. ✅ **Overrides tokenizzati** — `Button`, `Card`, `CardHeader`, `DataGrid`, `TableHead`: tutti i colori hex sostituiti con token palette (`primary.*`, `divider`, `alpha()`, `darken()`)
+2. ✅ **Colori hardcoded in app/ e components/** — `login/page.tsx`, `foto/page.tsx`, `documenti/page.tsx`, `HeadToHeadMatrix.tsx`, `Sidebar.tsx` bonificati
+3. ✅ **`palette.ruolo` adottato ovunque** — `tabellinoHelpers.tsx` (bug fix: C usava `action.hover`!), `Rosa.tsx` migrati a `theme.palette.ruolo[ruolo]`
+4. ✅ **`docs/DESIGN_SYSTEM.md`** aggiornato: stato "FASE 6", sezione 9 chiusa, tabella colori residui intenzionali documentata
 
-**Done quando:** ricerca grep `sx={{` ridotta significativamente; nessun colore hex sparso fuori da `theme/`.
+**Colori residui intenzionali (non toccati):** `theme/index.ts` + `lightTheme.ts` (fonte verità), colori maglietta in `useShirtSelector`, fallback maglia in `Squadra.tsx`.
 
----
-
-### FASE 7 — Entità & DB hygiene
-
-**Owner:** `dostojevskij`
-
-1. **`Utente`**: rinominare `Campionato`/`Champions`/`Secondo`/`Terzo` in camelCase (campionato, champions, secondo, terzo) → migrazione TypeORM con rename column.
-2. **`Voto`**: chiarire `Formazione?: Relation<Formazione | null>`; rimuovere duplicazione tra FK e relations.
-3. **`Partita.SquadraHome/Away`** che puntano a `Utente`: rinominare relazioni (`UtenteHome/Away`) o creare entità `Squadra` separata se semanticamente diversa (decisione architetturale, vedi nota in calce).
-4. Verifica indici su FK frequenti (`idPartita`, `idCalendario`, `idSquadra`).
-
-**Done quando:** migration generata, `npm run migration:show:local` clean, build verde.
+**Done quando:** ricerca grep `sx={{` ridotta significativamente; nessun colore hex sparso fuori da `theme/`. ✅
 
 ---
 
-### FASE 8 — Testing coverage
+### FASE 7 — Testing coverage
 
 **Owner:** `dick` (in parallelo alle fasi 3-5 dove possibile)
 
@@ -235,7 +225,7 @@ Aree critiche prioritarie:
 
 ---
 
-### FASE 9 — Documentazione & DX
+### FASE 8 — Documentazione & DX
 
 **Owner:** Murakami (orchestrazione) + tutti
 
@@ -249,9 +239,7 @@ Aree critiche prioritarie:
 ## Decisioni aperte (da concordare con Luciano)
 
 - [x] **Password hashing**: ✅ Migrazione a bcrypt con lazy migration (FASE 2). `docs/ADR/001-password-hashing.md`.
-- [ ] **Entità Squadra separata**: oggi `Partita` punta a `Utente` per home/away. Estraiamo `Squadra`? (impatta fase 7, refactor pesante)
 - [x] **Branch strategy**: ✅ Una branch per fase (`refactor/fase-N`)
-- [ ] **Ordine reale di esecuzione**: l'ordine attuale è "rischio crescente". Si può anticipare la fase 5 (giocatori 897 righe) se urgente.
 
 ---
 
