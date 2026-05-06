@@ -596,6 +596,67 @@ Questo è un progetto privato. Per suggerimenti o segnalazioni contattare l'auto
 
 ---
 
+## 👩‍💻 How to contribute
+
+### Setup locale
+
+```bash
+# 1. Clona il repository
+git clone https://github.com/lukmin77/erfantacalcio.git
+cd erfantacalcio
+
+# 2. Installa le dipendenze
+npm install
+
+# 3. Copia e configura le variabili d'ambiente
+cp .env.example .env
+# Modifica .env con i tuoi valori (DB, NextAuth, bonus, ecc.)
+
+# 4. Applica le migrations al DB locale
+npm run migration:run:local
+
+# 5. Avvia il server di sviluppo (Turbopack, porta 8080)
+npm run dev
+```
+
+L'app sarà disponibile su `http://localhost:8080`.
+
+### Workflow branch
+
+Usa una delle seguenti convenzioni per il nome del branch:
+
+| Tipo | Pattern | Esempio |
+|---|---|---|
+| Refactoring strutturato (fasi) | `refactor/fase-N` | `refactor/fase-8` |
+| Nuova feature | `feature/<nome-kebab>` | `feature/export-classifica` |
+| Bugfix | `fix/<nome-kebab>` | `fix/voto-null-portiere` |
+
+### Prima di aprire una PR
+
+Esegui questi controlli localmente e assicurati che passino tutti:
+
+```bash
+npm run build    # Build di produzione — deve completare senza errori
+npm run lint     # ESLint — zero errori, zero warning
+```
+
+> **Nota:** non esiste una suite di test automatizzati completa. Verifica manualmente
+> le funzionalità toccate dalla tua modifica prima di aprire la PR.
+
+### Documentazione di riferimento
+
+| Documento | Contenuto |
+|---|---|
+| [`CONTEXT.md`](CONTEXT.md) | Dominio, glossario, ruoli utente, struttura directory |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Request flow, scoring flow, routers tRPC, entità DB |
+| [`docs/ADR/`](docs/ADR/) | Decisioni architetturali (password hashing, tRPC, TypeORM, MUI) |
+| [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) | Tema MUI, palette token, convenzioni di stile |
+
+Leggi `CONTEXT.md` prima di iniziare: contiene il glossario di dominio indispensabile
+per capire variabili, procedure e commenti nel codice.
+
+---
+
 ## 📞 Supporto
 
 Per assistenza o domande, contattare l'amministratore del sistema.
