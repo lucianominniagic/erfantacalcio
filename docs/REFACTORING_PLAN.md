@@ -233,14 +233,18 @@ Obiettivo: ridurre cast/any e centralizzare config.
 
 ---
 
-### FASE 8 — Documentazione & DX
+### FASE 8 — Documentazione & DX ✅ COMPLETATA
 
 **Owner:** Murakami (orchestrazione) + tutti
+**Branch:** `refactor/fase-8` | **Commits:** 4 atomici + 1 review fix (`34550a3`)
+**Review:** 2 errori fattuali trovati e fixati — path `auth.ts` → `auth.config.ts`, token `custom.*` inesistenti → `champions` + `ruolo.{P,D,C,A}`
 
-1. `CONTEXT.md` (root) con glossario domain (giornata, partita, formazione, voto, ...).
-2. `docs/ARCHITECTURE.md` con diagramma flussi (request flow, scoring flow).
-3. ADR (`docs/adr/`) per decisioni storiche (MD5, MUI, NamingStrategy, JWT only).
-4. Aggiornare `README.md` con sezione "How to contribute".
+1. ✅ `CONTEXT.md` — glossario 13 termini di dominio, stack, struttura directory, request flow, ruoli utente
+2. ✅ `docs/ARCHITECTURE.md` — diagrammi ASCII request flow + scoring flow, tutti i router tRPC documentati, auth flow, service layer
+3. ✅ `docs/ADR/002-trpc-tanstack-query.md` — tRPC vs REST/GraphQL
+4. ✅ `docs/ADR/003-typeorm-active-record.md` — TypeORM Active Record vs Prisma/DataMapper
+5. ✅ `docs/ADR/004-mui-v5-theme.md` — MUI v5 vs Tailwind/shadcn
+6. ✅ `README.md` — sezione "How to contribute" con setup locale, workflow branch, checklist pre-PR
 
 ---
 
