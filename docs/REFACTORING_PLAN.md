@@ -210,18 +210,26 @@ Obiettivo: ridurre cast/any e centralizzare config.
 
 ---
 
-### FASE 7 — Testing coverage
+### FASE 7 — Testing coverage ✅ COMPLETATA
 
-**Owner:** `dick` (in parallelo alle fasi 3-5 dove possibile)
+**Owner:** `dick`
+**Branch:** `refactor/fase-7` | **Commits:** 1 atomico (dick) + 1 review fix (`373b23c`)
+**Review:** 1 bug critico trovato e fixato — `sortPlayersByRoleDescThenRiserva` mutava oggetti nella cache TanStack Query
 
-Aree critiche prioritarie:
+| Area | Test | File |
+|---|---|---|
+| `votiService` — calcolo fantapunti | 10 | `votiService.test.ts` |
+| `formazioneService` — builder | 13 | `formazioneService.test.ts` |
+| `statisticheService` — aggregazione | 19 | `statisticheService.test.ts` |
+| `tabelliniService` — mapping | 7 | `tabelliniService.test.ts` |
+| `schemas/maglia` — Zod validation | 15 | `maglia/index.test.ts` |
+| `schemas/calendario` — Zod validation | 15 | `calendario/index.test.ts` |
+| `utils.ts` — 3 bug fix TDD | 26 | `utils.test.ts` |
+| **Totale** | **413** | **7 file** |
 
-1. **Calcolo fantapunti** (`votiService` post fase 3) — test su giornata storica.
-2. **Logica formazione** (`utils.ts`, `formazioneService`) — moduli ammessi, calcolo codice formazione.
-3. **`confirmPrecedente`** — clone + esistenza + giornate correnti.
-4. **Schemi Zod** — happy path + edge case (date invalide, formazioni incomplete).
+**Bug fixati via TDD:** `formatModulo` (split('-')), `sortPlayersByRoleDescThenRiserva` (P>D>C>A + no mutation), `checkDataFormazione` (timezone-safe).
 
-**Target:** coverage >40% sulle aree business-critical (non vincolante per PR).
+**Target:** coverage >40% sulle aree business-critical. ✅
 
 ---
 
