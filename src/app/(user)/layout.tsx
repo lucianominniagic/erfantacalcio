@@ -1,22 +1,10 @@
-import { redirect } from 'next/navigation'
 import type { ReactNode } from 'react'
-import { auth } from '~/server/auth.config'
 
 /**
- * Server-side auth guard for all (user) routes.
- * Redirects to /login if the user is not authenticated.
- * No UI markup — pure guard.
+ * Passthrough layout for the (user) route group.
+ * Pages under this group are mostly public — individual protected pages
+ * (formazione, foto, maglia) enforce auth in their own layout.tsx files.
  */
-export default async function UserLayout({
-  children,
-}: {
-  children: ReactNode
-}) {
-  const session = await auth()
-
-  if (!session) {
-    redirect('/login')
-  }
-
+export default function UserLayout({ children }: { children: ReactNode }) {
   return <>{children}</>
 }
