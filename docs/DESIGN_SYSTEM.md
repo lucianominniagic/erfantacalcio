@@ -1,7 +1,6 @@
 # ErFantacalcio — Design System
 
-> **Stato**: Bozza — aggiornato durante FASE 4 del refactoring.
-> Audit sx inline rimandato a FASE 6.
+> **Stato**: Aggiornato in FASE 6 — audit sx inline e colori hardcoded completato.
 
 ---
 
@@ -84,7 +83,7 @@ src/theme/
 | `error` | `#ff6f60` | `#e53935` | `#ab000d` |
 | `warning` | `#ffe57f` | `#ffd740` | `#c8a600` |
 
-> ⚠️ `success` usa formato `rgb()` invece di hex — da uniformare in FASE 6.
+> ✅ `success` convertito da `rgb()` a hex in FASE 6.
 
 ### Background & Surface
 
@@ -172,7 +171,7 @@ sx={{ color: theme.palette.ruolo.A }}
 // (Rosa usava Chip color="error"|"success"|"info"|"default")
 ```
 
-> **FASE 6**: migrare `getColorByRuolo()` in `ViewTabellini.tsx` e `RUOLO_COLOR` in `Rosa.tsx` a `theme.palette.ruolo`.
+> ✅ **FASE 6**: `getColorByRuolo()` in `tabellinoHelpers.tsx` e `RUOLO_COLOR` in `Rosa.tsx` migrati a `theme.palette.ruolo`.
 
 ### Fantapunti (positivo / negativo)
 
@@ -194,7 +193,7 @@ Attualmente hardcoded in `src/app/(user)/documenti/page.tsx`. Mappatura consigli
 | XLSX | `#16a34a` | `success.main` |
 | CSV | `#2563eb` | `info.main` |
 
-> **FASE 6**: aggiornare `documenti/page.tsx` per usare i token palette.
+> ✅ **FASE 6**: `documenti/page.tsx` usa `theme.palette[colorKey].main` via `SemanticColorKey`.
 
 ### Overlay Amber (superfici trasparenti)
 
@@ -246,7 +245,7 @@ Font: **Montserrat** — caricato globalmente, nessun font display secondario.
 - `outlinedPrimary` → bordo amber, hover amber
 - **VIETATO** `color="info"` o `color="warning"` sui `<Button>`
 
-> ⚠️ **FASE 6**: migrare i valori hardcoded a `theme.palette.primary.*` e `theme.palette.background.default`.
+> ✅ **FASE 6**: migrati a `theme.palette.primary.*` e `theme.palette.background.default`.
 
 ### Card (`overrides/Card.ts`)
 
@@ -257,12 +256,12 @@ Font: **Montserrat** — caricato globalmente, nessun font display secondario.
 
 ### CardHeader (`overrides/CardHeader.ts`)
 
-- Gradient `rgba(255,143,0,0.15) → rgba(255,193,7,0.08)` → **FASE 6**: usare `alpha()`
+- Gradient `rgba(255,143,0,0.15) → rgba(255,193,7,0.08)` → ✅ **FASE 6**: usa `alpha(primary.dark, 0.15)` e `alpha(primary.main, 0.08)`
 - Bordo inferiore: `theme.palette.divider`
 
 ### DataGrid (`overrides/DataGrid.ts`)
 
-- Column header dark bg: `#393027` — colore brownish-amber senza token. **FASE 6**: nominarlo o derivarlo con `darken(theme.palette.primary.dark, 0.85)`
+- Column header dark bg: `#393027` → ✅ **FASE 6**: `darken(theme.palette.primary.dark, 0.85)`
 
 ### CssBaseline (`overrides/CssBaseline.ts`)
 
@@ -322,10 +321,11 @@ sx={{ color: isDark ? 'rgba(251,191,36,0.75)' : 'rgba(255,255,255,0.85)' }}
 
 ---
 
-## 9. Colori hardcoded — da risolvere in FASE 6
+## 9. Colori hardcoded — ✅ Risolti in FASE 6
 
 > **Perimetro audit FASE 4**: solo `src/theme/` e `src/app/`.
 > Audit completo degli `sx` inline nei componenti rimandato a **FASE 6**.
+> **FASE 6**: tutti i punti sotto sono stati risolti. Vedere sezione 10 per dettagli.
 
 ### `src/theme/overrides/` — problemi da correggere
 
@@ -359,9 +359,46 @@ sx={{ color: isDark ? 'rgba(251,191,36,0.75)' : 'rgba(255,255,255,0.85)' }}
 
 | Problema | Azione |
 |---|---|
-| `success` usa `rgb()` invece di hex | Convertire in FASE 6 |
+| `success` usa `rgb()` invece di hex | ✅ Convertito in FASE 6 |
 | Typography colors hardcoded (es. `h2: { color: '#FFD54F' }`) | Accettabile come fonte di verità — non replicare nei componenti |
 
 ---
 
-*Ultima modifica: FASE 4 — asimov*
+*Ultima modifica: FASE 6 — asimov*
+
+---
+
+## 10. Modifiche FASE 6 — Theme & styling consistency
+
+> **Stato**: ✅ Completato in FASE 6.
+
+### Commit effettuati
+
+#### `refactor(theme): replace hardcoded hex with palette tokens in overrides/`
+- **Button.ts**: gradient usa `primary.dark → primary.main`, hover `primary.main → primary.light`, `background.default`, `alpha(primary.main, 0.5)`, `action.hover`
+- **Card.ts**: aggiunto parametro `theme`, border usa `divider`, hover border `alpha(primary.main, 0.28)`, box-shadow `alpha(primary.main, 0.08)`
+- **CardHeader.ts**: gradient `alpha(primary.dark, 0.15) → alpha(primary.main, 0.08)`, border `divider`
+- **DataGrid.ts**: colonna header dark usa `darken(primary.dark, 0.85)` (era `#393027`), `common.white`, row backgrounds via `alpha(primary.main, X)`
+- **TableHead.ts**: gradient usa `primary.dark → primary.main`, testo `background.default`
+- **index.ts**: `success` convertito da `rgb()` a hex
+
+#### `refactor(theme): replace hardcoded hex in app/ and components/`
+- **login/page.tsx**: aggiunto `'use client'` + `useTheme()`; gradient, border, shadow, icona logo usano token palette
+- **documenti/page.tsx**: `FILE_TYPE_CONFIG` usa `colorKey: SemanticColorKey` (`'success'|'info'|'error'`), colore risolto via `theme.palette[colorKey].main`
+- **foto/page.tsx**: aggiunto `useTheme` + `alpha`; step indicator, drag-zone, slider, crop border, avatar, CheckCircle usano token
+- **HeadToHeadMatrix.tsx**: `#0d0d14` → `background.default`
+- **Sidebar.tsx**: `#1a1208` → `darken(primary.dark, 0.9)`
+
+#### `refactor(theme): migrate palette.ruolo — getColorByRuolo + RUOLO_COLOR`
+- **tabellinoHelpers.tsx**: `getColorByRuolo()` usa `theme.palette.ruolo[ruolo]` (era: secondary.dark / info.dark / action.hover (errato!) / error.dark)
+- **Rosa.tsx**: rimossa `RUOLO_COLOR` map (MUI color string); Chip usa `bgcolor: theme.palette.ruolo[g.ruolo]`
+
+### Colori residui (intenzionali, non da migrare)
+
+| File | Colore | Motivo |
+|---|---|---|
+| `login/page.tsx` | `rgba(26,18,8,0.95)` in box bg | Colore specifico login card — nessun token corrispondente |
+| `foto/page.tsx` | `rgba(255,255,255,0.02/0.04/0.05)` | Overlay semi-trasparente bianco — semanticamente corretto |
+| `selectColors/useShirtSelector.ts` | `#ff0000`, `#ffffff`, `#000000` | Default colori maglietta utente — non sono UI tokens |
+| `squadra/Squadra.tsx` | `#1a237e` | Fallback colore maglia assente — non è UI token |
+| Tutti i file `theme/*.ts` | vari hex | Fonte di verità della palette — per definizione hardcoded |
