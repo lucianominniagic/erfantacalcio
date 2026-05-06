@@ -128,7 +128,7 @@ export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
-                            color: '#0d0d14',
+                            color: theme.palette.background.default,
                           }}
                         >
                           {s.squadra}

@@ -13,7 +13,7 @@ import {
   Typography,
 } from '@mui/material'
 import { DarkMode, LightMode, Login, Logout, SportsSoccer } from '@mui/icons-material'
-import { useTheme } from '@mui/material/styles'
+import { darken, useTheme } from '@mui/material/styles'
 import { RuoloUtente } from '~/utils/enums'
 import { Configurazione } from '~/config'
 import { useThemeMode } from '~/theme/themeContext'
@@ -33,7 +33,7 @@ function SidebarContent() {
   const theme = useTheme()
   const { mode, toggleMode } = useThemeMode()
 
-  const headerBg = `linear-gradient(135deg, ${theme.palette.background.default} 0%, #1a1208 100%)`
+  const headerBg = `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${darken(theme.palette.primary.dark, 0.9)} 100%)`
   const titleColor = theme.palette.primary.main
 
   return (

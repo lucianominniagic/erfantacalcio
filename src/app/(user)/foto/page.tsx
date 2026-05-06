@@ -28,6 +28,7 @@ import {
   ArrowBack,
   Crop,
 } from '@mui/icons-material'
+import { alpha, useTheme } from '@mui/material/styles'
 import LinearProgressBar from '~/components/LinearProgressBar/LinearProgressBar'
 import { api } from '~/utils/api'
 import { getFileExtension } from '~/utils/stringUtils'
@@ -40,6 +41,7 @@ export default function FotoProfilo() {
   const { data: session, update } = useSession()
   const updateFotoProfilo = api.profilo.updateFoto.useMutation()
   const uploadFileVercel = api.profilo.uploadFotoVercel.useMutation()
+  const theme = useTheme()
 
   const [step, setStep] = useState<Step>('select')
   const [imageSrc, setImageSrc] = useState<string | null>(null)
@@ -240,11 +242,11 @@ export default function FotoProfilo() {
                 fontWeight: 700,
                 ...(step === s
                   ? {
-                      background: 'linear-gradient(135deg,#FF8F00,#FFC107)',
-                      color: '#0d0d14',
+                      background: `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main})`,
+                      color: theme.palette.background.default,
                     }
                   : i < ['select', 'crop', 'upload'].indexOf(step)
-                    ? { background: 'rgba(255,193,7,0.2)', color: '#FFD54F' }
+                    ? { background: alpha(theme.palette.primary.main, 0.2), color: theme.palette.primary.light }
                     : {
                         background: 'rgba(255,255,255,0.05)',
                         color: 'text.disabled',
@@ -267,7 +269,7 @@ export default function FotoProfilo() {
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
           sx={{
-            border: `2px dashed ${isDragging ? '#FFC107' : 'rgba(255,193,7,0.25)'}`,
+            border: `2px dashed ${isDragging ? theme.palette.primary.main : alpha(theme.palette.primary.main, 0.25)}`,
             borderRadius: '16px',
             p: 5,
             display: 'flex',
@@ -289,7 +291,7 @@ export default function FotoProfilo() {
           <PhotoCamera
             sx={{
               fontSize: '3rem',
-              color: isDragging ? '#FFC107' : 'rgba(255,193,7,0.4)',
+              color: isDragging ? theme.palette.primary.main : alpha(theme.palette.primary.main, 0.4),
             }}
           />
           <Typography variant="subtitle1" sx={{ textAlign: 'center' }}>
@@ -331,8 +333,8 @@ export default function FotoProfilo() {
               height: 340,
               borderRadius: '12px',
               overflow: 'hidden',
-              border: '1px solid rgba(255,193,7,0.15)',
-              background: '#000',
+              border: `1px solid ${alpha(theme.palette.primary.main, 0.15)}`,
+              background: theme.palette.common.black,
             }}
           >
             <Cropper
@@ -350,7 +352,7 @@ export default function FotoProfilo() {
               style={{
                 containerStyle: { borderRadius: '12px' },
                 cropAreaStyle: {
-                  border: '2px solid #FFC107',
+                  border: `2px solid ${theme.palette.primary.main}`,
                   boxShadow: '0 0 0 9999px rgba(0,0,0,0.6)',
                 },
               }}
@@ -368,7 +370,7 @@ export default function FotoProfilo() {
                 step={0.05}
                 onChange={(_, v) => setZoom(v as number)}
                 sx={{
-                  color: '#FFC107',
+                  color: 'primary.main',
                   '& .MuiSlider-thumb': { width: 16, height: 16 },
                   '& .MuiSlider-rail': { opacity: 0.2 },
                 }}
@@ -400,7 +402,7 @@ export default function FotoProfilo() {
                 step={1}
                 onChange={(_, v) => setRotation(v as number)}
                 sx={{
-                  color: '#FFC107',
+                  color: 'primary.main',
                   '& .MuiSlider-thumb': { width: 16, height: 16 },
                   '& .MuiSlider-rail': { opacity: 0.2 },
                 }}
@@ -458,8 +460,8 @@ export default function FotoProfilo() {
                 sx={{
                   width: 160,
                   height: 160,
-                  border: '3px solid rgba(255,193,7,0.35)',
-                  boxShadow: '0 8px 32px rgba(255,193,7,0.15)',
+                  border: `3px solid ${alpha(theme.palette.primary.main, 0.35)}`,
+                  boxShadow: `0 8px 32px ${alpha(theme.palette.primary.main, 0.15)}`,
                 }}
               />
               {alert?.severity === 'success' && (
@@ -468,9 +470,9 @@ export default function FotoProfilo() {
                     position: 'absolute',
                     bottom: 4,
                     right: 4,
-                    color: '#4caf50',
+                    color: theme.palette.success.main,
                     fontSize: '2rem',
-                    background: '#0d0d14',
+                    background: theme.palette.background.default,
                     borderRadius: '50%',
                   }}
                 />

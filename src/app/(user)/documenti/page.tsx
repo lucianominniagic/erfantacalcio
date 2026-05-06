@@ -18,11 +18,12 @@ import { Configurazione } from '~/config'
 // ── Types & config ────────────────────────────────────────────────────────────
 
 type FileType = 'xlsx' | 'csv' | 'pdf'
+type SemanticColorKey = 'success' | 'info' | 'error'
 
-const FILE_TYPE_CONFIG: Record<FileType, { label: string; color: string }> = {
-  xlsx: { label: 'XLSX', color: '#16a34a' },
-  csv: { label: 'CSV', color: '#2563eb' },
-  pdf: { label: 'PDF', color: '#dc2626' },
+const FILE_TYPE_CONFIG: Record<FileType, { label: string; colorKey: SemanticColorKey }> = {
+  xlsx: { label: 'XLSX', colorKey: 'success' },
+  csv: { label: 'CSV', colorKey: 'info' },
+  pdf: { label: 'PDF', colorKey: 'error' },
 }
 
 // ── DocumentCard sub-component ────────────────────────────────────────────────
@@ -37,7 +38,8 @@ interface DocumentCardProps {
 function DocumentCard({ title, image, href, fileType }: DocumentCardProps) {
   const theme = useTheme()
   const [hovered, setHovered] = useState(false)
-  const { label, color } = FILE_TYPE_CONFIG[fileType]
+  const { label, colorKey } = FILE_TYPE_CONFIG[fileType]
+  const color = theme.palette[colorKey].main
 
   return (
     <Card
