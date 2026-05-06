@@ -1,3 +1,4 @@
+import { alpha } from '@mui/material/styles'
 import type { Theme } from '@mui/material/styles'
 
 // ==============================|| OVERRIDES - CARD HEADER ||============================== //
@@ -8,9 +9,8 @@ export default function CardHeader(theme: Theme) {
       styleOverrides: {
         root: {
           padding: '8px 12px',
-          background:
-            'linear-gradient(135deg, rgba(255,143,0,0.15) 0%, rgba(255,193,7,0.08) 100%)',
-          borderBottom: `1px solid rgba(255, 193, 7, 0.12)`,
+          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.15)} 0%, ${alpha(theme.palette.primary.main, 0.08)} 100%)`,
+          borderBottom: `1px solid ${theme.palette.divider}`,
           borderRadius: '12px 12px 0 0',
           color: theme.palette.primary.light,
           '&:last-child': {

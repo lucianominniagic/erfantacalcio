@@ -19,9 +19,9 @@ export const themeOptions: ThemeOptions = {
       dark: '#2962ff',
     },
     success: {
-      light: 'rgb(12, 236, 79)',
-      main: 'rgb(8, 204, 67)',
-      dark: 'rgb(3, 148, 47)',
+      light: '#0cec4f',
+      main: '#08cc43',
+      dark: '#03942f',
     },
     error: {
       light: '#ff6f60',
