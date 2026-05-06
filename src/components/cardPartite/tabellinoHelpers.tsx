@@ -34,16 +34,7 @@ export interface Tabellino {
 }
 
 export function getColorByRuolo(ruolo: string, theme: Theme): string | undefined {
-  switch (ruolo) {
-    case 'P':
-      return theme.palette.secondary.dark
-    case 'D':
-      return theme.palette.info.dark
-    case 'C':
-      return theme.palette.action.hover
-    case 'A':
-      return theme.palette.error.dark
-  }
+  return theme.palette.ruolo[ruolo as keyof typeof theme.palette.ruolo]
 }
 
 export function getVotoBonus(

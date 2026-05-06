@@ -22,13 +22,6 @@ interface RosaProps {
 
 const RUOLO_ORDER: Record<string, number> = { A: 0, C: 1, D: 2, P: 3 }
 
-const RUOLO_COLOR: Record<string, 'error' | 'success' | 'info' | 'default'> = {
-  A: 'error',
-  C: 'success',
-  D: 'info',
-  P: 'default',
-}
-
 interface RosaListProps {
   giocatori: GiocatoreType[]
   onSelect: (id: number) => void
@@ -42,6 +35,7 @@ function RosaList({
   dimmed = false,
   truncateSquad = false,
 }: RosaListProps) {
+  const theme = useTheme()
   return (
     <Box>
       {giocatori.map((g, i) => (
@@ -67,12 +61,16 @@ function RosaList({
           <Chip
             label={g.ruolo}
             size="small"
-            color={RUOLO_COLOR[g.ruolo] ?? 'default'}
             sx={{
               width: 36,
               flexShrink: 0,
               fontSize: '0.65rem',
               fontWeight: 700,
+              bgcolor:
+                theme.palette.ruolo[
+                  g.ruolo as keyof typeof theme.palette.ruolo
+                ] ?? theme.palette.secondary.main,
+              color: theme.palette.background.default,
             }}
           />
           <Typography
