@@ -247,6 +247,20 @@ describe('squadra/utils — Pure Functions', () => {
       expect(sorted[0].riserva).toBeNull()
       expect(sorted[1].riserva).toBeNull()
     })
+
+    it('should not mutate the original player objects', () => {
+      const players: GiocatoreFormazioneType[] = [
+        { ruolo: 'A', nome: 'Attacker1', costo: 5, riserva: 3 } as GiocatoreFormazioneType,
+        { ruolo: 'A', nome: 'Attacker2', costo: 4, riserva: 1 } as GiocatoreFormazioneType,
+      ]
+      const originalRiserva0 = players[0].riserva
+      const originalRiserva1 = players[1].riserva
+
+      sortPlayersByRoleDescThenRiserva(players)
+
+      expect(players[0].riserva).toBe(originalRiserva0)
+      expect(players[1].riserva).toBe(originalRiserva1)
+    })
   })
 
   describe('checkDataFormazione', () => {

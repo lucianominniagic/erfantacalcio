@@ -68,14 +68,15 @@ export const sortPlayersByRoleDescThenRiserva = (
       return a.riserva - b.riserva
     })
 
-    // Renumber riserva indices sequentially for non-null values
+    // Renumber riserva indices sequentially for non-null values (clone to avoid mutating query cache)
     let riservaIndex = 0
     playersSortedForRuolo.forEach((player) => {
-      if (player.riserva !== null) {
+      const cloned = { ...player }
+      if (cloned.riserva !== null) {
         riservaIndex += 1
-        player.riserva = riservaIndex
+        cloned.riserva = riservaIndex
       }
-      playersSorted.push(player)
+      playersSorted.push(cloned)
     })
   })
 
