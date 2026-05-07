@@ -1,5 +1,5 @@
 'use client'
-import { Analytics, SportsSoccer } from '@mui/icons-material'
+import { Analytics, SportsSoccer, TrendingDown, TrendingFlat, TrendingUp } from '@mui/icons-material'
 import {
   Box,
   Grid,
@@ -17,6 +17,11 @@ import { type GiocatoreFormazioneType } from '~/types/squadre'
 import { getShortName } from '~/utils/helper'
 import { getMatch } from './utils'
 
+interface FormaData {
+  media: number | null
+  giocate: number
+}
+
 interface Props {
   roles: string[]
   title: string
@@ -28,6 +33,7 @@ interface Props {
   handleClickPlayer: (player: GiocatoreFormazioneType) => void
   setIdGiocatoreStat: (id: number) => void
   setOpenModalCalendario: (open: boolean) => void
+  formaMap: Map<number, FormaData>
 }
 
 export function FormazioneRosaSection({
@@ -41,6 +47,7 @@ export function FormazioneRosaSection({
   handleClickPlayer,
   setIdGiocatoreStat,
   setOpenModalCalendario,
+  formaMap,
 }: Props) {
   const mergedPlayers = [
     ...rosa
@@ -74,6 +81,22 @@ export function FormazioneRosaSection({
       )
     }
     return null
+  }
+
+  const getFormaIcon = (forma: FormaData | undefined): React.ReactNode => {
+    if (!forma || forma.giocate < 2) return <Analytics color="info" />
+    if (forma.media !== null && forma.media >= 6.8) return <TrendingUp color="success" />
+    if (forma.media !== null && forma.media >= 6.0) return <TrendingFlat color="warning" />
+    return <TrendingDown color="error" />
+  }
+
+  const getFormaTooltip = (forma: FormaData | undefined): string => {
+    if (!forma || forma.giocate < 2) return 'Statistiche giocatore'
+    if (forma.media !== null && forma.media >= 6.8)
+      return `Forma ottima (media ${forma.media.toFixed(2)})`
+    if (forma.media !== null && forma.media >= 6.0)
+      return `Forma nella norma (media ${forma.media.toFixed(2)})`
+    return `Forma scarsa (media ${forma.media!.toFixed(2)})`
   }
 
   return (
@@ -112,14 +135,14 @@ export function FormazioneRosaSection({
               </Grid>
               <Grid item xs={3} display="flex" justifyContent="flex-end">
                 {renderStatusIcon(player)}
-                <Tooltip title="Statistiche giocatore">
+                <Tooltip title={getFormaTooltip(formaMap.get(player.idGiocatore))}>
                   <IconButton
                     onClick={() => {
                       setIdGiocatoreStat(player.idGiocatore)
                       setOpenModalCalendario(true)
                     }}
                   >
-                    <Analytics color="info" />
+                    {getFormaIcon(formaMap.get(player.idGiocatore))}
                   </IconButton>
                 </Tooltip>
               </Grid>
