@@ -1,3 +1,4 @@
+import { alpha } from '@mui/material/styles'
 import type { Theme } from '@mui/material/styles'
 
 // ==============================|| OVERRIDES - BUTTON ||============================== //
@@ -24,20 +25,20 @@ export default function Button(theme: Theme) {
           ...disabledStyle,
         },
         containedPrimary: {
-          background: 'linear-gradient(135deg, #FF8F00 0%, #FFC107 100%)',
-          color: '#0d0d14',
+          background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+          color: theme.palette.background.default,
           '&:hover': {
-            background: 'linear-gradient(135deg, #FFC107 0%, #FFD54F 100%)',
+            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
           },
         },
         outlined: {
           ...disabledStyle,
         },
         outlinedPrimary: {
-          borderColor: 'rgba(255, 193, 7, 0.5)',
+          borderColor: alpha(theme.palette.primary.main, 0.5),
           '&:hover': {
-            borderColor: '#FFC107',
-            backgroundColor: 'rgba(255, 193, 7, 0.08)',
+            borderColor: theme.palette.primary.main,
+            backgroundColor: theme.palette.action.hover,
           },
         },
       },

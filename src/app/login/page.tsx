@@ -1,11 +1,15 @@
+'use client'
 import { LoginForm } from './form'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
 import { SportsSoccer } from '@mui/icons-material'
 import { Suspense } from 'react'
+import { alpha, useTheme } from '@mui/material/styles'
 
 export default function LoginPage() {
+  const theme = useTheme()
+
   return (
     <Box
       sx={{
@@ -13,7 +17,8 @@ export default function LoginPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'radial-gradient(ellipse at 50% 0%, rgba(255,193,7,0.06) 0%, transparent 70%)',
+        background:
+          'radial-gradient(ellipse at 50% 0%, rgba(255,193,7,0.06) 0%, transparent 70%)',
       }}
     >
       <Container maxWidth="xs">
@@ -24,10 +29,11 @@ export default function LoginPage() {
             alignItems: 'center',
             p: { xs: 3, sm: 4 },
             borderRadius: '16px',
-            border: '1px solid rgba(255,193,7,0.18)',
-            background: 'linear-gradient(160deg, rgba(26,18,8,0.95) 0%, rgba(22,22,31,0.98) 100%)',
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
+            background:
+              'linear-gradient(160deg, rgba(26,18,8,0.95) 0%, rgba(22,22,31,0.98) 100%)',
             backdropFilter: 'blur(16px)',
-            boxShadow: '0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,193,7,0.06)',
+            boxShadow: `0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px ${alpha(theme.palette.primary.main, 0.06)}`,
           }}
         >
           {/* Logo */}
@@ -36,15 +42,15 @@ export default function LoginPage() {
               width: 56,
               height: 56,
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #FF8F00 0%, #FFC107 100%)',
+              background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               mb: 2,
-              boxShadow: '0 4px 16px rgba(255,193,7,0.25)',
+              boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.25)}`,
             }}
           >
-            <SportsSoccer sx={{ color: '#0d0d14', fontSize: '1.75rem' }} />
+            <SportsSoccer sx={{ color: theme.palette.background.default, fontSize: '1.75rem' }} />
           </Box>
 
           <Typography
@@ -52,7 +58,7 @@ export default function LoginPage() {
             sx={{
               fontSize: '1.5rem',
               fontWeight: 700,
-              background: 'linear-gradient(135deg, #FF8F00 0%, #FFD54F 100%)',
+              background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.light} 100%)`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               mb: 0.5,
@@ -76,4 +82,3 @@ export default function LoginPage() {
     </Box>
   )
 }
-

@@ -23,20 +23,20 @@ Componente card generico con header, content e actions completamente configurabi
 
 ```typescript
 interface GenericCardProps {
-  title?: React.ReactNode              // Titolo
-  subtitle?: React.ReactNode           // Sottotitolo
-  avatar?: React.ReactNode             // Avatar o icona
-  headerAction?: React.ReactNode       // Azioni nell'header
-  children: React.ReactNode            // Contenuto
-  actions?: React.ReactNode            // Azioni nel footer
-  maxWidth?: string | number           // Larghezza massima
-  elevation?: number                   // Elevazione (default: 1)
-  withPaper?: boolean                  // Wrap in Paper
-  clickable?: boolean                  // Card cliccabile
-  onClick?: () => void                 // Handler click
-  showHeaderDivider?: boolean          // Divisore dopo header
-  showActionsDivider?: boolean         // Divisore prima azioni
-  titleVariant?: TypographyVariant     // Variante titolo
+  title?: React.ReactNode // Titolo
+  subtitle?: React.ReactNode // Sottotitolo
+  avatar?: React.ReactNode // Avatar o icona
+  headerAction?: React.ReactNode // Azioni nell'header
+  children: React.ReactNode // Contenuto
+  actions?: React.ReactNode // Azioni nel footer
+  maxWidth?: string | number // Larghezza massima
+  elevation?: number // Elevazione (default: 1)
+  withPaper?: boolean // Wrap in Paper
+  clickable?: boolean // Card cliccabile
+  onClick?: () => void // Handler click
+  showHeaderDivider?: boolean // Divisore dopo header
+  showActionsDivider?: boolean // Divisore prima azioni
+  titleVariant?: TypographyVariant // Variante titolo
   // ... altre props
 }
 ```
@@ -47,8 +47,7 @@ interface GenericCardProps {
 
 ```tsx
 import { GenericCard } from '~/components/cards'
-
-<GenericCard title="Titolo Card" subtitle="Sottotitolo">
+;<GenericCard title="Titolo Card" subtitle="Sottotitolo">
   <Typography>Contenuto della card</Typography>
 </GenericCard>
 ```
@@ -58,8 +57,7 @@ import { GenericCard } from '~/components/cards'
 ```tsx
 import { GenericCard } from '~/components/cards'
 import { Avatar, Button } from '@mui/material'
-
-<GenericCard
+;<GenericCard
   title="Profilo Utente"
   subtitle="Utente attivo"
   avatar={<Avatar src="/avatar.jpg" alt="User" />}
@@ -81,8 +79,7 @@ import { Avatar, Button } from '@mui/material'
 
 ```tsx
 import { useNavigate } from 'next/navigation'
-
-<GenericCard
+;<GenericCard
   title="Clicca per dettagli"
   subtitle="Card interattiva"
   clickable
@@ -114,12 +111,7 @@ import { useNavigate } from 'next/navigation'
 ##### Card con Paper Wrapper
 
 ```tsx
-<GenericCard
-  title="Card con Paper"
-  withPaper
-  elevation={3}
-  maxWidth={600}
->
+<GenericCard title="Card con Paper" withPaper elevation={3} maxWidth={600}>
   <Typography>Contenuto wrappato in Paper</Typography>
 </GenericCard>
 ```
@@ -157,14 +149,14 @@ Card specializzata per form e azioni con gestione messaggi integrata.
 
 ```typescript
 interface CardWithActionsProps extends GenericCardProps {
-  successMessage?: string              // Messaggio successo
-  errorMessage?: string                // Messaggio errore
-  loading?: boolean                    // Stato loading
-  onSubmit?: (event) => void          // Handler submit form
-  asForm?: boolean                     // Render come form
+  successMessage?: string // Messaggio successo
+  errorMessage?: string // Messaggio errore
+  loading?: boolean // Stato loading
+  onSubmit?: (event) => void // Handler submit form
+  asForm?: boolean // Render come form
   actionsDirection?: 'row' | 'column' // Direzione azioni
-  actionsJustify?: JustifyContent     // Allineamento azioni
-  actionsSpacing?: number             // Spaziatura azioni
+  actionsJustify?: JustifyContent // Allineamento azioni
+  actionsSpacing?: number // Spaziatura azioni
 }
 ```
 
@@ -252,8 +244,12 @@ function EditUserForm() {
   actionsSpacing={2}
   actions={
     <>
-      <Button variant="contained" fullWidth>Azione 1</Button>
-      <Button variant="outlined" fullWidth>Azione 2</Button>
+      <Button variant="contained" fullWidth>
+        Azione 1
+      </Button>
+      <Button variant="outlined" fullWidth>
+        Azione 2
+      </Button>
       <Button fullWidth>Azione 3</Button>
     </>
   }

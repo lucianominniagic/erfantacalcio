@@ -12,7 +12,9 @@ export default function PageHeader({ title, subtitle, Icon }: PageHeaderProps) {
   const theme = useTheme()
   const isDark = theme.palette.mode === 'dark'
 
-  const textColor = isDark ? theme.palette.primary.light : theme.palette.common.white
+  const textColor = isDark
+    ? theme.palette.primary.light
+    : theme.palette.common.white
   const subtitleColor = alpha(textColor, isDark ? 0.75 : 0.85)
   const background = isDark
     ? `linear-gradient(135deg, ${darken(theme.palette.primary.main, 0.65)} 0%, ${darken(theme.palette.primary.main, 0.4)} 100%)`
@@ -31,9 +33,7 @@ export default function PageHeader({ title, subtitle, Icon }: PageHeaderProps) {
         gap: 1.5,
       }}
     >
-      {Icon && (
-        <Icon sx={{ color: textColor, fontSize: '1.4rem' }} />
-      )}
+      {Icon && <Icon sx={{ color: textColor, fontSize: '1.4rem' }} />}
       <Box>
         <Typography
           variant="h5"

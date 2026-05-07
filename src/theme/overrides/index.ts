@@ -34,7 +34,7 @@ export default function ComponentsOverrides(theme: Theme) {
     Autocomplete(theme),
     Button(theme),
     Badge(theme),
-    Card(),
+    Card(theme),
     CardHeader(theme),
     CardContent(),
     Checkbox(theme),

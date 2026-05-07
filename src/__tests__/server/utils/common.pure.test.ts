@@ -42,9 +42,12 @@ describe('getBonusModulo', () => {
     ['5-3-2', 0.5],
     ['4-5-1', 1],
     ['5-4-1', 1.5],
-  ])('returns the correct bonus for modulo %s when bonusModulo is enabled', (modulo, expected) => {
-    expect(getBonusModulo(modulo)).toBe(expected)
-  })
+  ])(
+    'returns the correct bonus for modulo %s when bonusModulo is enabled',
+    (modulo, expected) => {
+      expect(getBonusModulo(modulo)).toBe(expected)
+    },
+  )
 
   it('returns 0 for an unknown modulo', () => {
     expect(getBonusModulo('1-2-3')).toBe(0)

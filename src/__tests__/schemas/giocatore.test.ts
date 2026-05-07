@@ -31,7 +31,9 @@ describe('giocatoreSchema', () => {
   })
 
   it('rejects a non-numeric idGiocatore', () => {
-    expect(() => giocatoreSchema.parse({ ...valid, idGiocatore: 'abc' })).toThrow()
+    expect(() =>
+      giocatoreSchema.parse({ ...valid, idGiocatore: 'abc' }),
+    ).toThrow()
   })
 })
 
@@ -133,6 +135,8 @@ describe('uploadVotoGiocatoreSchema', () => {
   })
 
   it('rejects a non-string Nome', () => {
-    expect(() => uploadVotoGiocatoreSchema.parse({ ...valid, Nome: 123 })).toThrow()
+    expect(() =>
+      uploadVotoGiocatoreSchema.parse({ ...valid, Nome: 123 }),
+    ).toThrow()
   })
 })

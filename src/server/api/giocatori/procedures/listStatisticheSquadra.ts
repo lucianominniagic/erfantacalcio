@@ -37,13 +37,13 @@ export const listStatisticheSquadra = publicProcedure
 
       return stat.map((player) => ({
         ...toClientPlayer(player),
-        gol: player.ruolo === 'P'
-          ? -Number(player.golsubiti)
-          : Number(player.golfatti),
+        gol:
+          player.ruolo === 'P'
+            ? -Number(player.golsubiti)
+            : Number(player.golfatti),
       }))
     } catch (error) {
       console.error('Si è verificato un errore', error)
       throw error
     }
   })
-

@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from 'zod'
 
 export const messageSchema = z.object({
   isError: z.boolean().default(false),

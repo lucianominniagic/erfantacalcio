@@ -13,6 +13,7 @@
 ### File più grandi / più critici
 
 **Pagine (`src/app/`)**
+
 - `app/(admin)/giocatori/page.tsx` — **897 righe** ⚠️
 - `app/(admin)/voti/page.tsx` — 515
 - `app/(admin)/calendario/page.tsx` — 452
@@ -21,6 +22,7 @@
 - `app/(admin)/uploadVoti/page.tsx` — 305
 
 **Componenti (`src/components/`)**
+
 - `selectColors/shirtSVG.tsx` — 879 ⚠️
 - `cardPartite/ViewTabellini.tsx` — 531
 - `cardPartite/ViewFormazioni.tsx` — 445
@@ -31,6 +33,7 @@
 - `squadra/useFormazioneState.ts` — 319
 
 **Procedure tRPC (`src/server/api/`)** — 70 procedure totali
+
 - `voti/procedures/processVoti.ts` — 323 ⚠️
 - `partita/procedures/getTabellini.ts` — 275
 - `statisticheSquadre/procedures/riepilogo.ts` — 183
@@ -68,147 +71,187 @@
 
 > Ogni fase ha owner consigliato (sub-agent), file impattati, criteri di completamento.
 
-### FASE 0 — Baseline e safety net
-**Owner:** `dick` + `pasolini`
+### FASE 0 — Baseline e safety net ✅ COMPLETATA
 
-- Verificare che `npm run build`, `npm run lint`, `npm run format -- --check` passino.
-- Configurare Vitest (smoke test) con un primo test sulle pure functions di `src/components/squadra/utils.ts` (`calcolaCodiceFormazione`, `formatModulo`, `allowedFormations`, `sortPlayersBy*`).
-- Documentare in `docs/TESTING.md` come scrivere/runnare test.
+**Owner:** `dick` + `pasolini`
+**Branch:** `refactor/fase-0` | **Commits:** `d89877c`, `9eecc6d`
+
+- ✅ `npm run build` — PASS
+- ✅ `npm run format -- --check` — PASS (285 file formattati)
+- ✅ `npm run lint` — funzionante; 360 problemi pre-esistenti documentati come baseline per FASE 1
+  - Fix: `next lint` rimosso in Next.js 16 → script aggiornato a `eslint .`
+  - Fix: `eslint.config.js` → `eslint.config.mjs` (ESM flat config)
+  - Fix: `eslint-config-next` → `@next/eslint-plugin-next` (flatConfig API)
+  - Fix: installato `typescript-eslint` (mancante da devDeps)
+  - 133 problemi auto-fixati con `eslint --fix`
+- ✅ Vitest v2.1.9 configurato — 25 test verdi su `src/components/squadra/utils.ts`
+  - 3 bug documentati nei test (non fixati): `formatModulo`, `sortPlayersByRoleDescThenRiserva`, `checkDataFormazione`
+- ✅ `docs/TESTING.md` creato con guida completa
 
 **Done quando:** `npm test` runna almeno 1 file con N test verdi; CI baseline documentata.
 
 ---
 
-### FASE 1 — Fondamenta tipi & config
+### FASE 1 — Fondamenta tipi & config ✅ COMPLETATA
+
 **Owner:** `ishiguro` (lead) + `mccarthy`
+**Branch:** `refactor/fase-1` | **Commits:** `af767ee`, `37ad700`
+**Review:** 2 problemi trovati e fixati (commit `37ad700`)
 
 Obiettivo: ridurre cast/any e centralizzare config.
 
-1. **`src/config.ts`** → spezzare in moduli (`config/bonus.ts`, `config/pf.ts`, `config/dates.ts`, `config/urls.ts`); validare ogni gruppo con Zod; rimuovere parsing inline.
-2. **Tipi da Zod**: per ogni schema in `src/schemas/**`, esportare `z.infer` e usarlo lato client al posto dei tipi manuali in `src/types/`.
-3. **Eliminare `any`** in `src/components/squadra/utils.ts` (`getOpponent`, `getMatch`) — tipare con `Partita`/`GiocatoreFormazione`.
-4. **Sostituire `JSON.parse(...) as X`** con parsing tipato Zod (`schema.parse(JSON.parse(...))`).
+1. ✅ **`src/config.ts`** → spezzato in 5 moduli (`config/bonus.ts`, `config/pf.ts`, `config/dates.ts`, `config/urls.ts`, `config/season.ts`) con schema Zod per gruppo; 2 bug fix al parsing env (Date invalide, Number con virgola).
+2. ✅ **Tipi da Zod**: `iVotoGiocatore` convertito a `z.infer`; altri 2 skippati (shape divergente, documentati).
+3. ✅ **Eliminare `any`** in `src/components/squadra/utils.ts` — `getOpponent`/`getMatch` tipati con `z.infer<giornataSchema>` e `Pick<GiocatoreType>`; `as ShirtTemplate` sostituito con `toShirtTemplate()` type-safe in 4 file.
+4. ✅ **Sostituire `JSON.parse(...) as X`** — nuovo `src/schemas/maglia/index.ts` con `parseMaglia()` safe; 4 file aggiornati.
+5. ✅ **Review fix**: `interface magliaType` duplicata rimossa da `selectColors/index.tsx`, ora re-esporta `MagliaType` da `~/schemas/maglia`; `toShirtTemplate()` ora logga `console.warn` su valori non riconosciuti.
 
 **Done quando:** `tsc --noEmit` zero errori, ricerca `as any` ridotta del 80%.
 
 ---
 
-### FASE 2 — Auth & route group hardening
-**Owner:** `gibson`
+### FASE 2 — Auth & route group hardening ✅ COMPLETATA
 
-1. Creare `src/app/(admin)/layout.tsx` con server-side guard (`auth()` → redirect se `!adminLevel`).
-2. Creare `src/app/(user)/layout.tsx` con server-side guard (`auth()` → redirect se non autenticato).
-3. Audit di ogni pagina admin/user per rimuovere check duplicati ora coperti dal layout.
-4. Verifica `Utente.pwd varchar(50)`: confermare che MD5 è una scelta consapevole o pianificare migrazione a bcrypt (richiede migration + reset password flow).
+**Owner:** `gibson` + `dostojevskij`
+**Branch:** `refactor/fase-2` | **Commits:** 5 atomici
+
+1. ✅ `src/app/(admin)/layout.tsx` — Server Component guard: `!session || !session.user || session.user.ruolo !== 'admin'` → `redirect('/login')`
+2. ✅ `src/app/(user)/layout.tsx` — Server Component guard: `!session` → `redirect('/login')`
+3. ✅ Audit pagine — nessun check manuale ridondante trovato nelle 18 pagine `(admin)`/`(user)`
+4. ✅ **Bcrypt lazy migration** (decisione presa: bcrypt con lazy migration):
+   - `hashPassword.ts`: `hashPassword()` bcrypt + `verifyPassword()` auto-detect MD5/bcrypt + `hashMD5()` legacy
+   - `auth.config.ts`: al login MD5 match → re-hash bcrypt → aggiorna DB best-effort
+   - `changePassword.ts`: nuove password sempre bcrypt
+   - 14 test verdi
+5. ✅ `docs/ADR/001-password-hashing.md` — decisione documentata
+6. ✅ `Utente.pwd` varchar(50) → varchar(100); migration `AlterUtentePwdLength` generata (applicare al prossimo deploy)
+
+**Nota:** pattern corretto per guard: `!session || !session.user || session.user.ruolo !== 'admin'`
+**Deploy:** eseguire `npm run migration:run:prod` prima di deployare in produzione.
 
 **Done quando:** un utente non admin che apre `/giocatori` viene redirectato lato server; nessun flicker client-side.
 
 ---
 
-### FASE 3 — Service layer backend (procedure grandi)
-**Owner:** `mccarthy` + `dick` (test caratterizzanti prima)
+### FASE 3 — Service layer backend (procedure grandi) ✅ COMPLETATA
 
-Target principali (in ordine):
+**Owner:** `mccarthy` + `dick`
+**Branch:** `refactor/fase-3` | **Commits:** 4 atomici (mccarthy) + test caratterizzanti (dick)
+**Review:** ✅ Zero problemi — logica identica verificata line-by-line
 
-1. **`voti/procedures/processVoti.ts` (323 righe)**
-   - Test caratterizzanti: input/output reali su giornata storica.
-   - Estrarre in `src/server/services/votiService.ts`: `parseVotiCsv`, `applicaModificatori`, `calcolaBonusModulo`, `calcolaFantapunti`.
-   - Procedure resta solo orchestrazione + persistence.
-2. **`partita/procedures/getTabellini.ts` (275 righe)** → `tabelliniService.ts` con mapper puri.
-3. **`statisticheSquadre/procedures/riepilogo.ts` (183 righe)** → `statisticheService.ts`.
-4. **`formazione/procedures/{create,confirmPrecedente}.ts`** → estrarre `formazioneService.ts` con `cloneFormazione`, `validateFormazione`, mail templating in `service/mailTemplates.ts`.
+- ✅ **332 test caratterizzanti** scritti da dick prima del refactor (18+51+64+46+74+74)
+- ✅ **5 service creati** in `src/server/services/`:
+  1. `votiService.ts` — `calcBonusVoto()`: -20 righe da `processVoti.ts`
+  2. `tabelliniService.ts` — `mapVotoToTabellinoEntry()`: -60 righe da `getTabellini.ts` + ottimizzazione 3 `.find()` → 1
+  3. `statisticheService.ts` — `initStats()`, `accumulate()`, `round2()`: -100 righe da `riepilogo.ts`
+  4. `formazioneService.ts` — `buildFormazioneInsertData()`, `buildVotiInsertData()`: condiviso tra `create` + `confirmPrecedente`
+  5. `mailTemplates.ts` — 3 template HTML estratti: -60 righe inline
+- ✅ 332/332 test verdi post-refactor
+- ✅ Build TypeScript zero errori
+- ✅ Tutti i service sono pure functions (zero `ctx` tRPC, zero TypeORM diretto)
 
 **Done quando:** ogni procedure target sotto le ~80 righe, logica pura testata.
 
 ---
 
-### FASE 4 — Componenti grandi: split & extract hook
-**Owner:** `coe` + `asimov` (per token tema)
+### FASE 4 — Componenti grandi: split & extract hook ✅ COMPLETATA
 
-Per ciascun componente >300 righe:
+**Owner:** `coe` + `asimov`
+**Branch:** `refactor/fase-4` | **Commits:** 6 atomici (coe) + token tema (asimov) + review fix
+**Review:** 1 bug critico trovato e fixato — `TottenhamShirt` mancante dal `TEMPLATE_MAP` (commit `ebaa5e3`)
 
-1. **`selectColors/shirtSVG.tsx` (879 righe)** — è probabilmente un asset SVG: valutare estrazione in file `.svg` + import oppure split per template.
-2. **`cardPartite/ViewTabellini.tsx` (531)** — split: header / lista voti / footer; estrarre mapper in hook `useTabellinoView`.
-3. **`cardPartite/ViewFormazioni.tsx` (445)** — analogo.
-4. **`sidebar/Sidebar.tsx` (389)** — estrarre menu items in config + sub-components.
-5. **`giocatori/Giocatore.tsx` (384)** — separare profile/stats/storico in tab components.
-6. **`selectColors/index.tsx` (351)** — split form/preview/persist.
-7. **`squadra/Formazione.tsx` (340)** + **`useFormazioneState.ts` (319)** — già hook-driven, ma il file hook è grande: spezzare in `useFormazioneData`, `useFormazioneActions`, `useFormazionePrecedente`.
+| Componente | Prima | Dopo | Sub-componenti |
+|---|---|---|---|
+| `shirtSVG.tsx` | 934 | 85 | 4 file template (basic/pattern/gradient) + `TEMPLATE_MAP` |
+| `ViewTabellini.tsx` | 538 | 116 | `TabellinoCard`, `TabellinoVotiList`, `tabellinoHelpers` |
+| `ViewFormazioni.tsx` | 459 | 138 | `FormazioneSquadra` |
+| `Sidebar.tsx` | 501 | 243 | `SidebarNavItem`, `SidebarSection`, `sidebarConfig` |
+| `Giocatore.tsx` | 384 | 63 | `GiocatoreProfile`, `GiocatoreStats`, `GiocatoreStorico` |
+| `selectColors/index.tsx` | 356 | 234 | `useShirtSelector` hook |
+| `useFormazioneState.ts` | 330 | 75 | `useFormazioneData`, `useFormazioneActions`, `useFormazionePrecedente` |
+| `Formazione.tsx` | 382 | 255 | `FormazioneRosaSection`, `FormazioneDisabilitata` |
+
+**asimov:** `palette.ruolo` token semantici (P/D/C/A) + `mui.d.ts` augmentato + `docs/DESIGN_SYSTEM.md` (340 righe, base per FASE 6)
 
 **Output target:** nessun file UI > ~250 righe.
 
 ---
 
-### FASE 5 — Pagine admin pesanti
-**Owner:** `coe` (con `mccarthy` per procedure se servono)
+### FASE 5 — Pagine admin pesanti ✅ COMPLETATA
 
-1. **`(admin)/giocatori/page.tsx` (897 righe)** ⚠️ — split in:
-   - `GiocatoriTable.tsx` (data grid)
-   - `GiocatoreFormModal.tsx` (form crea/modifica)
-   - `GiocatoriFilters.tsx`
-   - `useGiocatoriAdmin.ts` (data fetching + mutations)
-2. **`(admin)/voti/page.tsx` (515)** — split form upload / lista / preview.
-3. **`(admin)/calendario/page.tsx` (452)** — già parzialmente modulare; estrarre `CalendarioForm.tsx` modale.
-4. **`(admin)/presidenti/page.tsx` (353)** — split tabella / form.
-5. **`(admin)/uploadVoti/page.tsx` (305)** — estrarre logica parsing in service condiviso con processVoti.
+**Owner:** `coe`
+**Branch:** `refactor/fase-5` | **Commits:** 5 atomici (`61842dc`, `1456618`, `9add224`, `7583057`, `54ebb97`)
 
-**Output target:** nessuna pagina > ~200 righe (solo composizione).
+| Pagina | Prima | Dopo | Sub-componenti |
+|---|---|---|---|
+| `giocatori/page.tsx` | 897 | 99 | `GiocatoriTable`, `GiocatoreFormModal`, `GiocatoriFilters`, `useGiocatoriAdmin` |
+| `voti/page.tsx` | 515 | 56 | `VotiUploadForm`, `VotiList`, `useVotiAdmin` |
+| `calendario/page.tsx` | 452 | 149 | `CalendarioForm`, `useCalendarioAdmin` |
+| `presidenti/page.tsx` | 353 | 39 | `PresidentiTable`, `PresidenteFormModal` |
+| `uploadVoti/page.tsx` | 305 | 54 | logica parsing in service condiviso |
+
+**Output target:** nessuna pagina > ~200 righe (solo composizione). ✅
 
 ---
 
-### FASE 6 — Theme & styling consistency
+### FASE 6 — Theme & styling consistency ✅ COMPLETATA
+
 **Owner:** `asimov`
+**Branch:** `refactor/fase-6` | **Commits:** 4 atomici (`4ccde95`, `eba5000`, `d05694e`, `86872d5`)
 
-1. Audit `sx={{ ... }}` ricorrenti: spostare in `theme/overrides/` o creare componenti `Styled*`.
-2. Audit colori hardcoded (es. `#1a1a2e`, `#E65100`): consolidare in `palette` semantica.
-3. Verificare contrast ratio light/dark.
-4. Documentare design tokens in `docs/DESIGN_SYSTEM.md`.
+1. ✅ **Overrides tokenizzati** — `Button`, `Card`, `CardHeader`, `DataGrid`, `TableHead`: tutti i colori hex sostituiti con token palette (`primary.*`, `divider`, `alpha()`, `darken()`)
+2. ✅ **Colori hardcoded in app/ e components/** — `login/page.tsx`, `foto/page.tsx`, `documenti/page.tsx`, `HeadToHeadMatrix.tsx`, `Sidebar.tsx` bonificati
+3. ✅ **`palette.ruolo` adottato ovunque** — `tabellinoHelpers.tsx` (bug fix: C usava `action.hover`!), `Rosa.tsx` migrati a `theme.palette.ruolo[ruolo]`
+4. ✅ **`docs/DESIGN_SYSTEM.md`** aggiornato: stato "FASE 6", sezione 9 chiusa, tabella colori residui intenzionali documentata
 
-**Done quando:** ricerca grep `sx={{` ridotta significativamente; nessun colore hex sparso fuori da `theme/`.
+**Colori residui intenzionali (non toccati):** `theme/index.ts` + `lightTheme.ts` (fonte verità), colori maglietta in `useShirtSelector`, fallback maglia in `Squadra.tsx`.
 
----
-
-### FASE 7 — Entità & DB hygiene
-**Owner:** `dostojevskij`
-
-1. **`Utente`**: rinominare `Campionato`/`Champions`/`Secondo`/`Terzo` in camelCase (campionato, champions, secondo, terzo) → migrazione TypeORM con rename column.
-2. **`Voto`**: chiarire `Formazione?: Relation<Formazione | null>`; rimuovere duplicazione tra FK e relations.
-3. **`Partita.SquadraHome/Away`** che puntano a `Utente`: rinominare relazioni (`UtenteHome/Away`) o creare entità `Squadra` separata se semanticamente diversa (decisione architetturale, vedi nota in calce).
-4. Verifica indici su FK frequenti (`idPartita`, `idCalendario`, `idSquadra`).
-
-**Done quando:** migration generata, `npm run migration:show:local` clean, build verde.
+**Done quando:** ricerca grep `sx={{` ridotta significativamente; nessun colore hex sparso fuori da `theme/`. ✅
 
 ---
 
-### FASE 8 — Testing coverage
-**Owner:** `dick` (in parallelo alle fasi 3-5 dove possibile)
+### FASE 7 — Testing coverage ✅ COMPLETATA
 
-Aree critiche prioritarie:
-1. **Calcolo fantapunti** (`votiService` post fase 3) — test su giornata storica.
-2. **Logica formazione** (`utils.ts`, `formazioneService`) — moduli ammessi, calcolo codice formazione.
-3. **`confirmPrecedente`** — clone + esistenza + giornate correnti.
-4. **Schemi Zod** — happy path + edge case (date invalide, formazioni incomplete).
+**Owner:** `dick`
+**Branch:** `refactor/fase-7` | **Commits:** 1 atomico (dick) + 1 review fix (`373b23c`)
+**Review:** 1 bug critico trovato e fixato — `sortPlayersByRoleDescThenRiserva` mutava oggetti nella cache TanStack Query
 
-**Target:** coverage >40% sulle aree business-critical (non vincolante per PR).
+| Area | Test | File |
+|---|---|---|
+| `votiService` — calcolo fantapunti | 10 | `votiService.test.ts` |
+| `formazioneService` — builder | 13 | `formazioneService.test.ts` |
+| `statisticheService` — aggregazione | 19 | `statisticheService.test.ts` |
+| `tabelliniService` — mapping | 7 | `tabelliniService.test.ts` |
+| `schemas/maglia` — Zod validation | 15 | `maglia/index.test.ts` |
+| `schemas/calendario` — Zod validation | 15 | `calendario/index.test.ts` |
+| `utils.ts` — 3 bug fix TDD | 26 | `utils.test.ts` |
+| **Totale** | **413** | **7 file** |
+
+**Bug fixati via TDD:** `formatModulo` (split('-')), `sortPlayersByRoleDescThenRiserva` (P>D>C>A + no mutation), `checkDataFormazione` (timezone-safe).
+
+**Target:** coverage >40% sulle aree business-critical. ✅
 
 ---
 
-### FASE 9 — Documentazione & DX
+### FASE 8 — Documentazione & DX ✅ COMPLETATA
+
 **Owner:** Murakami (orchestrazione) + tutti
+**Branch:** `refactor/fase-8` | **Commits:** 4 atomici + 1 review fix (`34550a3`)
+**Review:** 2 errori fattuali trovati e fixati — path `auth.ts` → `auth.config.ts`, token `custom.*` inesistenti → `champions` + `ruolo.{P,D,C,A}`
 
-1. `CONTEXT.md` (root) con glossario domain (giornata, partita, formazione, voto, ...).
-2. `docs/ARCHITECTURE.md` con diagramma flussi (request flow, scoring flow).
-3. ADR (`docs/adr/`) per decisioni storiche (MD5, MUI, NamingStrategy, JWT only).
-4. Aggiornare `README.md` con sezione "How to contribute".
+1. ✅ `CONTEXT.md` — glossario 13 termini di dominio, stack, struttura directory, request flow, ruoli utente
+2. ✅ `docs/ARCHITECTURE.md` — diagrammi ASCII request flow + scoring flow, tutti i router tRPC documentati, auth flow, service layer
+3. ✅ `docs/ADR/002-trpc-tanstack-query.md` — tRPC vs REST/GraphQL
+4. ✅ `docs/ADR/003-typeorm-active-record.md` — TypeORM Active Record vs Prisma/DataMapper
+5. ✅ `docs/ADR/004-mui-v5-theme.md` — MUI v5 vs Tailwind/shadcn
+6. ✅ `README.md` — sezione "How to contribute" con setup locale, workflow branch, checklist pre-PR
 
 ---
 
 ## Decisioni aperte (da concordare con Luciano)
 
-- [ ] **Password hashing**: tenere MD5 o migrare a bcrypt? (impatta fase 2 e fase 7)
-- [ ] **Entità Squadra separata**: oggi `Partita` punta a `Utente` per home/away. Estraiamo `Squadra`? (impatta fase 7, refactor pesante)
-- [ ] **Branch strategy**: una PR per fase o sotto-PR per file?
-- [ ] **Ordine reale di esecuzione**: l'ordine attuale è "rischio crescente". Si può anticipare la fase 5 (giocatori 897 righe) se urgente.
+- [x] **Password hashing**: ✅ Migrazione a bcrypt con lazy migration (FASE 2). `docs/ADR/001-password-hashing.md`.
+- [x] **Branch strategy**: ✅ Una branch per fase (`refactor/fase-N`)
 
 ---
 

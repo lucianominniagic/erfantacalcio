@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { computeMD5Hash } from '~/utils/hashPassword'
+import { verifyPassword, hashPassword } from '~/utils/hashPassword'
 import { protectedProcedure } from '~/server/api/trpc'
 import { Utenti } from '~/server/db/entities'
 
@@ -19,13 +19,14 @@ export const changePasswordProcedure = protectedProcedure
       })
       if (!user) throw new Error('Utente non trovato')
 
-      const oldPasswordHash = computeMD5Hash(opts.input.oldPassword)
-      if (oldPasswordHash !== user.pwd)
+      const oldPasswordMatch = await verifyPassword(opts.input.oldPassword, user.pwd)
+      if (!oldPasswordMatch)
         throw new Error('La vecchia password non è corretta')
 
+      // Nuove password salvate sempre come bcrypt.
       await Utenti.update(
         { idUtente: opts.input.id },
-        { pwd: computeMD5Hash(opts.input.newPassword) },
+        { pwd: await hashPassword(opts.input.newPassword) },
       )
     } catch (error) {
       console.error('Si è verificato un errore', error)

@@ -39,7 +39,7 @@ export const upsertTrasferimentoProcedure = adminProcedure
         const isExists = await trx.exists(Trasferimenti, {
           where: { idTrasferimento: opts.input.idTrasferimento },
         })
-        
+
         if (isExists) {
           await trx.update(
             Trasferimenti,

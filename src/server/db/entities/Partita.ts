@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, type Relation, BaseEntity } from 'typeorm'
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  type Relation,
+  BaseEntity,
+} from 'typeorm'
 import { Formazione } from './Formazione'
 import { Calendario } from './Calendario'
 import { Utente } from './Utente'
@@ -35,10 +44,22 @@ export class Partita extends BaseEntity {
   @Column({ name: 'has_multa_away', type: 'boolean', default: false })
   hasMultaA!: boolean
 
-  @Column({ name: 'punteggio_home', type: 'decimal', precision: 9, scale: 2, nullable: true })
+  @Column({
+    name: 'punteggio_home',
+    type: 'decimal',
+    precision: 9,
+    scale: 2,
+    nullable: true,
+  })
   punteggioH!: number | null
 
-  @Column({ name: 'punteggio_away', type: 'decimal', precision: 9, scale: 2, nullable: true })
+  @Column({
+    name: 'punteggio_away',
+    type: 'decimal',
+    precision: 9,
+    scale: 2,
+    nullable: true,
+  })
   punteggioA!: number | null
 
   @Column({ name: 'fattore_casalingo', type: 'boolean', default: false })
@@ -47,15 +68,33 @@ export class Partita extends BaseEntity {
   @OneToMany(() => Formazione, (f: Formazione) => f.Partita)
   Formazioni!: Relation<Formazione[]>
 
-  @ManyToOne(() => Calendario, (c: Calendario) => c.Partite, { onUpdate: 'NO ACTION', onDelete: 'RESTRICT' })
-  @JoinColumn({ name: 'id_calendario', foreignKeyConstraintName: 'FK_Partite_Calendario' })
+  @ManyToOne(() => Calendario, (c: Calendario) => c.Partite, {
+    onUpdate: 'NO ACTION',
+    onDelete: 'RESTRICT',
+  })
+  @JoinColumn({
+    name: 'id_calendario',
+    foreignKeyConstraintName: 'FK_Partite_Calendario',
+  })
   Calendario!: Relation<Calendario>
 
-  @ManyToOne(() => Utente, (u: Utente) => u.PartiteHome, { onUpdate: 'NO ACTION', onDelete: 'NO ACTION' })
-  @JoinColumn({ name: 'id_squadra_home', foreignKeyConstraintName: 'FK_Partite_SquadreCasa' })
+  @ManyToOne(() => Utente, (u: Utente) => u.PartiteHome, {
+    onUpdate: 'NO ACTION',
+    onDelete: 'NO ACTION',
+  })
+  @JoinColumn({
+    name: 'id_squadra_home',
+    foreignKeyConstraintName: 'FK_Partite_SquadreCasa',
+  })
   SquadraHome!: Relation<Utente | null>
 
-  @ManyToOne(() => Utente, (u: Utente) => u.PartiteAway, { onUpdate: 'NO ACTION', onDelete: 'NO ACTION' })
-  @JoinColumn({ name: 'id_squadra_away', foreignKeyConstraintName: 'FK_Partite_SquadreTrasferta' })
+  @ManyToOne(() => Utente, (u: Utente) => u.PartiteAway, {
+    onUpdate: 'NO ACTION',
+    onDelete: 'NO ACTION',
+  })
+  @JoinColumn({
+    name: 'id_squadra_away',
+    foreignKeyConstraintName: 'FK_Partite_SquadreTrasferta',
+  })
   SquadraAway!: Relation<Utente | null>
 }

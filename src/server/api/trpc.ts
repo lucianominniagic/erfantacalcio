@@ -38,7 +38,10 @@ interface CreateContextOptions {
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
-const createInnerTRPCContext = ({ session, dataSource }: CreateContextOptions & { dataSource?: unknown }) => {
+const createInnerTRPCContext = ({
+  session,
+  dataSource,
+}: CreateContextOptions & { dataSource?: unknown }) => {
   return {
     session,
     dataSource,
@@ -54,7 +57,7 @@ const createInnerTRPCContext = ({ session, dataSource }: CreateContextOptions & 
 export const createTRPCContext = async (opts?: FetchCreateContextFnOptions) => {
   const session = await auth()
   const datasource = await initializeDBConnection()
-  
+
   return createInnerTRPCContext({
     session,
     dataSource: datasource,
@@ -127,7 +130,7 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
 })
 
 export const adminProcedure = t.procedure.use(({ ctx, next }) => {
-  if (!ctx?.session?.user || ctx.session.user.ruolo !== RuoloUtente.admin) {
+  if (ctx?.session?.user?.ruolo !== RuoloUtente.admin) {
     throw new TRPCError({ code: 'UNAUTHORIZED' })
   }
   return next({

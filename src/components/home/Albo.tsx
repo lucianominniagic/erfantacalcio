@@ -1,5 +1,12 @@
 'use client'
-import { Box, Card, CardContent, Skeleton, Typography, useTheme } from '@mui/material'
+import {
+  Box,
+  Card,
+  CardContent,
+  Skeleton,
+  Typography,
+  useTheme,
+} from '@mui/material'
 import { EmojiEvents } from '@mui/icons-material'
 import { alpha, darken } from '@mui/material/styles'
 import { api } from '~/utils/api'
@@ -16,7 +23,9 @@ function PodioRow({ icon, name, highlight = false }: PodioRowProps) {
   const theme = useTheme()
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.4 }}>
-      <Typography sx={{ fontSize: '1rem', lineHeight: 1, flexShrink: 0 }}>{icon}</Typography>
+      <Typography sx={{ fontSize: '1rem', lineHeight: 1, flexShrink: 0 }}>
+        {icon}
+      </Typography>
       <Typography
         sx={{
           fontSize: '0.875rem',
@@ -53,7 +62,15 @@ function TrofeoSection({ title, accentColor, children }: TrofeoSectionProps) {
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.75 }}>
-        <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: accentColor, flexShrink: 0 }} />
+        <Box
+          sx={{
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            backgroundColor: accentColor,
+            flexShrink: 0,
+          }}
+        />
         <Typography
           sx={{
             fontSize: '0.65rem',
@@ -93,10 +110,19 @@ export default function Albo() {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
         {alboList.isLoading
           ? Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} variant="rectangular" height={110} sx={{ borderRadius: 2 }} />
+              <Skeleton
+                key={i}
+                variant="rectangular"
+                height={110}
+                sx={{ borderRadius: 2 }}
+              />
             ))
           : (alboList.data ?? []).map((row) => (
-              <Card key={row.id} elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
+              <Card
+                key={row.id}
+                elevation={2}
+                sx={{ borderRadius: 2, overflow: 'hidden' }}
+              >
                 {/* Season header */}
                 <Box
                   sx={{
@@ -110,12 +136,21 @@ export default function Albo() {
                     gap: 1,
                   }}
                 >
-                  <EmojiEvents sx={{ color: isDark ? theme.palette.primary.light : theme.palette.common.white, fontSize: '1.1rem' }} />
+                  <EmojiEvents
+                    sx={{
+                      color: isDark
+                        ? theme.palette.primary.light
+                        : theme.palette.common.white,
+                      fontSize: '1.1rem',
+                    }}
+                  />
                   <Typography
                     sx={{
                       fontWeight: 800,
                       fontSize: '1rem',
-                      color: isDark ? theme.palette.primary.light : theme.palette.common.white,
+                      color: isDark
+                        ? theme.palette.primary.light
+                        : theme.palette.common.white,
                       letterSpacing: '0.04em',
                     }}
                   >
@@ -125,14 +160,26 @@ export default function Albo() {
 
                 {/* Trofei body */}
                 <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
-                  <Box sx={{ display: 'flex', gap: 1.5, flexDirection: { xs: 'column', sm: 'row' } }}>
-                    <TrofeoSection title="Campionato" accentColor={campionatoColor}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      gap: 1.5,
+                      flexDirection: { xs: 'column', sm: 'row' },
+                    }}
+                  >
+                    <TrofeoSection
+                      title="Campionato"
+                      accentColor={campionatoColor}
+                    >
                       <PodioRow icon="🥇" name={row.campionato} highlight />
                       <PodioRow icon="🥈" name={row.secondo} />
                       <PodioRow icon="🥉" name={row.terzo} />
                     </TrofeoSection>
 
-                    <TrofeoSection title="Champions" accentColor={championsColor}>
+                    <TrofeoSection
+                      title="Champions"
+                      accentColor={championsColor}
+                    >
                       <PodioRow icon="🏆" name={row.champions} highlight />
                     </TrofeoSection>
                   </Box>

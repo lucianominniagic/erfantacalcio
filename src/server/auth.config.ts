@@ -1,6 +1,6 @@
 import NextAuth, { type DefaultSession } from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
-import { computeMD5Hash } from '~/utils/hashPassword'
+import { verifyPassword, hashPassword } from '~/utils/hashPassword'
 import { RuoloUtente } from '~/utils/enums'
 import { Utenti } from './db/entities'
 import { initializeDBConnection } from '~/data-source'
@@ -21,15 +21,38 @@ async function authenticate(input: { username: string; password: string }) {
   console.info('authenticate: ' + input.username)
   try {
     await initializeDBConnection()
-    
-    const hashedPassword = computeMD5Hash(input.password)
+
+    // Recupera l'utente per username — confronto password separato
+    // per supportare la lazy migration MD5 → bcrypt.
     const utente = await Utenti.findOne({
-      where: {
-        username: input.username.toLowerCase(),
-        pwd: hashedPassword,
-      },
+      where: { username: input.username.toLowerCase() },
     })
-    console.info('utente trovato: ' + (utente ? utente.presidente : 'null'))
+
+    if (!utente) {
+      console.info('utente non trovato: ' + input.username)
+      return null
+    }
+
+    const passwordMatch = await verifyPassword(input.password, utente.pwd)
+    if (!passwordMatch) {
+      console.info('password errata per: ' + input.username)
+      return null
+    }
+
+    // Lazy migration: se l'hash corrente è MD5 (32 hex uppercase),
+    // lo aggiorna silenziosamente a bcrypt al momento del login.
+    if (/^[0-9A-F]{32}$/.test(utente.pwd)) {
+      try {
+        const bcryptHash = await hashPassword(input.password)
+        await Utenti.update({ idUtente: utente.idUtente }, { pwd: bcryptHash })
+        console.info('lazy migration MD5→bcrypt completata per: ' + input.username)
+      } catch (migrationError) {
+        // La migrazione è best-effort: un fallimento non blocca il login.
+        console.error('lazy migration fallita per: ' + input.username, migrationError)
+      }
+    }
+
+    console.info('utente autenticato: ' + utente.presidente)
     return utente
   } catch (error) {
     console.error('Si è verificato un errore', error)
@@ -89,11 +112,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         ...session,
         user: {
           ...session.user,
-          id: token.sub as string,
+          id: token.sub!,
           ruolo: token.ruolo as RuoloUtente,
           idSquadra: token.idSquadra as number,
           squadra: token.squadra as string,
-          email: token.email as string,
+          email: token.email!,
           presidente: token.presidente as string,
           image: token.image?.toString(),
         },

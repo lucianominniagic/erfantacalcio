@@ -26,7 +26,9 @@ function MobileTopBar({ onMenuClick }: { onMenuClick: () => void }) {
       position="fixed"
       sx={{
         display: { xs: 'flex', md: 'none' },
-        background: isDark ? `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${darken(theme.palette.primary.dark, 0.85)} 100%)` : theme.palette.background.paper,
+        background: isDark
+          ? `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${darken(theme.palette.primary.dark, 0.85)} 100%)`
+          : theme.palette.background.paper,
         borderBottom: `1px solid ${theme.palette.divider}`,
         boxShadow: `0 2px 8px ${alpha(theme.palette.common.black, isDark ? 0.4 : 0.12)}`,
         zIndex: (t) => t.zIndex.drawer + 1,
@@ -69,7 +71,9 @@ function Footer() {
         py: 0.75,
         px: 2,
         borderTop: `1px solid ${theme.palette.divider}`,
-        background: isDark ? alpha(theme.palette.background.default, 0.95) : theme.palette.background.paper,
+        background: isDark
+          ? alpha(theme.palette.background.default, 0.95)
+          : theme.palette.background.paper,
         backdropFilter: 'blur(8px)',
         display: 'flex',
         justifyContent: 'space-between',
@@ -78,21 +82,35 @@ function Footer() {
         mt: 'auto',
       }}
     >
-      <a href="mailto:lucianominni@gmail.com" style={{ textDecoration: 'none' }}>
+      <a
+        href="mailto:lucianominni@gmail.com"
+        style={{ textDecoration: 'none' }}
+      >
         <Typography
-          sx={{ fontSize: '0.65rem', color: 'primary.main', fontWeight: 500, opacity: 0.7 }}
+          sx={{
+            fontSize: '0.65rem',
+            color: 'primary.main',
+            fontWeight: 500,
+            opacity: 0.7,
+          }}
         >
           Powered by Luciano Minni
         </Typography>
       </a>
-      <Typography sx={{ fontSize: '0.65rem', color: 'text.secondary', opacity: 0.6 }}>
+      <Typography
+        sx={{ fontSize: '0.65rem', color: 'text.secondary', opacity: 0.6 }}
+      >
         Next.js · React · MUI · TypeORM
       </Typography>
     </Box>
   )
 }
 
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
+export default function ClientLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -127,9 +145,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
           <Box sx={{ display: { xs: 'block', md: 'none' }, height: '48px' }} />
 
           <Container maxWidth="lg" sx={{ mt: '8px', mb: '8px', flex: 1 }}>
-              <Breadcrumb />
-              {children}
-            </Container>
+            <Breadcrumb />
+            {children}
+          </Container>
 
           <Footer />
         </Box>
@@ -137,4 +155,3 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     </ProvidersWrapper>
   )
 }
-

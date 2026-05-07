@@ -27,10 +27,9 @@ async function refreshStats(ruolo: string) {
         BEGIN
           PERFORM public.sp_RefreshStats_${ruolo}('${ruolo}', '${Configurazione.stagione}');
         END $$;
-        `
+        `,
       )
-    }
-    catch (error) {
+    } catch (error) {
       console.error(
         `Error executing function sp_RefreshStats${ruolo} for stagione ${Configurazione.stagione}`,
         error,

@@ -25,12 +25,15 @@ export const updateRisultatiProcedure = adminProcedure
           idSquadraH: true,
           idSquadraA: true,
           idCalendario: true,
-          Calendario: { idCalendario: true, Torneo: { idTorneo: true, hasClassifica: true } },
+          Calendario: {
+            idCalendario: true,
+            Torneo: { idTorneo: true, hasClassifica: true },
+          },
         },
         relations: { Calendario: { Torneo: true } },
         where: { idPartita: opts.input.idPartita },
       })
-      
+
       if (partita?.idSquadraH && partita?.idSquadraA) {
         const idSquadraHome = partita.idSquadraH
         const idSquadraAway = partita.idSquadraA

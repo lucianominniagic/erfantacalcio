@@ -10,7 +10,6 @@ import {
 import { Configurazione } from '~/config'
 import { getFormazione } from '../services/partiteMapping'
 
-
 export const getTabellinoProcedure = adminProcedure
   .input(z.object({ idPartita: z.number(), idSquadra: z.number().nullable() }))
   .query(async (opts) => {

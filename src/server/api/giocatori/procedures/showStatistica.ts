@@ -28,7 +28,7 @@ export const showStatistica = publicProcedure
           Utente: { nomeSquadra: true },
         },
         relations: { SquadraSerieA: true, Utente: true },
-        where: { idGiocatore: idGiocatore , dataCessione: IsNull() },
+        where: { idGiocatore: idGiocatore, dataCessione: IsNull() },
         order: { idTrasferimento: 'desc' },
       })
 
@@ -40,7 +40,11 @@ export const showStatistica = publicProcedure
           .addSelect('SUM(voto.gol)', 'sumGol')
           .addSelect('SUM(voto.assist)', 'sumAssist')
           .addSelect('COUNT(voto.id_calendario)', 'countCalendario')
-          .leftJoin('calendario', 'calendario', 'voto.id_calendario = calendario.id_calendario')
+          .leftJoin(
+            'calendario',
+            'calendario',
+            'voto.id_calendario = calendario.id_calendario',
+          )
           .where('voto.id_giocatore = :idGiocatore', { idGiocatore })
           .andWhere('voto.voto > 0')
           .andWhere(

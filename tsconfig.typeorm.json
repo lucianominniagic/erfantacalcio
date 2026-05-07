@@ -19,6 +19,7 @@
     "src/app",
     "src/components",
     "src/theme",
-    "src/styles"
+    "src/styles",
+    "src/**/*.test.ts"
   ]
 }

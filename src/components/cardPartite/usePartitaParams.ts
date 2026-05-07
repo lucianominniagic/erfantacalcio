@@ -29,5 +29,10 @@ export function useGiocatoreModal() {
     setOpenModalCalendario(false)
   }
 
-  return { idGiocatore, openModalCalendario, handleStatGiocatore, handleModalClose }
+  return {
+    idGiocatore,
+    openModalCalendario,
+    handleStatGiocatore,
+    handleModalClose,
+  }
 }

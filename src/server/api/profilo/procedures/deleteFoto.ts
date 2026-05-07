@@ -10,7 +10,9 @@ export const deleteFotoProcedure = protectedProcedure.mutation(async (opts) => {
       if (err) throw err
 
       for (const file of files) {
-        const userFilePattern = new RegExp(`foto_${opts.ctx.session.user.idSquadra}_.*`)
+        const userFilePattern = new RegExp(
+          `foto_${opts.ctx.session.user.idSquadra}_.*`,
+        )
         if (userFilePattern.test(file)) {
           fs.unlink(path.join(directory, file), (err) => {
             if (err) throw err

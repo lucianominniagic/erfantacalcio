@@ -2,7 +2,10 @@ import * as React from 'react'
 import GenericCard, { type GenericCardProps } from './GenericCard'
 import { Alert, Stack } from '@mui/material'
 
-export interface CardWithActionsProps extends Omit<GenericCardProps, 'actions' | 'children'> {
+export interface CardWithActionsProps extends Omit<
+  GenericCardProps,
+  'actions' | 'children'
+> {
   /** Main content of the card */
   children: React.ReactNode
   /** Action buttons */
@@ -20,7 +23,12 @@ export interface CardWithActionsProps extends Omit<GenericCardProps, 'actions' |
   /** Direction of actions (row or column) */
   actionsDirection?: 'row' | 'column'
   /** Justify actions */
-  actionsJustify?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around'
+  actionsJustify?:
+    | 'flex-start'
+    | 'center'
+    | 'flex-end'
+    | 'space-between'
+    | 'space-around'
   /** Spacing between actions */
   actionsSpacing?: number
 }
@@ -28,7 +36,7 @@ export interface CardWithActionsProps extends Omit<GenericCardProps, 'actions' |
 /**
  * Card component with built-in support for actions, messages, and form handling.
  * Extends GenericCard with additional functionality for interactive cards.
- * 
+ *
  * @example Card with form
  * ```tsx
  * <CardWithActions
@@ -48,7 +56,7 @@ export interface CardWithActionsProps extends Omit<GenericCardProps, 'actions' |
  *   <TextField label="Email" />
  * </CardWithActions>
  * ```
- * 
+ *
  * @example Card with actions and messages
  * ```tsx
  * <CardWithActions

@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { calendarioSchema, tabellinoSchema, giornataSchema } from '~/schemas/calendario'
+import {
+  calendarioSchema,
+  tabellinoSchema,
+  giornataSchema,
+} from '~/schemas/calendario'
 
 // ---------------------------------------------------------------------------
 // calendarioSchema

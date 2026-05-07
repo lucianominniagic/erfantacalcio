@@ -1,4 +1,4 @@
-export type GiornataAdminType = {
+export interface GiornataAdminType {
   idCalendario: number
   idTorneo: number
   giornata: number
@@ -15,16 +15,16 @@ export type GiornataAdminType = {
   SubTitle: string
 }
 
-export type votoGiocatoreType = {
+export interface votoGiocatoreType {
   idVoto: number
-  voto: Number | null
+  voto: number | null
   ruolo: string
-  ammonizione: Number | null
-  espulsione: Number | null
-  gol: Number | null
-  assist: Number | null
-  altriBonus: Number | null
-  autogol: Number | null
+  ammonizione: number | null
+  espulsione: number | null
+  gol: number | null
+  assist: number | null
+  altriBonus: number | null
+  autogol: number | null
   titolare: boolean
   riserva: number | null
   idGiocatore: number
@@ -33,7 +33,7 @@ export type votoGiocatoreType = {
   isVotoInfluente: boolean
 }
 
-export type PartitaAdminType = {
+export interface PartitaAdminType {
   idPartita: number
   idHome: number | null
   idFormazioneHome: number | undefined

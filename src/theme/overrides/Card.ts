@@ -1,6 +1,9 @@
+import { alpha } from '@mui/material/styles'
+import type { Theme } from '@mui/material/styles'
+
 // ==============================|| OVERRIDES - CARD ||============================== //
 
-export default function Card() {
+export default function Card(theme: Theme) {
   return {
     MuiCard: {
       styleOverrides: {
@@ -9,12 +12,12 @@ export default function Card() {
           marginTop: '3px',
           marginBottom: '8px',
           borderRadius: '12px',
-          border: '1px solid rgba(255, 193, 7, 0.12)',
+          border: `1px solid ${theme.palette.divider}`,
           backdropFilter: 'blur(8px)',
           transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
           '&:hover': {
-            borderColor: 'rgba(255, 193, 7, 0.28)',
-            boxShadow: '0 4px 20px rgba(255, 193, 7, 0.08)',
+            borderColor: alpha(theme.palette.primary.main, 0.28),
+            boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.08)}`,
           },
         },
       },

@@ -67,9 +67,7 @@ export const showStatisticaVotiProcedure = publicProcedure
           }
           return acc
         }, new Map())
-        const votiDistinct = Array.from(
-          voti.values(),
-        ) 
+        const votiDistinct = Array.from(voti.values())
         return votiDistinct
       } else return []
     } catch (error) {

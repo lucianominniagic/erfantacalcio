@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+ 
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 'use client'
@@ -22,10 +22,7 @@ import { type Ruoli } from '~/types/common'
 import { getRuoloEsteso } from '~/utils/helper'
 import Modal from '../modal/Modal'
 import Giocatore from './Giocatore'
-import {
-  DataGrid,
-  type GridColDef,
-} from '@mui/x-data-grid'
+import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { createSkeletonRows } from '~/utils/datatable'
 
 function Giocatori() {
@@ -35,11 +32,16 @@ function Giocatori() {
   const [selectedGiocatoreId, setSelectedGiocatoreId] = useState<number>()
   const [openModalCalendario, setOpenModalCalendario] = useState(false)
   const [soloSvincolati, setSoloSvincolati] = useState(false)
-  const giocatoriList = api.giocatori.listAll.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
+  const [searchInput, setSearchInput] = useState('')
   const [ruolo, setRuolo] = useState<Ruoli>('C')
+  const giocatoriSearch = api.giocatori.search.useQuery(
+    { query: searchInput },
+    {
+      enabled: searchInput.length >= 2,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    },
+  )
   const giocatoriStats = api.giocatori.listStatistiche.useQuery(
     { ruolo: ruolo, soloSvincolati: soloSvincolati },
     { refetchOnWindowFocus: false, refetchOnReconnect: false },
@@ -218,7 +220,11 @@ function Giocatori() {
               const numericId = typeof id === 'number' ? id : undefined
               handleGiocatoreSelected(numericId)
             }}
-            items={giocatoriList.data ?? []}
+            items={giocatoriSearch.data ?? []}
+            loading={giocatoriSearch.isFetching}
+            onInputChange={setSearchInput}
+            filterOptions={(x) => x}
+            allowCustomInput={false}
           />
         </Grid>
         <Grid item xs={12} sx={{ minHeight: 500 }}>

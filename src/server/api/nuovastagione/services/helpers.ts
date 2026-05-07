@@ -2,7 +2,13 @@ import { toUtcDate } from '~/utils/dateUtils'
 import { Configurazione } from '~/config'
 import { getCalendario } from '../../../utils/common'
 import { type Partita, RoundRobin4, RoundRobin8 } from '~/utils/bergerTables'
-import { Calendario, Classifiche, FlowNewSeason, Partite, Voti } from '~/server/db/entities'
+import {
+  Calendario,
+  Classifiche,
+  FlowNewSeason,
+  Partite,
+  Voti,
+} from '~/server/db/entities'
 import { EntityManager, LessThanOrEqual } from 'typeorm'
 
 export async function updateFase(trx: EntityManager, idFase: number) {

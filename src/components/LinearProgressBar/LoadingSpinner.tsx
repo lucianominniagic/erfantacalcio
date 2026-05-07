@@ -1,10 +1,16 @@
-import { Box, CircularProgress, type CircularProgressProps } from '@mui/material'
+import {
+  Box,
+  CircularProgress,
+  type CircularProgressProps,
+} from '@mui/material'
 
 interface LoadingSpinnerProps {
   color?: CircularProgressProps['color']
 }
 
-export default function LoadingSpinner({ color = 'warning' }: LoadingSpinnerProps) {
+export default function LoadingSpinner({
+  color = 'warning',
+}: LoadingSpinnerProps) {
   return (
     <Box
       sx={{

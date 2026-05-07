@@ -19,7 +19,8 @@ export const updateVotoProcedure = adminProcedure
   )
   .mutation(async (opts) => {
     try {
-      await Voti.update({
+      await Voti.update(
+        {
           idVoto: opts.input.idVoto,
         },
         {
@@ -33,7 +34,8 @@ export const updateVotoProcedure = adminProcedure
           assist: opts.input.assist * Configurazione.bonusAssist,
           autogol: opts.input.autogol * Configurazione.bonusAutogol,
           altriBonus: opts.input.altriBonus,
-        })
+        },
+      )
       return opts.input.idVoto
     } catch (error) {
       console.error('Si è verificato un errore', error)

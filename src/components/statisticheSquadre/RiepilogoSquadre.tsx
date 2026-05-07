@@ -33,14 +33,39 @@ interface StatRowProps {
 
 function StatRow({ icon, label, value }: StatRowProps) {
   return (
-    <Stack direction="row" alignItems="center" spacing={1} sx={{ py: 0.4, minHeight: 36 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary', flexShrink: 0 }}>
+    <Stack
+      direction="row"
+      alignItems="center"
+      spacing={1}
+      sx={{ py: 0.4, minHeight: 36 }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          color: 'text.secondary',
+          flexShrink: 0,
+        }}
+      >
         {icon}
       </Box>
-      <Typography variant="caption" color="text.secondary" sx={{ minWidth: 90 }}>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ minWidth: 90 }}
+      >
         {label}
       </Typography>
-      <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, flex: 1, textAlign: 'right', fontFamily: 'monospace', color: 'primary.main' }}>
+      <Typography
+        sx={{
+          fontSize: '0.85rem',
+          fontWeight: 600,
+          flex: 1,
+          textAlign: 'right',
+          fontFamily: 'monospace',
+          color: 'primary.main',
+        }}
+      >
         {value}
       </Typography>
     </Stack>
@@ -83,21 +108,50 @@ export default function RiepilogoSquadre({ idTornei }: RiepilogoSquadreProps) {
             <Card sx={{ height: '100%' }}>
               <CardContent>
                 {/* Header: rank + avatar + nome */}
-                <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={1.5}
+                  sx={{ mb: 1 }}
+                >
                   {s.foto ? (
                     <Avatar src={s.foto} sx={{ width: 32, height: 32 }} />
                   ) : (
-                    <Avatar sx={{ width: 32, height: 32 }}>{s.squadra.charAt(0)}</Avatar>
+                    <Avatar sx={{ width: 32, height: 32 }}>
+                      {s.squadra.charAt(0)}
+                    </Avatar>
                   )}
-                  <Typography variant="h6" sx={{ fontSize: '0.95rem', fontWeight: 700, flex: 1 }}>
+                  <Typography
+                    variant="h6"
+                    sx={{ fontSize: '0.95rem', fontWeight: 700, flex: 1 }}
+                  >
                     {s.squadra}
                   </Typography>
                 </Stack>
-                <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={1.5}
+                  sx={{ mb: 1 }}
+                >
                   <Stack direction="row" spacing={0.5}>
-                    <Chip label={`${s.vittorie} V`} size="small" color="success" sx={{ fontSize: '0.7rem', height: 20 }} />
-                    <Chip label={`${s.pareggi} N`} size="small" sx={{ fontSize: '0.7rem', height: 20 }} />
-                    <Chip label={`${s.sconfitte} P`} size="small" color="error" sx={{ fontSize: '0.7rem', height: 20 }} />
+                    <Chip
+                      label={`${s.vittorie} V`}
+                      size="small"
+                      color="success"
+                      sx={{ fontSize: '0.7rem', height: 20 }}
+                    />
+                    <Chip
+                      label={`${s.pareggi} N`}
+                      size="small"
+                      sx={{ fontSize: '0.7rem', height: 20 }}
+                    />
+                    <Chip
+                      label={`${s.sconfitte} P`}
+                      size="small"
+                      color="error"
+                      sx={{ fontSize: '0.7rem', height: 20 }}
+                    />
                   </Stack>
                 </Stack>
 
@@ -168,14 +222,28 @@ export default function RiepilogoSquadre({ idTornei }: RiepilogoSquadreProps) {
                       <StatRow
                         icon={<TrendingUp fontSize="small" color="success" />}
                         label="Miglior W"
-                        value={<Typography component="span" sx={{ fontSize: '0.75rem', fontFamily: 'inherit' }}>{s.miglioreVittoria}</Typography>}
+                        value={
+                          <Typography
+                            component="span"
+                            sx={{ fontSize: '0.75rem', fontFamily: 'inherit' }}
+                          >
+                            {s.miglioreVittoria}
+                          </Typography>
+                        }
                       />
                     )}
                     {s.peggioreSconfitta && (
                       <StatRow
                         icon={<TrendingDown fontSize="small" color="error" />}
                         label="Peggior L"
-                        value={<Typography component="span" sx={{ fontSize: '0.75rem', fontFamily: 'inherit' }}>{s.peggioreSconfitta}</Typography>}
+                        value={
+                          <Typography
+                            component="span"
+                            sx={{ fontSize: '0.75rem', fontFamily: 'inherit' }}
+                          >
+                            {s.peggioreSconfitta}
+                          </Typography>
+                        }
                       />
                     )}
                   </>

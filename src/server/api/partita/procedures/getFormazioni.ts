@@ -16,7 +16,7 @@ export const getFormazioniProcedure = publicProcedure
         const calendario = (await mapCalendario(calendarioQry)).pop()
         if (calendario) {
           const partita = calendario.partite[0]
-          
+
           const formazioni = await getFormazioni(idPartita)
 
           const altrePartite = await getAltrePartite(calendario?.idCalendario)
@@ -38,4 +38,3 @@ export const getFormazioniProcedure = publicProcedure
       throw error
     }
   })
-

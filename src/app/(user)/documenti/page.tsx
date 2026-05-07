@@ -18,11 +18,12 @@ import { Configurazione } from '~/config'
 // ── Types & config ────────────────────────────────────────────────────────────
 
 type FileType = 'xlsx' | 'csv' | 'pdf'
+type SemanticColorKey = 'success' | 'info' | 'error'
 
-const FILE_TYPE_CONFIG: Record<FileType, { label: string; color: string }> = {
-  xlsx: { label: 'XLSX', color: '#16a34a' },
-  csv: { label: 'CSV', color: '#2563eb' },
-  pdf: { label: 'PDF', color: '#dc2626' },
+const FILE_TYPE_CONFIG: Record<FileType, { label: string; colorKey: SemanticColorKey }> = {
+  xlsx: { label: 'XLSX', colorKey: 'success' },
+  csv: { label: 'CSV', colorKey: 'info' },
+  pdf: { label: 'PDF', colorKey: 'error' },
 }
 
 // ── DocumentCard sub-component ────────────────────────────────────────────────
@@ -37,31 +38,48 @@ interface DocumentCardProps {
 function DocumentCard({ title, image, href, fileType }: DocumentCardProps) {
   const theme = useTheme()
   const [hovered, setHovered] = useState(false)
-  const { label, color } = FILE_TYPE_CONFIG[fileType]
+  const { label, colorKey } = FILE_TYPE_CONFIG[fileType]
+  const color = theme.palette[colorKey].main
 
   return (
     <Card
       elevation={2}
-      sx={{ borderRadius: 2, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }}
+      sx={{
+        borderRadius: 2,
+        overflow: 'hidden',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
     >
       {/* Image with hover overlay */}
       <Box
         sx={{ position: 'relative', cursor: 'pointer' }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        onClick={() => { window.location.href = href }}
+        onClick={() => {
+          window.location.href = href
+        }}
       >
         <CardMedia
           component="img"
           image={image}
           alt={title}
-          sx={{ width: '100%', height: 140, objectFit: 'cover', display: 'block' }}
+          sx={{
+            width: '100%',
+            height: 140,
+            objectFit: 'cover',
+            display: 'block',
+          }}
         />
         <Box
           sx={{
             position: 'absolute',
             inset: 0,
-            backgroundColor: alpha(theme.palette.common.black, hovered ? 0.5 : 0),
+            backgroundColor: alpha(
+              theme.palette.common.black,
+              hovered ? 0.5 : 0,
+            ),
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -107,7 +125,9 @@ function DocumentCard({ title, image, href, fileType }: DocumentCardProps) {
             mb: 0.75,
           }}
         />
-        <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, lineHeight: 1.3 }}>
+        <Typography
+          sx={{ fontSize: '0.875rem', fontWeight: 600, lineHeight: 1.3 }}
+        >
           {title}
         </Typography>
       </Box>
@@ -124,7 +144,10 @@ function DocumentCard({ title, image, href, fileType }: DocumentCardProps) {
             borderColor: alpha(color, 0.4),
             color,
             fontSize: '0.75rem',
-            '&:hover': { borderColor: color, backgroundColor: alpha(color, 0.06) },
+            '&:hover': {
+              borderColor: color,
+              backgroundColor: alpha(color, 0.06),
+            },
           }}
         >
           Scarica
