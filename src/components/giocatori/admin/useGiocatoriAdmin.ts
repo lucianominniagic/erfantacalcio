@@ -36,7 +36,7 @@ export function useGiocatoriAdmin() {
     useState<number>()
   const [selectedTrasferimentoStagione, setSelectedTrasferimentoStagione] =
     useState<string>()
-  const [giocatori, setGiocatori] = useState<AutocompleteOption[]>([])
+  const [searchInput, setSearchInput] = useState('')
   const [squadre, setSquadre] = useState<AutocompleteOption[]>([])
   const [squadreSerieA, setSquadreSerieA] = useState<AutocompleteOption[]>([])
   const [trasferimenti, setTrasferimenti] = useState<trasferimentoListType[]>(
@@ -55,10 +55,14 @@ export function useGiocatoriAdmin() {
     { idGiocatore: selectedGiocatoreId! },
     { enabled: !!selectedGiocatoreId },
   )
-  const giocatoriList = api.giocatori.listAll.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
+  const giocatoriSearch = api.giocatori.search.useQuery(
+    { query: searchInput },
+    {
+      enabled: searchInput.length >= 2,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    },
+  )
   const giocatoreOne = api.giocatori.get.useQuery(
     { idGiocatore: selectedGiocatoreId! },
     {
@@ -79,12 +83,12 @@ export function useGiocatoriAdmin() {
   // ── mutations ─────────────────────────────────────────────────────────────
   const giocatoreUpsert = api.giocatori.upsert.useMutation({
     onSuccess: async () => {
-      await giocatoriList.refetch()
+      await giocatoriSearch.refetch()
     },
   })
   const giocatoreDelete = api.giocatori.delete.useMutation({
     onSuccess: async () => {
-      await giocatoriList.refetch()
+      await giocatoriSearch.refetch()
       await trasferimentiList.refetch()
     },
   })
@@ -113,12 +117,6 @@ export function useGiocatoriAdmin() {
       setTrasferimenti(trasferimentiList.data)
     }
   }, [trasferimentiList.data])
-
-  useEffect(() => {
-    if (giocatoriList.data) {
-      setGiocatori(giocatoriList.data)
-    }
-  }, [giocatoriList.data])
 
   useEffect(() => {
     if (squadreList.data) {
@@ -369,7 +367,8 @@ export function useGiocatoriAdmin() {
     selectedGiocatore,
     selectedTrasferimentoId,
     selectedTrasferimentoStagione,
-    giocatori,
+    giocatori: giocatoriSearch.data ?? [],
+    giocatoriIsLoading: giocatoriSearch.isFetching,
     squadre,
     squadreSerieA,
     trasferimenti,
@@ -394,5 +393,6 @@ export function useGiocatoriAdmin() {
     handleDeleteTrasferimento,
     handleInputChange,
     handleSelectChange,
+    handleSearchInputChange: setSearchInput,
   }
 }

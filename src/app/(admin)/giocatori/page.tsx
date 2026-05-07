@@ -15,6 +15,7 @@ export default function Giocatori() {
     selectedTrasferimentoId,
     selectedTrasferimentoStagione,
     giocatori,
+    giocatoriIsLoading,
     squadre,
     squadreSerieA,
     trasferimenti,
@@ -37,6 +38,7 @@ export default function Giocatori() {
     handleDeleteTrasferimento,
     handleInputChange,
     handleSelectChange,
+    handleSearchInputChange,
   } = useGiocatoriAdmin()
 
   return (
@@ -53,7 +55,11 @@ export default function Giocatori() {
           const numericId = typeof id === 'number' ? id : undefined
           handleGiocatoreSelected(numericId, text)
         }}
-        items={giocatori ?? []}
+        items={giocatori}
+        loading={giocatoriIsLoading}
+        onInputChange={handleSearchInputChange}
+        filterOptions={(x) => x}
+        allowCustomInput={false}
       />
       <Stack direction="row" spacing={1} justifyContent="flex-start">
         <Typography variant="h5">IdGiocatore: {selectedGiocatoreId}</Typography>
