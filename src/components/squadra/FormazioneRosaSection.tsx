@@ -1,6 +1,5 @@
 'use client'
-import { Analytics, SportsSoccer, ThumbDownAlt, ThumbUpAlt, ThumbsUpDown } from '@mui/icons-material'
-import { Analytics, SportsSoccer, ThumbDownAlt, ThumbUpAlt, ThumbsUpDown } from '@mui/icons-material'
+import { Analytics, SportsSoccer } from '@mui/icons-material'
 import {
   Box,
   Grid,
@@ -120,14 +119,14 @@ export function FormazioneRosaSection({
               </Grid>
               <Grid item xs={3} display="flex" justifyContent="flex-end">
                 {renderStatusIcon(player)}
-                <Tooltip title={getFormaTooltip(formaMap.get(player.idGiocatore))}>
+                <Tooltip title='Statistiche giocatore'>
                   <IconButton
                     onClick={() => {
                       setIdGiocatoreStat(player.idGiocatore)
                       setOpenModalCalendario(true)
                     }}
                   >
-                    {getFormaIcon(formaMap.get(player.idGiocatore))}
+                    <Analytics color="primary" />
                   </IconButton>
                 </Tooltip>
               </Grid>
