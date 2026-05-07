@@ -10,7 +10,6 @@ import { uploadVotiVercelProcedure } from './procedures/uploadVotiVercel'
 import { resetVotiProcedure } from './procedures/resetVoti'
 import { readVotiProcedure } from './procedures/readVoti'
 import { refreshStatsProcedure } from './procedures/refreshStats'
-import { getFormaGiocatoriProcedure } from './procedures/getFormaGiocatori'
 
 export const votiRouter = createTRPCRouter({
   get: showVotoProcedure,
@@ -23,5 +22,4 @@ export const votiRouter = createTRPCRouter({
   readVoti: readVotiProcedure,
   processVoti: processVotiProcedure,
   refreshStats: refreshStatsProcedure,
-  getFormaGiocatori: getFormaGiocatoriProcedure,
 })

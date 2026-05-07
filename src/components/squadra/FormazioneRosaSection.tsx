@@ -1,5 +1,11 @@
 'use client'
-import { Analytics, SportsSoccer } from '@mui/icons-material'
+import {
+  Analytics,
+  SportsSoccer,
+  ThumbDownTwoTone,
+  ThumbsUpDownTwoTone,
+  ThumbUpAltTwoTone,
+} from '@mui/icons-material'
 import {
   Box,
   Grid,
@@ -61,6 +67,51 @@ export function FormazioneRosaSection({
       .map((p) => ({ ...p, status: 'panca' as const })),
   ]
 
+  const renderFormaIcon = (idGiocatore: number) => {
+    const forma = formaMap.get(idGiocatore)
+    if (!forma) return null
+
+    const { media, giocate } = forma
+
+    if (giocate < 2 || media === null) {
+      return (
+        <Tooltip title="Dati insufficienti">
+          <span>
+            <IconButton disabled size="small" />
+          </span>
+        </Tooltip>
+      )
+    }
+
+    if (media < 6) {
+      return (
+        <Tooltip title={`Forma: ${media}`}>
+          <IconButton size="small">
+            <ThumbDownTwoTone color="error" />
+          </IconButton>
+        </Tooltip>
+      )
+    }
+
+    if (media <= 6.5) {
+      return (
+        <Tooltip title={`Forma: ${media}`}>
+          <IconButton size="small">
+            <ThumbsUpDownTwoTone color="warning" />
+          </IconButton>
+        </Tooltip>
+      )
+    }
+
+    return (
+      <Tooltip title={`Forma: ${media}`}>
+        <IconButton size="small">
+          <ThumbUpAltTwoTone color="success" />
+        </IconButton>
+      </Tooltip>
+    )
+  }
+
   const renderStatusIcon = (
     player: GiocatoreFormazioneType & { status: 'rosa' | 'campo' | 'panca' },
   ) => {
@@ -119,16 +170,14 @@ export function FormazioneRosaSection({
               </Grid>
               <Grid item xs={3} display="flex" justifyContent="flex-end">
                 {renderStatusIcon(player)}
-                <Tooltip title='Statistiche giocatore'>
                   <IconButton
                     onClick={() => {
                       setIdGiocatoreStat(player.idGiocatore)
                       setOpenModalCalendario(true)
                     }}
                   >
-                    <Analytics color="primary" />
+                    {renderFormaIcon(player.idGiocatore)}
                   </IconButton>
-                </Tooltip>
               </Grid>
             </Grid>
           ))}

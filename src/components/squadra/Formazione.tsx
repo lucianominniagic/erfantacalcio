@@ -29,7 +29,7 @@ import { api } from '~/utils/api'
 
 function Formazione() {
   const {
-    idSquadra: _idSquadra,
+    idSquadra,
     squadra,
     idGiocatoreStat,
     setIdGiocatoreStat,
@@ -63,16 +63,10 @@ function Formazione() {
   const theme = useTheme()
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'))
 
-  // Raccoglie tutti gli idGiocatori di rosa+campo+panca (deduplicati)
-  const allIds = React.useMemo(
-    () => [...new Set([...rosa, ...campo, ...panca].map((p) => p.idGiocatore))],
-    [rosa, campo, panca],
-  )
-
-  const formaQuery = api.voti.getFormaGiocatori.useQuery(
-    { idGiocatori: allIds },
+  const formaQuery = api.squadre.getRosa.useQuery(
+    { idSquadra, includeVenduti: false, includeForma: true },
     {
-      enabled: allIds.length > 0,
+      enabled: idSquadra > 0,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
     },
@@ -80,9 +74,7 @@ function Formazione() {
 
   const formaMap = React.useMemo(() => {
     const map = new Map<number, { media: number | null; giocate: number }>()
-    formaQuery.data?.forEach((f) =>
-      map.set(f.idGiocatore, { media: f.media, giocate: f.giocate }),
-    )
+    formaQuery.data?.forEach((f) => { if (f.forma) map.set(f.idGiocatore, f.forma) })
     return map
   }, [formaQuery.data])
 
