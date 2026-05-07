@@ -50,6 +50,8 @@ export interface GenericAutocompleteProps<T extends AutocompleteOption> {
   defaultValue?: T | string | null
   /** Clear button visibility */
   disableClearable?: boolean
+  /** Callback invoked when the text input changes */
+  onInputChange?: (value: string) => void
 }
 
 export default function GenericAutocomplete<T extends AutocompleteOption>({
@@ -69,6 +71,7 @@ export default function GenericAutocomplete<T extends AutocompleteOption>({
   value,
   defaultValue,
   disableClearable = false,
+  onInputChange,
 }: GenericAutocompleteProps<T>) {
   const defaultFilterOptions = React.useCallback(
     (options: T[], params: FilterParams<T>) => {
@@ -143,6 +146,7 @@ export default function GenericAutocomplete<T extends AutocompleteOption>({
       value={value}
       defaultValue={defaultValue}
       disableClearable={disableClearable}
+      onInputChange={(_, value) => onInputChange?.(value)}
       sx={{ width, ...sx }}
       renderInput={(params) => (
         <TextField

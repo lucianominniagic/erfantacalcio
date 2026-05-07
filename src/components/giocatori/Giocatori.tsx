@@ -32,11 +32,16 @@ function Giocatori() {
   const [selectedGiocatoreId, setSelectedGiocatoreId] = useState<number>()
   const [openModalCalendario, setOpenModalCalendario] = useState(false)
   const [soloSvincolati, setSoloSvincolati] = useState(false)
-  const giocatoriList = api.giocatori.listAll.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
+  const [searchInput, setSearchInput] = useState('')
   const [ruolo, setRuolo] = useState<Ruoli>('C')
+  const giocatoriSearch = api.giocatori.search.useQuery(
+    { query: searchInput },
+    {
+      enabled: searchInput.length >= 2,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    },
+  )
   const giocatoriStats = api.giocatori.listStatistiche.useQuery(
     { ruolo: ruolo, soloSvincolati: soloSvincolati },
     { refetchOnWindowFocus: false, refetchOnReconnect: false },
@@ -215,7 +220,11 @@ function Giocatori() {
               const numericId = typeof id === 'number' ? id : undefined
               handleGiocatoreSelected(numericId)
             }}
-            items={giocatoriList.data ?? []}
+            items={giocatoriSearch.data ?? []}
+            loading={giocatoriSearch.isFetching}
+            onInputChange={setSearchInput}
+            filterOptions={(x) => x}
+            allowCustomInput={false}
           />
         </Grid>
         <Grid item xs={12} sx={{ minHeight: 500 }}>
