@@ -1,5 +1,5 @@
 'use client'
-import { Analytics, SportsSoccer, TrendingDown, TrendingFlat, TrendingUp } from '@mui/icons-material'
+import { Analytics, SportsSoccer, ThumbDownAlt, ThumbUpAlt, ThumbsUpDown } from '@mui/icons-material'
 import {
   Box,
   Grid,
@@ -85,9 +85,9 @@ export function FormazioneRosaSection({
 
   const getFormaIcon = (forma: FormaData | undefined): React.ReactNode => {
     if (!forma || forma.giocate < 2) return <Analytics color="info" />
-    if (forma.media !== null && forma.media >= 6.8) return <TrendingUp color="success" />
-    if (forma.media !== null && forma.media >= 6.0) return <TrendingFlat color="warning" />
-    return <TrendingDown color="error" />
+    if (forma.media !== null && forma.media >= 6.8) return <ThumbUpAlt color="success" />
+    if (forma.media !== null && forma.media >= 6.0) return <ThumbsUpDown color="warning" />
+    return <ThumbDownAlt color="error" />
   }
 
   const getFormaTooltip = (forma: FormaData | undefined): string => {
