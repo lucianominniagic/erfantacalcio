@@ -1,5 +1,6 @@
 'use client'
 import { Analytics, SportsSoccer, ThumbDownAlt, ThumbUpAlt, ThumbsUpDown } from '@mui/icons-material'
+import { Analytics, SportsSoccer, ThumbDownAlt, ThumbUpAlt, ThumbsUpDown } from '@mui/icons-material'
 import {
   Box,
   Grid,
@@ -83,25 +84,6 @@ export function FormazioneRosaSection({
     return null
   }
 
-<<<<<<< HEAD
-=======
-  const getFormaIcon = (forma: FormaData | undefined): React.ReactNode => {
-    if (!forma || forma.giocate < 2) return <Analytics color="info" />
-    if (forma.media !== null && forma.media >= 6.8) return <ThumbUpAlt color="success" />
-    if (forma.media !== null && forma.media >= 6.0) return <ThumbsUpDown color="warning" />
-    return <ThumbDownAlt color="error" />
-  }
-
-  const getFormaTooltip = (forma: FormaData | undefined): string => {
-    if (!forma || forma.giocate < 2) return 'Statistiche giocatore'
-    if (forma.media !== null && forma.media >= 6.8)
-      return `Forma ottima (media ${forma.media.toFixed(2)})`
-    if (forma.media !== null && forma.media >= 6.0)
-      return `Forma nella norma (media ${forma.media.toFixed(2)})`
-    return `Forma scarsa (media ${forma.media!.toFixed(2)})`
-  }
-
->>>>>>> 1aa7cbb (feat(FormazioneRosaSection): update forma icons to use ThumbUpAlt, ThumbsUpDown, and ThumbDownAlt)
   return (
     <Grid item xs={12} md={6}>
       <Box>
