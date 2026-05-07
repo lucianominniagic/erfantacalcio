@@ -1,12 +1,15 @@
 'use client'
 import {
-  Analytics,
+  BatteryCharging20,
+  BatteryCharging60,
+  BatteryChargingFull,
   SportsSoccer,
   ThumbDownTwoTone,
   ThumbsUpDownTwoTone,
   ThumbUpAltTwoTone,
 } from '@mui/icons-material'
 import {
+  Badge,
   Box,
   Grid,
   IconButton,
@@ -67,48 +70,38 @@ export function FormazioneRosaSection({
       .map((p) => ({ ...p, status: 'panca' as const })),
   ]
 
-  const renderFormaIcon = (idGiocatore: number) => {
+  const renderFormaIcon = (idGiocatore: number, onOpenStats: () => void) => {
     const forma = formaMap.get(idGiocatore)
     if (!forma) return null
 
     const { media, giocate } = forma
+    if (giocate < 2 || media === null) return null
 
-    if (giocate < 2 || media === null) {
-      return (
-        <Tooltip title="Dati insufficienti">
-          <span>
-            <IconButton disabled size="small" />
-          </span>
-        </Tooltip>
-      )
-    }
-
-    if (media < 6) {
-      return (
-        <Tooltip title={`Forma: ${media}`}>
-          <IconButton size="small">
-            <ThumbDownTwoTone color="error" />
-          </IconButton>
-        </Tooltip>
-      )
-    }
-
-    if (media <= 6.5) {
-      return (
-        <Tooltip title={`Forma: ${media}`}>
-          <IconButton size="small">
-            <ThumbsUpDownTwoTone color="warning" />
-          </IconButton>
-        </Tooltip>
-      )
-    }
+    const { icon, color, badgeColor } =
+      media < 6
+        ? { icon: <BatteryCharging20 />, color: '#e57373', badgeColor: '#e57373' }
+        : media <= 6.5
+          ? { icon: <BatteryCharging60 />, color: '#ffd54f', badgeColor: '#f9a825' }
+          : { icon: <BatteryChargingFull />, color: '#66bb6a', badgeColor: '#66bb6a' }
 
     return (
-      <Tooltip title={`Forma: ${media}`}>
-        <IconButton size="small">
-          <ThumbUpAltTwoTone color="success" />
+      <Badge
+        badgeContent={media.toFixed(1)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+        sx={{
+          '& .MuiBadge-badge': {
+            fontSize: '0.6rem',
+            minWidth: 24,
+            height: 16,
+            backgroundColor: badgeColor,
+            color: 'white',
+          },
+        }}
+      >
+        <IconButton size="small" onClick={onOpenStats} sx={{ color }}>
+          {icon}
         </IconButton>
-      </Tooltip>
+      </Badge>
     )
   }
 
@@ -168,16 +161,12 @@ export function FormazioneRosaSection({
                   </ListItem>
                 </div>
               </Grid>
-              <Grid item xs={3} display="flex" justifyContent="flex-end">
+              <Grid item xs={3} display="flex" justifyContent="flex-end" alignItems="center">
                 {renderStatusIcon(player)}
-                  <IconButton
-                    onClick={() => {
-                      setIdGiocatoreStat(player.idGiocatore)
-                      setOpenModalCalendario(true)
-                    }}
-                  >
-                    {renderFormaIcon(player.idGiocatore)}
-                  </IconButton>
+                {renderFormaIcon(player.idGiocatore, () => {
+                  setIdGiocatoreStat(player.idGiocatore)
+                  setOpenModalCalendario(true)
+                })}
               </Grid>
             </Grid>
           ))}
