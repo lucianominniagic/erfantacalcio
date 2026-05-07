@@ -90,7 +90,7 @@ export function FormazioneRosaSection({
         anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
         sx={{
           '& .MuiBadge-badge': {
-            fontSize: '0.6rem',
+            fontSize: '0.75rem',
             minWidth: 24,
             height: 16,
             backgroundColor: badgeColor,
@@ -161,8 +161,10 @@ export function FormazioneRosaSection({
                   </ListItem>
                 </div>
               </Grid>
-              <Grid item xs={3} display="flex" justifyContent="flex-end" alignItems="center">
+              <Grid item xs={1.5} display="flex" justifyContent="flex-end" alignItems="center">
                 {renderStatusIcon(player)}
+              </Grid>
+              <Grid item xs={1.5} display="flex" justifyContent="flex-end" alignItems="center">
                 {renderFormaIcon(player.idGiocatore, () => {
                   setIdGiocatoreStat(player.idGiocatore)
                   setOpenModalCalendario(true)
