@@ -25,6 +25,7 @@ import Giocatore from '../giocatori/Giocatore'
 import { FormazioneRosaSection } from './FormazioneRosaSection'
 import { FormazioneDisabilitata } from './FormazioneDisabilitata'
 import { useFormazioneState } from './useFormazioneState'
+import { api } from '~/utils/api'
 
 function Formazione() {
   const {
@@ -62,6 +63,29 @@ function Formazione() {
   const theme = useTheme()
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'))
 
+  // Raccoglie tutti gli idGiocatori di rosa+campo+panca (deduplicati)
+  const allIds = React.useMemo(
+    () => [...new Set([...rosa, ...campo, ...panca].map((p) => p.idGiocatore))],
+    [rosa, campo, panca],
+  )
+
+  const formaQuery = api.voti.getFormaGiocatori.useQuery(
+    { idGiocatori: allIds },
+    {
+      enabled: allIds.length > 0,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    },
+  )
+
+  const formaMap = React.useMemo(() => {
+    const map = new Map<number, { media: number | null; giocate: number }>()
+    formaQuery.data?.forEach((f) =>
+      map.set(f.idGiocatore, { media: f.media, giocate: f.giocate }),
+    )
+    return map
+  }, [formaQuery.data])
+
   const rosaProps = {
     rosa,
     campo,
@@ -71,6 +95,7 @@ function Formazione() {
     handleClickPlayer,
     setIdGiocatoreStat,
     setOpenModalCalendario,
+    formaMap,
   }
 
   const modalWidth = isDesktop ? '1266px' : '98%'
