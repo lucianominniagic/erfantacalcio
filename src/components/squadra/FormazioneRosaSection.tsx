@@ -3,10 +3,7 @@ import {
   BatteryCharging20,
   BatteryCharging60,
   BatteryChargingFull,
-  SportsSoccer,
-  ThumbDownTwoTone,
-  ThumbsUpDownTwoTone,
-  ThumbUpAltTwoTone,
+  SportsSoccer
 } from '@mui/icons-material'
 import {
   Badge,
