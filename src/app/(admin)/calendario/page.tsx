@@ -65,6 +65,11 @@ const columns = (onEdit: (id: number) => void): GridColDef[] => [
     renderHeader: () => <strong>Recupero</strong>,
   },
   {
+    field: 'isGiocata',
+    type: 'boolean',
+    renderHeader: () => <strong>Giocata</strong>,
+  },
+  {
     field: 'actions',
     type: 'actions',
     headerName: 'Actions',

@@ -186,7 +186,6 @@ export default function CalendarioForm({
             />
             <FormControlLabel
               sx={{ ml: 2, mr: 2 }}
-              color="error"
               control={
                 <Checkbox
                   onChange={onInputChange}
@@ -197,6 +196,19 @@ export default function CalendarioForm({
                 />
               }
               label={<Typography color="primary">Sovrapposta</Typography>}
+            />
+            <FormControlLabel
+              sx={{ ml: 2, mr: 2 }}
+              control={
+                <Checkbox
+                  onChange={onInputChange}
+                  color="warning"
+                  name="isGiocata"
+                  checked={calendarioInModifica.isGiocata}
+                  value={calendarioInModifica.isGiocata}
+                />
+              }
+              label={<Typography color="primary">Giocata</Typography>}
             />
           </Grid>
           <Grid item xs={12}>

@@ -14,6 +14,7 @@ export const updateCalendarioProcedure = adminProcedure
       dataFine: z.string().datetime().optional().nullable(),
       isRecupero: z.boolean(),
       isSovrapposta: z.boolean(),
+      isGiocata: z.boolean(),
     }),
   )
   .mutation(async (opts) => {
@@ -27,6 +28,7 @@ export const updateCalendarioProcedure = adminProcedure
           girone: opts.input.girone,
           hasDaRecuperare: opts.input.isRecupero,
           hasSovrapposta: opts.input.isSovrapposta,
+          hasGiocata: opts.input.isGiocata,
           data: opts.input.data,
           dataFine: opts.input.dataFine,
         },
