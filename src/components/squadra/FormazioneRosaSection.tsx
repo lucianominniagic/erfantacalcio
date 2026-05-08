@@ -82,23 +82,24 @@ export function FormazioneRosaSection({
           : { icon: <BatteryChargingFull />, color: '#66bb6a', badgeColor: '#66bb6a' }
 
     return (
-      <Badge
-        badgeContent={media.toFixed(1)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
-        sx={{
-          '& .MuiBadge-badge': {
-            fontSize: '0.75rem',
-            minWidth: 24,
-            height: 16,
-            backgroundColor: badgeColor,
-            color: 'white',
-          },
-        }}
-      >
-        <IconButton size="small" onClick={onOpenStats} sx={{ color }}>
+      <IconButton size="small" onClick={onOpenStats} sx={{ color }}>
+        <Badge
+          badgeContent={media.toFixed(1)}
+          anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+          sx={{
+            '& .MuiBadge-badge': {
+              fontSize: '0.75rem',
+              minWidth: 24,
+              height: 16,
+              backgroundColor: badgeColor,
+              border: `1px solid`,
+              color: 'white',
+            },
+          }}
+        >
           {icon}
-        </IconButton>
-      </Badge>
+        </Badge>
+      </IconButton>
     )
   }
 
