@@ -119,7 +119,7 @@ export default function Calendario() {
           loading={isLoading}
           initialState={{
             columns: { columnVisibilityModel: { id: false } },
-            pagination: { paginationModel: { pageSize: 25 } },
+            pagination: { paginationModel: { pageSize: 30 } },
             filter: undefined,
             density: 'compact',
           }}
