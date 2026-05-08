@@ -24,6 +24,7 @@ import {
   PendingActions,
 } from '@mui/icons-material'
 import Classifica from '~/components/home/Classifica'
+import ChampionsBracket from '~/components/home/ChampionsBracket'
 import Squadre from '~/components/home/Squadre'
 import Calendario from '~/components/home/Calendario'
 import Modal from '~/components/modal/Modal'
@@ -36,6 +37,10 @@ import { giornataSchema } from '~/schemas/calendario'
 export default function HomePage() {
   const { data: session } = useSession()
   const torneiList = api.tornei.list.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  })
+  const championsBracket = api.tornei.championsBracket.useQuery(undefined, {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   })
@@ -230,16 +235,51 @@ export default function HomePage() {
                   sm={6}
                   sx={!isXs ? { pr: '2px', pl: '15px', pt: '15px' } : {}}
                 >
-                  {torneiList.data
-                    ?.filter((t) => t.hasClassifica)
-                    .map((torneo) => (
+                  {(() => {
+                    const hasSemifinaliTeams =
+                      !championsBracket.isLoading &&
+                      championsBracket.data?.semifinaliAndata?.partite.some(
+                        (p) => p.idHome !== null || p.idAway !== null,
+                      )
+
+                    const classificheConHasClassifica = torneiList.data?.filter(
+                      (t) => t.hasClassifica,
+                    )
+                    const classificheCampionato = classificheConHasClassifica?.filter(
+                      (t) => t.nome.toLowerCase() === 'campionato',
+                    )
+                    const classificheChampions = classificheConHasClassifica?.filter(
+                      (t) => t.nome.toLowerCase() !== 'campionato',
+                    )
+
+                    const renderClassifica = (torneo: NonNullable<typeof classificheConHasClassifica>[0]) => (
                       <Classifica
-                        key={torneo?.idTorneo}
-                        nomeTorneo={torneo?.nome ?? ''}
-                        idTorneo={torneo?.idTorneo}
-                        gruppo={torneo?.gruppoFase ?? ''}
+                        key={torneo.idTorneo}
+                        nomeTorneo={torneo.nome ?? ''}
+                        idTorneo={torneo.idTorneo}
+                        gruppo={torneo.gruppoFase ?? ''}
                       />
-                    ))}
+                    )
+
+                    return (
+                      <>
+                        {classificheCampionato?.map(renderClassifica)}
+                        {hasSemifinaliTeams && (
+                          <ChampionsBracket
+                            semifinaliAndata={
+                              championsBracket.data?.semifinaliAndata ?? null
+                            }
+                            semifinaliRitorno={
+                              championsBracket.data?.semifinaliRitorno ?? null
+                            }
+                            finale={championsBracket.data?.finale ?? null}
+                          />
+                        )}
+                        <br></br>
+                        {classificheChampions?.map(renderClassifica)}
+                      </>
+                    )
+                  })()}
                 </Grid>
               </>
             )}
