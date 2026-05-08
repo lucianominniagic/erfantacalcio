@@ -1,13 +1,14 @@
 'use client'
 
 import React from 'react'
-import { Box, Paper, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { Box, Paper, Typography, useTheme } from '@mui/material'
 import { EmojiEvents } from '@mui/icons-material'
 import { alpha } from '@mui/material/styles'
 import { ChampionsBracketProps, PartitaType } from './types'
 import SFCard from './SFCard'
 import FinaleCard from './FinaleCard'
 import BracketConnector from './BracketConnector'
+import { findRitorno, resolveRitornoGoals, hasTeams } from './utils'
 
 // ── Column header label ───────────────────────────────────────────────────────
 
@@ -54,40 +55,10 @@ export default function ChampionsBracket({
   finale,
 }: ChampionsBracketProps) {
   const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const championsColor = theme.palette.champions.main
 
   // Empty state — bracket not configured or no teams assigned yet
-  const hasTeams = semifinaliAndata?.partite.some(
-    (p) => p.idHome !== null || p.idAway !== null,
-  )
-  if (!semifinaliAndata || !hasTeams) return null
-
-  // ── Helper: find the ritorno partita matching an andata partita by team IDs ──
-  // Matches regardless of which team is home/away in the ritorno.
-  const findRitorno = (
-    andataP: PartitaType,
-    ritornoPartite: PartitaType[] | undefined,
-  ): PartitaType | undefined =>
-    ritornoPartite?.find(
-      (r) =>
-        (r.idHome === andataP.idHome && r.idAway === andataP.idAway) ||
-        (r.idHome === andataP.idAway && r.idAway === andataP.idHome),
-    )
-
-  // ── Helper: resolve each team's 2P goals from the matched ritorno partita ───
-  // Team A = home in andata. In ritorno they may be home OR away.
-  const resolveRitornoGoals = (
-    andataP: PartitaType,
-    ritornoP: PartitaType | undefined,
-  ): { aGol2P: number | null; bGol2P: number | null } => {
-    if (!ritornoP) return { aGol2P: null, bGol2P: null }
-    const teamAIsHomeInRitorno = ritornoP.idHome === andataP.idHome
-    return {
-      aGol2P: teamAIsHomeInRitorno ? ritornoP.golHome : ritornoP.golAway,
-      bGol2P: teamAIsHomeInRitorno ? ritornoP.golAway : ritornoP.golHome,
-    }
-  }
+  if (!semifinaliAndata || !hasTeams(semifinaliAndata.partite)) return null
 
   // ── Partite references ─────────────────────────────────────────────────────
   const sf1Andata = semifinaliAndata.partite[0]
@@ -154,50 +125,6 @@ export default function ChampionsBracket({
       )}
     </>
   )
-
-  // ── Mobile: stacked ────────────────────────────────────────────────────────
-  if (isMobile) {
-    return (
-      <Box sx={{ mt: 2 }}>
-        <SectionTitle championsColor={championsColor} />
-
-        <Typography
-          sx={{
-            fontSize: '0.62rem',
-            fontWeight: 700,
-            color: championsColor,
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            mb: 0.75,
-          }}
-        >
-          Semifinali
-        </Typography>
-
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mb: 2 }}>
-          {renderSFCards(false)}
-        </Box>
-
-        {finale && (
-          <>
-            <Typography
-              sx={{
-                fontSize: '0.62rem',
-                fontWeight: 700,
-                color: championsColor,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                mb: 0.75,
-              }}
-            >
-              Finale
-            </Typography>
-            <FinaleCard finaleGiornata={finale} championsColor={championsColor} />
-          </>
-        )}
-      </Box>
-    )
-  }
 
   // ── Desktop: 2-column bracket layout ──────────────────────────────────────
   return (
