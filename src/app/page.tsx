@@ -252,29 +252,34 @@ export default function HomePage() {
                     )
 
                     const renderClassifica = (torneo: NonNullable<typeof classificheConHasClassifica>[0]) => (
-                      <Classifica
-                        key={torneo.idTorneo}
-                        nomeTorneo={torneo.nome ?? ''}
-                        idTorneo={torneo.idTorneo}
-                        gruppo={torneo.gruppoFase ?? ''}
-                      />
+                      <>
+                        <Classifica
+                          key={torneo.idTorneo}
+                          nomeTorneo={torneo.nome ?? ''}
+                          idTorneo={torneo.idTorneo}
+                          gruppo={torneo.gruppoFase ?? ''}
+                        />
+                        <br></br>
+                      </>
                     )
 
                     return (
                       <>
                         {classificheCampionato?.map(renderClassifica)}
                         {hasSemifinaliTeams && (
-                          <ChampionsBracket
-                            semifinaliAndata={
-                              championsBracket.data?.semifinaliAndata ?? null
-                            }
-                            semifinaliRitorno={
-                              championsBracket.data?.semifinaliRitorno ?? null
-                            }
-                            finale={championsBracket.data?.finale ?? null}
-                          />
+                          <>
+                            <ChampionsBracket
+                              semifinaliAndata={
+                                championsBracket.data?.semifinaliAndata ?? null
+                              }
+                              semifinaliRitorno={
+                                championsBracket.data?.semifinaliRitorno ?? null
+                              }
+                              finale={championsBracket.data?.finale ?? null}
+                            />
+                            <br></br>
+                          </>
                         )}
-                        <br></br>
                         {classificheChampions?.map(renderClassifica)}
                       </>
                     )

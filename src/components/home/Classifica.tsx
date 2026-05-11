@@ -6,6 +6,7 @@ import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { autosizeOptions, createSkeletonRows } from '~/utils/datatable'
 import { z } from 'zod'
 import { classificaSchema } from '~/schemas/classifica'
+import { EmojiEvents, MilitaryTech } from '@mui/icons-material'
 
 interface ClassificaProps {
   nomeTorneo: string
@@ -107,9 +108,10 @@ export default function Classifica({
 
   return (
     <>
-      <Typography variant="h4">
-        Classifica {getNomeTorneo(nomeTorneo, gruppo)}
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+        <MilitaryTech sx={{ color: theme.palette.champions.main, fontSize: '1.4rem' }} />
+        <Typography variant="h5">Classifica {getNomeTorneo(nomeTorneo, gruppo)}</Typography>
+      </Box>
       <Box
         sx={{
           borderRadius: '0 0 12px 12px',
