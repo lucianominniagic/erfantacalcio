@@ -475,43 +475,45 @@ export default function Economia() {
 
                         {/* Saldo */}
                         <Box sx={{ mt: 'auto' }}>
-                          <Tooltip
-                            title={
-                              !finaleGiocata
-                                ? 'Provvisorio: finale Champions non ancora giocata'
-                                : saldoPositivo
-                                  ? 'Importo da ricevere'
-                                  : 'Importo da pagare'
-                            }
-                          >
-                            <Chip
-                              size="small"
-                              icon={
-                                saldoZero ? (
-                                  <RemoveCircleOutline fontSize="small" />
-                                ) : saldoPositivo ? (
-                                  <TrendingUp fontSize="small" />
-                                ) : (
-                                  <TrendingDown fontSize="small" />
-                                )
-                              }
-                              label={`${saldoPositivo ? '+' : saldoZero ? '' : '-'}${formatCurrency(Math.abs(saldo))}${!finaleGiocata ? ' *' : ''}`}
-                              color={
-                                saldoZero
-                                  ? 'default'
+                          <Stack spacing={0.5}>
+                            <Tooltip
+                              title={
+                                !finaleGiocata
+                                  ? 'Provvisorio: finale Champions non ancora giocata'
                                   : saldoPositivo
-                                    ? 'success'
-                                    : 'error'
+                                    ? 'Importo da ricevere'
+                                    : 'Importo da pagare'
                               }
-                              variant="outlined"
-                              sx={{
-                                fontWeight: 700,
-                                fontSize: '0.78rem',
-                                width: '100%',
-                                justifyContent: 'flex-start',
-                              }}
-                            />
-                          </Tooltip>
+                            >
+                              <Chip
+                                size="small"
+                                icon={
+                                  saldoZero ? (
+                                    <RemoveCircleOutline fontSize="small" />
+                                  ) : saldoPositivo ? (
+                                    <TrendingUp fontSize="small" />
+                                  ) : (
+                                    <TrendingDown fontSize="small" />
+                                  )
+                                }
+                                label={`${saldoPositivo ? '+' : saldoZero ? '' : '-'}${squadra.isAdmin ? `${formatCurrency(Math.abs(saldo))} +${formatCurrency(detrazioneSito)} (sito)` : formatCurrency(Math.abs(saldo))}${!finaleGiocata ? ' *' : ''}`}
+                                color={
+                                  saldoZero
+                                    ? 'default'
+                                    : saldoPositivo
+                                      ? 'success'
+                                      : 'error'
+                                }
+                                variant="outlined"
+                                sx={{
+                                  fontWeight: 700,
+                                  fontSize: '0.78rem',
+                                  width: '100%',
+                                  justifyContent: 'flex-start',
+                                }}
+                              />
+                            </Tooltip>
+                          </Stack>
                         </Box>
                       </Paper>
                     </Grid>
