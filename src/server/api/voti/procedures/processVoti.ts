@@ -25,6 +25,7 @@ export const processVotiProcedure = adminProcedure
   .mutation(async (opts) => {
     try {
       console.log(`Processing ${opts.input.votiGiocatori.length} giocatori`)
+      console.dir(opts.input.votiGiocatori, { depth: null })
 
       const checkFormazioniResult = await checkFormazioni(
         opts.input.idCalendario,
@@ -46,7 +47,7 @@ export const processVotiProcedure = adminProcedure
         await Promise.all(
           opts.input.votiGiocatori.map(async (votoGiocatore) => {
             console.log(
-              `Processing voto for player: ${votoGiocatore.Nome} ${votoGiocatore.Squadra}`,
+              `Processing voto for player: ${votoGiocatore.Nome} ${votoGiocatore.Squadra} ${votoGiocatore.Voto} (id_pf: ${votoGiocatore.id_pf})`,
             )
             const idGiocatore = giocatori.find(
               (g) =>
