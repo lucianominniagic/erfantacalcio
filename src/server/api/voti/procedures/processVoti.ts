@@ -45,7 +45,7 @@ export const processVotiProcedure = adminProcedure
         await Promise.all(
           opts.input.votiGiocatori.map(async (votoGiocatore) => {
             console.log(
-              `Processing voto for player: ${votoGiocatore.Nome} ${votoGiocatore.Squadra}`,
+              `Processing voto for player: ${votoGiocatore.Nome} ${votoGiocatore.Squadra} ${votoGiocatore.Voto} (id_pf: ${votoGiocatore.id_pf})`,
             )
             const idGiocatore =
               giocatori.find(
