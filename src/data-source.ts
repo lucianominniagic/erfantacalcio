@@ -9,11 +9,11 @@ import * as Entities from './server/db/entities'
 // Incremental migration: do NOT enable synchronize in production.
 export const AppDataSource = new DataSource({
   type: 'postgres',
-  host: process.env.DB_HOST,
+  host: process.env.DATABASE_HOST,
   port: Number(process.env.DB_PORT),
-  username: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
+  username: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_DATABASE,
   migrations: [join(__dirname, 'server/db/migrations/*.{js,ts}')],
   entities: [
     Entities.AlboTrofei,
