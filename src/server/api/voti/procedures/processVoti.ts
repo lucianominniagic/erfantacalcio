@@ -24,6 +24,7 @@ export const processVotiProcedure = adminProcedure
   .mutation(async (opts) => {
     try {
       console.log(`Processing ${opts.input.votiGiocatori.length} giocatori`)
+      console.log(`Processing ${opts.input.votiGiocatori} giocatori`)
 
       const checkFormazioniResult = await checkFormazioni(
         opts.input.idCalendario,
