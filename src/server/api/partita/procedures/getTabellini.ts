@@ -1,17 +1,13 @@
 import { publicProcedure } from '~/server/api/trpc'
 import { z } from 'zod'
 import { getCalendario, mapCalendario } from '../../../utils/common'
-import {
-  getBonusModulo,
-  getBonusSenzaVoto,
-  getGiocatoriVotoInfluente,
-  getGolSegnati,
-  getTabellino,
-} from '../../../utils/common'
-import { Configurazione } from '~/config'
+import { getTabellino } from '../../../utils/common'
 import { Formazioni, Partite } from '~/server/db/entities'
 import { IsNull, LessThan, MoreThan, Not } from 'typeorm'
-import { mapVotoToTabellinoEntry } from '~/server/services/tabelliniService'
+import {
+  mapVotoToTabellinoEntry,
+  calcolaFantapunti,
+} from '~/server/services/tabelliniService'
 
 export const getTabelliniProcedure = publicProcedure
   .input(z.object({ idPartita: z.number() }))
@@ -48,17 +44,20 @@ export const getTabelliniProcedure = publicProcedure
             const giocatoriInfluentiHome = await getTabellino(
               datiHome?.idFormazione ?? 0,
             )
-
-            const fantapuntiHome = getGiocatoriVotoInfluente(
+            const risultatoHome = calcolaFantapunti(
               giocatoriInfluentiHome,
-            ).reduce((acc, cur) => acc + (cur.votoBonus ?? 0), 0)
+              datiHome?.modulo ?? '',
+              partita?.isFattoreHome === true,
+            )
 
             const giocatoriInfluentiAway = await getTabellino(
               datiAway?.idFormazione ?? 0,
             )
-            const fantapuntiAway = getGiocatoriVotoInfluente(
+            const risultatoAway = calcolaFantapunti(
               giocatoriInfluentiAway,
-            ).reduce((acc, cur) => acc + (cur.votoBonus ?? 0), 0)
+              datiAway?.modulo ?? '',
+              false,
+            )
 
             const altrePartite = await getAltrePartite(idCalendario)
 
@@ -69,34 +68,12 @@ export const getTabelliniProcedure = publicProcedure
                 dataOra: datiHome?.dataOra,
                 modulo: datiHome?.modulo,
                 idSquadra: datiHome?.idSquadra,
-                fattoreCasalingo:
-                  partita?.isFattoreHome === true
-                    ? Configurazione.bonusFattoreCasalingo
-                    : 0,
-                bonusModulo: getBonusModulo(datiHome.modulo),
-                bonusSenzaVoto: getBonusSenzaVoto(
-                  getGiocatoriVotoInfluente(giocatoriInfluentiHome).length,
-                ),
-                fantapunti: fantapuntiHome,
-                golSegnati: getGolSegnati(
-                  fantapuntiHome +
-                    getBonusModulo(datiHome.modulo) +
-                    getBonusSenzaVoto(
-                      getGiocatoriVotoInfluente(giocatoriInfluentiHome).length,
-                    ) +
-                    (partita?.isFattoreHome === true
-                      ? Configurazione.bonusFattoreCasalingo
-                      : 0),
-                ),
-                fantapuntiTotale:
-                  fantapuntiHome +
-                  getBonusModulo(datiHome.modulo) +
-                  getBonusSenzaVoto(
-                    getGiocatoriVotoInfluente(giocatoriInfluentiHome).length,
-                  ) +
-                  (partita?.isFattoreHome === true
-                    ? Configurazione.bonusFattoreCasalingo
-                    : 0),
+                fattoreCasalingo: risultatoHome.fattoreCasalingo,
+                bonusModulo: risultatoHome.bonusModulo,
+                bonusSenzaVoto: risultatoHome.bonusSenzaVoto,
+                fantapunti: risultatoHome.fantapuntiBase,
+                golSegnati: risultatoHome.golSegnati,
+                fantapuntiTotale: risultatoHome.fantapuntiTotale,
                 Voti: datiHome.Voti.map((voto) =>
                   mapVotoToTabellinoEntry(voto, giocatoriInfluentiHome),
                 ),
@@ -105,25 +82,12 @@ export const getTabelliniProcedure = publicProcedure
                 dataOra: datiAway?.dataOra,
                 modulo: datiAway?.modulo,
                 idSquadra: datiAway?.idSquadra,
-                fattoreCasalingo: 0,
-                bonusModulo: getBonusModulo(datiAway.modulo),
-                bonusSenzaVoto: getBonusSenzaVoto(
-                  getGiocatoriVotoInfluente(giocatoriInfluentiAway).length,
-                ),
-                fantapunti: fantapuntiAway,
-                golSegnati: getGolSegnati(
-                  fantapuntiAway +
-                    getBonusModulo(datiAway.modulo) +
-                    getBonusSenzaVoto(
-                      getGiocatoriVotoInfluente(giocatoriInfluentiAway).length,
-                    ),
-                ),
-                fantapuntiTotale:
-                  fantapuntiAway +
-                  getBonusModulo(datiAway.modulo) +
-                  getBonusSenzaVoto(
-                    getGiocatoriVotoInfluente(giocatoriInfluentiAway).length,
-                  ),
+                fattoreCasalingo: risultatoAway.fattoreCasalingo,
+                bonusModulo: risultatoAway.bonusModulo,
+                bonusSenzaVoto: risultatoAway.bonusSenzaVoto,
+                fantapunti: risultatoAway.fantapuntiBase,
+                golSegnati: risultatoAway.golSegnati,
+                fantapuntiTotale: risultatoAway.fantapuntiTotale,
                 Voti: datiAway.Voti.map((voto) =>
                   mapVotoToTabellinoEntry(voto, giocatoriInfluentiAway),
                 ),

@@ -1,12 +1,7 @@
 import { Configurazione } from '~/config'
-import {
-  getBonusModulo,
-  getGiocatoriVotoInfluente,
-  getBonusSenzaVoto,
-  getGolSegnati,
-  getTabellino,
-} from '../../../utils/common'
+import { getTabellino } from '../../../utils/common'
 import { Formazioni, Partite } from '~/server/db/entities'
+import { calcolaFantapunti } from '~/server/services/tabelliniService'
 
 export async function getFormazione(idPartita: number, idSquadra: number) {
   const formazioni = await Formazioni.find({
@@ -35,55 +30,14 @@ export function mapPartite(
         includeTabellini && formazioneAway?.idFormazione
           ? await getTabellino(formazioneAway?.idFormazione)
           : []
-      const fantapuntiHome = includeTabellini
-        ? getGiocatoriVotoInfluente(tabellinoHome).reduce(
-            (acc, cur) => acc + (cur.votoBonus ?? 0),
-            0,
-          )
-        : 0
-      const fantapuntiAway = includeTabellini
-        ? getGiocatoriVotoInfluente(tabellinoAway).reduce(
-            (acc, cur) => acc + (cur.votoBonus ?? 0),
-            0,
-          )
-        : 0
-      const bonusModuloHome =
-        includeTabellini && fantapuntiHome > 0
-          ? getBonusModulo(formazioneHome?.modulo ?? '')
-          : 0
-      const bonusModuloAway =
-        includeTabellini && fantapuntiAway > 0
-          ? getBonusModulo(formazioneAway?.modulo ?? '')
-          : 0
-      const bonusSenzaVotoHome =
-        includeTabellini && fantapuntiHome > 0
-          ? getBonusSenzaVoto(getGiocatoriVotoInfluente(tabellinoHome).length)
-          : 0
-      const bonusSenzaVotoAway =
-        includeTabellini && fantapuntiAway > 0
-          ? getBonusSenzaVoto(getGiocatoriVotoInfluente(tabellinoAway).length)
-          : 0
-      const totaleFantapuntiHome =
-        includeTabellini && fantapuntiHome > 0
-          ? fantapuntiHome +
-            bonusModuloHome +
-            bonusSenzaVotoHome +
-            (p.fattoreCasalingo && fantapuntiHome > 0
-              ? Configurazione.bonusFattoreCasalingo
-              : 0)
-          : 0
-      const totaleFantapuntiAway =
-        includeTabellini && fantapuntiAway > 0
-          ? fantapuntiAway + bonusModuloAway + bonusSenzaVotoAway
-          : 0
-      const golSegnatiHome =
-        includeTabellini && backOfficeMode && fantapuntiHome > 0
-          ? getGolSegnati(totaleFantapuntiHome)
-          : 0
-      const golSegnatiAway =
-        includeTabellini && backOfficeMode && fantapuntiAway > 0
-          ? getGolSegnati(totaleFantapuntiAway)
-          : 0
+
+      const risultatoHome = includeTabellini
+        ? calcolaFantapunti(tabellinoHome, formazioneHome?.modulo ?? '', p.fattoreCasalingo ?? false)
+        : null
+
+      const risultatoAway = includeTabellini
+        ? calcolaFantapunti(tabellinoAway, formazioneAway?.modulo ?? '', false)
+        : null
 
       return {
         idPartita: p.idPartita,
@@ -97,11 +51,11 @@ export function mapPartite(
         multaHome: p.hasMultaH,
         golHome: p.golH,
         tabellinoHome: tabellinoHome,
-        bonusModuloHome,
-        bonusSenzaVotoHome,
-        fantapuntiHome,
-        calcoloGolSegnatiHome: golSegnatiHome,
-        totaleFantapuntiHome,
+        bonusModuloHome: risultatoHome?.bonusModulo ?? 0,
+        bonusSenzaVotoHome: risultatoHome?.bonusSenzaVoto ?? 0,
+        fantapuntiHome: risultatoHome?.fantapuntiBase ?? 0,
+        calcoloGolSegnatiHome: backOfficeMode ? (risultatoHome?.golSegnati ?? 0) : 0,
+        totaleFantapuntiHome: risultatoHome?.fantapuntiTotale ?? 0,
         idFormazioneAway: formazioneAway?.idFormazione,
         idAway: p.idSquadraA,
         squadraAway: p.SquadraAway?.nomeSquadra,
@@ -109,11 +63,11 @@ export function mapPartite(
         multaAway: p.hasMultaA,
         golAway: p.golA,
         tabellinoAway: tabellinoAway,
-        bonusModuloAway,
-        bonusSenzaVotoAway,
-        fantapuntiAway,
-        calcoloGolSegnatiAway: golSegnatiAway,
-        totaleFantapuntiAway,
+        bonusModuloAway: risultatoAway?.bonusModulo ?? 0,
+        bonusSenzaVotoAway: risultatoAway?.bonusSenzaVoto ?? 0,
+        fantapuntiAway: risultatoAway?.fantapuntiBase ?? 0,
+        calcoloGolSegnatiAway: backOfficeMode ? (risultatoAway?.golSegnati ?? 0) : 0,
+        totaleFantapuntiAway: risultatoAway?.fantapuntiTotale ?? 0,
       }
     }),
   )

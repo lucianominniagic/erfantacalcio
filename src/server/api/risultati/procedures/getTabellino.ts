@@ -1,14 +1,9 @@
 import { z } from 'zod'
 import { adminProcedure } from '~/server/api/trpc'
-import {
-  getTabellino,
-  getGiocatoriVotoInfluente,
-  getBonusModulo,
-  getBonusSenzaVoto,
-  getGolSegnati,
-} from '../../../utils/common'
+import { getTabellino } from '../../../utils/common'
 import { Configurazione } from '~/config'
 import { getFormazione } from '../services/partiteMapping'
+import { calcolaFantapunti } from '~/server/services/tabelliniService'
 
 export const getTabellinoProcedure = adminProcedure
   .input(z.object({ idPartita: z.number(), idSquadra: z.number().nullable() }))
@@ -24,21 +19,20 @@ export const getTabellinoProcedure = adminProcedure
             resultFormazione.idFormazione,
           )
           if (giocatoriInfluenti) {
-            const fantapunti = getGiocatoriVotoInfluente(
+            const risultato = calcolaFantapunti(
               giocatoriInfluenti,
-            ).reduce((acc, cur) => acc + (cur.votoBonus ?? 0), 0)
+              resultFormazione.modulo,
+              false, // questa procedura non conosce home/away — fattoreCasalingo gestito lato frontend
+            )
             return {
               idPartita: opts.input.idPartita,
               idSquadra: opts.input.idSquadra,
-              fantapunti,
-              fattoreCasalingo: Configurazione.bonusFattoreCasalingo,
-              bonusModulo: getBonusModulo(resultFormazione.modulo),
-              giocatoriInfluenti:
-                getGiocatoriVotoInfluente(giocatoriInfluenti).length,
-              bonusSenzaVoto: getBonusSenzaVoto(
-                getGiocatoriVotoInfluente(giocatoriInfluenti).length,
-              ),
-              golSegnati: getGolSegnati(fantapunti),
+              fantapunti: risultato.fantapuntiBase,
+              fattoreCasalingo: Configurazione.bonusFattoreCasalingo, // costante per il frontend
+              bonusModulo: risultato.bonusModulo,
+              giocatoriInfluenti: risultato.giocatoriInfluentiCount,
+              bonusSenzaVoto: risultato.bonusSenzaVoto,
+              golSegnati: risultato.golSegnati,
             }
           }
         } else {

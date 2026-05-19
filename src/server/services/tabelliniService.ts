@@ -5,6 +5,13 @@
  * Rimuove la duplicazione tra home e away in getTabellini.
  */
 
+import {
+  getBonusModulo,
+  getBonusSenzaVoto,
+  getGolSegnati,
+} from '~/server/utils/common'
+import { Configurazione } from '~/config'
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface GiocatoreInfluente {
@@ -84,5 +91,59 @@ export function mapVotoToTabellinoEntry(
     votoBonus: influente?.votoBonus ?? 0,
     isSostituito: influente?.isSostituito ?? false,
     isVotoInfluente: influente?.isVotoInfluente ?? false,
+  }
+}
+
+// ─── calcolaFantapunti ────────────────────────────────────────────────────────
+
+export interface CalcolaFantapuntiResult {
+  fantapuntiBase: number
+  fantapuntiTotale: number
+  bonusModulo: number
+  bonusSenzaVoto: number
+  fattoreCasalingo: number
+  golSegnati: number
+  giocatoriInfluentiCount: number
+}
+
+export function calcolaFantapunti(
+  giocatoriFormazione: GiocatoreInfluente[],
+  modulo: string,
+  isFattoreCasalingo: boolean,
+): CalcolaFantapuntiResult {
+  const influenti = giocatoriFormazione.filter((g) => g.isVotoInfluente)
+  const fantapuntiBase = influenti.reduce(
+    (acc, g) => acc + (g.votoBonus ?? 0),
+    0,
+  )
+
+  if (fantapuntiBase === 0) {
+    return {
+      fantapuntiBase: 0,
+      fantapuntiTotale: 0,
+      bonusModulo: 0,
+      bonusSenzaVoto: 0,
+      fattoreCasalingo: 0,
+      golSegnati: 0,
+      giocatoriInfluentiCount: influenti.length,
+    }
+  }
+
+  const bonusModulo = getBonusModulo(modulo)
+  const bonusSenzaVoto = getBonusSenzaVoto(influenti.length)
+  const fattoreCasalingo = isFattoreCasalingo
+    ? Configurazione.bonusFattoreCasalingo
+    : 0
+  const fantapuntiTotale =
+    fantapuntiBase + bonusModulo + bonusSenzaVoto + fattoreCasalingo
+
+  return {
+    fantapuntiBase,
+    fantapuntiTotale,
+    bonusModulo,
+    bonusSenzaVoto,
+    fattoreCasalingo,
+    golSegnati: getGolSegnati(fantapuntiTotale),
+    giocatoriInfluentiCount: influenti.length,
   }
 }
