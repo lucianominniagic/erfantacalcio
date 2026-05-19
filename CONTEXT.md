@@ -38,7 +38,8 @@ Esistono due livelli di accesso: **admin** (gestisce la lega) e **presidente** (
 | **maglia** | Configurazione grafica della divisa della squadra fantasy (colori, stile), salvata come stringa nella colonna `utente.maglia`. |
 | **montepremi** | Totale dei versamenti dei presidenti (quote + multe + mercato), al netto della detrazione sito. Rappresenta il fondo premi distribuibile. |
 | **premio** | Quota del montepremi spettante a una squadra in base alla posizione finale in campionato (1°/2°/3°) e/o alla vittoria della Champions fantasy. |
-| **saldo** | Differenza tra il premio ricevuto e il totale versato da un presidente (quote + multe + mercato). Positivo = credito, negativo = debito.
+| **saldo** | Differenza tra il premio ricevuto e il totale versato da un presidente (quote + multe + mercato). Positivo = credito, negativo = debito. |
+| **caricamento voti** | Processo admin che importa i voti da CSV FantaGazzetta per una giornata: parsing del file → lookup/creazione giocatori → auto-trasferimento se mancante → upsert voti su DB. |
 
 ---
 
