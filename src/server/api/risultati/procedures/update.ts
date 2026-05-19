@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { adminProcedure } from '~/server/api/trpc'
-import { UpdateClassifica } from '../services/classifica'
+import { punteggioPartita, aggiornaClassifica, aggiornaMulte } from '../services/risultatiService'
 import { Calendario, Formazioni, Partite } from '~/server/db/entities'
 import { AppDataSource } from '~/data-source'
 
@@ -53,13 +53,13 @@ export const updateRisultatiProcedure = adminProcedure
             Partite,
             { idPartita: opts.input.idPartita },
             {
-              puntiH: getPunti(
+              puntiH: punteggioPartita(
                 partita?.Calendario.Torneo.hasClassifica ?? false,
                 opts.input.multaHome,
                 opts.input.golHome,
                 opts.input.golAway,
               ),
-              puntiA: getPunti(
+              puntiA: punteggioPartita(
                 partita?.Calendario.Torneo.hasClassifica ?? false,
                 opts.input.multaAway,
                 opts.input.golAway,
@@ -79,22 +79,16 @@ export const updateRisultatiProcedure = adminProcedure
           )
 
           if (partita?.Calendario.Torneo.hasClassifica) {
-            await UpdateClassifica(
-              trx,
-              idSquadraHome,
-              partita.Calendario.Torneo.idTorneo,
-            )
+            await aggiornaClassifica(trx, idSquadraHome, partita.Calendario.Torneo.idTorneo)
             console.info(
               `Aggiornate classifica e utenti (multe) per idsquadraHome: ${idSquadraHome} e idTorneo: ${partita.Calendario.Torneo.idTorneo}`,
             )
-            await UpdateClassifica(
-              trx,
-              idSquadraAway,
-              partita.Calendario.Torneo.idTorneo,
-            )
+            await aggiornaMulte(trx, idSquadraHome)
+            await aggiornaClassifica(trx, idSquadraAway, partita.Calendario.Torneo.idTorneo)
             console.info(
               `Aggiornate classifica e utenti (multe) per idsquadraAway: ${idSquadraAway} e idTorneo: ${partita.Calendario.Torneo.idTorneo}`,
             )
+            await aggiornaMulte(trx, idSquadraAway)
           }
         })
       }
@@ -103,20 +97,3 @@ export const updateRisultatiProcedure = adminProcedure
       throw error
     }
   })
-
-function getPunti(
-  hasClassifica: boolean,
-  multa: boolean,
-  gol1: number,
-  gol2: number,
-): number {
-  return hasClassifica
-    ? multa
-      ? 0
-      : gol1 > gol2
-        ? 3
-        : gol1 === gol2
-          ? 1
-          : 0
-    : 0
-}

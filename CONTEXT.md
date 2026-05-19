@@ -40,6 +40,7 @@ Esistono due livelli di accesso: **admin** (gestisce la lega) e **presidente** (
 | **premio** | Quota del montepremi spettante a una squadra in base alla posizione finale in campionato (1°/2°/3°) e/o alla vittoria della Champions fantasy. |
 | **saldo** | Differenza tra il premio ricevuto e il totale versato da un presidente (quote + multe + mercato). Positivo = credito, negativo = debito. |
 | **caricamento voti** | Processo admin che importa i voti da CSV FantaGazzetta per una giornata: parsing del file → lookup/creazione giocatori → auto-trasferimento se mancante → upsert voti su DB. |
+| **punteggioPartita** | Punti classifica assegnati a una squadra per una partita: vittoria = 3, pareggio = 1, sconfitta = 0, multa = 0. Regola applicata solo ai tornei con `hasClassifica = true`. |
 
 ---
 
