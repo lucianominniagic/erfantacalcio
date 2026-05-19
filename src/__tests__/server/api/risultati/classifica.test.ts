@@ -14,7 +14,7 @@ vi.mock('~/config', () => ({
   },
 }))
 
-import { UpdateClassifica } from '~/server/api/risultati/services/classifica'
+import { aggiornaClassifica, aggiornaMulte } from '~/server/api/risultati/services/risultatiService'
 import { Classifiche, Utenti } from '~/server/db/entities'
 
 // ---------------------------------------------------------------------------
@@ -54,10 +54,10 @@ function makeEntityManager(partite: PartitaStub[]) {
 }
 
 // ---------------------------------------------------------------------------
-// Tests
+// Tests — aggiornaClassifica
 // ---------------------------------------------------------------------------
 
-describe('UpdateClassifica', () => {
+describe('aggiornaClassifica', () => {
   const ID_SQUADRA = 1
   const ID_TORNEO = 10
 
@@ -68,7 +68,7 @@ describe('UpdateClassifica', () => {
     ]
     const trx = makeEntityManager(partite)
 
-    await UpdateClassifica(trx, ID_SQUADRA, ID_TORNEO)
+    await aggiornaClassifica(trx, ID_SQUADRA, ID_TORNEO)
 
     const updateCall = (trx.update as ReturnType<typeof vi.fn>).mock.calls.find(
       (c) => c[0] === Classifiche,
@@ -93,7 +93,7 @@ describe('UpdateClassifica', () => {
     ]
     const trx = makeEntityManager(partite)
 
-    await UpdateClassifica(trx, ID_SQUADRA, ID_TORNEO)
+    await aggiornaClassifica(trx, ID_SQUADRA, ID_TORNEO)
 
     const updateCall = (trx.update as ReturnType<typeof vi.fn>).mock.calls.find(
       (c) => c[0] === Classifiche,
@@ -109,7 +109,7 @@ describe('UpdateClassifica', () => {
     ]
     const trx = makeEntityManager(partite)
 
-    await UpdateClassifica(trx, ID_SQUADRA, ID_TORNEO)
+    await aggiornaClassifica(trx, ID_SQUADRA, ID_TORNEO)
 
     const updateCall = (trx.update as ReturnType<typeof vi.fn>).mock.calls.find(
       (c) => c[0] === Classifiche,
@@ -126,7 +126,7 @@ describe('UpdateClassifica', () => {
     ]
     const trx = makeEntityManager(partite)
 
-    await UpdateClassifica(trx, ID_SQUADRA, ID_TORNEO)
+    await aggiornaClassifica(trx, ID_SQUADRA, ID_TORNEO)
 
     const updateCall = (trx.update as ReturnType<typeof vi.fn>).mock.calls.find(
       (c) => c[0] === Classifiche,
@@ -148,7 +148,7 @@ describe('UpdateClassifica', () => {
     ]
     const trx = makeEntityManager(partite)
 
-    await UpdateClassifica(trx, ID_SQUADRA, ID_TORNEO)
+    await aggiornaClassifica(trx, ID_SQUADRA, ID_TORNEO)
 
     const updateCall = (trx.update as ReturnType<typeof vi.fn>).mock.calls.find(
       (c) => c[0] === Classifiche,
@@ -177,7 +177,7 @@ describe('UpdateClassifica', () => {
     ]
     const trx = makeEntityManager(partite)
 
-    await UpdateClassifica(trx, ID_SQUADRA, ID_TORNEO)
+    await aggiornaClassifica(trx, ID_SQUADRA, ID_TORNEO)
 
     const updateCall = (trx.update as ReturnType<typeof vi.fn>).mock.calls.find(
       (c) => c[0] === Classifiche,
@@ -187,22 +187,6 @@ describe('UpdateClassifica', () => {
     expect(data.differenzaReti).toBe(3)
   })
 
-  it('calculates importoMulte correctly', async () => {
-    const partite = [
-      makePartita({ idSquadraH: 1, hasMultaH: true }),
-      makePartita({ idSquadraA: 1, hasMultaA: true }),
-    ]
-    const trx = makeEntityManager(partite)
-
-    await UpdateClassifica(trx, ID_SQUADRA, ID_TORNEO)
-
-    const utentiUpdateCall = (
-      trx.update as ReturnType<typeof vi.fn>
-    ).mock.calls.find((c) => c[0] === Utenti)
-    // 2 multe × 10 = 20
-    expect(utentiUpdateCall![2].importoMulte).toBe(20)
-  })
-
   it('calculates giocate correctly', async () => {
     const partite = [
       makePartita({ idSquadraH: 1, idSquadraA: 2, golH: 1, golA: 0 }),
@@ -210,7 +194,7 @@ describe('UpdateClassifica', () => {
     ]
     const trx = makeEntityManager(partite)
 
-    await UpdateClassifica(trx, ID_SQUADRA, ID_TORNEO)
+    await aggiornaClassifica(trx, ID_SQUADRA, ID_TORNEO)
 
     const updateCall = (trx.update as ReturnType<typeof vi.fn>).mock.calls.find(
       (c) => c[0] === Classifiche,
@@ -219,3 +203,28 @@ describe('UpdateClassifica', () => {
     expect(data.giocate).toBe(2)
   })
 })
+
+// ---------------------------------------------------------------------------
+// Tests — aggiornaMulte
+// ---------------------------------------------------------------------------
+
+describe('aggiornaMulte', () => {
+  const ID_SQUADRA = 1
+
+  it('calculates importoMulte correctly', async () => {
+    const partite = [
+      makePartita({ idSquadraH: 1, hasMultaH: true }),
+      makePartita({ idSquadraA: 1, hasMultaA: true }),
+    ]
+    const trx = makeEntityManager(partite)
+
+    await aggiornaMulte(trx, ID_SQUADRA)
+
+    const utentiUpdateCall = (
+      trx.update as ReturnType<typeof vi.fn>
+    ).mock.calls.find((c) => c[0] === Utenti)
+    // 2 multe × 10 = 20
+    expect(utentiUpdateCall![2].importoMulte).toBe(20)
+  })
+})
+
