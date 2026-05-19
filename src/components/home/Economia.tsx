@@ -1,6 +1,8 @@
- 
+
 'use client'
+import { useMemo } from 'react'
 import { api } from '~/utils/api'
+import { calcolaEconomia } from '~/server/services/economiaService'
 import {
   Avatar,
   Box,
@@ -25,16 +27,6 @@ import {
 } from '@mui/icons-material'
 import { formatCurrency } from '~/utils/numberUtils'
 import { GenericCard } from '~/components/cards'
-
-// Percentuali premi
-const PERC_PRIMO = 52
-const PERC_SECONDO = 20
-const PERC_TERZO = 13
-const PERC_CHAMPIONS = 15
-
-function calcolaPercentuale(somma: number, percentuale: number): number {
-  return Math.round((somma * percentuale) / 100)
-}
 
 function MetricBox({
   label,
@@ -158,36 +150,23 @@ export default function Economia() {
   const montepremi =
     importoAnnuale + importoMercato + importoMulte - detrazioneSito
 
-  const classificaMap: Record<number, number> =
-    saldoData.data?.classificaMap ?? {}
-  const idVincitriceChampions = saldoData.data?.idVincitriceChampions ?? null
   const finaleGiocata = saldoData.data?.finaleGiocata ?? false
 
-  function getPremio(idSquadra: number): number {
-    let premio = 0
-    const pos = classificaMap[idSquadra]
-    if (pos === 1) premio += calcolaPercentuale(montepremi, PERC_PRIMO)
-    else if (pos === 2) premio += calcolaPercentuale(montepremi, PERC_SECONDO)
-    else if (pos === 3) premio += calcolaPercentuale(montepremi, PERC_TERZO)
-    if (idVincitriceChampions === idSquadra)
-      premio += calcolaPercentuale(montepremi, PERC_CHAMPIONS)
-    return premio
-  }
-
-  function getPremiVinti(
-    idSquadra: number,
-  ): { label: string; color: 'warning' | 'info' | 'default' }[] {
-    const premi: { label: string; color: 'warning' | 'info' | 'default' }[] = []
-    const pos = classificaMap[idSquadra]
-    if (pos === 1) premi.push({ label: '1° Classificato', color: 'warning' })
-    else if (pos === 2)
-      premi.push({ label: '2° Classificato', color: 'default' })
-    else if (pos === 3)
-      premi.push({ label: '3° Classificato', color: 'default' })
-    if (idVincitriceChampions === idSquadra)
-      premi.push({ label: 'Vincitore Champions', color: 'info' })
-    return premi
-  }
+  const economiaCalcolata = useMemo(() => {
+    if (!economiaList.data || !saldoData.data) return null
+    return calcolaEconomia({
+      montepremi,
+      classificaMap: saldoData.data.classificaMap ?? {},
+      idVincitriceChampions: saldoData.data.idVincitriceChampions ?? null,
+      squadre: economiaList.data.map((s) => ({
+        id: s.id,
+        importoAnnuale: s.importoAnnuale ?? null,
+        importoMulte: s.importoMulte ?? null,
+        importoMercato: s.importoMercato ?? null,
+        isAdmin: s.isAdmin,
+      })),
+    })
+  }, [economiaList.data, saldoData.data, montepremi])
 
   const isLoading = economiaList.isLoading || saldoData.isLoading
 
@@ -297,23 +276,23 @@ export default function Economia() {
             <Stack spacing={0}>
               <PremioRow
                 label="1° Classificato"
-                value={calcolaPercentuale(montepremi, PERC_PRIMO)}
-                perc={PERC_PRIMO}
+                value={economiaCalcolata?.premi.primo ?? 0}
+                perc={52}
               />
               <PremioRow
                 label="2° Classificato"
-                value={calcolaPercentuale(montepremi, PERC_SECONDO)}
-                perc={PERC_SECONDO}
+                value={economiaCalcolata?.premi.secondo ?? 0}
+                perc={20}
               />
               <PremioRow
                 label="3° Classificato"
-                value={calcolaPercentuale(montepremi, PERC_TERZO)}
-                perc={PERC_TERZO}
+                value={economiaCalcolata?.premi.terzo ?? 0}
+                perc={13}
               />
               <PremioRow
                 label="Vincitore Champions"
-                value={calcolaPercentuale(montepremi, PERC_CHAMPIONS)}
-                perc={PERC_CHAMPIONS}
+                value={economiaCalcolata?.premi.champions ?? 0}
+                perc={15}
               />
             </Stack>
           </GenericCard>
@@ -342,16 +321,13 @@ export default function Economia() {
                   <Skeleton variant="rounded" height={180} />
                 </Grid>
               ))
-            : [...(economiaList.data ?? [])]
-                .sort((a, b) => getPremio(b.id) - getPremio(a.id))
-                .map((squadra) => {
-                  const pagato =
-                    (squadra.importoAnnuale ?? 0) +
-                    (squadra.importoMulte ?? 0) +
-                    (squadra.importoMercato ?? 0)
-                  const premio = getPremio(squadra.id)
-                  const premiVinti = getPremiVinti(squadra.id)
-                  const saldo = premio - pagato
+            : (economiaCalcolata?.squadreCalcolate ?? []).map((calcolata) => {
+                  const squadra = economiaList.data?.find(
+                    (s) => s.id === calcolata.id,
+                  )
+                  if (!squadra) return null
+                  const premiVinti = calcolata.premiVinti
+                  const saldo = calcolata.saldo
                   const saldoPositivo = saldo > 0
                   const saldoZero = saldo === 0
 

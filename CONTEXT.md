@@ -36,6 +36,9 @@ Esistono due livelli di accesso: **admin** (gestisce la lega) e **presidente** (
 | **tabellino** | Riepilogo dettagliato di una partita fantasy: voti di ogni titolare/riserva, bonus/malus applicati, gol fantasy segnati, punteggio finale. |
 | **albo** | Hall of fame delle stagioni passate: per ogni stagione vengono registrati il vincitore del campionato, il vincitore della champions e i piazzamenti. |
 | **maglia** | Configurazione grafica della divisa della squadra fantasy (colori, stile), salvata come stringa nella colonna `utente.maglia`. |
+| **montepremi** | Totale dei versamenti dei presidenti (quote + multe + mercato), al netto della detrazione sito. Rappresenta il fondo premi distribuibile. |
+| **premio** | Quota del montepremi spettante a una squadra in base alla posizione finale in campionato (1°/2°/3°) e/o alla vittoria della Champions fantasy. |
+| **saldo** | Differenza tra il premio ricevuto e il totale versato da un presidente (quote + multe + mercato). Positivo = credito, negativo = debito.
 
 ---
 
