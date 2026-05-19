@@ -24,8 +24,9 @@ async function authenticate(input: { username: string; password: string }) {
 
     // Recupera l'utente per username — confronto password separato
     // per supportare la lazy migration MD5 → bcrypt.
+    const identifier = input.username.toLowerCase()
     const utente = await Utenti.findOne({
-      where: { username: input.username.toLowerCase() },
+      where: [{ username: identifier }, { mail: identifier }],
     })
 
     if (!utente) {

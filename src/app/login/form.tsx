@@ -33,7 +33,7 @@ export const LoginForm = () => {
 
     const validationResult = loginFormSchema.safeParse(formValues)
     if (!validationResult.success) {
-      setError('Compila username e password.')
+      setError('Compila username (o email) e password.')
       return
     }
 
@@ -71,9 +71,9 @@ export const LoginForm = () => {
           required
           fullWidth
           id="username"
-          label="Username"
+          label="Username o email"
           name="username"
-          autoComplete="username"
+          autoComplete="username email"
           autoFocus
           value={formValues.username}
           onChange={(e) => setFormValues((v) => ({ ...v, username: e.target.value }))}
