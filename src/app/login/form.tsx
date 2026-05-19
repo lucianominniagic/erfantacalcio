@@ -1,20 +1,28 @@
 'use client'
 import { signIn } from 'next-auth/react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { type ChangeEvent, useState } from 'react'
+import { useState } from 'react'
 
-//import material ui
-import { Button, TextField, Box, Typography, Link } from '@mui/material'
+import {
+  Alert,
+  AlertTitle,
+  Button,
+  IconButton,
+  InputAdornment,
+  Stack,
+  TextField,
+  Box,
+  Link,
+} from '@mui/material'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 import { loginFormSchema } from '~/schemas/presidente'
 
 export const LoginForm = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [formValues, setFormValues] = useState({
-    username: '',
-    password: '',
-  })
+  const [formValues, setFormValues] = useState({ username: '', password: '' })
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const searchParams = useSearchParams()
   const callbackUrl = searchParams?.get('callbackUrl') ?? '/'
@@ -22,89 +30,114 @@ export const LoginForm = () => {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    console.log('submitting form', formValues)
+
+    const validationResult = loginFormSchema.safeParse(formValues)
+    if (!validationResult.success) {
+      setError('Compila username e password.')
+      return
+    }
+
     try {
-      const validationResult = loginFormSchema.safeParse(formValues)
-      if (!validationResult.success) {
-        setError('compilare i campi')
-      } else {
-        setLoading(true)
-
-        const res = await signIn('erFantacalcio', {
-          redirect: false,
-          username: formValues.username,
-          password: formValues.password,
-          callbackUrl,
-        })
-
-        setLoading(false)
-        if (res?.error) {
-          setError('invalid username or password')
-        } else {
-          setFormValues({ username: '', password: '' })
-          router.push(callbackUrl)
-        }
-      }
-    } catch (error) {
+      setLoading(true)
+      const res = await signIn('erFantacalcio', {
+        redirect: false,
+        username: formValues.username,
+        password: formValues.password,
+        callbackUrl,
+      })
       setLoading(false)
-      setError(error instanceof Error ? error.message : 'Unknown Error')
+
+      if (res?.error) {
+        setError('Username o password non corretti.')
+      } else {
+        setFormValues({ username: '', password: '' })
+        router.push(callbackUrl)
+      }
+    } catch (err) {
+      setLoading(false)
+      setError(err instanceof Error ? err.message : 'Si è verificato un errore.')
     }
   }
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target
-    setFormValues({ ...formValues, [name]: value })
-  }
-
   return (
-    <Box component="form" onSubmit={onSubmit} noValidate sx={{ mt: 1 }}>
-      <TextField
-        margin="normal"
-        required
-        fullWidth
-        id="username"
-        label="Username"
-        name="username"
-        autoComplete="username"
-        autoFocus
-        onChange={handleChange}
-      />
-      <TextField
-        margin="normal"
-        required
-        fullWidth
-        name="password"
-        label="Password"
-        type="password"
-        id="password"
-        onChange={handleChange}
-        autoComplete="current-password"
-      />
-      {error && (
-        <Typography color="error" variant="h3">
-          {error}
-        </Typography>
-      )}
-      <Button
-        type="submit"
-        fullWidth
-        color="primary"
-        variant="contained"
-        sx={{ mt: 3, mb: 2, py: 1.25 }}
-        disabled={loading}
-      >
-        {loading ? 'loading...' : 'Sign in'}
-      </Button>
-      <Box sx={{ textAlign: 'center' }}>
-        <Link
-          href="/recupera-password"
-          underline="hover"
-          variant="body2"
-          sx={{ color: 'text.secondary', fontSize: '0.8rem' }}
+    <Box
+      component="form"
+      onSubmit={onSubmit}
+      noValidate
+      sx={{ width: '100%' }}
+    >
+      <Stack spacing={2.5}>
+        <TextField
+          required
+          fullWidth
+          id="username"
+          label="Username"
+          name="username"
+          autoComplete="username"
+          autoFocus
+          value={formValues.username}
+          onChange={(e) => setFormValues((v) => ({ ...v, username: e.target.value }))}
+        />
+
+        <TextField
+          required
+          fullWidth
+          name="password"
+          label="Password"
+          type={showPassword ? 'text' : 'password'}
+          id="password"
+          autoComplete="current-password"
+          value={formValues.password}
+          onChange={(e) => setFormValues((v) => ({ ...v, password: e.target.value }))}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setShowPassword((v) => !v)}
+                  edge="end"
+                  size="small"
+                  aria-label={showPassword ? 'Nascondi password' : 'Mostra password'}
+                >
+                  {showPassword ? (
+                    <VisibilityOff fontSize="small" />
+                  ) : (
+                    <Visibility fontSize="small" />
+                  )}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+
+        {error && (
+          <Alert severity="error" onClose={() => setError('')}>
+            <AlertTitle>Errore</AlertTitle>
+            {error}
+          </Alert>
+        )}
+
+        <Button
+          type="submit"
+          fullWidth
+          color="primary"
+          variant="contained"
+          sx={{ py: 1.25 }}
+          disabled={loading}
         >
-          Hai dimenticato la password?
-        </Link>
-      </Box>
+          {loading ? 'Accesso in corso...' : 'Accedi'}
+        </Button>
+
+        <Box sx={{ textAlign: 'center' }}>
+          <Link
+            href="/recupera-password"
+            underline="hover"
+            variant="body2"
+            sx={{ color: 'text.secondary', fontSize: '0.8rem' }}
+          >
+            Hai dimenticato la password?
+          </Link>
+        </Box>
+      </Stack>
     </Box>
   )
 }

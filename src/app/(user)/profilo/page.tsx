@@ -36,6 +36,16 @@ export default function ProfiloPage() {
     setSuccess(false)
     changePassword.reset()
 
+    if (!oldPassword) {
+      setClientError('Inserisci la vecchia password.')
+      return
+    }
+
+    if (newPassword.length < 6) {
+      setClientError('La nuova password deve contenere almeno 6 caratteri.')
+      return
+    }
+
     if (newPassword !== confirmPassword) {
       setClientError('Le nuove password non coincidono.')
       return
@@ -58,7 +68,16 @@ export default function ProfiloPage() {
     }
   }
 
-  const serverError = changePassword.error?.message ?? null
+  const serverError = (() => {
+    const msg = changePassword.error?.message
+    if (!msg) return null
+    try {
+      JSON.parse(msg)
+      return 'Si è verificato un errore. Riprova.'
+    } catch {
+      return msg
+    }
+  })()
 
   return (
     <Box sx={{ maxWidth: 480, mx: 'auto', mt: 2 }}>

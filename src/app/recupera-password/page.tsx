@@ -12,6 +12,7 @@ import Link from '@mui/material/Link'
 import { LockOpen } from '@mui/icons-material'
 import { alpha, useTheme } from '@mui/material/styles'
 import { api } from '~/utils/api'
+import { requestPasswordResetSchema } from '~/schemas/auth'
 
 // ---------------------------------------------------------------------------
 // Inner form — isolated so future useSearchParams usage can be Suspense-safe
@@ -21,9 +22,17 @@ function RecuperaPasswordForm() {
   const requestReset = api.auth.requestPasswordReset.useMutation()
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [clientError, setClientError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setClientError(null)
+
+    const result = requestPasswordResetSchema.safeParse({ email })
+    if (!result.success) {
+      setClientError('Inserisci un indirizzo email valido.')
+      return
+    }
 
     try {
       await requestReset.mutateAsync({ email })
@@ -67,12 +76,19 @@ function RecuperaPasswordForm() {
           label="Indirizzo email"
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => { setEmail(e.target.value); setClientError(null) }}
           required
           autoComplete="email"
           autoFocus
           placeholder="es. mario.rossi@example.com"
         />
+
+        {clientError && (
+          <Alert severity="error" onClose={() => setClientError(null)}>
+            <AlertTitle>Errore</AlertTitle>
+            {clientError}
+          </Alert>
+        )}
 
         <Button
           type="submit"

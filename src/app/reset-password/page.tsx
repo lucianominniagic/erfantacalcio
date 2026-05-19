@@ -69,6 +69,11 @@ function ResetPasswordForm() {
     setClientError(null)
     resetPassword.reset()
 
+    if (newPassword.length < 6) {
+      setClientError('La nuova password deve contenere almeno 6 caratteri.')
+      return
+    }
+
     if (newPassword !== confirmPassword) {
       setClientError('Le password non coincidono.')
       return
