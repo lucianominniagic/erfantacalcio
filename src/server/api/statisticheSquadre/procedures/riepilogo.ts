@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import { publicProcedure } from '~/server/api/trpc'
+import { statisticheSquadreInputSchema } from '~/schemas/statisticheSquadre'
 import { Partite, Utenti } from '~/server/db/entities'
 import {
   type SquadraStats,
@@ -9,7 +9,7 @@ import {
 } from '~/server/services/statisticheService'
 
 export const riepilogoProcedure = publicProcedure
-  .input(z.object({ idTornei: z.array(z.number()) }))
+  .input(statisticheSquadreInputSchema)
   .query(async (opts) => {
     try {
       const idTornei = opts.input.idTornei

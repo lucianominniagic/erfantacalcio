@@ -1,5 +1,5 @@
-import { z } from 'zod'
 import { publicProcedure } from '~/server/api/trpc'
+import { statisticheSquadreInputSchema } from '~/schemas/statisticheSquadre'
 import { StatsA, StatsC, StatsD, StatsP, Utenti } from '~/server/db/entities'
 import { Not, IsNull } from 'typeorm'
 import { getSogliaGiocate } from '~/server/api/giocatori/utils'
@@ -45,7 +45,7 @@ const buildEntry = (player: PlayerRow, value: number): TopEntry => ({
 })
 
 export const topGiocatoriProcedure = publicProcedure
-  .input(z.object({ idTornei: z.array(z.number()) }))
+  .input(statisticheSquadreInputSchema)
   .query(async () => {
     try {
       const sogliaGiocate = await getSogliaGiocate()

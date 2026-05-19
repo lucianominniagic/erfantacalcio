@@ -1,9 +1,9 @@
-import { z } from 'zod'
 import { uploadFile } from '~/utils/blobVercelUtils'
 import { protectedProcedure } from '~/server/api/trpc'
+import { uploadFotoVercelSchema } from '~/schemas/profilo'
 
 export const uploadFotoVercelProcedure = protectedProcedure
-  .input(z.object({ fileName: z.string(), fileData: z.string() }))
+  .input(uploadFotoVercelSchema)
   .mutation(async (opts) => {
     try {
       const { fileName, fileData } = opts.input

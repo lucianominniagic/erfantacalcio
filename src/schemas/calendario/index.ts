@@ -68,3 +68,10 @@ export const giornataSchema = z.object({
   SubTitle: z.string(),
   SerieA: z.array(serieASchema).optional(),
 })
+
+export const calendarioByGiornataSchema = z.object({
+  idTorneo: z.number(),
+  giornata: z.number(),
+})
+
+export type CalendarioByGiornataType = z.infer<typeof calendarioByGiornataSchema>

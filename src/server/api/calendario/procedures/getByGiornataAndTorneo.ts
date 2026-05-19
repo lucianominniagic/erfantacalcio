@@ -1,9 +1,9 @@
 import { publicProcedure } from '~/server/api/trpc'
-import { z } from 'zod'
+import { calendarioByGiornataSchema } from '~/schemas/calendario'
 import { getCalendario, mapCalendario } from '../../../utils/common'
 
 export const getByGiornataAndTorneoProcedure = publicProcedure
-  .input(z.object({ idTorneo: z.number(), giornata: z.number() }))
+  .input(calendarioByGiornataSchema)
   .query(async ({ input }) => {
     try {
       const result = await getCalendario({

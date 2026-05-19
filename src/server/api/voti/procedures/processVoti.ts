@@ -1,15 +1,9 @@
-import { z } from 'zod'
 import { adminProcedure } from '../../trpc'
-import { uploadVotoGiocatoreSchema } from '~/schemas/giocatore'
+import { processVotiInputSchema } from '~/schemas/voti'
 import { caricaVoti } from '~/server/services/caricaVotiService'
 
 export const processVotiProcedure = adminProcedure
-  .input(
-    z.object({
-      idCalendario: z.number(),
-      votiGiocatori: z.array(uploadVotoGiocatoreSchema),
-    }),
-  )
+  .input(processVotiInputSchema)
   .mutation(async (opts) => {
     try {
       console.log(`Processing ${opts.input.votiGiocatori.length} giocatori`)

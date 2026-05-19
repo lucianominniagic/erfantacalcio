@@ -1,12 +1,12 @@
-import { z } from 'zod'
 import { adminProcedure } from '~/server/api/trpc'
+import { tabellinoInputSchema } from '~/schemas/risultati'
 import { getTabellino } from '../../../utils/common'
 import { Configurazione } from '~/config'
 import { getFormazione } from '../services/partiteMapping'
 import { calcolaFantapunti } from '~/server/services/tabelliniService'
 
 export const getTabellinoProcedure = adminProcedure
-  .input(z.object({ idPartita: z.number(), idSquadra: z.number().nullable() }))
+  .input(tabellinoInputSchema)
   .query(async (opts) => {
     try {
       if (opts.input.idSquadra) {
