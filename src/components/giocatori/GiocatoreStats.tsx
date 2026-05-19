@@ -4,6 +4,8 @@ import { Grid, Zoom } from '@mui/material'
 import { BarChart } from '@mui/x-charts/BarChart'
 import { axisClasses } from '@mui/x-charts/ChartsAxis'
 import { LineChart } from '@mui/x-charts/LineChart'
+import { type MarkElementProps } from '@mui/x-charts'
+import { useTheme } from '@mui/material/styles'
 
 interface VotoRow {
   giornataSerieA: number
@@ -68,6 +70,45 @@ const customizegraphstagioni = {
 }
 
 export function GiocatoreStats({ voti, statsStagioni }: GiocatoreStatsProps) {
+  const theme = useTheme()
+
+  // Custom mark that highlights giornate with gol or assist
+  function GolAssistMark({ x, y, dataIndex }: MarkElementProps) {
+    const row = voti[dataIndex]
+    const hasGol = (row?.gol ?? 0) > 0
+    const hasAssist = (row?.assist ?? 0) > 0
+
+    if (!hasGol && !hasAssist) {
+      return <circle cx={x} cy={y} r={3} fill={theme.palette.primary.main} />
+    }
+
+    const color =
+      hasGol && hasAssist
+        ? theme.palette.secondary.main
+        : hasGol
+          ? theme.palette.success.main
+          : theme.palette.info.main
+
+    const label = hasGol && hasAssist ? 'G·A' : hasGol ? 'G' : 'A'
+
+    return (
+      <g>
+        <circle cx={x} cy={y} r={10} fill={color} opacity={0.9} />
+        <text
+          x={x}
+          y={y}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize={9}
+          fontWeight="bold"
+          fill="#fff"
+        >
+          {label}
+        </text>
+      </g>
+    )
+  }
+
   return (
     <>
       <Zoom in={true}>
@@ -113,6 +154,7 @@ export function GiocatoreStats({ voti, statsStagioni }: GiocatoreStatsProps) {
               }))}
             grid={{ vertical: true, horizontal: true }}
             dataset={voti}
+            slots={{ mark: GolAssistMark }}
             {...customizegraphvoti}
           />
         </Grid>
