@@ -3,8 +3,7 @@ import { In, Not } from 'typeorm'
 import { env } from 'process'
 
 import { protectedProcedure } from '../../trpc'
-import { AppDataSource } from '~/data-source'
-import { Formazioni, Partite, Utenti, Voti } from '~/server/db/entities'
+import { Formazioni, Partite, Utenti } from '~/server/db/entities'
 import {
   getProssimaGiornata,
   getProssimaGiornataSerieA,
@@ -14,13 +13,10 @@ import { formatDateTime, nowInItalyIso } from '~/utils/dateUtils'
 import { getDescrizioneGiornata } from '~/utils/helper'
 import { Configurazione } from '~/config'
 import {
-  buildFormazioneInsertData,
-  buildVotiInsertData,
-} from '~/server/services/formazioneService'
-import {
   buildConfermaPrecedenteHtml,
   buildConfermaPrecedenteAdminHtml,
 } from '~/server/services/mailTemplates'
+import { scriviFormazione } from '~/server/services/scriviFormazione'
 
 export const confirmPrecedente = protectedProcedure.mutation(async (opts) => {
   const idSquadra = opts.ctx.session.user.idSquadra
@@ -79,92 +75,59 @@ export const confirmPrecedente = protectedProcedure.mutation(async (opts) => {
   }[] = []
 
   for (const idPartita of idPartiteCorrente) {
-    await AppDataSource.transaction(async (trx) => {
-      // Elimina voti e formazione esistenti per questa partita+squadra
-      const formazioniIds = await trx.find(Formazioni, {
-        select: { idFormazione: true },
-        where: { idPartita: idPartita, idSquadra: idSquadra },
-      })
-      if (formazioniIds.length > 0) {
-        await trx.delete(Voti, {
-          idFormazione: In(formazioniIds.map((f) => f.idFormazione)),
-        })
-      }
-      await trx.delete(Formazioni, {
-        idPartita: idPartita,
-        idSquadra: idSquadra,
-      })
-
-      // Recupera i dettagli della partita corrente
-      const partita = await trx.findOne(Partite, {
-        select: {
+    // Carica partita (per idCalendario + dettagli mail)
+    const partita = await Partite.findOne({
+      select: {
+        idCalendario: true,
+        idPartita: true,
+        SquadraHome: {
+          nomeSquadra: true,
+          presidente: true,
+          idUtente: true,
+          mail: true,
+        },
+        SquadraAway: {
+          nomeSquadra: true,
+          presidente: true,
+          idUtente: true,
+          mail: true,
+        },
+        Calendario: {
           idCalendario: true,
-          idPartita: true,
-          SquadraHome: {
-            nomeSquadra: true,
-            presidente: true,
-            idUtente: true,
-            mail: true,
-          },
-          SquadraAway: {
-            nomeSquadra: true,
-            presidente: true,
-            idUtente: true,
-            mail: true,
-          },
-          Calendario: {
-            idCalendario: true,
-            giornata: true,
-            giornataSerieA: true,
-            data: true,
-            girone: true,
-            Torneo: { idTorneo: true, nome: true, gruppoFase: true },
-          },
+          giornata: true,
+          giornataSerieA: true,
+          data: true,
+          girone: true,
+          Torneo: { idTorneo: true, nome: true, gruppoFase: true },
         },
-        relations: {
-          Calendario: { Torneo: true },
-          SquadraHome: true,
-          SquadraAway: true,
-        },
-        where: { idPartita: idPartita },
-      })
-
-      if (!partita) return
-
-      // Inserisce la nuova formazione (stesso modulo di quella precedente)
-      const dataInserimento = nowInItalyIso()
-      const formazioneResult = await trx.insert(
-        Formazioni,
-        buildFormazioneInsertData(
-          idPartita,
-          idSquadra,
-          lastFormazione.modulo,
-          dataInserimento,
-        ),
-      )
-      const idFormazione = formazioneResult.identifiers[0]
-        .idFormazione as number
-
-      // Clona i voti dalla formazione precedente
-      await Promise.all(
-        buildVotiInsertData(
-          lastFormazione.Voti,
-          idFormazione,
-          partita.idCalendario,
-        ).map(async (votoData) => {
-          await trx.insert(Voti, votoData)
-        }),
-      )
-
-      // Salva i dettagli per le mail (fuori transazione)
-      const descrizioneGiornata = getDescrizioneGiornata(
-        partita.Calendario.giornataSerieA,
-        partita.Calendario.Torneo.nome,
-        partita.Calendario.giornata,
-        partita.Calendario.Torneo.gruppoFase,
-      )
-      partiteConDettagli.push({ partita, descrizioneGiornata })
+      },
+      relations: {
+        Calendario: { Torneo: true },
+        SquadraHome: true,
+        SquadraAway: true,
+      },
+      where: { idPartita },
     })
+
+    if (!partita) continue
+
+    // Scrivi formazione (usa voti della formazione precedente come giocatori)
+    await scriviFormazione({
+      idPartita,
+      idSquadra,
+      idCalendario: partita.idCalendario,
+      modulo: lastFormazione.modulo,
+      giocatori: lastFormazione.Voti,
+    })
+
+    // Salva dettagli per mail
+    const descrizioneGiornata = getDescrizioneGiornata(
+      partita.Calendario.giornataSerieA,
+      partita.Calendario.Torneo.nome,
+      partita.Calendario.giornata,
+      partita.Calendario.Torneo.gruppoFase,
+    )
+    partiteConDettagli.push({ partita, descrizioneGiornata })
   }
 
   // 5. Invia mail (dopo le transazioni)
