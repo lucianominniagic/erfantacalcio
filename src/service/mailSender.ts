@@ -9,6 +9,11 @@ export async function ReSendMailAsync(
   subject: string,
   htmlMessage: string,
 ) {
+  if (env.MAIL_ENABLED !== 'true') {
+    console.info('Mail disabilitata (MAIL_ENABLED != true), skip invio a:', to)
+    return
+  }
+
   const { data, error } = await resend.emails.send({
     from: env.MAIL_FROM ?? 'notify@erfantacalcio.com',
     to: to,
