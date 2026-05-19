@@ -91,6 +91,12 @@ export class Utente extends BaseEntity {
   @Column({ name: 'maglia', type: 'varchar', length: 500, nullable: true })
   maglia!: string | null
 
+  @Column({ name: 'reset_token', type: 'varchar', length: 100, nullable: true })
+  resetToken!: string | null
+
+  @Column({ name: 'reset_token_expires_at', type: 'timestamp', nullable: true })
+  resetTokenExpiresAt!: Date | null
+
   @OneToMany(() => Classifica, (c: Classifica) => c.Utente)
   Classifiche!: Relation<Classifica[]>
 

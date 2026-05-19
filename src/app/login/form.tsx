@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { type ChangeEvent, useState } from 'react'
 
 //import material ui
-import { Button, TextField, Box, Typography } from '@mui/material'
+import { Button, TextField, Box, Typography, Link } from '@mui/material'
 import { loginFormSchema } from '~/schemas/presidente'
 
 export const LoginForm = () => {
@@ -95,6 +95,16 @@ export const LoginForm = () => {
       >
         {loading ? 'loading...' : 'Sign in'}
       </Button>
+      <Box sx={{ textAlign: 'center' }}>
+        <Link
+          href="/recupera-password"
+          underline="hover"
+          variant="body2"
+          sx={{ color: 'text.secondary', fontSize: '0.8rem' }}
+        >
+          Hai dimenticato la password?
+        </Link>
+      </Box>
     </Box>
   )
 }

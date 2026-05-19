@@ -1,0 +1,3 @@
+# ADR-005 — Reset token di password salvato sulla tabella `utente`
+
+Per il recupero password abbiamo scelto di aggiungere due colonne nullable a `utente` (`reset_token`, `reset_token_expires_at`) anziché creare una tabella separata `password_reset_token`. La lega è un sistema privato con un numero fisso di presidenti (< 20); un solo token attivo per utente è sufficiente e la complessità di una tabella dedicata — join, cleanup job, gestione TTL separata — non porta benefici reali in questo contesto. Se in futuro servisse tracciare la storia dei token o supportare reset multipli contemporanei, migrare è semplice.

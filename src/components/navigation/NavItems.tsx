@@ -102,6 +102,12 @@ export function guestListItems(isXs: boolean, isAuthenticated: boolean) {
             'Foto profilo',
             <Badge color="success" />,
           ),
+          listItem(
+            'guest_profilo_3',
+            '/profilo',
+            'Cambio password',
+            <Badge color="success" />,
+          ),
         ]
       : []),
     listItem(

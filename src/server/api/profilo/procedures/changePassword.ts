@@ -1,16 +1,10 @@
-import { z } from 'zod'
 import { verifyPassword, hashPassword } from '~/utils/hashPassword'
 import { protectedProcedure } from '~/server/api/trpc'
 import { Utenti } from '~/server/db/entities'
+import { changePasswordSchema } from '~/schemas/auth'
 
 export const changePasswordProcedure = protectedProcedure
-  .input(
-    z.object({
-      id: z.number(),
-      oldPassword: z.string(),
-      newPassword: z.string(),
-    }),
-  )
+  .input(changePasswordSchema)
   .mutation(async (opts) => {
     try {
       const user = await Utenti.findOne({

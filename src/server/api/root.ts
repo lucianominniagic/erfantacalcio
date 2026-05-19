@@ -1,5 +1,6 @@
 import { createTRPCRouter } from '~/server/api/trpc'
 
+import { authRouter } from './auth'
 import { squadreRouter } from './squadre'
 import { calendarioRouter } from './calendario'
 import { formazioneRouter } from './formazione'
@@ -23,6 +24,7 @@ import { economiaRouter } from './economia'
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
+  auth: authRouter,
   albo: alboRouter,
   calendario: calendarioRouter,
   classifica: classificaRouter,

@@ -15,6 +15,7 @@ import {
   ThumbsUpDown,
   UploadFile,
   EmojiEvents,
+  Key,
 } from '@mui/icons-material'
 
 export interface NavItem {
@@ -71,7 +72,13 @@ export const profiloItems: NavItem[] = [
     key: 'foto',
     label: 'Foto profilo',
     href: '/foto',
-    icon: <Badge color="success" />,
+    icon: <Badge color="error" />,
+  },
+  {
+    key: 'profilo',
+    label: 'Cambio password',
+    href: '/profilo',
+    icon: <Key color="action" />,
   },
 ]
 
