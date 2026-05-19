@@ -2,7 +2,6 @@
 import { Grid, Typography } from '@mui/material'
 import { Box } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
-import { autosizeOptions } from '~/utils/datatable'
 import Image from 'next/image'
 import dayjs from 'dayjs'
 
@@ -34,7 +33,8 @@ const columns: GridColDef[] = [
   {
     field: 'maglia',
     type: 'string',
-    align: 'left',
+    align: 'center',
+    width: 40,
     renderCell: (params) => (
       <Image
         src={params.row?.maglia as string}
@@ -50,31 +50,36 @@ const columns: GridColDef[] = [
     field: 'squadra',
     type: 'string',
     align: 'left',
+    flex: 1,
     renderHeader: () => <strong>Squadra</strong>,
   },
   {
     field: 'costo',
     type: 'number',
     align: 'right',
+    headerAlign: 'right',
+    width: 60,
     renderHeader: () => <strong>Costo</strong>,
   },
   {
     field: 'dataAcquisto',
     type: 'date',
+    width: 88,
     valueFormatter: (value) => {
-      if (value) return dayjs(value as Date).format('DD/MM/YYYY HH:mm')
+      if (value) return dayjs(value as Date).format('DD/MM/YY')
       return ''
     },
-    renderHeader: () => <strong>Data acquisto</strong>,
+    renderHeader: () => <strong>Acquisto</strong>,
   },
   {
     field: 'dataCessione',
     type: 'date',
+    width: 88,
     valueFormatter: (value) => {
-      if (value) return dayjs(value as Date).format('DD/MM/YYYY HH:mm')
+      if (value) return dayjs(value as Date).format('DD/MM/YY')
       return ''
     },
-    renderHeader: () => <strong>Data cessione</strong>,
+    renderHeader: () => <strong>Cessione</strong>,
   },
 ]
 
@@ -106,7 +111,6 @@ export function GiocatoreStorico({ trasferimenti, isLoading }: GiocatoreStoricoP
           pagination
           hideFooterSelectedRowCount
           columns={columns}
-          autosizeOptions={autosizeOptions}
           rows={trasferimenti}
           disableRowSelectionOnClick
           sx={{}}

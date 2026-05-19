@@ -85,7 +85,7 @@ export default function GiocatoriRankingList({
                 lineHeight: 1,
               }}
             >
-              {g.media ?? '—'}
+              {g.media != null ? Number(g.media).toFixed(2) : '—'}
             </Typography>
 
             {/* Pillole statistiche secondarie */}
