@@ -10,6 +10,7 @@ import {
   InputAdornment,
   Paper,
   Skeleton,
+  Snackbar,
   Stack,
   Switch,
   Table,
@@ -75,12 +76,20 @@ export default function MercatoUtente() {
     {},
   )
 
+  // ── Snackbar ──
+  const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
+    open: false,
+    message: '',
+    severity: 'success',
+  })
+
   // ── Mutations ──
   const createProposta = api.mercato.createProposta.useMutation({
     onSuccess: () => {
       void utils.mercato.getMieProposte.invalidate()
       void utils.mercato.getSessioneAttiva.invalidate()
       void utils.mercato.getGiocatoriSvincolati.invalidate()
+      setSnackbar({ open: true, message: 'Proposta inviata con successo', severity: 'success' })
     },
   })
 
@@ -114,6 +123,7 @@ export default function MercatoUtente() {
             ...prev,
             [idGiocatore]: err.message,
           }))
+          setSnackbar({ open: true, message: err.message, severity: 'error' })
         },
       },
     )
@@ -369,6 +379,21 @@ export default function MercatoUtente() {
           </Box>
         </>
       )}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Stack>
   )
 }
