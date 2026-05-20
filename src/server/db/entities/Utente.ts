@@ -7,6 +7,7 @@ import {
   BaseEntity,
 } from 'typeorm'
 import { Trasferimento } from './Trasferimento'
+import { PropostaMercato } from './PropostaMercato'
 import { Classifica } from './Classifica'
 import { Formazione } from './Formazione'
 import { Partita } from './Partita'
@@ -111,4 +112,7 @@ export class Utente extends BaseEntity {
 
   @OneToMany(() => Trasferimento, (t: Trasferimento) => t.Utente)
   Trasferimenti!: Relation<Trasferimento[]>
+
+  @OneToMany(() => PropostaMercato, (p: PropostaMercato) => p.Utente)
+  ProposteMercato!: Relation<PropostaMercato[]>
 }

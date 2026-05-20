@@ -8,6 +8,7 @@ import {
 } from 'typeorm'
 import { Trasferimento } from './Trasferimento'
 import { Voto } from './Voto'
+import { PropostaMercato } from './PropostaMercato'
 
 @Entity({ name: 'giocatore' })
 export class Giocatore extends BaseEntity {
@@ -36,4 +37,7 @@ export class Giocatore extends BaseEntity {
 
   @OneToMany(() => Voto, (v: Voto) => v.Giocatore)
   Voti!: Relation<Voto[]>
+
+  @OneToMany(() => PropostaMercato, (p: PropostaMercato) => p.Giocatore)
+  ProposteMercato!: Relation<PropostaMercato[]>
 }

@@ -5,6 +5,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    setupFiles: ['./src/test-setup.ts'],
     include: ['src/**/*.test.ts'],
     // Env vars for unit tests — values chosen to match test expectations:
     //   BONUS_MODULO enabled, SENZA_VOTO=1 per sostituzione, SOSTITUZIONI=9 (no cap before 9),

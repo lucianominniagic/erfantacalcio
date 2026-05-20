@@ -15,6 +15,8 @@ import {
   Partite,
   Voti,
   Calendario,
+  ProposteMercato,
+  SessioniMercato,
 } from '~/server/db/entities'
 
 export const preparaStagioneProcedure = adminProcedure.mutation<
@@ -64,6 +66,10 @@ export const preparaStagioneProcedure = adminProcedure.mutation<
 
         await updateFase(trx, 2)
       })
+
+      // Cleanup dati mercato della stagione precedente
+      await ProposteMercato.delete({})
+      await SessioniMercato.delete({})
 
       console.info(
         `Azzeramento dati della scorsa stagione ${Configurazione.stagione}`,

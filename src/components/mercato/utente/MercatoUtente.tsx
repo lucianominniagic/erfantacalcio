@@ -1,0 +1,374 @@
+'use client'
+import { useState } from 'react'
+import {
+  Alert,
+  Box,
+  Button,
+  Chip,
+  Divider,
+  FormControlLabel,
+  InputAdornment,
+  Paper,
+  Skeleton,
+  Stack,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Typography,
+  useMediaQuery,
+} from '@mui/material'
+import { useTheme } from '@mui/material/styles'
+import { Gavel } from '@mui/icons-material'
+import { api } from '~/utils/api'
+import PageHeader from '~/components/PageHeader'
+import { type Ruoli } from '~/types/common'
+import { getRuoloEsteso } from '~/utils/helper'
+import { Configurazione } from '~/config'
+
+// ── Helper ───────────────────────────────────────────────────────────────────
+function fmtDate(d: Date | string) {
+  return new Date(d).toLocaleString('it-IT', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+// ── Main component ────────────────────────────────────────────────────────────
+export default function MercatoUtente() {
+  const utils = api.useUtils()
+  const theme = useTheme()
+  const isXs = useMediaQuery(theme.breakpoints.down('md'))
+  const [ruolo, setRuolo] = useState<Ruoli>('C')
+
+  // ── Queries ──
+  const { data: sessione, isLoading: loadingSessione } =
+    api.mercato.getSessioneAttiva.useQuery(undefined, {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    })
+
+  const { data: giocatori, isLoading: loadingGiocatori } =
+    api.mercato.getGiocatoriSvincolati.useQuery({ ruolo: ruolo, stagione: Configurazione.stagione }, {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      enabled: !!sessione,
+    })
+
+  const { data: mieProposte, isLoading: loadingMieProposte } =
+    api.mercato.getMieProposte.useQuery(undefined, {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      enabled: !!sessione,
+    })
+
+  // ── Prezzi per giocatore (form state) ──
+  const [prezzi, setPrezzi] = useState<Record<number, string>>({})
+  const [erroriProposta, setErroriProposta] = useState<Record<number, string>>(
+    {},
+  )
+
+  // ── Mutations ──
+  const createProposta = api.mercato.createProposta.useMutation({
+    onSuccess: () => {
+      void utils.mercato.getMieProposte.invalidate()
+      void utils.mercato.getSessioneAttiva.invalidate()
+      void utils.mercato.getGiocatoriSvincolati.invalidate()
+    },
+  })
+
+  const deleteProposta = api.mercato.deleteProposta.useMutation({
+    onSuccess: () => {
+      void utils.mercato.getMieProposte.invalidate()
+      void utils.mercato.getSessioneAttiva.invalidate()
+    },
+  })
+
+  // ── Handlers ──
+  const handleProponi = (idGiocatore: number) => {
+    const prezzo = parseFloat(prezzi[idGiocatore] ?? '0')
+    if (!prezzo || prezzo <= 0) {
+      setErroriProposta((prev) => ({
+        ...prev,
+        [idGiocatore]: 'Inserisci un prezzo valido',
+      }))
+      return
+    }
+    setErroriProposta((prev) => {
+      const next = { ...prev }
+      delete next[idGiocatore]
+      return next
+    })
+    createProposta.mutate(
+      { idGiocatore, prezzoOfferto: prezzo },
+      {
+        onError: (err) => {
+          setErroriProposta((prev) => ({
+            ...prev,
+            [idGiocatore]: err.message,
+          }))
+        },
+      },
+    )
+  }
+
+  // ── Label valuta ──
+  const labelValuta = sessione?.tipoValuta === 'euro' ? '€' : 'FM'
+
+  // ── Map giocatori per id (per lookup nelle proposte) ──
+  const giocatoriMap = new Map(
+    (giocatori ?? []).map((g) => [g.idGiocatore, g]),
+  )
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  return (
+    <Stack spacing={3}>
+      <PageHeader title="Mercato Svincolati" Icon={Gavel} />
+
+      {/* ── Banner sessione ── */}
+      {loadingSessione ? (
+        <Skeleton variant="rounded" height={80} />
+      ) : !sessione ? (
+        <Alert severity="info">
+          Nessuna sessione di mercato aperta al momento
+        </Alert>
+      ) : (
+        <Alert severity="success" variant="outlined">
+          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+            Sessione attiva
+          </Typography>
+          <Typography variant="body2">
+            Scadenza: <strong>{fmtDate(sessione.dataChiusura)}</strong>
+          </Typography>
+          <Typography variant="body2">
+            Proposte rimanenti:{' '}
+            <strong>
+              {sessione.maxProposte - sessione.myCount} /{' '}
+              {sessione.maxProposte}
+            </strong>
+          </Typography>
+          <Typography variant="body2">
+            Valuta:{' '}
+            <strong>
+              {sessione.tipoValuta === 'fantamilioni'
+                ? 'Fantamilioni'
+                : 'Euro reali'}
+            </strong>
+          </Typography>
+        </Alert>
+      )}
+
+      {/* ── Contenuto visibile solo con sessione attiva ── */}
+      {sessione && (
+        <>
+        {/* ── Le mie proposte ── */}
+          <Box>
+            <Typography variant="h6" sx={{ mb: 1 }}>
+              Le mie proposte
+            </Typography>
+            {loadingMieProposte ? (
+              <Stack spacing={1}>
+                {[...Array(3)].map((_, i) => (
+                  <Skeleton key={i} variant="rounded" height={48} />
+                ))}
+              </Stack>
+            ) : !mieProposte?.length ? (
+              <Alert severity="info">
+                Non hai ancora inserito proposte per questa sessione
+              </Alert>
+            ) : (
+              <TableContainer component={Paper} variant="outlined">
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Giocatore</TableCell>
+                      <TableCell align="right">Offerta</TableCell>
+                      <TableCell />
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {mieProposte.map((p) => {
+                      return (
+                        <TableRow key={p.id}>
+                          <TableCell>
+                            {p.Giocatore?.nome ?? `#${p.idGiocatore}`}
+                          </TableCell>
+                          <TableCell align="right">
+                            {p.prezzoOfferto} {labelValuta}
+                          </TableCell>
+                          <TableCell align="right">
+                            <Button
+                              size="small"
+                              color="error"
+                              variant="outlined"
+                              onClick={() =>
+                                deleteProposta.mutate({ idProposta: p.id })
+                              }
+                              disabled={deleteProposta.isPending}
+                            >
+                              Elimina
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </Box>
+
+          <Divider />
+
+          {/* ── Contatore proposte per squadra ── */}
+          <Box>
+            <Typography variant="h6" sx={{ mb: 1 }}>
+              Proposte per squadra
+            </Typography>
+            {!sessione.countPerSquadra ||
+            Object.keys(sessione.countPerSquadra).length === 0 ? (
+              <Typography color="text.secondary" variant="body2">
+                Nessuna proposta ancora inserita
+              </Typography>
+            ) : (
+              <Stack direction="row" flexWrap="wrap" gap={1}>
+                {Object.entries(sessione.countPerSquadra).map(
+                  ([idSquadra, count]) => (
+                    <Chip
+                      key={idSquadra}
+                      label={`Squadra ${idSquadra}: ${count} ${count === 1 ? 'proposta' : 'proposte'}`}
+                      variant="outlined"
+                      size="small"
+                    />
+                  ),
+                )}
+              </Stack>
+            )}
+          </Box>
+
+          <Divider />
+
+          {/* ── Lista giocatori svincolati ── */}
+          <Box>
+            <Typography variant="h6" sx={{ mb: 1 }}>
+              Giocatori svincolati — {getRuoloEsteso(ruolo, true)}
+            </Typography>
+            <Box sx={{ mb: 1 }}>
+              <FormControlLabel
+                control={<Switch color="warning" onChange={() => setRuolo('P')} checked={ruolo === 'P'} />}
+                label={isXs ? 'P' : getRuoloEsteso('P', true)}
+              />
+              <FormControlLabel
+                control={<Switch color="warning" onChange={() => setRuolo('D')} checked={ruolo === 'D'} />}
+                label={isXs ? 'D' : getRuoloEsteso('D', true)}
+              />
+              <FormControlLabel
+                control={<Switch color="warning" onChange={() => setRuolo('C')} checked={ruolo === 'C'} />}
+                label={isXs ? 'C' : getRuoloEsteso('C', true)}
+              />
+              <FormControlLabel
+                control={<Switch color="warning" onChange={() => setRuolo('A')} checked={ruolo === 'A'} />}
+                label={isXs ? 'A' : getRuoloEsteso('A', true)}
+              />
+            </Box>
+            {loadingGiocatori ? (
+              <Stack spacing={1}>
+                {[...Array(5)].map((_, i) => (
+                  <Skeleton key={i} variant="rounded" height={56} />
+                ))}
+              </Stack>
+            ) : !giocatori?.length ? (
+              <Alert severity="info">
+                Nessun giocatore svincolato disponibile
+              </Alert>
+            ) : (
+              <TableContainer component={Paper} variant="outlined">
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Nome</TableCell>
+                      <TableCell>Costo acquisto</TableCell>
+                      <TableCell>Offerta ({labelValuta})</TableCell>
+                      <TableCell />
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {(giocatori ?? []).map((g) => (
+                      <TableRow key={g.idGiocatore}>
+                        <TableCell>
+                          <Stack direction="row" alignItems="center" spacing={1}>
+                            {g.maglia ? (
+                              <img
+                                src={g.maglia}
+                                width={24}
+                                height={21}
+                                alt={g.nomeSquadraSerieA ?? ''}
+                                title={g.nomeSquadraSerieA ?? ''}
+                                style={{ objectFit: 'contain' }}
+                              />
+                            ) : (
+                              <Box sx={{ width: 24, height: 21 }} />
+                            )}
+                            <Stack spacing={0} overflow="hidden">
+                              <Typography variant="body2" fontWeight={700} noWrap>
+                                {g.nome ?? `#${g.idGiocatore}`}
+                              </Typography>
+                              <Typography variant="caption" color="text.secondary" noWrap>
+                                {g.nomeSquadraSerieA ?? '—'}
+                              </Typography>
+                            </Stack>
+                          </Stack>
+                        </TableCell>
+                        <TableCell>{g.costo ?? '—'}</TableCell>
+                        <TableCell sx={{ width: 160 }}>
+                          <TextField
+                            size="small"
+                            type="number"
+                            value={prezzi[g.idGiocatore] ?? ''}
+                            onChange={(e) =>
+                              setPrezzi((prev) => ({
+                                ...prev,
+                                [g.idGiocatore]: e.target.value,
+                              }))
+                            }
+                            InputProps={{
+                              startAdornment: (
+                                <InputAdornment position="start">
+                                  {labelValuta}
+                                </InputAdornment>
+                              ),
+                            }}
+                            error={!!erroriProposta[g.idGiocatore]}
+                            helperText={erroriProposta[g.idGiocatore]}
+                            inputProps={{ min: 0, step: 0.5 }}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            size="small"
+                            variant="contained"
+                            onClick={() => handleProponi(g.idGiocatore)}
+                            disabled={createProposta.isPending}
+                          >
+                            Proponi
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </Box>
+        </>
+      )}
+    </Stack>
+  )
+}

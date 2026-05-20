@@ -33,6 +33,8 @@ export const AppDataSource = new DataSource({
     Entities.SerieA,
     Entities.Partite,
     Entities.Voti,
+    Entities.SessioniMercato,
+    Entities.ProposteMercato,
   ],
   namingStrategy: new NamingStrategy(),
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,

@@ -7,11 +7,13 @@ import {
   CalendarMonth,
   Euro,
   FiberNew,
+  Gavel,
   Group,
   Groups,
   ListAlt,
   ManageAccounts,
   Portrait,
+  Storefront,
   ThumbsUpDown,
   UploadFile,
   EmojiEvents,
@@ -80,6 +82,20 @@ export const profiloItems: NavItem[] = [
     href: '/profilo',
     icon: <Key color="action" />,
   },
+  {
+    key: 'mercato',
+    label: 'Proposta di acquisto',
+    href: '/mercato',
+    icon: <Gavel color="success" />,
+    authRequired: true,
+  },
+  {
+    key: 'sessioni-mercato',
+    label: 'Sessioni di mercato',
+    href: '/sessioni-mercato',
+    icon: <Storefront color="info" />,
+    authRequired: true,
+  },
 ]
 
 export const adminItems: NavItem[] = [
@@ -114,5 +130,11 @@ export const adminItems: NavItem[] = [
     label: 'Nuova stagione',
     href: '/avvioStagione',
     icon: <FiberNew />,
+  },
+  {
+    key: 'gestione-mercato',
+    label: 'Sessioni mercato',
+    href: '/gestione-mercato',
+    icon: <Storefront />,
   },
 ]

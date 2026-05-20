@@ -25,6 +25,9 @@ const PATH_LABELS: Record<string, string> = {
   '/giocatori': 'Giocatori',
   '/voti': 'Voti',
   '/avvioStagione': 'Nuova stagione',
+  '/gestione-mercato': 'Gestione mercato',
+  '/mercato': 'Mercato svincolati',
+  '/sessioni-mercato': 'Sessioni di mercato',
 }
 
 const ADMIN_PATHS = new Set([
@@ -35,6 +38,7 @@ const ADMIN_PATHS = new Set([
   '/giocatori',
   '/voti',
   '/avvioStagione',
+  '/gestione-mercato',
 ])
 
 function getLabel(pathname: string): string {

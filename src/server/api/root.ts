@@ -17,6 +17,7 @@ import { alboRouter } from './albo'
 import { classificaRouter } from './classifica'
 import { statisticheSquadreRouter } from './statisticheSquadre'
 import { economiaRouter } from './economia'
+import { mercatoRouter } from './mercato'
 
 /**
  * This is the primary router for your server.
@@ -41,6 +42,7 @@ export const appRouter = createTRPCRouter({
   trasferimenti: trasferimentiRouter,
   risultati: risultatiRouter,
   statisticheSquadre: statisticheSquadreRouter,
+  mercato: mercatoRouter,
 })
 
 // export type definition of API

@@ -11,6 +11,7 @@ import {
   CalendarMonth,
   Euro,
   FiberNew,
+  Gavel,
   Grading,
   Group,
   HistoryEdu,
@@ -19,6 +20,7 @@ import {
   Portrait,
   Groups,
   RecentActors,
+  Storefront,
   ThumbsUpDown,
   UploadFile,
 } from '@mui/icons-material'
@@ -77,6 +79,12 @@ export function adminListItems() {
       'Nuova stagione',
       <FiberNew color="primary" />,
     ),
+    listItem(
+      'admin_mercato',
+      '/gestione-mercato',
+      'Sessioni mercato',
+      <Storefront color="primary" />,
+    ),
   ]
 }
 
@@ -107,6 +115,18 @@ export function guestListItems(isXs: boolean, isAuthenticated: boolean) {
             '/profilo',
             'Cambio password',
             <Badge color="success" />,
+          ),
+          listItem(
+            'mercato_proposte',
+            '/mercato',
+            'Proposta di acquisto',
+            <Gavel color="success" />,
+          ),
+          listItem(
+            'mercato_sessioni',
+            '/sessioni-mercato',
+            'Sessioni di mercato',
+            <Storefront color="info" />,
           ),
         ]
       : []),
