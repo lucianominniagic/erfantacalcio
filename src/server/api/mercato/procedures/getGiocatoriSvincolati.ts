@@ -25,7 +25,6 @@ export async function getGiocatoriSvincolati({
     idTrasferimento: t.idTrasferimento,
     nome: t.Giocatore?.nome,
     ruolo: t.Giocatore?.ruolo,
-    costo: t.costo,
     stagione: t.stagione,
     nomeSquadraSerieA: t.SquadraSerieA?.nome,
     maglia: t.SquadraSerieA?.maglia ? `/images/maglie/${t.SquadraSerieA.maglia}` : null,

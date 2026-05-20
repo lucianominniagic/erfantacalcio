@@ -304,7 +304,6 @@ export default function MercatoUtente() {
                   <TableHead>
                     <TableRow>
                       <TableCell>Nome</TableCell>
-                      <TableCell>Costo acquisto</TableCell>
                       <TableCell>Offerta ({labelValuta})</TableCell>
                       <TableCell />
                     </TableRow>
@@ -336,7 +335,6 @@ export default function MercatoUtente() {
                             </Stack>
                           </Stack>
                         </TableCell>
-                        <TableCell>{g.costo ?? '—'}</TableCell>
                         <TableCell sx={{ width: 160 }}>
                           <TextField
                             size="small"
