@@ -9,8 +9,9 @@ export const createSessioneProcedure = adminProcedure
     const now = new Date()
 
     // Verifica: nessuna sessione attiva sovrapposta
-    const esistente = await SessioneMercato.find({
+    const [esistente] = await SessioneMercato.find({
       order: { id: 'DESC' },
+      take: 1,
     })
 
     if (esistente) {

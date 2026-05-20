@@ -447,7 +447,7 @@ describe('getSessioneAttiva', () => {
   it('should return null when no sessione exists', async () => {
     const ctx = makeMockContext()
 
-    vi.mocked(SessioneMercato.find).mockResolvedValue([])
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(null)
 
     const result = await getSessioneAttiva.bind(null)({ ctx, input: {} })
 
@@ -456,13 +456,8 @@ describe('getSessioneAttiva', () => {
 
   it('should return null when sessione is in future (not yet open)', async () => {
     const ctx = makeMockContext()
-    const now = new Date()
-    const sessione = makeSessioneMercato({
-      dataApertura: new Date(now.getTime() + 86400000), // Tomorrow (not yet open)
-      dataChiusura: new Date(now.getTime() + 172800000),
-    })
 
-    vi.mocked(SessioneMercato.find).mockResolvedValue([sessione as any])
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(null)
 
     const result = await getSessioneAttiva.bind(null)({ ctx, input: {} })
 
@@ -471,13 +466,8 @@ describe('getSessioneAttiva', () => {
 
   it('should return null when sessione is closed (in past)', async () => {
     const ctx = makeMockContext()
-    const now = new Date()
-    const sessione = makeSessioneMercato({
-      dataApertura: new Date(now.getTime() - 172800000), // 2 days ago
-      dataChiusura: new Date(now.getTime() - 86400000), // 1 day ago (CLOSED)
-    })
 
-    vi.mocked(SessioneMercato.find).mockResolvedValue([sessione as any])
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(null)
 
     const result = await getSessioneAttiva.bind(null)({ ctx, input: {} })
 
@@ -495,12 +485,12 @@ describe('getSessioneAttiva', () => {
       tipoValuta: 'fantamilioni',
     })
 
-    vi.mocked(SessioneMercato.find).mockResolvedValue([sessione as any])
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
     vi.mocked(PropostaMercato.find).mockResolvedValue([
-      makePropostaMercato({ idSquadra: 1, deletedAt: null }),
-      makePropostaMercato({ id: 2, idSquadra: 1, deletedAt: null }),
-      makePropostaMercato({ id: 3, idSquadra: 2, deletedAt: null }),
-    ])
+      { ...makePropostaMercato({ idSquadra: 1, deletedAt: null }), Utente: { nomeSquadra: 'Squadra Alpha' } },
+      { ...makePropostaMercato({ id: 2, idSquadra: 1, deletedAt: null }), Utente: { nomeSquadra: 'Squadra Alpha' } },
+      { ...makePropostaMercato({ id: 3, idSquadra: 2, deletedAt: null }), Utente: { nomeSquadra: 'Squadra Beta' } },
+    ] as any)
 
     const result = await getSessioneAttiva.bind(null)({ ctx, input: {} })
 
@@ -508,7 +498,7 @@ describe('getSessioneAttiva', () => {
     if (result) {
       expect(result.tipoValuta).toEqual('fantamilioni')
       expect(result.myCount).toEqual(2) // 2 proposte from squadra 1
-      expect(result.countPerSquadra).toBeDefined()
+      expect(result.countPerSquadra).toMatchObject({ 'Squadra Alpha': 2, 'Squadra Beta': 1 })
     }
   })
 })
@@ -555,9 +545,9 @@ describe('getSessioniMercato', () => {
       dataChiusura: new Date(now.getTime() - 86400000), // CLOSED
       tipoValuta: 'fantamilioni',
       ProposteMercato: [
-        makePropostaMercato({ id: 101, idSquadra: 1, idGiocatore: 50, prezzoOfferto: 100, deletedAt: null }),
-        makePropostaMercato({ id: 102, idSquadra: 2, idGiocatore: 51, prezzoOfferto: 150, deletedAt: null }),
-      ],
+        { ...makePropostaMercato({ id: 101, idSquadra: 1, idGiocatore: 50, prezzoOfferto: 100, deletedAt: null }), Giocatore: { nome: 'Player1' }, Utente: { presidente: 'President1' } },
+        { ...makePropostaMercato({ id: 102, idSquadra: 2, idGiocatore: 51, prezzoOfferto: 150, deletedAt: null }), Giocatore: { nome: 'Player2' }, Utente: { presidente: 'President2' } },
+      ] as any,
     })
 
     vi.mocked(SessioneMercato.find).mockResolvedValue([sessione as any])
@@ -629,12 +619,8 @@ describe('getMieProposte', () => {
 
   it('should return [] when sessione is closed', async () => {
     const ctx = makeMockContext()
-    const now = new Date()
-    const sessione = makeSessioneMercato({
-      dataApertura: new Date(now.getTime() - 172800000),
-      dataChiusura: new Date(now.getTime() - 86400000),
-    })
-    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(null)
 
     const result = await getMieProposte({ ctx, input: {} })
 
@@ -691,9 +677,8 @@ describe('getGiocatoriSvincolati', () => {
       ...makeTrasferimento({ idSquadra: null, dataCessione: null }),
       costo: 15,
       stagione: '2025-2026',
-      nomeSquadraSerieA: 'Juventus',
       Giocatore: { nome: 'Mbappé', ruolo: 'A' },
-      SquadraSerieA: { maglia: 'juventus.png' },
+      SquadraSerieA: { nome: 'Juventus', maglia: 'juventus.png' },
     }
     vi.mocked(Trasferimento.find).mockResolvedValue([trasf as any])
 
@@ -733,7 +718,6 @@ describe('getGiocatoriSvincolati', () => {
       ...makeTrasferimento({ idSquadra: null, dataCessione: null }),
       costo: 10,
       stagione: '2025-2026',
-      nomeSquadraSerieA: null,
       Giocatore: { nome: 'Test', ruolo: 'C' },
       SquadraSerieA: undefined,
     }
@@ -742,7 +726,7 @@ describe('getGiocatoriSvincolati', () => {
     const result = await getGiocatoriSvincolati({ ctx, input: { ruolo: 'C', stagione: '2025-2026' } })
 
     expect(result[0]?.maglia).toBeNull()
-    expect(result[0]?.nomeSquadraSerieA).toBeNull()
+    expect(result[0]?.nomeSquadraSerieA).toBeUndefined()
   })
 
   it('should pass ruolo to TypeORM find as where condition', async () => {
