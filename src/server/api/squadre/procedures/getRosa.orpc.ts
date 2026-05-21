@@ -16,14 +16,14 @@ export const getRosaORPCProcedure = publicProcedure
     }),
   )
   .handler(async ({ input }) => {
-    const { idSquadra, includeForma } = {
+    const { idSquadra, include, includeForma } = {
       idSquadra: input.idSquadra,
       include: input.includeVenduti,
       includeForma: input.includeForma ?? false,
     }
     try {
       const rosaDisponibile = await getRosaDisponibile(idSquadra)
-      const giocatori = input.includeVenduti
+      const giocatori = include
         ? [...rosaDisponibile, ...(await getGiocatoriVenduti(idSquadra))]
         : rosaDisponibile
 
