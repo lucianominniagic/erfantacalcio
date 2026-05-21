@@ -6,11 +6,17 @@
  *
  * NON usare createTRPCRouter — questo oggetto è un plain TypeScript object.
  */
+import { listAlboORPCProcedure } from '~/server/api/albo/procedures/list.orpc'
+import { getAlboORPCProcedure } from '~/server/api/albo/procedures/get.orpc'
 import { listClassificaORPCProcedure } from '~/server/api/classifica/procedures/list.orpc'
 import { getRisultatiStagioneORPCProcedure } from '~/server/api/economia/procedures/getRisultatiStagione.orpc'
 import { listSquadreSerieAORPCProcedure } from '~/server/api/squadreSerieA/procedures/list.orpc'
 
 export const orpcRouter = {
+  albo: {
+    list: listAlboORPCProcedure,
+    get: getAlboORPCProcedure,
+  },
   classifica: {
     list: listClassificaORPCProcedure,
   },

@@ -9,7 +9,8 @@ import {
 } from '@mui/material'
 import { EmojiEvents } from '@mui/icons-material'
 import { alpha, darken } from '@mui/material/styles'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
@@ -93,10 +94,12 @@ function TrofeoSection({ title, accentColor, children }: TrofeoSectionProps) {
 export default function Albo() {
   const theme = useTheme()
   const isDark = theme.palette.mode === 'dark'
-  const alboList = api.albo.list.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
+  const alboList = useQuery(
+    orpc.albo.list.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
+  )
 
   const campionatoColor = theme.palette.info.light
   const championsColor = theme.palette.champions.main

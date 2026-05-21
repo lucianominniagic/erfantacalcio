@@ -122,7 +122,7 @@ publicProcedure
 | 1 | `classifica` | 1 | 🟢 Bassa | ✅ Migrato |
 | 2 | `economia` | 1 | 🟢 Bassa | ✅ Migrato |
 | 3 | `squadreSerieA` | 1 | 🟢 Bassa | ✅ Migrato |
-| 4 | `albo` | 2 | 🟢 Bassa | ⏳ |
+| 4 | `albo` | 2 | 🟢 Bassa | ✅ Migrato |
 | 5 | `partita` | 2 | 🟢 Bassa | ⏳ |
 | 6 | `tornei` | 2 | 🟡 Media | ⏳ |
 | 7 | `risultati` | 3 | 🟡 Media | ⏳ |
