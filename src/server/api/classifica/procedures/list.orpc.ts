@@ -15,6 +15,7 @@ import { getFantapunti } from '../services/getFantapunti'
 import { Classifiche } from '~/server/db/entities'
 
 export const listClassificaORPCProcedure = publicProcedure
+  .route({ method: 'GET', path: '/classifica/list', summary: 'Classifica torneo' })
   .input(z.object({ idTorneo: z.number() }))
   .handler(async ({ input }) => {
     const idTorneo = +input.idTorneo

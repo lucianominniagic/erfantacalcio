@@ -7,10 +7,14 @@
  * NON usare createTRPCRouter — questo oggetto è un plain TypeScript object.
  */
 import { listClassificaORPCProcedure } from '~/server/api/classifica/procedures/list.orpc'
+import { getRisultatiStagioneORPCProcedure } from '~/server/api/economia/procedures/getRisultatiStagione.orpc'
 
 export const orpcRouter = {
   classifica: {
     list: listClassificaORPCProcedure,
+  },
+  economia: {
+    getRisultatiStagione: getRisultatiStagioneORPCProcedure,
   },
 }
 

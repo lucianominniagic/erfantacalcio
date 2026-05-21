@@ -1,7 +1,9 @@
 
 'use client'
 import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { api } from '~/utils/api'
+import { orpc } from '~/utils/orpc'
 import { calcolaEconomia } from '~/server/services/economiaService'
 import {
   Avatar,
@@ -127,10 +129,12 @@ export default function Economia() {
     refetchOnReconnect: false,
   })
 
-  const saldoData = api.economia.getSaldoSquadre.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
+  const saldoData = useQuery(
+    orpc.economia.getRisultatiStagione.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
+  )
 
   const importoAnnuale =
     economiaList.data?.reduce(

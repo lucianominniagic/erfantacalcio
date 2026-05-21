@@ -89,6 +89,30 @@ const getBaseUrl = () => {
 
 Esempio: se `HomePage` (la pagina) ha `'use client'`, allora `<Classifica>` — pur usando `useQuery` — funziona correttamente senza `'use client'`.
 
+### ⚠️ `.route()` obbligatorio per la visibilità in Swagger
+
+`OpenAPIGenerator` include una procedura nello spec Swagger **solo se ha metadati `.route()`**. Senza di essi la procedura è accessibile via `/api/orpc` (RPCLink client) ma è **invisibile a Swagger e Postman**.
+
+Ogni procedura oRPC **deve** dichiarare `.route()`:
+
+```typescript
+// ✅ CORRETTO — appare in Swagger
+publicProcedure
+  .route({ method: 'GET', path: '/classifica/list', summary: 'Classifica torneo' })
+  .input(z.object({ idTorneo: z.number() }))
+  .handler(...)
+
+// ❌ SBAGLIATO — invisibile in Swagger
+publicProcedure
+  .input(z.object({ idTorneo: z.number() }))
+  .handler(...)
+```
+
+**Convenzione path/method:**
+- Procedure con input → `GET` con params come query string (`?idTorneo=2`) oppure `POST` con body JSON
+- Procedure senza input → `GET`
+- Path: `/<router>/<procedureName>` (es. `/classifica/list`, `/economia/getSaldoSquadre`)
+
 ---
 
 ## Piano di migrazione — Router per complessità
@@ -96,7 +120,7 @@ Esempio: se `HomePage` (la pagina) ha `'use client'`, allora `<Classifica>` — 
 | # | Router | Procedure | Complessità | Stato |
 |---|--------|-----------|-------------|-------|
 | 1 | `classifica` | 1 | 🟢 Bassa | ✅ Migrato |
-| 2 | `economia` | 1 | 🟢 Bassa | ⏳ |
+| 2 | `economia` | 1 | 🟢 Bassa | ✅ Migrato |
 | 3 | `squadreSerieA` | 1 | 🟢 Bassa | ⏳ |
 | 4 | `albo` | 2 | 🟢 Bassa | ⏳ |
 | 5 | `partita` | 2 | 🟢 Bassa | ⏳ |
