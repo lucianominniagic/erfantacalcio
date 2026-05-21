@@ -5,7 +5,7 @@ import { ReSendMailAsync } from '~/server/services/mailSender'
 import { env } from 'process'
 import { Partite } from '~/server/db/entities'
 import { getDescrizioneGiornata } from '~/utils/helper'
-import { buildFormazioneCreatedHtml } from '~/server/services/mailTemplates'
+import { buildFormazioneCreatedHtml, resolveFormazioneMailRecipients } from '~/server/services/mailTemplates'
 import { scriviFormazione } from '~/server/services/scriviFormazione'
 
 export const createFormazioneORPCProcedure = protectedProcedure
@@ -92,20 +92,8 @@ export const createFormazioneORPCProcedure = protectedProcedure
     const mailEnabled = env.MAIL_ENABLED === 'true'
     if (mailEnabled) {
       console.log(`Invio notifica mail inserimento formazione`)
+      const { to, cc, avversario } = resolveFormazioneMailRecipients(partita, idSquadra)
       const subject = `ErFantacalcio: Formazione partita ${partita.SquadraHome?.nomeSquadra} - ${partita.SquadraAway?.nomeSquadra}`
-      const avversario =
-        idSquadra === partita.SquadraHome?.idUtente
-          ? partita.SquadraHome?.presidente
-          : partita.SquadraAway?.presidente
-      const to =
-        idSquadra === partita.SquadraHome?.idUtente
-          ? partita.SquadraAway?.mail
-          : partita.SquadraHome?.mail
-      const cc =
-        idSquadra === partita.SquadraHome?.idUtente
-          ? partita.SquadraHome?.mail
-          : partita.SquadraAway?.mail
-
       const descrizioneGiornata = getDescrizioneGiornata(
         partita.Calendario.giornataSerieA,
         partita.Calendario.Torneo.nome,
@@ -116,19 +104,13 @@ export const createFormazioneORPCProcedure = protectedProcedure
         avversarioPresidente: avversario,
         descrizioneGiornata,
         dataInserimentoFormazione: formatDateTime(dataInserimentoFormazione),
-        dataCalcioInizio: formatDateTime(
-          partita.Calendario.data ?? new Date(),
-        ),
+        dataCalcioInizio: formatDateTime(partita.Calendario.data ?? new Date()),
       })
 
       if (to && cc) await ReSendMailAsync(to, cc, subject, htmlMessage)
       else {
-        const presidenteWithoutMail =
-          idSquadra === partita.SquadraHome?.idUtente
-            ? partita.SquadraAway?.presidente
-            : partita.SquadraHome?.presidente
         console.warn(
-          `Impossibile inviare notifica, mail non configurata per il presidente: ${presidenteWithoutMail}`,
+          `Impossibile inviare notifica, mail non configurata per il presidente avversario`,
         )
       }
     }

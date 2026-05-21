@@ -7,6 +7,44 @@
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+export interface PartitaMailPartecipanti {
+  SquadraHome?: { idUtente?: number; mail?: string; presidente?: string; nomeSquadra?: string } | null
+  SquadraAway?: { idUtente?: number; mail?: string; presidente?: string; nomeSquadra?: string } | null
+}
+
+export interface FormazioneMailRecipients {
+  /** Mail dell'avversario (destinatario principale) */
+  to: string | undefined
+  /** Mail di chi ha inserito la formazione (in copia) */
+  cc: string | undefined
+  /** Nome del presidente avversario (per il corpo email) */
+  avversario: string | undefined
+  /** Nome del presidente che ha inserito la formazione */
+  submitter: string | undefined
+  /** Nome della squadra di chi ha inserito */
+  nomeSquadraSubmitter: string | undefined
+}
+
+/**
+ * Risolve i destinatari di una mail di notifica formazione dato chi l'ha inserita.
+ * Funzione pura: nessuna dipendenza da DB o sessione.
+ */
+export function resolveFormazioneMailRecipients(
+  partita: PartitaMailPartecipanti,
+  idSquadraSubmitter: number,
+): FormazioneMailRecipients {
+  const isHome = idSquadraSubmitter === partita.SquadraHome?.idUtente
+  return {
+    to: isHome ? partita.SquadraAway?.mail : partita.SquadraHome?.mail,
+    cc: isHome ? partita.SquadraHome?.mail : partita.SquadraAway?.mail,
+    avversario: isHome ? partita.SquadraAway?.presidente : partita.SquadraHome?.presidente,
+    submitter: isHome ? partita.SquadraHome?.presidente : partita.SquadraAway?.presidente,
+    nomeSquadraSubmitter: isHome ? partita.SquadraHome?.nomeSquadra : partita.SquadraAway?.nomeSquadra,
+  }
+}
+
+
+
 export interface FormazioneMailData {
   avversarioPresidente: string | undefined
   descrizioneGiornata: string

@@ -14,6 +14,7 @@ import { Configurazione } from '~/config'
 import {
   buildConfermaPrecedenteHtml,
   buildConfermaPrecedenteAdminHtml,
+  resolveFormazioneMailRecipients,
 } from '~/server/services/mailTemplates'
 import { scriviFormazione } from '~/server/services/scriviFormazione'
 
@@ -136,36 +137,13 @@ export const confirmPrecedenteORPCProcedure = protectedProcedure
 
       for (const { partita, descrizioneGiornata } of partiteConDettagli) {
         const subject = `ErFantacalcio: Conferma formazione precedente – ${partita.SquadraHome?.nomeSquadra} - ${partita.SquadraAway?.nomeSquadra}`
-
-        const avversarioPresidente =
-          idSquadra === partita.SquadraHome?.idUtente
-            ? partita.SquadraHome?.presidente
-            : partita.SquadraAway?.presidente
-
-        const to =
-          idSquadra === partita.SquadraHome?.idUtente
-            ? partita.SquadraAway?.mail
-            : partita.SquadraHome?.mail
-
-        const cc =
-          idSquadra === partita.SquadraHome?.idUtente
-            ? partita.SquadraHome?.mail
-            : partita.SquadraAway?.mail
-
-        const presidenteCorrente =
-          idSquadra === partita.SquadraHome?.idUtente
-            ? partita.SquadraHome?.presidente
-            : partita.SquadraAway?.presidente
-
-        const nomeSquadraCorrente =
-          idSquadra === partita.SquadraHome?.idUtente
-            ? partita.SquadraHome?.nomeSquadra
-            : partita.SquadraAway?.nomeSquadra
+        const { to, cc, avversario, submitter, nomeSquadraSubmitter } =
+          resolveFormazioneMailRecipients(partita, idSquadra)
 
         // Mail all'avversario (to) e copia al presidente che ha confermato (cc)
         if (to && cc) {
           const htmlMessage = buildConfermaPrecedenteHtml({
-            avversarioPresidente,
+            avversarioPresidente: avversario,
             descrizioneGiornata,
             dataConferma: formatDateTime(nowInItalyIso()),
             dataCalcioInizio: formatDateTime(
@@ -182,8 +160,8 @@ export const confirmPrecedenteORPCProcedure = protectedProcedure
           if (!admin.mail) continue
           const subjectAdmin = `[Admin] ErFantacalcio: Conferma automatica formazione – ${partita.SquadraHome?.nomeSquadra} - ${partita.SquadraAway?.nomeSquadra}`
           const htmlAdmin = buildConfermaPrecedenteAdminHtml({
-            presidenteCorrente,
-            nomeSquadraCorrente,
+            presidenteCorrente: submitter,
+            nomeSquadraCorrente: nomeSquadraSubmitter,
             nomeSquadraHome: partita.SquadraHome?.nomeSquadra,
             nomeSquadraAway: partita.SquadraAway?.nomeSquadra,
             descrizioneGiornata,
