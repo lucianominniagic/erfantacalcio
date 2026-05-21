@@ -8,7 +8,8 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import Modal from '../modal/Modal'
 import {
   usePartitaFromSearchParams,
@@ -30,13 +31,13 @@ function ViewTabellini() {
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
 
-  const tabelliniList = api.partita.getTabellini.useQuery(
-    { idPartita: partita! },
-    {
+  const tabelliniList = useQuery(
+    orpc.partita.getTabellini.queryOptions({
+      input: { idPartita: partita! },
       enabled: !!partita,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
 
   const calendario = tabelliniList.data?.Calendario

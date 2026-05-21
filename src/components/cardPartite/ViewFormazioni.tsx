@@ -9,7 +9,8 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import { formatDateFromIso } from '~/utils/dateUtils'
 import { useMemo } from 'react'
 import Modal from '../modal/Modal'
@@ -33,13 +34,13 @@ function ViewFormazioni() {
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
 
-  const formazioniList = api.partita.getFormazioni.useQuery(
-    { idPartita: partita! },
-    {
+  const formazioniList = useQuery(
+    orpc.partita.getFormazioni.queryOptions({
+      input: { idPartita: partita! },
       enabled: !!partita,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
 
   const calendario = formazioniList.data?.Calendario
