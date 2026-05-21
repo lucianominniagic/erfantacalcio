@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { publicProcedure } from '~/server/orpc'
 import { getCalendario, mapCalendario } from '../../../utils/common'
-import { getAltrePartite, getFormazioni } from './getTabellini'
+import { getAltrePartite, getFormazioni } from './helpers'
 
 export const getFormazioniORPCProcedure = publicProcedure
   .route({ method: 'GET', path: '/partita/getFormazioni', summary: 'Formazioni di una partita' })

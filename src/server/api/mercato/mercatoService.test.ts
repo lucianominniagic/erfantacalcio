@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { type EntityManager } from 'typeorm'
-import { TRPCError } from '@trpc/server'
 
 // ============================================================================
 // Mocks (setup BEFORE imports that depend on these modules)
@@ -67,12 +66,10 @@ vi.mock('~/schemas/mercato', () => ({
 import { createProposta } from '~/server/api/mercato/procedures/createProposta'
 // @ts-expect-error - modules don't exist yet (RED phase)
 import { deleteProposta } from '~/server/api/mercato/procedures/deleteProposta'
-// @ts-expect-error - modules don't exist yet (RED phase)
-import { getSessioneAttiva } from '~/server/api/mercato/procedures/getSessioneAttiva'
-// @ts-expect-error - modules don't exist yet (RED phase)
-import { getSessioniMercato } from '~/server/api/mercato/procedures/getSessioniMercato'
-import { getMieProposte } from '~/server/api/mercato/procedures/getMieProposte'
-import { getGiocatoriSvincolati } from '~/server/api/mercato/procedures/getGiocatoriSvincolati'
+import { getSessioneAttiva } from '~/server/api/mercato/procedures/helpers'
+import { getSessioniMercato } from '~/server/api/mercato/procedures/helpers'
+import { getMieProposte } from '~/server/api/mercato/procedures/helpers'
+import { getGiocatoriSvincolati } from '~/server/api/mercato/procedures/helpers'
 
 import { SessioneMercato, PropostaMercato, Trasferimento, Utente } from '~/server/db/entities'
 

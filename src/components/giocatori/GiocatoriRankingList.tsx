@@ -1,9 +1,18 @@
 'use client'
 
 import { Box, Chip, List, ListItem, Stack, Typography } from '@mui/material'
-import { type RouterOutputs } from '~/utils/api'
-
-type GiocatoreStats = RouterOutputs['giocatori']['listStatistiche'][number]
+interface GiocatoreStats {
+  id: number
+  nome: string
+  squadra?: string | null
+  squadraSerieA?: string | null
+  maglia?: string | null
+  media?: number | string | null
+  golsubiti?: number | string | null
+  golfatti?: number | string | null
+  assist?: number | string | null
+  giocate?: number | string | null
+}
 
 interface GiocatoriRankingListProps {
   giocatori: GiocatoreStats[]

@@ -212,7 +212,7 @@ describe('votiService', () => {
       expect(result.assist).toBe(1)
       expect(result.ammonizione).toBe(-0.5)
       expect(result.espulsione).toBe(0)
-      expect(result.autoriBonus).toBeUndefined()
+      expect(result.altriBonus).toBeUndefined()
       expect(result.altriBonus).toBe(4)
     })
 

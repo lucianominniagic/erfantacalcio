@@ -5,8 +5,7 @@
  * e createTanstackQueryUtils di @orpc/tanstack-query per generare queryOptions
  * compatibili con TanStack Query v5.
  *
- * Il QueryClient è già provisionato da TRPCReactProvider — non occorre un
- * secondo QueryClientProvider.
+ * Il QueryClient è provisionato da QueryClientProvider in ProvidersWrapper.
  */
 import { createORPCClient } from '@orpc/client'
 import { RPCLink } from '@orpc/client/fetch'

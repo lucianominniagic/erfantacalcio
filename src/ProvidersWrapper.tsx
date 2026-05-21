@@ -1,7 +1,7 @@
 'use client'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { SessionProvider } from 'next-auth/react'
-import { TRPCReactProvider } from '~/components/TRPCReactProvider'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 
 // material-ui
@@ -38,13 +38,24 @@ export default function ProvidersWrapper({
 }: {
   children: ReactNode
 }) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 5 * 1000,
+          },
+        },
+      }),
+  )
+
   return (
     <ThemeModeProvider>
-      <TRPCReactProvider>
+      <QueryClientProvider client={queryClient}>
         <SessionProvider>
           <ThemedApp>{children}</ThemedApp>
         </SessionProvider>
-      </TRPCReactProvider>
+      </QueryClientProvider>
     </ThemeModeProvider>
   )
 }

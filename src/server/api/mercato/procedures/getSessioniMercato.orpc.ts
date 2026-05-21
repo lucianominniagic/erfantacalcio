@@ -1,5 +1,5 @@
 import { protectedProcedure } from '~/server/orpc'
-import { getSessioniMercato } from './getSessioniMercato'
+import { getSessioniMercato } from './helpers'
 
 export const getSessioniMercatoORPCProcedure = protectedProcedure
   .route({ method: 'GET', path: '/mercato/getSessioniMercato', summary: 'Lista sessioni di mercato con proposte' })

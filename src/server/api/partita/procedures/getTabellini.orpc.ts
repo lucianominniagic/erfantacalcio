@@ -7,7 +7,7 @@ import {
   mapVotoToTabellinoEntry,
   calcolaFantapunti,
 } from '~/server/services/tabelliniService'
-import { getAltrePartite, getFormazioni } from './getTabellini'
+import { getAltrePartite, getFormazioni } from './helpers'
 
 export const getTabelliniORPCProcedure = publicProcedure
   .route({ method: 'GET', path: '/partita/getTabellini', summary: 'Tabellini di una partita' })

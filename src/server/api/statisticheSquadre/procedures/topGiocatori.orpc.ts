@@ -3,7 +3,24 @@ import { statisticheSquadreInputSchema } from '~/schemas/statisticheSquadre'
 import { StatsA, StatsC, StatsD, StatsP, Utenti } from '~/server/db/entities'
 import { Not, IsNull } from 'typeorm'
 import { getSogliaGiocate } from '~/server/api/giocatori/utils'
-import type { TopGiocatoriPerSquadra } from './topGiocatori'
+
+interface TopEntry {
+  idGiocatore: number
+  nome: string
+  ruolo: string
+  maglia: string | null
+  squadraSerieA: string | null
+  value: number
+}
+
+interface TopGiocatoriPerSquadra {
+  idSquadra: number
+  squadra: string
+  foto: string | null
+  topMedia: TopEntry | null
+  topBomber: TopEntry | null
+  topAssist: TopEntry | null
+}
 
 interface PlayerRow {
   idgiocatore: number

@@ -2,7 +2,16 @@ import { z } from 'zod'
 import { adminProcedure } from '~/server/orpc'
 import { normalizeNomeGiocatore } from '~/utils/helper'
 import { Giocatori } from '~/server/db/entities'
-import { isAbsoluteUrl } from './createOrUpdatePlayer'
+
+function isAbsoluteUrl(value?: string | null): boolean {
+  if (!value) return false
+  try {
+    const parsed = new URL(value)
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
 
 export const createOrUpdatePlayerORPCProcedure = adminProcedure
   .route({ method: 'POST', path: '/giocatori/upsert', summary: 'Crea o aggiorna giocatore' })

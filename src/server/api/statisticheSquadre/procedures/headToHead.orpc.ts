@@ -1,7 +1,15 @@
 import { publicProcedure } from '~/server/orpc'
 import { statisticheSquadreInputSchema } from '~/schemas/statisticheSquadre'
 import { Partite, Utenti } from '~/server/db/entities'
-import type { H2HCell } from './headToHead'
+
+interface H2HCell {
+  v: number
+  n: number
+  p: number
+  golFatti: number
+  golSubiti: number
+  partite: number
+}
 
 export const headToHeadORPCProcedure = publicProcedure
   .route({ method: 'GET', path: '/statisticheSquadre/headToHead', summary: 'Matrice head-to-head squadre' })
