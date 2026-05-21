@@ -1,4 +1,5 @@
-import { api } from '~/utils/api'
+import { useMutation } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import type { FormazioneDataState } from './useFormazioneData'
 
 interface AlertState {
@@ -11,7 +12,9 @@ export function useFormazionePrecedente(
   data: Pick<FormazioneDataState, 'message' | 'formazioneList'>,
   alert: AlertState,
 ) {
-  const confirmPrecedenteMutation = api.formazione.confirmPrecedente.useMutation()
+  const confirmPrecedenteMutation = useMutation(
+    orpc.formazione.confirmPrecedente.mutationOptions(),
+  )
 
   const formazioneGiaRilasciata =
     data.message ===
@@ -29,7 +32,7 @@ export function useFormazionePrecedente(
 
   const handleConfirmPrecedente = async () => {
     try {
-      await confirmPrecedenteMutation.mutateAsync()
+      await confirmPrecedenteMutation.mutateAsync(undefined)
       await data.formazioneList.refetch()
       alert.setAlertMessage('Formazione precedente confermata con successo')
       alert.setAlertSeverity('success')

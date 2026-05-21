@@ -2,7 +2,6 @@ import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
-import { api } from '~/utils/api'
 import { orpc } from '~/utils/orpc'
 import { type Moduli } from '~/types/common'
 import { moduloDefault } from '~/utils/helper'
@@ -32,17 +31,19 @@ export function useFormazioneData() {
   const [idPartita, setIdPartita] = useState<number>(0)
   const [modulo, setModulo] = useState<Moduli>(moduloDefault)
 
-  const calendarioProssima = api.formazione.getGiornateDaGiocare.useQuery(
-    undefined,
-    { refetchOnWindowFocus: false, refetchOnReconnect: false },
+  const calendarioProssima = useQuery(
+    orpc.formazione.getGiornateDaGiocare.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
   )
-  const formazioneList = api.formazione.get.useQuery(
-    { idTorneo: idTorneo! },
-    {
+  const formazioneList = useQuery(
+    orpc.formazione.get.queryOptions({
+      input: { idTorneo: idTorneo! },
       enabled: !!idTorneo,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
   const rosaList = useQuery(
     orpc.squadre.getRosa.queryOptions({

@@ -19,6 +19,18 @@ import { championsBracketORPCProcedure } from '~/server/api/tornei/procedures/ch
 import { getGiornataPartiteORPCProcedure } from '~/server/api/risultati/procedures/getGiornataPartite.orpc'
 import { getTabellinoORPCProcedure } from '~/server/api/risultati/procedures/getTabellino.orpc'
 import { updateRisultatiORPCProcedure } from '~/server/api/risultati/procedures/update.orpc'
+// formazione
+import { giornateDaGiocareORPCProcedure } from '~/server/api/formazione/procedures/giornateDaGiocare.orpc'
+import { showFormazioneORPCProcedure } from '~/server/api/formazione/procedures/show.orpc'
+import { createFormazioneORPCProcedure } from '~/server/api/formazione/procedures/create.orpc'
+import { confirmPrecedenteORPCProcedure } from '~/server/api/formazione/procedures/confirmPrecedente.orpc'
+// nuovastagione
+import { getFaseAvvioORPCProcedure } from '~/server/api/nuovastagione/procedures/getFaseAvvio.orpc'
+import { chiudiStagioneORPCProcedure } from '~/server/api/nuovastagione/procedures/chiudiStagione.orpc'
+import { preparaStagioneORPCProcedure } from '~/server/api/nuovastagione/procedures/preparaStagione.orpc'
+import { preparaIdSquadreORPCProcedure } from '~/server/api/nuovastagione/procedures/preparaIdSquadre.orpc'
+import { creaPartiteORPCProcedure } from '~/server/api/nuovastagione/procedures/creaPartite.orpc'
+import { creaClassificheORPCProcedure } from '~/server/api/nuovastagione/procedures/creaClassifiche.orpc'
 // statisticheSquadre
 import { riepilogoORPCProcedure } from '~/server/api/statisticheSquadre/procedures/riepilogo.orpc'
 import { headToHeadORPCProcedure } from '~/server/api/statisticheSquadre/procedures/headToHead.orpc'
@@ -82,6 +94,20 @@ export const orpcRouter = {
     update: updateRisultatiORPCProcedure,
     getGiornataPartite: getGiornataPartiteORPCProcedure,
     getTabellino: getTabellinoORPCProcedure,
+  },
+  formazione: {
+    getGiornateDaGiocare: giornateDaGiocareORPCProcedure,
+    get: showFormazioneORPCProcedure,
+    create: createFormazioneORPCProcedure,
+    confirmPrecedente: confirmPrecedenteORPCProcedure,
+  },
+  nuovastagione: {
+    getFaseAvvio: getFaseAvvioORPCProcedure,
+    chiudiStagione: chiudiStagioneORPCProcedure,
+    preparaStagione: preparaStagioneORPCProcedure,
+    preparaIdSquadre: preparaIdSquadreORPCProcedure,
+    creaPartite: creaPartiteORPCProcedure,
+    creaClassifiche: creaClassificheORPCProcedure,
   },
   statisticheSquadre: {
     riepilogo: riepilogoORPCProcedure,

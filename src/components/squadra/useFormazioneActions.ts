@@ -1,4 +1,5 @@
-import { api } from '~/utils/api'
+import { useMutation } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import type { FormazioneDataState } from './useFormazioneData'
 import {
   allowedFormations,
@@ -40,11 +41,13 @@ export function useFormazioneActions(
   const [idGiocatoreStat, setIdGiocatoreStat] = useState<number>()
   const [openModalCalendario, setOpenModalCalendario] = useState(false)
 
-  const saveFormazione = api.formazione.create.useMutation({
-    onSuccess: async () => {
-      alert.setAlertSeverity('success')
-    },
-  })
+  const saveFormazione = useMutation(
+    orpc.formazione.create.mutationOptions({
+      onSuccess: async () => {
+        alert.setAlertSeverity('success')
+      },
+    }),
+  )
 
   function canAddPlayer(ruoloGiocatore: string): boolean {
     const newState = calcolaCodiceFormazione(campo, ruoloGiocatore)

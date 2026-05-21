@@ -10,7 +10,8 @@ import {
   Step,
   StepLabel,
 } from '@mui/material'
-import { api } from '~/utils/api'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import CheckIcon from '@mui/icons-material/CheckCircle'
 import PlayCircle from '@mui/icons-material/PlayCircle'
 import { Configurazione } from '~/config'
@@ -20,12 +21,12 @@ import LoadingSpinner from '~/components/LinearProgressBar/LoadingSpinner'
 import PageHeader from '~/components/PageHeader'
 
 export default function AvvioStagione() {
-  const faseNuovaStagione = api.nuovaStagione.getFaseAvvio.useQuery()
-  const chiudiStagione = api.nuovaStagione.chiudiStagione.useMutation()
-  const preparaStagione = api.nuovaStagione.preparaStagione.useMutation()
-  const preparaIdSquadre = api.nuovaStagione.preparaIdSquadre.useMutation()
-  const creaPartite = api.nuovaStagione.creaPartite.useMutation()
-  const creaClassifiche = api.nuovaStagione.creaClassifiche.useMutation()
+  const faseNuovaStagione = useQuery(orpc.nuovastagione.getFaseAvvio.queryOptions())
+  const chiudiStagione = useMutation(orpc.nuovastagione.chiudiStagione.mutationOptions())
+  const preparaStagione = useMutation(orpc.nuovastagione.preparaStagione.mutationOptions())
+  const preparaIdSquadre = useMutation(orpc.nuovastagione.preparaIdSquadre.mutationOptions())
+  const creaPartite = useMutation(orpc.nuovastagione.creaPartite.mutationOptions())
+  const creaClassifiche = useMutation(orpc.nuovastagione.creaClassifiche.mutationOptions())
   const steps = [
     {
       fase: 1,
@@ -87,19 +88,19 @@ export default function AvvioStagione() {
 
     switch (activeStep) {
       case 0:
-        message = await chiudiStagione.mutateAsync()
+        message = await chiudiStagione.mutateAsync(undefined)
         break
       case 1:
-        message = await preparaStagione.mutateAsync()
+        message = await preparaStagione.mutateAsync(undefined)
         break
       case 2:
-        message = await preparaIdSquadre.mutateAsync()
+        message = await preparaIdSquadre.mutateAsync(undefined)
         break
       case 3:
-        message = await creaPartite.mutateAsync()
+        message = await creaPartite.mutateAsync(undefined)
         break
       case 4:
-        message = await creaClassifiche.mutateAsync()
+        message = await creaClassifiche.mutateAsync(undefined)
         break
     }
     if (message.isError) setErrorMessage(message.message)

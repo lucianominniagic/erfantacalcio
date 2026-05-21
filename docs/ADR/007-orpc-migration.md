@@ -132,8 +132,8 @@ publicProcedure
 | 11 | `trasferimenti` | 6 | 🟡 Media | ✅ Migrato |
 | 12 | `profilo` | 5 | 🟡 Media | ✅ Migrato |
 | 13 | `giocatori` | 8 | 🟡 Media | ✅ Migrato |
-| 14 | `formazione` | 4 | 🟠 Alta | ⏳ |
-| 15 | `nuovaStagione` | 6 | 🔴 Alta | ⏳ |
+| 14 | `formazione` | 4 | 🟠 Alta | ✅ Migrato |
+| 15 | `nuovastagione` | 6 | 🔴 Alta | ✅ Migrato |
 | 16 | `calendario` | 11 | 🟠 Alta | ⏳ |
 | 17 | `mercato` | 8 | 🔴 Alta | ⏳ |
 | 18 | `voti` | 9 | 🔴 Alta | ⏳ |
