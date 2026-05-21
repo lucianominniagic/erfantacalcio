@@ -1,0 +1,3310 @@
+{
+  "info": {
+    "title": "ErFantacalcio oRPC API",
+    "version": "1.0.0",
+    "description": "Documentazione API generata automaticamente da oRPC"
+  },
+  "servers": [
+    {
+      "url": "/api/rest"
+    }
+  ],
+  "openapi": "3.1.1",
+  "paths": {
+    "/albo/list": {
+      "get": {
+        "operationId": "albo.list",
+        "summary": "Lista albo trofei",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/albo/get": {
+      "get": {
+        "operationId": "albo.get",
+        "summary": "Trofei di una squadra",
+        "parameters": [
+          {
+            "name": "idSquadra",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/classifica/list": {
+      "get": {
+        "operationId": "classifica.list",
+        "summary": "Classifica torneo",
+        "parameters": [
+          {
+            "name": "idTorneo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/economia/getRisultatiStagione": {
+      "get": {
+        "operationId": "economia.getRisultatiStagione",
+        "summary": "Risultati stagionali per calcolo premi",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/partita/getTabellini": {
+      "get": {
+        "operationId": "partita.getTabellini",
+        "summary": "Tabellini di una partita",
+        "parameters": [
+          {
+            "name": "idPartita",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/partita/getFormazioni": {
+      "get": {
+        "operationId": "partita.getFormazioni",
+        "summary": "Formazioni di una partita",
+        "parameters": [
+          {
+            "name": "idPartita",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/squadreSerieA/list": {
+      "get": {
+        "operationId": "squadreSerieA.list",
+        "summary": "Lista squadre Serie A",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tornei/list": {
+      "get": {
+        "operationId": "tornei.list",
+        "summary": "Lista tornei",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tornei/championsBracket": {
+      "get": {
+        "operationId": "tornei.championsBracket",
+        "summary": "Bracket Champions League",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/risultati/update": {
+      "post": {
+        "operationId": "risultati.update",
+        "summary": "Aggiorna risultati di una partita",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idPartita": {
+                    "type": "number"
+                  },
+                  "escludi": {
+                    "type": "boolean"
+                  },
+                  "golHome": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10
+                  },
+                  "golAway": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10
+                  },
+                  "fantapuntiHome": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 120
+                  },
+                  "fantapuntiAway": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 120
+                  },
+                  "multaHome": {
+                    "type": "boolean"
+                  },
+                  "multaAway": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "idPartita",
+                  "escludi",
+                  "golHome",
+                  "golAway",
+                  "fantapuntiHome",
+                  "fantapuntiAway",
+                  "multaHome",
+                  "multaAway"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/risultati/getGiornataPartite": {
+      "get": {
+        "operationId": "risultati.getGiornataPartite",
+        "summary": "Partite di una giornata",
+        "parameters": [
+          {
+            "name": "idCalendario",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "includeTabellini",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "backOfficeMode",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/risultati/getTabellino": {
+      "get": {
+        "operationId": "risultati.getTabellino",
+        "summary": "Tabellino di una squadra per partita",
+        "parameters": [
+          {
+            "name": "idPartita",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "idSquadra",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/formazione/getGiornateDaGiocare": {
+      "get": {
+        "operationId": "formazione.getGiornateDaGiocare",
+        "summary": "Giornate da giocare per la squadra utente",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/formazione/get": {
+      "get": {
+        "operationId": "formazione.get",
+        "summary": "Formazione corrente per torneo",
+        "parameters": [
+          {
+            "name": "idTorneo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/formazione/create": {
+      "post": {
+        "operationId": "formazione.create",
+        "summary": "Inserisci formazione per una partita",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idPartita": {
+                    "type": "number"
+                  },
+                  "modulo": {
+                    "type": "string"
+                  },
+                  "giocatori": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "idGiocatore": {
+                          "type": "number"
+                        },
+                        "titolare": {
+                          "type": "boolean"
+                        },
+                        "riserva": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "idGiocatore",
+                        "titolare"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "idPartita",
+                  "modulo",
+                  "giocatori"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/formazione/confirmPrecedente": {
+      "post": {
+        "operationId": "formazione.confirmPrecedente",
+        "summary": "Conferma formazione della giornata precedente",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nuovastagione/getFaseAvvio": {
+      "get": {
+        "operationId": "nuovastagione.getFaseAvvio",
+        "summary": "Ottieni la fase corrente di avvio nuova stagione",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nuovastagione/chiudiStagione": {
+      "post": {
+        "operationId": "nuovastagione.chiudiStagione",
+        "summary": "Chiudi la stagione corrente e liquida i trasferimenti aperti",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isError": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "isComplete": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "default": "",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nuovastagione/preparaStagione": {
+      "post": {
+        "operationId": "nuovastagione.preparaStagione",
+        "summary": "Azzera i dati della stagione precedente per preparare la nuova",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isError": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "isComplete": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "default": "",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nuovastagione/preparaIdSquadre": {
+      "post": {
+        "operationId": "nuovastagione.preparaIdSquadre",
+        "summary": "Sorteggia i nuovi ID squadra per la stagione",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isError": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "isComplete": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "default": "",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nuovastagione/creaPartite": {
+      "post": {
+        "operationId": "nuovastagione.creaPartite",
+        "summary": "Crea il calendario partite per la nuova stagione",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isError": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "isComplete": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "default": "",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nuovastagione/creaClassifiche": {
+      "post": {
+        "operationId": "nuovastagione.creaClassifiche",
+        "summary": "Crea le classifiche per la nuova stagione",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isError": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "isComplete": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "default": "",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statisticheSquadre/riepilogo": {
+      "get": {
+        "operationId": "statisticheSquadre.riepilogo",
+        "summary": "Riepilogo statistiche squadre",
+        "parameters": [
+          {
+            "name": "idTornei",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "style": "deepObject",
+            "explode": true,
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statisticheSquadre/headToHead": {
+      "get": {
+        "operationId": "statisticheSquadre.headToHead",
+        "summary": "Matrice head-to-head squadre",
+        "parameters": [
+          {
+            "name": "idTornei",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "style": "deepObject",
+            "explode": true,
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/statisticheSquadre/topGiocatori": {
+      "get": {
+        "operationId": "statisticheSquadre.topGiocatori",
+        "summary": "Top giocatori per squadra",
+        "parameters": [
+          {
+            "name": "idTornei",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              }
+            },
+            "style": "deepObject",
+            "explode": true,
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/requestPasswordReset": {
+      "post": {
+        "operationId": "auth.requestPasswordReset",
+        "summary": "Richiesta reset password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/resetPassword": {
+      "post": {
+        "operationId": "auth.resetPassword",
+        "summary": "Reset password con token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 6
+                  }
+                },
+                "required": [
+                  "token",
+                  "newPassword"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/squadre/list": {
+      "get": {
+        "operationId": "squadre.list",
+        "summary": "Lista squadre fantasy",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/squadre/get": {
+      "get": {
+        "operationId": "squadre.get",
+        "summary": "Dettaglio squadra fantasy",
+        "parameters": [
+          {
+            "name": "idSquadra",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/squadre/getMaglia": {
+      "get": {
+        "operationId": "squadre.getMaglia",
+        "summary": "Maglia della squadra dell'utente",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/squadre/getRosa": {
+      "get": {
+        "operationId": "squadre.getRosa",
+        "summary": "Rosa di una squadra fantasy",
+        "parameters": [
+          {
+            "name": "idSquadra",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "includeVenduti",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "boolean"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "includeForma",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/squadre/update": {
+      "post": {
+        "operationId": "squadre.update",
+        "summary": "Aggiorna dati squadra fantasy",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "isAdmin": {
+                    "type": "boolean"
+                  },
+                  "isLockLevel": {
+                    "type": "boolean"
+                  },
+                  "presidente": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "squadra": {
+                    "type": "string"
+                  },
+                  "importoAnnuale": {
+                    "type": "number"
+                  },
+                  "importoMulte": {
+                    "type": "number"
+                  },
+                  "importoMercato": {
+                    "type": "number"
+                  },
+                  "fantamilioni": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "id",
+                  "isAdmin",
+                  "isLockLevel",
+                  "presidente",
+                  "email",
+                  "squadra",
+                  "importoAnnuale",
+                  "importoMulte",
+                  "importoMercato",
+                  "fantamilioni"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/squadre/updateMaglia": {
+      "post": {
+        "operationId": "squadre.updateMaglia",
+        "summary": "Aggiorna maglia della squadra",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "mainColor": {
+                    "type": "string"
+                  },
+                  "secondaryColor": {
+                    "type": "string"
+                  },
+                  "thirdColor": {
+                    "type": "string"
+                  },
+                  "textColor": {
+                    "type": "string"
+                  },
+                  "shirtNumber": {
+                    "type": "number"
+                  },
+                  "selectedTemplate": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "mainColor",
+                  "secondaryColor",
+                  "thirdColor",
+                  "textColor",
+                  "shirtNumber",
+                  "selectedTemplate"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trasferimenti/list": {
+      "get": {
+        "operationId": "trasferimenti.list",
+        "summary": "Lista trasferimenti di un giocatore",
+        "parameters": [
+          {
+            "name": "idGiocatore",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trasferimenti/statsStagioni": {
+      "get": {
+        "operationId": "trasferimenti.statsStagioni",
+        "summary": "Statistiche stagioni di un giocatore",
+        "parameters": [
+          {
+            "name": "idGiocatore",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trasferimenti/get": {
+      "get": {
+        "operationId": "trasferimenti.get",
+        "summary": "Dettaglio trasferimento",
+        "parameters": [
+          {
+            "name": "idTrasferimento",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trasferimenti/upsert": {
+      "post": {
+        "operationId": "trasferimenti.upsert",
+        "summary": "Crea o aggiorna trasferimento",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idTrasferimento": {
+                    "type": "number"
+                  },
+                  "idGiocatore": {
+                    "type": "number"
+                  },
+                  "idSquadraSerieA": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "idSquadra": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "costo": {
+                    "type": "number"
+                  },
+                  "dataAcquisto": {
+                    "type": "string",
+                    "format": "date-time",
+                    "x-native-type": "date"
+                  },
+                  "dataCessione": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time",
+                        "x-native-type": "date"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "idTrasferimento",
+                  "idGiocatore",
+                  "costo"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trasferimenti/delete": {
+      "post": {
+        "operationId": "trasferimenti.delete",
+        "summary": "Elimina trasferimento",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trasferimenti/chiudiTrasferimento": {
+      "post": {
+        "operationId": "trasferimenti.chiudiTrasferimento",
+        "summary": "Chiudi trasferimento giocatore",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profilo/changePassword": {
+      "post": {
+        "operationId": "profilo.changePassword",
+        "summary": "Cambia password utente",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "oldPassword": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "newPassword": {
+                    "type": "string",
+                    "minLength": 6
+                  }
+                },
+                "required": [
+                  "id",
+                  "oldPassword",
+                  "newPassword"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profilo/uploadFoto": {
+      "post": {
+        "operationId": "profilo.uploadFoto",
+        "summary": "Upload foto profilo (locale)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileName": {
+                    "type": "string"
+                  },
+                  "fileSize": {
+                    "type": "number"
+                  },
+                  "blockDataBase64": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fileName",
+                  "fileSize",
+                  "blockDataBase64"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profilo/uploadFotoVercel": {
+      "post": {
+        "operationId": "profilo.uploadFotoVercel",
+        "summary": "Upload foto profilo su Vercel Blob",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileName": {
+                    "type": "string"
+                  },
+                  "fileData": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fileName",
+                  "fileData"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profilo/deleteFoto": {
+      "post": {
+        "operationId": "profilo.deleteFoto",
+        "summary": "Elimina foto profilo locale",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profilo/updateFoto": {
+      "post": {
+        "operationId": "profilo.updateFoto",
+        "summary": "Aggiorna URL foto profilo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileName": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fileName"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/giocatori/upsert": {
+      "post": {
+        "operationId": "giocatori.upsert",
+        "summary": "Crea o aggiorna giocatore",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idGiocatore": {
+                    "type": "number"
+                  },
+                  "ruolo": {
+                    "type": "string"
+                  },
+                  "nome": {
+                    "type": "string"
+                  },
+                  "nomeFantagazzetta": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "idGiocatore",
+                  "ruolo",
+                  "nome",
+                  "nomeFantagazzetta"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/giocatori/delete": {
+      "post": {
+        "operationId": "giocatori.delete",
+        "summary": "Elimina giocatore",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/giocatori/get": {
+      "get": {
+        "operationId": "giocatori.get",
+        "summary": "Dettaglio giocatore",
+        "parameters": [
+          {
+            "name": "idGiocatore",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/giocatori/listAll": {
+      "get": {
+        "operationId": "giocatori.listAll",
+        "summary": "Lista tutti i giocatori",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/giocatori/search": {
+      "get": {
+        "operationId": "giocatori.search",
+        "summary": "Ricerca giocatori per nome",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/giocatori/listStatistiche": {
+      "get": {
+        "operationId": "giocatori.listStatistiche",
+        "summary": "Statistiche giocatori per ruolo",
+        "parameters": [
+          {
+            "name": "ruolo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "P",
+                "D",
+                "C",
+                "A"
+              ],
+              "type": "string"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "soloSvincolati",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/giocatori/listStatisticheSquadra": {
+      "get": {
+        "operationId": "giocatori.listStatisticheSquadra",
+        "summary": "Statistiche giocatori di una squadra",
+        "parameters": [
+          {
+            "name": "id_squadra",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/giocatori/getStatistica": {
+      "get": {
+        "operationId": "giocatori.getStatistica",
+        "summary": "Statistica completa di un giocatore",
+        "parameters": [
+          {
+            "name": "idGiocatore",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendario/list": {
+      "get": {
+        "operationId": "calendario.list",
+        "summary": "Lista completa del calendario (admin)",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendario/getOne": {
+      "get": {
+        "operationId": "calendario.getOne",
+        "summary": "Recupera un singolo elemento del calendario (admin)",
+        "parameters": [
+          {
+            "name": "idCalendario",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendario/update": {
+      "post": {
+        "operationId": "calendario.update",
+        "summary": "Aggiorna un elemento del calendario (admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "idTorneo": {
+                    "type": "number"
+                  },
+                  "giornata": {
+                    "type": "number"
+                  },
+                  "giornataSerieA": {
+                    "type": "number"
+                  },
+                  "girone": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "data": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "dataFine": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "isRecupero": {
+                    "type": "boolean"
+                  },
+                  "isSovrapposta": {
+                    "type": "boolean"
+                  },
+                  "isGiocata": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "id",
+                  "idTorneo",
+                  "giornata",
+                  "giornataSerieA",
+                  "isRecupero",
+                  "isSovrapposta",
+                  "isGiocata"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendario/getProssimeGiornate": {
+      "get": {
+        "operationId": "calendario.getProssimeGiornate",
+        "summary": "Restituisce le prossime giornate del calendario",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendario/getUltimiRisultati": {
+      "get": {
+        "operationId": "calendario.getUltimiRisultati",
+        "summary": "Restituisce gli ultimi risultati del calendario",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendario/listByGirone": {
+      "post": {
+        "operationId": "calendario.listByGirone",
+        "summary": "Lista partite del calendario per girone",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendario/listRecuperi": {
+      "get": {
+        "operationId": "calendario.listRecuperi",
+        "summary": "Lista partite di recupero del calendario",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendario/listByTorneo": {
+      "post": {
+        "operationId": "calendario.listByTorneo",
+        "summary": "Lista partite del calendario per torneo (array di id)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendario/getByGiornataAndTorneo": {
+      "get": {
+        "operationId": "calendario.getByGiornataAndTorneo",
+        "summary": "Recupera partite del calendario per giornata e torneo",
+        "parameters": [
+          {
+            "name": "idTorneo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "giornata",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendario/getByIdCalendario": {
+      "get": {
+        "operationId": "calendario.getByIdCalendario",
+        "summary": "Recupera partite del calendario per idCalendario",
+        "parameters": [
+          {
+            "name": "idCalendario",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendario/listAttuale": {
+      "get": {
+        "operationId": "calendario.listAttuale",
+        "summary": "Lista partite del calendario attuale (±10 giorni)",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/calendario/listPartiteBySquadra": {
+      "get": {
+        "operationId": "calendario.listPartiteBySquadra",
+        "summary": "Lista partite del calendario per squadra",
+        "parameters": [
+          {
+            "name": "idSquadra",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mercato/listSessioni": {
+      "get": {
+        "operationId": "mercato.listSessioni",
+        "summary": "Lista sessioni di mercato (admin)",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mercato/getSessioniMercato": {
+      "get": {
+        "operationId": "mercato.getSessioniMercato",
+        "summary": "Lista sessioni di mercato con proposte",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mercato/getSessioneAttiva": {
+      "get": {
+        "operationId": "mercato.getSessioneAttiva",
+        "summary": "Recupera la sessione di mercato attiva",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mercato/getProposteSessione": {
+      "get": {
+        "operationId": "mercato.getProposteSessione",
+        "summary": "Recupera le proposte di una sessione chiusa (admin)",
+        "parameters": [
+          {
+            "name": "idSessione",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mercato/getMieProposte": {
+      "get": {
+        "operationId": "mercato.getMieProposte",
+        "summary": "Recupera le proposte di mercato dell'utente corrente",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mercato/getGiocatoriSvincolati": {
+      "get": {
+        "operationId": "mercato.getGiocatoriSvincolati",
+        "summary": "Lista giocatori svincolati disponibili al mercato",
+        "parameters": [
+          {
+            "name": "ruolo",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "P",
+                "D",
+                "C",
+                "A"
+              ],
+              "type": "string"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "stagione",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mercato/deleteProposta": {
+      "post": {
+        "operationId": "mercato.deleteProposta",
+        "summary": "Elimina una proposta di mercato",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idProposta": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "idProposta"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mercato/createSessione": {
+      "post": {
+        "operationId": "mercato.createSessione",
+        "summary": "Crea una nuova sessione di mercato (admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "dataApertura": {
+                    "type": "string",
+                    "format": "date-time",
+                    "x-native-type": "date"
+                  },
+                  "dataChiusura": {
+                    "type": "string",
+                    "format": "date-time",
+                    "x-native-type": "date"
+                  },
+                  "maxProposte": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "tipoValuta": {
+                    "default": "fantamilioni",
+                    "enum": [
+                      "fantamilioni",
+                      "euro"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "dataApertura",
+                  "dataChiusura",
+                  "maxProposte"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mercato/createProposta": {
+      "post": {
+        "operationId": "mercato.createProposta",
+        "summary": "Crea una proposta di acquisto per un giocatore svincolato",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idGiocatore": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "prezzoOfferto": {
+                    "type": "number",
+                    "minimum": 1
+                  }
+                },
+                "required": [
+                  "idGiocatore",
+                  "prezzoOfferto"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voti/list": {
+      "get": {
+        "operationId": "voti.list",
+        "summary": "Lista voti di un giocatore",
+        "parameters": [
+          {
+            "name": "idGiocatore",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "top",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voti/get": {
+      "get": {
+        "operationId": "voti.get",
+        "summary": "Recupera un voto per id",
+        "parameters": [
+          {
+            "name": "idVoto",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voti/getStatisticaVoti": {
+      "get": {
+        "operationId": "voti.getStatisticaVoti",
+        "summary": "Statistiche voti di un giocatore",
+        "parameters": [
+          {
+            "name": "idGiocatore",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number"
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          },
+          {
+            "name": "top",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "allowEmptyValue": true,
+            "allowReserved": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voti/update": {
+      "post": {
+        "operationId": "voti.update",
+        "summary": "Aggiorna un voto giocatore",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idVoto": {
+                    "type": "number"
+                  },
+                  "ruolo": {
+                    "type": "string"
+                  },
+                  "voto": {
+                    "type": "number"
+                  },
+                  "ammonizione": {
+                    "type": "number"
+                  },
+                  "espulsione": {
+                    "type": "number"
+                  },
+                  "gol": {
+                    "type": "number"
+                  },
+                  "assist": {
+                    "type": "number"
+                  },
+                  "autogol": {
+                    "type": "number"
+                  },
+                  "altriBonus": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "idVoto",
+                  "ruolo",
+                  "voto",
+                  "ammonizione",
+                  "espulsione",
+                  "gol",
+                  "assist",
+                  "autogol",
+                  "altriBonus"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voti/uploadVercel": {
+      "post": {
+        "operationId": "voti.uploadVercel",
+        "summary": "Upload file voti su Vercel Blob",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idCalendario": {
+                    "type": "number"
+                  },
+                  "fileName": {
+                    "type": "string"
+                  },
+                  "fileData": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "idCalendario",
+                  "fileName",
+                  "fileData"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voti/resetVoti": {
+      "post": {
+        "operationId": "voti.resetVoti",
+        "summary": "Azzera i voti di una giornata (admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idCalendario": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "idCalendario"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voti/readVoti": {
+      "post": {
+        "operationId": "voti.readVoti",
+        "summary": "Legge e analizza un file voti da URL (admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "fileUrl": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fileUrl"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voti/processVoti": {
+      "post": {
+        "operationId": "voti.processVoti",
+        "summary": "Processa e salva i voti di una giornata (admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "idCalendario": {
+                    "type": "number"
+                  },
+                  "votiGiocatori": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id_pf": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "Nome": {
+                          "type": "string"
+                        },
+                        "Ammonizione": {
+                          "type": "number"
+                        },
+                        "Assist": {
+                          "type": "number"
+                        },
+                        "Autogol": {
+                          "type": "number"
+                        },
+                        "Espulsione": {
+                          "type": "number"
+                        },
+                        "GolSegnati": {
+                          "type": "number"
+                        },
+                        "GolSubiti": {
+                          "type": "number"
+                        },
+                        "RigoriErrati": {
+                          "type": "number"
+                        },
+                        "RigoriParati": {
+                          "type": "number"
+                        },
+                        "Ruolo": {
+                          "type": "string"
+                        },
+                        "Squadra": {
+                          "type": "string"
+                        },
+                        "Voto": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id_pf",
+                        "Nome",
+                        "Ammonizione",
+                        "Assist",
+                        "Autogol",
+                        "Espulsione",
+                        "GolSegnati",
+                        "GolSubiti",
+                        "RigoriErrati",
+                        "RigoriParati",
+                        "Ruolo",
+                        "Squadra",
+                        "Voto"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "idCalendario",
+                  "votiGiocatori"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/voti/refreshStats": {
+      "post": {
+        "operationId": "voti.refreshStats",
+        "summary": "Aggiorna le statistiche dei giocatori per ruolo (admin)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ruolo": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "ruolo"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {},
+                    {
+                      "not": {}
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

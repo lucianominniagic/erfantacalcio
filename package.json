@@ -24,6 +24,7 @@
     "migration:run:prod": "cross-env DOTENV_CONFIG_PATH=.env.prod npm run migration:run",
     "migration:revert:prod": "cross-env DOTENV_CONFIG_PATH=.env.prod npm run migration:revert",
     "migration:show:prod": "cross-env DOTENV_CONFIG_PATH=.env.prod npm run migration:show",
+    "export:openapi": "node -e \"fetch('http://localhost:8080/api/docs?format=json').then(r=>r.text()).then(t=>{require('fs').writeFileSync('openapi.json',t);console.log('✓ openapi.json exported')}).catch(e=>{console.error('ERROR: dev server running?',e.message);process.exit(1)})\"",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
