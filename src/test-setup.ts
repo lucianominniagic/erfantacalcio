@@ -27,3 +27,19 @@ vi.mock('~/server/api/trpc', () => {
     adminProcedure: buildProcedure(),
   }
 })
+
+// Mock ~/server/orpc so oRPC procedure files can be imported without
+// triggering the Next.js / next-auth module chain.
+vi.mock('~/server/orpc', () => {
+  const buildProcedure = (): any => ({
+    use: () => buildProcedure(),
+    route: () => buildProcedure(),
+    input: () => buildProcedure(),
+    handler: (fn: unknown) => fn,
+  })
+  return {
+    publicProcedure: buildProcedure(),
+    protectedProcedure: buildProcedure(),
+    adminProcedure: buildProcedure(),
+  }
+})

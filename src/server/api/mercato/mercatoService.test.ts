@@ -62,14 +62,7 @@ vi.mock('~/schemas/mercato', () => ({
 }))
 
 // Import AFTER mocks are defined
-// @ts-expect-error - modules don't exist yet (RED phase)
-import { createProposta } from '~/server/api/mercato/procedures/createProposta'
-// @ts-expect-error - modules don't exist yet (RED phase)
-import { deleteProposta } from '~/server/api/mercato/procedures/deleteProposta'
-import { getSessioneAttiva } from '~/server/api/mercato/procedures/helpers'
-import { getSessioniMercato } from '~/server/api/mercato/procedures/helpers'
-import { getMieProposte } from '~/server/api/mercato/procedures/helpers'
-import { getGiocatoriSvincolati } from '~/server/api/mercato/procedures/helpers'
+import { createProposta, deleteProposta, getSessioneAttiva, getSessioniMercato, getMieProposte, getGiocatoriSvincolati } from '~/server/api/mercato/procedures/helpers'
 
 import { SessioneMercato, PropostaMercato, Trasferimento, Utente } from '~/server/db/entities'
 

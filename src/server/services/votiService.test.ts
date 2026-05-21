@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest'
 import type { BonusConfig } from '~/config/bonus'
 import {
   calcBonusVoto,
-  type BonusVotoResult,
   type VotoInput,
 } from './votiService'
 
@@ -212,7 +211,6 @@ describe('votiService', () => {
       expect(result.assist).toBe(1)
       expect(result.ammonizione).toBe(-0.5)
       expect(result.espulsione).toBe(0)
-      expect(result.altriBonus).toBeUndefined()
       expect(result.altriBonus).toBe(4)
     })
 

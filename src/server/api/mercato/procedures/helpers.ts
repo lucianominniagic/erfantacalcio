@@ -1,6 +1,7 @@
+import { ORPCError } from '@orpc/server'
 import { IsNull, LessThanOrEqual, MoreThanOrEqual, Not } from 'typeorm'
-import { SessioneMercato, PropostaMercato, Trasferimento } from '~/server/db/entities'
-import type { GetGiocatoriSvincolatiInput } from '~/schemas/mercato'
+import { SessioneMercato, PropostaMercato, Trasferimento, Utente } from '~/server/db/entities'
+import type { GetGiocatoriSvincolatiInput, CreatePropostaInput, DeletePropostaInput } from '~/schemas/mercato'
 
 interface MieProposteCtx {
   session: { user: { id: string; ruolo?: string; idSquadra: number } }
@@ -171,4 +172,123 @@ export async function getGiocatoriSvincolati({
       ? `/images/maglie/${t.SquadraSerieA.maglia}`
       : null,
   }))
+}
+
+interface CreatePropostaCtx {
+  session: { user: { id: string; ruolo?: string; idSquadra: number } }
+}
+
+export async function createProposta({
+  ctx,
+  input,
+}: {
+  ctx: CreatePropostaCtx
+  input: CreatePropostaInput
+}) {
+  const sessione = await SessioneMercato.findOne({
+    where: {
+      dataApertura: LessThanOrEqual(new Date()),
+      dataChiusura: MoreThanOrEqual(new Date()),
+    },
+    relations: { ProposteMercato: true },
+    order: { id: 'DESC' },
+  })
+
+  if (!sessione) {
+    throw new ORPCError('NOT_FOUND', { message: 'Nessuna sessione trovata' })
+  }
+
+  const now = new Date()
+  const isAttiva = sessione.dataApertura <= now && sessione.dataChiusura >= now
+
+  if (!isAttiva) {
+    throw new ORPCError('NOT_FOUND', { message: 'Nessuna sessione di mercato attiva' })
+  }
+
+  const myProposte = (sessione.ProposteMercato ?? []).filter(
+    (p) => p.idSquadra === ctx.session.user.idSquadra && p.deletedAt === null,
+  )
+
+  if (myProposte.length >= sessione.maxProposte) {
+    throw new ORPCError('BAD_REQUEST', {
+      message: `Hai già raggiunto il massimo di ${sessione.maxProposte} proposte`,
+    })
+  }
+
+  if (myProposte.some((p) => p.idGiocatore === input.idGiocatore)) {
+    throw new ORPCError('BAD_REQUEST', {
+      message: "Hai già fatto un'offerta per questo giocatore",
+    })
+  }
+
+  const trasferimento = await Trasferimento.findOne({
+    where: { idGiocatore: input.idGiocatore, dataCessione: IsNull() },
+  })
+  if (trasferimento && trasferimento.idSquadra !== null) {
+    throw new ORPCError('BAD_REQUEST', { message: 'Il giocatore non è svincolato' })
+  }
+
+  if (sessione.tipoValuta === 'fantamilioni') {
+    const utente = await Utente.findOne({
+      where: { idUtente: ctx.session.user.idSquadra },
+    })
+
+    if (utente) {
+      const esistenti = await PropostaMercato.find({
+        where: {
+          idSessione: sessione.id,
+          idSquadra: ctx.session.user.idSquadra,
+          deletedAt: IsNull(),
+        },
+      })
+      const totalSpeso = esistenti.reduce((sum, p) => sum + Number(p.prezzoOfferto), 0)
+
+      if (totalSpeso + input.prezzoOfferto > Number(utente.fantaMilioni)) {
+        throw new ORPCError('BAD_REQUEST', { message: 'Budget fantamilioni superato' })
+      }
+    }
+  }
+
+  const proposta = PropostaMercato.create({
+    idSessione: sessione.id,
+    idSquadra: ctx.session.user.idSquadra,
+    idGiocatore: input.idGiocatore,
+    prezzoOfferto: input.prezzoOfferto,
+    deletedAt: null,
+  })
+
+  return await PropostaMercato.save(proposta)
+}
+
+interface DeletePropostaCtx {
+  session: { user: { id: string; ruolo?: string; idSquadra: number } }
+}
+
+export async function deleteProposta({
+  ctx,
+  input,
+}: {
+  ctx: DeletePropostaCtx
+  input: DeletePropostaInput
+}) {
+  const proposta = await PropostaMercato.findOne({
+    where: { id: input.idProposta },
+  })
+
+  if (!proposta) {
+    throw new ORPCError('NOT_FOUND', { message: 'Proposta non trovata' })
+  }
+
+  if (proposta.idSquadra !== ctx.session.user.idSquadra) {
+    throw new ORPCError('FORBIDDEN', {
+      message: "Non puoi eliminare una proposta di un'altra squadra",
+    })
+  }
+
+  if (proposta.deletedAt !== null) {
+    throw new ORPCError('BAD_REQUEST', { message: 'La proposta è già stata eliminata' })
+  }
+
+  proposta.deletedAt = new Date()
+  return await PropostaMercato.save(proposta)
 }
