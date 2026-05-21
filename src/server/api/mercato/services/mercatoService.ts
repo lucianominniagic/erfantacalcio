@@ -3,16 +3,19 @@ import { IsNull, LessThanOrEqual, MoreThanOrEqual, Not } from 'typeorm'
 import { SessioneMercato, PropostaMercato, Trasferimento, Utente } from '~/server/db/entities'
 import type { GetGiocatoriSvincolatiInput, CreatePropostaInput, DeletePropostaInput } from '~/schemas/mercato'
 
-interface MieProposteCtx {
+export interface MercatoCtx {
   session: { user: { id: string; ruolo?: string; idSquadra: number } }
 }
 
-export async function getMieProposte({
-  ctx,
-}: {
-  ctx: MieProposteCtx
-  input: Record<string, never>
-}) {
+export type StatoSessione = 'futura' | 'attiva' | 'chiusa'
+
+function calcolaStato(sessione: SessioneMercato, now: Date): StatoSessione {
+  if (sessione.dataApertura > now) return 'futura'
+  if (sessione.dataChiusura < now) return 'chiusa'
+  return 'attiva'
+}
+
+export async function getMieProposte({ ctx }: { ctx: MercatoCtx; input: Record<string, never> }) {
   const sessione = await SessioneMercato.findOne({
     where: {
       dataApertura: LessThanOrEqual(new Date()),
@@ -23,7 +26,7 @@ export async function getMieProposte({
 
   if (!sessione) return []
 
-  const proposte = await PropostaMercato.find({
+  return PropostaMercato.find({
     where: {
       idSessione: sessione.id,
       idSquadra: ctx.session.user.idSquadra,
@@ -31,20 +34,9 @@ export async function getMieProposte({
     },
     relations: { Giocatore: true },
   })
-
-  return proposte
 }
 
-interface GetSessioneAttivaCtx {
-  session: { user: { id: string; ruolo?: string; idSquadra: number } }
-}
-
-export async function getSessioneAttiva({
-  ctx,
-}: {
-  ctx: GetSessioneAttivaCtx
-  input: Record<string, never>
-}) {
+export async function getSessioneAttiva({ ctx }: { ctx: MercatoCtx; input: Record<string, never> }) {
   const sessione = await SessioneMercato.findOne({
     where: {
       dataApertura: LessThanOrEqual(new Date()),
@@ -81,24 +73,7 @@ export async function getSessioneAttiva({
   }
 }
 
-type StatoSessione = 'futura' | 'attiva' | 'chiusa'
-
-function calcolaStato(sessione: SessioneMercato, now: Date): StatoSessione {
-  if (sessione.dataApertura > now) return 'futura'
-  if (sessione.dataChiusura < now) return 'chiusa'
-  return 'attiva'
-}
-
-interface GetSessioniMercatoCtx {
-  session: { user: { id: string; ruolo?: string; idSquadra: number } }
-}
-
-export async function getSessioniMercato({
-  ctx: _ctx,
-}: {
-  ctx: GetSessioniMercatoCtx
-  input: Record<string, never>
-}) {
+export async function getSessioniMercato({ ctx: _ctx }: { ctx: MercatoCtx; input: Record<string, never> }) {
   const sessioni = await SessioneMercato.find({
     relations: { ProposteMercato: { Giocatore: true, Utente: true } },
     order: { id: 'DESC', ProposteMercato: { Giocatore: { nome: 'ASC' } } },
@@ -138,15 +113,11 @@ export async function getSessioniMercato({
   })
 }
 
-interface SvincolatiCtx {
-  session: { user: { id: string; ruolo?: string; idSquadra: number } }
-}
-
 export async function getGiocatoriSvincolati({
   ctx: _ctx,
   input,
 }: {
-  ctx: SvincolatiCtx
+  ctx: MercatoCtx
   input: GetGiocatoriSvincolatiInput
 }) {
   const svincolati = await Trasferimento.find({
@@ -174,15 +145,11 @@ export async function getGiocatoriSvincolati({
   }))
 }
 
-interface CreatePropostaCtx {
-  session: { user: { id: string; ruolo?: string; idSquadra: number } }
-}
-
 export async function createProposta({
   ctx,
   input,
 }: {
-  ctx: CreatePropostaCtx
+  ctx: MercatoCtx
   input: CreatePropostaInput
 }) {
   const sessione = await SessioneMercato.findOne({
@@ -257,18 +224,14 @@ export async function createProposta({
     deletedAt: null,
   })
 
-  return await PropostaMercato.save(proposta)
-}
-
-interface DeletePropostaCtx {
-  session: { user: { id: string; ruolo?: string; idSquadra: number } }
+  return PropostaMercato.save(proposta)
 }
 
 export async function deleteProposta({
   ctx,
   input,
 }: {
-  ctx: DeletePropostaCtx
+  ctx: MercatoCtx
   input: DeletePropostaInput
 }) {
   const proposta = await PropostaMercato.findOne({
@@ -290,5 +253,5 @@ export async function deleteProposta({
   }
 
   proposta.deletedAt = new Date()
-  return await PropostaMercato.save(proposta)
+  return PropostaMercato.save(proposta)
 }

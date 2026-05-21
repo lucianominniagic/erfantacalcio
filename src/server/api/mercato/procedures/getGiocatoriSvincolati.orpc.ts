@@ -1,6 +1,6 @@
 import { protectedProcedure } from '~/server/orpc'
 import { getGiocatoriSvincolatiSchema } from '~/schemas/mercato'
-import { getGiocatoriSvincolati } from './helpers'
+import { getGiocatoriSvincolati } from '../services/mercatoService'
 
 export const getGiocatoriSvincolatiORPCProcedure = protectedProcedure
   .route({ method: 'GET', path: '/mercato/getGiocatoriSvincolati', summary: 'Lista giocatori svincolati disponibili al mercato' })

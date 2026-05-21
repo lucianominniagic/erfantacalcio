@@ -1,5 +1,5 @@
 import { protectedProcedure } from '~/server/orpc'
-import { getSessioneAttiva } from './helpers'
+import { getSessioneAttiva } from '../services/mercatoService'
 
 export const getSessioneAttivaORPCProcedure = protectedProcedure
   .route({ method: 'GET', path: '/mercato/getSessioneAttiva', summary: 'Recupera la sessione di mercato attiva' })

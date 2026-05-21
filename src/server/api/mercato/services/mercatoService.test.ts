@@ -62,7 +62,7 @@ vi.mock('~/schemas/mercato', () => ({
 }))
 
 // Import AFTER mocks are defined
-import { createProposta, deleteProposta, getSessioneAttiva, getSessioniMercato, getMieProposte, getGiocatoriSvincolati } from '~/server/api/mercato/procedures/helpers'
+import { createProposta, deleteProposta, getSessioneAttiva, getSessioniMercato, getMieProposte, getGiocatoriSvincolati } from './mercatoService'
 
 import { SessioneMercato, PropostaMercato, Trasferimento, Utente } from '~/server/db/entities'
 

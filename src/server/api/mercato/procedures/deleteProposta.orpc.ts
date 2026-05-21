@@ -1,6 +1,6 @@
 import { protectedProcedure } from '~/server/orpc'
 import { deletePropostaSchema } from '~/schemas/mercato'
-import { deleteProposta } from './helpers'
+import { deleteProposta } from '../services/mercatoService'
 
 export const deletePropostaORPCProcedure = protectedProcedure
   .route({ method: 'POST', path: '/mercato/deleteProposta', summary: 'Elimina una proposta di mercato' })
