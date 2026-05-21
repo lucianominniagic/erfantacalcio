@@ -14,12 +14,13 @@ import {
 } from '@mui/material'
 import { Visibility, VisibilityOff, Lock } from '@mui/icons-material'
 import { alpha, useTheme } from '@mui/material/styles'
-import { api } from '~/utils/api'
+import { useMutation } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 
 export default function ProfiloPage() {
   const { data: session } = useSession()
   const theme = useTheme()
-  const changePassword = api.profilo.changePassword.useMutation()
+  const changePassword = useMutation(orpc.profilo.changePassword.mutationOptions())
 
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')

@@ -2,7 +2,9 @@
 import { useState, useEffect } from 'react'
 import { type AutocompleteOption } from '~/components/autocomplete/GenericAutocomplete'
 import { type votoType, type votoListType } from '~/types/voti'
+import { useQuery } from '@tanstack/react-query'
 import { api } from '~/utils/api'
+import { orpc } from '~/utils/orpc'
 import { votoSchema } from '~/schemas/giocatore'
 
 const defaultVoto: votoType = {
@@ -33,10 +35,12 @@ export function useVotiAdmin() {
     { idGiocatore: selectedGiocatoreId! },
     { enabled: !!selectedGiocatoreId },
   )
-  const giocatoriList = api.giocatori.listAll.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
+  const giocatoriList = useQuery(
+    orpc.giocatori.listAll.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
+  )
   const votoOne = api.voti.get.useQuery(
     { idVoto: selectedVotoId! },
     {

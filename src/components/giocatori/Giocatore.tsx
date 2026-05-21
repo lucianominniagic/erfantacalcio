@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 'use client'
 import { Box, CircularProgress, Fade, Grid } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
 import { api } from '~/utils/api'
+import { orpc } from '~/utils/orpc'
 import { GiocatoreProfile } from './GiocatoreProfile'
 import { GiocatoreStats } from './GiocatoreStats'
 import { GiocatoreStorico } from './GiocatoreStorico'
@@ -11,21 +13,30 @@ interface GiocatoreProps {
 }
 
 function Giocatore({ idGiocatore }: GiocatoreProps) {
-  const giocatoreProfilo = api.giocatori.getStatistica.useQuery(
-    { idGiocatore },
-    { refetchOnWindowFocus: false, refetchOnReconnect: false },
+  const giocatoreProfilo = useQuery(
+    orpc.giocatori.getStatistica.queryOptions({
+      input: { idGiocatore },
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
   )
   const giocatoreVoti = api.voti.getStatisticaVoti.useQuery(
     { idGiocatore },
     { refetchOnWindowFocus: false, refetchOnReconnect: false },
   )
-  const giocatoreTrasferimenti = api.trasferimenti.list.useQuery(
-    { idGiocatore },
-    { refetchOnWindowFocus: false, refetchOnReconnect: false },
+  const giocatoreTrasferimenti = useQuery(
+    orpc.trasferimenti.list.queryOptions({
+      input: { idGiocatore },
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
   )
-  const giocatoreStatsStagioni = api.trasferimenti.statsStagioni.useQuery(
-    { idGiocatore },
-    { refetchOnWindowFocus: false, refetchOnReconnect: false },
+  const giocatoreStatsStagioni = useQuery(
+    orpc.trasferimenti.statsStagioni.queryOptions({
+      input: { idGiocatore },
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
   )
 
   const isLoading =

@@ -9,7 +9,8 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import { useMemo } from 'react'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import { useTheme } from '@mui/material/styles'
 import { type GiocatoreType } from '~/types/squadre'
 import Modal from '../modal/Modal'
@@ -124,9 +125,12 @@ function Rosa({ idSquadra }: RosaProps) {
     handleModalClose,
   } = useGiocatoreModal()
 
-  const rosaList = api.squadre.getRosa.useQuery(
-    { idSquadra, includeVenduti: true },
-    { refetchOnWindowFocus: false, refetchOnReconnect: false },
+  const rosaList = useQuery(
+    orpc.squadre.getRosa.queryOptions({
+      input: { idSquadra, includeVenduti: true },
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
   )
 
   const { rosaAttiva, rosaVenduta } = useMemo(() => {

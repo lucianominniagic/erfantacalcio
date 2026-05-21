@@ -12,7 +12,8 @@ import {
 } from '@mui/material'
 import { EmojiEvents, ScoreOutlined, StarOutlined } from '@mui/icons-material'
 import Image from 'next/image'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 
 interface TopGiocatoriSquadreProps {
   idTornei: number[]
@@ -99,13 +100,13 @@ function StatRow({ icon, label, entry, formatValue }: RowProps) {
 export default function TopGiocatoriSquadre({
   idTornei,
 }: TopGiocatoriSquadreProps) {
-  const top = api.statisticheSquadre.topGiocatori.useQuery(
-    { idTornei },
-    {
+  const top = useQuery(
+    orpc.statisticheSquadre.topGiocatori.queryOptions({
+      input: { idTornei },
       enabled: idTornei.length > 0,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
 
   if (top.isLoading) {

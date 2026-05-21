@@ -13,7 +13,8 @@ import IconButton from '@mui/material/IconButton'
 import Stack from '@mui/material/Stack'
 import { LockReset, Visibility, VisibilityOff } from '@mui/icons-material'
 import { alpha, useTheme } from '@mui/material/styles'
-import { api } from '~/utils/api'
+import { useMutation } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 
 // ---------------------------------------------------------------------------
 // Inner form — uses useSearchParams() so must be wrapped in <Suspense>
@@ -25,7 +26,7 @@ function ResetPasswordForm() {
   const theme = useTheme()
   const token = searchParams?.get('token') ?? ''
 
-  const resetPassword = api.auth.resetPassword.useMutation()
+  const resetPassword = useMutation(orpc.auth.resetPassword.mutationOptions())
 
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -87,9 +88,10 @@ function ResetPasswordForm() {
     }
   }
 
-  // Mappa i codici TRPC in messaggi user-friendly
+  // Mappa i codici oRPC in messaggi user-friendly
   const getServerErrorMessage = () => {
-    const code = resetPassword.error?.data?.code
+    // oRPC exposes the error code directly on the error object (not via .data.code like tRPC)
+    const code = (resetPassword.error as { code?: string } | null)?.code
     if (code === 'NOT_FOUND') return 'Link non valido o già utilizzato.'
     if (code === 'BAD_REQUEST') return 'Link scaduto. Richiedine uno nuovo.'
     return resetPassword.error?.message ?? null

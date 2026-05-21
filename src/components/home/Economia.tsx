@@ -2,7 +2,6 @@
 'use client'
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { api } from '~/utils/api'
 import { orpc } from '~/utils/orpc'
 import { calcolaEconomia } from '~/server/services/economiaService'
 import {
@@ -124,10 +123,12 @@ export default function Economia() {
     process.env.NEXT_PUBLIC_COSTI_DOMINIO ?? '0',
   )
 
-  const economiaList = api.squadre.list.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
+  const economiaList = useQuery(
+    orpc.squadre.list.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
+  )
 
   const saldoData = useQuery(
     orpc.economia.getRisultatiStagione.queryOptions({

@@ -25,7 +25,8 @@ import Giocatore from '../giocatori/Giocatore'
 import { FormazioneRosaSection } from './FormazioneRosaSection'
 import { FormazioneDisabilitata } from './FormazioneDisabilitata'
 import { useFormazioneState } from './useFormazioneState'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 
 function Formazione() {
   const {
@@ -63,13 +64,13 @@ function Formazione() {
   const theme = useTheme()
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'))
 
-  const formaQuery = api.squadre.getRosa.useQuery(
-    { idSquadra, includeVenduti: false, includeForma: true },
-    {
+  const formaQuery = useQuery(
+    orpc.squadre.getRosa.queryOptions({
+      input: { idSquadra, includeVenduti: false, includeForma: true },
       enabled: idSquadra > 0,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
 
   const formaMap = React.useMemo(() => {

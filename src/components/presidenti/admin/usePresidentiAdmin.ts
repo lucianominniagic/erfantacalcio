@@ -1,7 +1,8 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { type SquadraType } from '~/types/squadre'
-import { api } from '~/utils/api'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import { utenteSchema } from '~/schemas/presidente'
 
 const defaultUtente: SquadraType = {
@@ -27,14 +28,16 @@ export function usePresidentiAdmin() {
     useState<SquadraType>(defaultUtente)
 
   // ── queries / mutations ───────────────────────────────────────────────────
-  const squadreList = api.squadre.list.useQuery()
-  const squadra = api.squadre.get.useQuery(
-    { idSquadra: idSquadra! },
-    { enabled: !!idSquadra },
+  const squadreList = useQuery(orpc.squadre.list.queryOptions({}))
+  const squadra = useQuery(
+    orpc.squadre.get.queryOptions({
+      input: { idSquadra: idSquadra! },
+      enabled: !!idSquadra,
+    }),
   )
-  const updateSquadra = api.squadre.update.useMutation({
+  const updateSquadra = useMutation(orpc.squadre.update.mutationOptions({
     onSuccess: async () => await squadreList.refetch(),
-  })
+  }))
 
   // ── effects ───────────────────────────────────────────────────────────────
   useEffect(() => {

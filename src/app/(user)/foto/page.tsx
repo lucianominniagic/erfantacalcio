@@ -30,7 +30,8 @@ import {
 } from '@mui/icons-material'
 import { alpha, useTheme } from '@mui/material/styles'
 import LinearProgressBar from '~/components/LinearProgressBar/LinearProgressBar'
-import { api } from '~/utils/api'
+import { useMutation } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import { getFileExtension } from '~/utils/stringUtils'
 import { getTimestamp } from '~/utils/dateUtils'
 import { getCroppedImg } from '~/utils/cropImage'
@@ -39,8 +40,8 @@ type Step = 'select' | 'crop' | 'upload'
 
 export default function FotoProfilo() {
   const { data: session, update } = useSession()
-  const updateFotoProfilo = api.profilo.updateFoto.useMutation()
-  const uploadFileVercel = api.profilo.uploadFotoVercel.useMutation()
+  const updateFotoProfilo = useMutation(orpc.profilo.updateFoto.mutationOptions())
+  const uploadFileVercel = useMutation(orpc.profilo.uploadFotoVercel.mutationOptions())
   const theme = useTheme()
 
   const [step, setStep] = useState<Step>('select')

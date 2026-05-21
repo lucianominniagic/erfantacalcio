@@ -9,7 +9,8 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import { useState } from 'react'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import { useTheme } from '@mui/material/styles'
 import GenericAutocomplete from '~/components/autocomplete/GenericAutocomplete'
 import { type Ruoli } from '~/types/common'
@@ -27,17 +28,20 @@ function Giocatori() {
   const [soloSvincolati, setSoloSvincolati] = useState(false)
   const [searchInput, setSearchInput] = useState('')
   const [ruolo, setRuolo] = useState<Ruoli>('C')
-  const giocatoriSearch = api.giocatori.search.useQuery(
-    { query: searchInput },
-    {
+  const giocatoriSearch = useQuery(
+    orpc.giocatori.search.queryOptions({
+      input: { query: searchInput },
       enabled: searchInput.length >= 2,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
-  const giocatoriStats = api.giocatori.listStatistiche.useQuery(
-    { ruolo: ruolo, soloSvincolati: soloSvincolati },
-    { refetchOnWindowFocus: false, refetchOnReconnect: false },
+  const giocatoriStats = useQuery(
+    orpc.giocatori.listStatistiche.queryOptions({
+      input: { ruolo: ruolo, soloSvincolati: soloSvincolati },
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
   )
 
   const handleGiocatoreSelected = async (idGiocatore: number | undefined) => {

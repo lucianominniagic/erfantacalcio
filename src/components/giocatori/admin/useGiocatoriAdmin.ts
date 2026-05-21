@@ -8,8 +8,7 @@ import {
   type trasferimentoType,
   type trasferimentoListType,
 } from '~/types/trasferimenti'
-import { useQuery } from '@tanstack/react-query'
-import { api } from '~/utils/api'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
 import { Configurazione } from '~/config'
 import { giocatoreSchema, trasferimentoSchema } from '~/schemas/giocatore'
@@ -53,30 +52,34 @@ export function useGiocatoriAdmin() {
     useState<trasferimentoType>(defaultTrasferimento)
 
   // ── tRPC queries ──────────────────────────────────────────────────────────
-  const trasferimentiList = api.trasferimenti.list.useQuery(
-    { idGiocatore: selectedGiocatoreId! },
-    { enabled: !!selectedGiocatoreId },
+  const trasferimentiList = useQuery(
+    orpc.trasferimenti.list.queryOptions({
+      input: { idGiocatore: selectedGiocatoreId! },
+      enabled: !!selectedGiocatoreId,
+    }),
   )
-  const giocatoriSearch = api.giocatori.search.useQuery(
-    { query: searchInput },
-    {
+  const giocatoriSearch = useQuery(
+    orpc.giocatori.search.queryOptions({
+      input: { query: searchInput },
       enabled: searchInput.length >= 2,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
-  const giocatoreOne = api.giocatori.get.useQuery(
-    { idGiocatore: selectedGiocatoreId! },
-    {
+  const giocatoreOne = useQuery(
+    orpc.giocatori.get.queryOptions({
+      input: { idGiocatore: selectedGiocatoreId! },
       enabled: !!selectedGiocatoreId,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
-  const squadreList = api.squadre.list.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
+  const squadreList = useQuery(
+    orpc.squadre.list.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
+  )
   const squadreSerieAList = useQuery(
     orpc.squadreSerieA.list.queryOptions({
       refetchOnWindowFocus: false,
@@ -85,35 +88,35 @@ export function useGiocatoriAdmin() {
   )
 
   // ── mutations ─────────────────────────────────────────────────────────────
-  const giocatoreUpsert = api.giocatori.upsert.useMutation({
+  const giocatoreUpsert = useMutation(orpc.giocatori.upsert.mutationOptions({
     onSuccess: async () => {
       await giocatoriSearch.refetch()
     },
-  })
-  const giocatoreDelete = api.giocatori.delete.useMutation({
+  }))
+  const giocatoreDelete = useMutation(orpc.giocatori.delete.mutationOptions({
     onSuccess: async () => {
       await giocatoriSearch.refetch()
       await trasferimentiList.refetch()
     },
-  })
-  const trasferimentoOne = api.trasferimenti.get.useQuery(
-    { idTrasferimento: selectedTrasferimentoId! },
-    {
+  }))
+  const trasferimentoOne = useQuery(
+    orpc.trasferimenti.get.queryOptions({
+      input: { idTrasferimento: selectedTrasferimentoId! },
       enabled: !!selectedTrasferimentoId,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
-  const trasferimentoUpsert = api.trasferimenti.upsert.useMutation({
+  const trasferimentoUpsert = useMutation(orpc.trasferimenti.upsert.mutationOptions({
     onSuccess: async () => {
       await trasferimentiList.refetch()
     },
-  })
-  const trasferimentoDelete = api.trasferimenti.delete.useMutation({
+  }))
+  const trasferimentoDelete = useMutation(orpc.trasferimenti.delete.mutationOptions({
     onSuccess: async () => {
       await trasferimentiList.refetch()
     },
-  })
+  }))
 
   // ── effects ───────────────────────────────────────────────────────────────
   useEffect(() => {

@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import {
   Box,
   Card,
@@ -19,10 +20,12 @@ export default function Squadre() {
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
 
-  const squadreList = api.squadre.list.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
+  const squadreList = useQuery(
+    orpc.squadre.list.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
+  )
 
   if (squadreList.isLoading) {
     return (

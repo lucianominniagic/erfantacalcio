@@ -125,17 +125,17 @@ publicProcedure
 | 4 | `albo` | 2 | 🟢 Bassa | ✅ Migrato |
 | 5 | `partita` | 2 | 🟢 Bassa | ✅ Migrato |
 | 6 | `tornei` | 2 | 🟡 Media | ✅ Migrato |
-| 7 | `risultati` | 3 | 🟡 Media | ⏳ |
-| 8 | `statisticheSquadre` | 3 | 🟡 Media | ⏳ |
-| 9 | `auth` | 2 | 🟡 Media | ⏳ |
-| 10 | `formazione` | 4 | 🟠 Alta | ⏳ |
-| 11 | `squadre` | 6 | 🟡 Media | ⏳ |
-| 12 | `trasferimenti` | 6 | 🟡 Media | ⏳ |
-| 13 | `nuovaStagione` | 6 | 🔴 Alta | ⏳ |
-| 14 | `profilo` | 5 | 🟡 Media | ⏳ |
-| 15 | `giocatori` | 7 | 🟡 Media | ⏳ |
-| 16 | `mercato` | 8 | 🔴 Alta | ⏳ |
-| 17 | `calendario` | 11 | 🟠 Alta | ⏳ |
+| 7 | `risultati` | 3 | 🟡 Media | ✅ Migrato |
+| 8 | `statisticheSquadre` | 3 | 🟡 Media | ✅ Migrato |
+| 9 | `auth` | 2 | 🟡 Media | ✅ Migrato |
+| 10 | `squadre` | 6 | 🟡 Media | ✅ Migrato |
+| 11 | `trasferimenti` | 6 | 🟡 Media | ✅ Migrato |
+| 12 | `profilo` | 5 | 🟡 Media | ✅ Migrato |
+| 13 | `giocatori` | 8 | 🟡 Media | ✅ Migrato |
+| 14 | `formazione` | 4 | 🟠 Alta | ⏳ |
+| 15 | `nuovaStagione` | 6 | 🔴 Alta | ⏳ |
+| 16 | `calendario` | 11 | 🟠 Alta | ⏳ |
+| 17 | `mercato` | 8 | 🔴 Alta | ⏳ |
 | 18 | `voti` | 9 | 🔴 Alta | ⏳ |
 
 > **Strategia consigliata:** iniziare dal pilota `classifica` (1 procedura, solo lettura) per validare il setup oRPC end-to-end prima di toccare router critici.

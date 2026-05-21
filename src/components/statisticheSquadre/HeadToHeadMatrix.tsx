@@ -14,7 +14,8 @@ import {
 } from '@mui/material'
 import { alpha, darken, useTheme } from '@mui/material/styles'
 import { useMediaQuery } from '@mui/material'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 
 interface HeadToHeadMatrixProps {
   idTornei: number[]
@@ -23,13 +24,13 @@ interface HeadToHeadMatrixProps {
 export default function HeadToHeadMatrix({ idTornei }: HeadToHeadMatrixProps) {
   const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
-  const h2h = api.statisticheSquadre.headToHead.useQuery(
-    { idTornei },
-    {
+  const h2h = useQuery(
+    orpc.statisticheSquadre.headToHead.queryOptions({
+      input: { idTornei },
       enabled: idTornei.length > 0,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
 
   if (h2h.isLoading) {

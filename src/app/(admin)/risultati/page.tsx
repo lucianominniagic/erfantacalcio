@@ -12,7 +12,9 @@ import {
   FormControl,
   InputLabel,
 } from '@mui/material'
+import { useQuery } from '@tanstack/react-query'
 import { api } from '~/utils/api'
+import { orpc } from '~/utils/orpc'
 import { getDescrizioneGiornata, getIdNextGiornata } from '~/utils/helper'
 import CardPartiteAdmin from '~/components/cardPartite/CardPartiteAdmin'
 import { type GiornataAdminType } from '~/types/risultati'
@@ -33,13 +35,15 @@ export default function Risultati() {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   })
-  const partiteList = api.risultati.getGiornataPartite.useQuery(
-    {
-      idCalendario: selectedIdCalendario!,
-      includeTabellini: true,
-      backOfficeMode: true,
-    },
-    { enabled: !!selectedIdCalendario },
+  const partiteList = useQuery(
+    orpc.risultati.getGiornataPartite.queryOptions({
+      input: {
+        idCalendario: selectedIdCalendario!,
+        includeTabellini: true,
+        backOfficeMode: true,
+      },
+      enabled: !!selectedIdCalendario,
+    }),
   )
 
   useEffect(() => {

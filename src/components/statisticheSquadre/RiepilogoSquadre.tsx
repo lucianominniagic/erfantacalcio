@@ -19,7 +19,8 @@ import {
   TrendingDown,
   TrendingUp,
 } from '@mui/icons-material'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 
 interface RiepilogoSquadreProps {
   idTornei: number[]
@@ -73,13 +74,13 @@ function StatRow({ icon, label, value }: StatRowProps) {
 }
 
 export default function RiepilogoSquadre({ idTornei }: RiepilogoSquadreProps) {
-  const riepilogo = api.statisticheSquadre.riepilogo.useQuery(
-    { idTornei },
-    {
+  const riepilogo = useQuery(
+    orpc.statisticheSquadre.riepilogo.queryOptions({
+      input: { idTornei },
       enabled: idTornei.length > 0,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
 
   if (riepilogo.isLoading) {

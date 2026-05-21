@@ -30,12 +30,10 @@ export interface ORPCContext {
  * Viene chiamato dal route handler per ogni richiesta.
  */
 export async function createORPCContext(): Promise<ORPCContext> {
-  console.log('Creating oRPC context...')
   const [session, dataSource] = await Promise.all([
     auth(),
     initializeDBConnection(),
   ])
-  console.log('oRPC context created:', { session, dataSource })
   return { session, dataSource }
 }
 

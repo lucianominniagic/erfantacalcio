@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { api } from '~/utils/api'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import { type MagliaType } from '~/schemas/maglia'
 import { toShirtTemplate, type ShirtTemplate } from '.'
 
@@ -24,14 +25,14 @@ export function useShirtSelector() {
     selectedTemplate: 'solid',
   })
 
-  const squadra = api.squadre.getMaglia.useQuery()
+  const squadra = useQuery(orpc.squadre.getMaglia.queryOptions({}))
 
-  const updateMaglia = api.squadre.updateMaglia.useMutation({
+  const updateMaglia = useMutation(orpc.squadre.updateMaglia.mutationOptions({
     onSuccess: async () => {
       setAlertMessage('Salvataggio completato')
-      squadra.refetch()
+      void squadra.refetch()
     },
-  })
+  }))
 
   useEffect(() => {
     if (!squadra.isFetching && squadra.isSuccess && squadra.data) {

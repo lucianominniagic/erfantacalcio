@@ -11,7 +11,8 @@ import Stack from '@mui/material/Stack'
 import Link from '@mui/material/Link'
 import { LockOpen } from '@mui/icons-material'
 import { alpha, useTheme } from '@mui/material/styles'
-import { api } from '~/utils/api'
+import { useMutation } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import { requestPasswordResetSchema } from '~/schemas/auth'
 
 // ---------------------------------------------------------------------------
@@ -19,7 +20,7 @@ import { requestPasswordResetSchema } from '~/schemas/auth'
 // ---------------------------------------------------------------------------
 
 function RecuperaPasswordForm() {
-  const requestReset = api.auth.requestPasswordReset.useMutation()
+  const requestReset = useMutation(orpc.auth.requestPasswordReset.mutationOptions())
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const [clientError, setClientError] = useState<string | null>(null)

@@ -15,7 +15,6 @@ import {
   WorkspacePremium,
 } from '@mui/icons-material'
 import { useQuery } from '@tanstack/react-query'
-import { api } from '~/utils/api'
 import { orpc } from '~/utils/orpc'
 import { toShirtTemplate } from '../selectColors'
 import { parseMaglia } from '~/schemas/maglia'
@@ -50,9 +49,12 @@ function TrophyBadge({ count, label, icon }: TrophyBadgeProps) {
 }
 
 export default function Squadra({ idSquadra }: SquadraProps) {
-  const apiSquadra = api.squadre.get.useQuery(
-    { idSquadra },
-    { refetchOnWindowFocus: false, refetchOnReconnect: false },
+  const apiSquadra = useQuery(
+    orpc.squadre.get.queryOptions({
+      input: { idSquadra },
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
   )
   const apiAlbo = useQuery(
     orpc.albo.get.queryOptions({

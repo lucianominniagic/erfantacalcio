@@ -13,7 +13,8 @@ import {
   type PartitaAdminType,
   type GiornataAdminType,
 } from '~/types/risultati'
-import { api } from '~/utils/api'
+import { useMutation } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import dayjs from 'dayjs'
 import { tabellinoSchema } from '~/schemas/calendario'
 import { CardWithActions } from '~/components/cards'
@@ -26,7 +27,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
   const [risultati, setRisultati] = useState<PartitaAdminType[]>([])
   const [message, setMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
-  const updateRisultati = api.risultati.update.useMutation()
+  const updateRisultati = useMutation(orpc.risultati.update.mutationOptions())
 
   useEffect(() => {
     if (giornata) {

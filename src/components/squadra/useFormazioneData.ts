@@ -1,7 +1,9 @@
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 import { api } from '~/utils/api'
+import { orpc } from '~/utils/orpc'
 import { type Moduli } from '~/types/common'
 import { moduloDefault } from '~/utils/helper'
 import {
@@ -42,13 +44,13 @@ export function useFormazioneData() {
       refetchOnReconnect: false,
     },
   )
-  const rosaList = api.squadre.getRosa.useQuery(
-    { idSquadra, includeVenduti: false },
-    {
+  const rosaList = useQuery(
+    orpc.squadre.getRosa.queryOptions({
+      input: { idSquadra, includeVenduti: false },
       enabled: enableRosa,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
 
   useEffect(() => {
