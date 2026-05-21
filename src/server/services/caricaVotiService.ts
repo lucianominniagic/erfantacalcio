@@ -109,6 +109,7 @@ async function checkFormazioni(idCalendario: number): Promise<void> {
     (p) => p.Formazioni.length !== 2,
   )
   if (partiteSenzaFormazioni.length > 0) {
+    console.error(`Giornata ${calendario.giornata} (serie A: ${calendario.giornataSerieA}) - Partite senza formazioni:`, partiteSenzaFormazioni.map((p) => p.idPartita))
     throw new Error(
       `Non tutte le partite della giornata ${calendario.giornata} (serie A: ${calendario.giornataSerieA}) hanno formazioni inserite.`,
     )

@@ -3,7 +3,7 @@ import { publicProcedure } from '~/server/orpc'
 import { getCalendario, mapCalendario } from '~/server/utils/common'
 
 export const listByGironeORPCProcedure = publicProcedure
-  .route({ method: 'GET', path: '/calendario/listByGirone', summary: 'Lista partite del calendario per girone' })
+  .route({ method: 'POST', path: '/calendario/listByGirone', summary: 'Lista partite del calendario per girone' })
   .input(z.number())
   .handler(async ({ input }) => {
     try {
