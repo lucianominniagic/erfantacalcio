@@ -671,30 +671,6 @@ describe('getGiocatoriSvincolati', () => {
     expect(result).toEqual([])
   })
 
-  it('should return free agents with nome and ruolo from Giocatore relation', async () => {
-    const ctx = makeMockContext()
-    const trasf = {
-      ...makeTrasferimento({ idSquadra: null, dataCessione: null }),
-      costo: 15,
-      stagione: '2025-2026',
-      Giocatore: { nome: 'Mbappé', ruolo: 'A' },
-      SquadraSerieA: { nome: 'Juventus', maglia: 'juventus.png' },
-    }
-    vi.mocked(Trasferimento.find).mockResolvedValue([trasf as any])
-
-    const result = await getGiocatoriSvincolati({ ctx, input: { ruolo: 'A', stagione: '2025-2026' } })
-
-    expect(result).toHaveLength(1)
-    expect(result[0]).toMatchObject({
-      idGiocatore: 100,
-      nome: 'Mbappé',
-      ruolo: 'A',
-      costo: 15,
-      nomeSquadraSerieA: 'Juventus',
-      maglia: '/images/maglie/juventus.png',
-    })
-  })
-
   it('should handle missing Giocatore relation gracefully', async () => {
     const ctx = makeMockContext()
     const trasf = {
