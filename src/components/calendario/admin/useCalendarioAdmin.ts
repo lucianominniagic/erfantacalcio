@@ -3,7 +3,9 @@ import { useState, useEffect } from 'react'
 import { type SelectChangeEvent } from '@mui/material'
 import { z } from 'zod'
 import dayjs from 'dayjs'
+import { useQuery } from '@tanstack/react-query'
 import { api } from '~/utils/api'
+import { orpc } from '~/utils/orpc'
 import { calendarioSchema } from '~/schemas/calendario'
 
 type CalendarioEntry = z.infer<typeof calendarioSchema>
@@ -39,9 +41,9 @@ export function useCalendarioAdmin() {
     { idCalendario: idCalendario! },
     { enabled: !!idCalendario },
   )
-  const torneiList = api.tornei.list.useQuery(undefined, {
+  const torneiList = useQuery(orpc.tornei.list.queryOptions({
     refetchOnWindowFocus: false,
-  })
+  }))
 
   // ── mutations ─────────────────────────────────────────────────────────────
   const updateCalendario = api.calendario.update.useMutation({

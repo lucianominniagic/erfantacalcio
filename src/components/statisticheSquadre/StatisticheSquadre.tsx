@@ -9,7 +9,8 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import RiepilogoSquadre from './RiepilogoSquadre'
 import HeadToHeadMatrix from './HeadToHeadMatrix'
 import TopGiocatoriSquadre from './TopGiocatoriSquadre'
@@ -24,10 +25,10 @@ interface Torneo {
 }
 
 export default function StatisticheSquadre() {
-  const torneiList = api.tornei.list.useQuery(undefined, {
+  const torneiList = useQuery(orpc.tornei.list.queryOptions({
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-  })
+  }))
 
   const [selectedNome, setSelectedNome] = useState<string | undefined>(
     undefined,

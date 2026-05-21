@@ -1,6 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { api } from '~/utils/api'
+import { orpc } from '~/utils/orpc'
 import {
   Box,
   Button,
@@ -35,14 +37,14 @@ import { giornataSchema } from '~/schemas/calendario'
 
 export default function HomePage() {
   const { data: session } = useSession()
-  const torneiList = api.tornei.list.useQuery(undefined, {
+  const torneiList = useQuery(orpc.tornei.list.queryOptions({
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-  })
-  const championsBracket = api.tornei.championsBracket.useQuery(undefined, {
+  }))
+  const championsBracket = useQuery(orpc.tornei.championsBracket.queryOptions({
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
-  })
+  }))
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
   const [openModalCalendario, setOpenModalCalendario] = useState(false)
