@@ -8,7 +8,9 @@ import {
   type trasferimentoType,
   type trasferimentoListType,
 } from '~/types/trasferimenti'
+import { useQuery } from '@tanstack/react-query'
 import { api } from '~/utils/api'
+import { orpc } from '~/utils/orpc'
 import { Configurazione } from '~/config'
 import { giocatoreSchema, trasferimentoSchema } from '~/schemas/giocatore'
 
@@ -75,10 +77,12 @@ export function useGiocatoriAdmin() {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   })
-  const squadreSerieAList = api.squadreSerieA.list.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
+  const squadreSerieAList = useQuery(
+    orpc.squadreSerieA.list.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
+  )
 
   // ── mutations ─────────────────────────────────────────────────────────────
   const giocatoreUpsert = api.giocatori.upsert.useMutation({

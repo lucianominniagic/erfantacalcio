@@ -8,6 +8,7 @@
  */
 import { listClassificaORPCProcedure } from '~/server/api/classifica/procedures/list.orpc'
 import { getRisultatiStagioneORPCProcedure } from '~/server/api/economia/procedures/getRisultatiStagione.orpc'
+import { listSquadreSerieAORPCProcedure } from '~/server/api/squadreSerieA/procedures/list.orpc'
 
 export const orpcRouter = {
   classifica: {
@@ -15,6 +16,9 @@ export const orpcRouter = {
   },
   economia: {
     getRisultatiStagione: getRisultatiStagioneORPCProcedure,
+  },
+  squadreSerieA: {
+    list: listSquadreSerieAORPCProcedure,
   },
 }
 
