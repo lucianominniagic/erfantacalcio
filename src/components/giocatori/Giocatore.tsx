@@ -2,7 +2,6 @@
 'use client'
 import { Box, CircularProgress, Fade, Grid } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { api } from '~/utils/api'
 import { orpc } from '~/utils/orpc'
 import { GiocatoreProfile } from './GiocatoreProfile'
 import { GiocatoreStats } from './GiocatoreStats'
@@ -20,9 +19,12 @@ function Giocatore({ idGiocatore }: GiocatoreProps) {
       refetchOnReconnect: false,
     }),
   )
-  const giocatoreVoti = api.voti.getStatisticaVoti.useQuery(
-    { idGiocatore },
-    { refetchOnWindowFocus: false, refetchOnReconnect: false },
+  const giocatoreVoti = useQuery(
+    orpc.voti.getStatisticaVoti.queryOptions({
+      input: { idGiocatore },
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
   )
   const giocatoreTrasferimenti = useQuery(
     orpc.trasferimenti.list.queryOptions({

@@ -24,15 +24,19 @@ import {
   type SelectChangeEvent,
 } from '@mui/material'
 import { Storefront } from '@mui/icons-material'
-import { api } from '~/utils/api'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import LoadingSpinner from '~/components/LinearProgressBar/LoadingSpinner'
 import PageHeader from '~/components/PageHeader'
 
 // ── Sub-component: proposte per una sessione chiusa ──────────────────────────
 function ProposteSessione({ idSessione }: { idSessione: number }) {
-  const { data, isLoading, isError } = api.mercato.getProposteSessione.useQuery(
-    { idSessione },
-    { refetchOnWindowFocus: false, refetchOnReconnect: false },
+  const { data, isLoading, isError } = useQuery(
+    orpc.mercato.getProposteSessione.queryOptions({
+      input: { idSessione },
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
   )
 
   if (isLoading) return <LoadingSpinner />
@@ -110,12 +114,15 @@ export default function MercatoAdmin() {
   const [espansi, setEspansi] = useState<Set<number>>(new Set())
 
   // ── Queries & Mutations ──
-  const { data: sessioni, isLoading, refetch } = api.mercato.listSessioni.useQuery(
-    undefined,
-    { refetchOnWindowFocus: false, refetchOnReconnect: false },
+  const { data: sessioni, isLoading, refetch } = useQuery(
+    orpc.mercato.listSessioni.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
   )
 
-  const createSessione = api.mercato.createSessione.useMutation({
+  const createSessione = useMutation({
+    ...orpc.mercato.createSessione.mutationOptions(),
     onSuccess: () => {
       setFormSuccess('Sessione creata con successo')
       setFormError('')

@@ -67,6 +67,39 @@ import { listStatisticheORPCProcedure } from '~/server/api/giocatori/procedures/
 import { showGiocatoreORPCProcedure } from '~/server/api/giocatori/procedures/show.orpc'
 import { listStatisticheSquadraORPCProcedure } from '~/server/api/giocatori/procedures/listStatisticheSquadra.orpc'
 import { showStatisticaORPCProcedure } from '~/server/api/giocatori/procedures/showStatistica.orpc'
+// calendario
+import { listCalendarioORPCProcedure } from '~/server/api/calendario/procedures/list.orpc'
+import { getOneCalendarioORPCProcedure } from '~/server/api/calendario/procedures/getOne.orpc'
+import { updateCalendarioORPCProcedure } from '~/server/api/calendario/procedures/update.orpc'
+import { getProssimeGiornateORPCProcedure } from '~/server/api/calendario/procedures/getProssimeGiornate.orpc'
+import { getUltimiRisultatiORPCProcedure } from '~/server/api/calendario/procedures/getUltimiRisultati.orpc'
+import { listByGironeORPCProcedure } from '~/server/api/calendario/procedures/listByGirone.orpc'
+import { listRecuperiORPCProcedure } from '~/server/api/calendario/procedures/listRecuperi.orpc'
+import { listByTorneoORPCProcedure } from '~/server/api/calendario/procedures/listByTorneo.orpc'
+import { getByGiornataAndTorneoORPCProcedure } from '~/server/api/calendario/procedures/getByGiornataAndTorneo.orpc'
+import { getByIdCalendarioORPCProcedure } from '~/server/api/calendario/procedures/getByIdCalendario.orpc'
+import { listAttualeORPCProcedure } from '~/server/api/calendario/procedures/listAttuale.orpc'
+import { listPartiteBySquadraORPCProcedure } from '~/server/api/calendario/procedures/listPartiteBySquadra.orpc'
+// mercato
+import { listSessioniORPCProcedure } from '~/server/api/mercato/procedures/listSessioni.orpc'
+import { getSessioniMercatoORPCProcedure } from '~/server/api/mercato/procedures/getSessioniMercato.orpc'
+import { getSessioneAttivaORPCProcedure } from '~/server/api/mercato/procedures/getSessioneAttiva.orpc'
+import { getProposteSessioneORPCProcedure } from '~/server/api/mercato/procedures/getProposteSessione.orpc'
+import { getMieProposteORPCProcedure } from '~/server/api/mercato/procedures/getMieProposte.orpc'
+import { getGiocatoriSvincolatiORPCProcedure } from '~/server/api/mercato/procedures/getGiocatoriSvincolati.orpc'
+import { deletePropostaORPCProcedure } from '~/server/api/mercato/procedures/deleteProposta.orpc'
+import { createSessioneORPCProcedure } from '~/server/api/mercato/procedures/createSessione.orpc'
+import { createPropostaORPCProcedure } from '~/server/api/mercato/procedures/createProposta.orpc'
+// voti
+import { listVotiORPCProcedure } from '~/server/api/voti/procedures/list.orpc'
+import { getVotoORPCProcedure } from '~/server/api/voti/procedures/get.orpc'
+import { getStatisticaVotiORPCProcedure } from '~/server/api/voti/procedures/getStatisticaVoti.orpc'
+import { updateVotoORPCProcedure } from '~/server/api/voti/procedures/update.orpc'
+import { uploadVercelORPCProcedure } from '~/server/api/voti/procedures/uploadVercel.orpc'
+import { resetVotiORPCProcedure } from '~/server/api/voti/procedures/resetVoti.orpc'
+import { readVotiORPCProcedure } from '~/server/api/voti/procedures/readVoti.orpc'
+import { processVotiORPCProcedure } from '~/server/api/voti/procedures/processVoti.orpc'
+import { refreshStatsORPCProcedure } from '~/server/api/voti/procedures/refreshStats.orpc'
 
 export const orpcRouter = {
   albo: {
@@ -150,6 +183,42 @@ export const orpcRouter = {
     listStatistiche: listStatisticheORPCProcedure,
     listStatisticheSquadra: listStatisticheSquadraORPCProcedure,
     getStatistica: showStatisticaORPCProcedure,
+  },
+  calendario: {
+    list: listCalendarioORPCProcedure,
+    getOne: getOneCalendarioORPCProcedure,
+    update: updateCalendarioORPCProcedure,
+    getProssimeGiornate: getProssimeGiornateORPCProcedure,
+    getUltimiRisultati: getUltimiRisultatiORPCProcedure,
+    listByGirone: listByGironeORPCProcedure,
+    listRecuperi: listRecuperiORPCProcedure,
+    listByTorneo: listByTorneoORPCProcedure,
+    getByGiornataAndTorneo: getByGiornataAndTorneoORPCProcedure,
+    getByIdCalendario: getByIdCalendarioORPCProcedure,
+    listAttuale: listAttualeORPCProcedure,
+    listPartiteBySquadra: listPartiteBySquadraORPCProcedure,
+  },
+  mercato: {
+    listSessioni: listSessioniORPCProcedure,
+    getSessioniMercato: getSessioniMercatoORPCProcedure,
+    getSessioneAttiva: getSessioneAttivaORPCProcedure,
+    getProposteSessione: getProposteSessioneORPCProcedure,
+    getMieProposte: getMieProposteORPCProcedure,
+    getGiocatoriSvincolati: getGiocatoriSvincolatiORPCProcedure,
+    deleteProposta: deletePropostaORPCProcedure,
+    createSessione: createSessioneORPCProcedure,
+    createProposta: createPropostaORPCProcedure,
+  },
+  voti: {
+    list: listVotiORPCProcedure,
+    get: getVotoORPCProcedure,
+    getStatisticaVoti: getStatisticaVotiORPCProcedure,
+    update: updateVotoORPCProcedure,
+    uploadVercel: uploadVercelORPCProcedure,
+    resetVoti: resetVotiORPCProcedure,
+    readVoti: readVotiORPCProcedure,
+    processVoti: processVotiORPCProcedure,
+    refreshStats: refreshStatsORPCProcedure,
   },
 }
 

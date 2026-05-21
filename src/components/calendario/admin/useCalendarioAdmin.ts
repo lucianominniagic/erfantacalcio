@@ -3,8 +3,7 @@ import { useState, useEffect } from 'react'
 import { type SelectChangeEvent } from '@mui/material'
 import { z } from 'zod'
 import dayjs from 'dayjs'
-import { useQuery } from '@tanstack/react-query'
-import { api } from '~/utils/api'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
 import { calendarioSchema } from '~/schemas/calendario'
 
@@ -36,17 +35,18 @@ export function useCalendarioAdmin() {
     useState<CalendarioEntry>(defaultCalendario)
 
   // ── queries ───────────────────────────────────────────────────────────────
-  const calendarioList = api.calendario.list.useQuery()
-  const oneCalendario = api.calendario.getOne.useQuery(
-    { idCalendario: idCalendario! },
-    { enabled: !!idCalendario },
-  )
+  const calendarioList = useQuery(orpc.calendario.list.queryOptions({}))
+  const oneCalendario = useQuery(orpc.calendario.getOne.queryOptions({
+    input: { idCalendario: idCalendario! },
+    enabled: !!idCalendario,
+  }))
   const torneiList = useQuery(orpc.tornei.list.queryOptions({
     refetchOnWindowFocus: false,
   }))
 
   // ── mutations ─────────────────────────────────────────────────────────────
-  const updateCalendario = api.calendario.update.useMutation({
+  const updateCalendario = useMutation({
+    ...orpc.calendario.update.mutationOptions(),
     onSuccess: async () => await calendarioList.refetch(),
   })
 

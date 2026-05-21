@@ -1,7 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { api } from '~/utils/api'
 import { orpc } from '~/utils/orpc'
 import {
   Box,
@@ -57,28 +56,30 @@ export default function HomePage() {
 
   const calendarioList =
     girone && !isCalendarioAttuale && !isCalendarioRecuperi
-      ? api.calendario.listByGirone.useQuery(girone, {
+      ? useQuery(orpc.calendario.listByGirone.queryOptions({
+          input: girone,
           enabled: true,
           refetchOnWindowFocus: false,
           refetchOnReconnect: false,
-        })
+        }))
       : isCalendarioAttuale
-        ? api.calendario.listAttuale.useQuery(undefined, {
+        ? useQuery(orpc.calendario.listAttuale.queryOptions({
             enabled: isCalendarioAttuale,
             refetchOnWindowFocus: false,
             refetchOnReconnect: false,
-          })
+          }))
         : isChampions
-          ? api.calendario.listByTorneo.useQuery([2, 3, 4, 5, 6], {
+          ? useQuery(orpc.calendario.listByTorneo.queryOptions({
+              input: [2, 3, 4, 5, 6],
               enabled: isChampions,
               refetchOnWindowFocus: false,
               refetchOnReconnect: false,
-            })
-          : api.calendario.listRecuperi.useQuery(undefined, {
+            }))
+          : useQuery(orpc.calendario.listRecuperi.queryOptions({
               enabled: isCalendarioRecuperi,
               refetchOnWindowFocus: false,
               refetchOnReconnect: false,
-            })
+            }))
   const [giornata, setGiornata] = useState<z.infer<typeof giornataSchema>[]>()
 
   useEffect(() => {

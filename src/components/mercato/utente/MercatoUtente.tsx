@@ -25,7 +25,8 @@ import {
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { Gavel } from '@mui/icons-material'
-import { api } from '~/utils/api'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import PageHeader from '~/components/PageHeader'
 import { type Ruoli } from '~/types/common'
 import { getRuoloEsteso } from '~/utils/helper'
@@ -44,31 +45,32 @@ function fmtDate(d: Date | string) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export default function MercatoUtente() {
-  const utils = api.useUtils()
+  const queryClient = useQueryClient()
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
   const [ruolo, setRuolo] = useState<Ruoli>('C')
 
   // ── Queries ──
   const { data: sessione, isLoading: loadingSessione } =
-    api.mercato.getSessioneAttiva.useQuery(undefined, {
+    useQuery(orpc.mercato.getSessioneAttiva.queryOptions({
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    })
+    }))
 
   const { data: giocatori, isLoading: loadingGiocatori } =
-    api.mercato.getGiocatoriSvincolati.useQuery({ ruolo: ruolo, stagione: Configurazione.stagione }, {
+    useQuery(orpc.mercato.getGiocatoriSvincolati.queryOptions({
+      input: { ruolo: ruolo, stagione: Configurazione.stagione },
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       enabled: !!sessione,
-    })
+    }))
 
   const { data: mieProposte, isLoading: loadingMieProposte } =
-    api.mercato.getMieProposte.useQuery(undefined, {
+    useQuery(orpc.mercato.getMieProposte.queryOptions({
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       enabled: !!sessione,
-    })
+    }))
 
   // ── Prezzi per giocatore (form state) ──
   const [prezzi, setPrezzi] = useState<Record<number, string>>({})
@@ -84,19 +86,21 @@ export default function MercatoUtente() {
   })
 
   // ── Mutations ──
-  const createProposta = api.mercato.createProposta.useMutation({
+  const createProposta = useMutation({
+    ...orpc.mercato.createProposta.mutationOptions(),
     onSuccess: () => {
-      void utils.mercato.getMieProposte.invalidate()
-      void utils.mercato.getSessioneAttiva.invalidate()
-      void utils.mercato.getGiocatoriSvincolati.invalidate()
+      void queryClient.invalidateQueries({ queryKey: orpc.mercato.getMieProposte.queryKey() })
+      void queryClient.invalidateQueries({ queryKey: orpc.mercato.getSessioneAttiva.queryKey() })
+      void queryClient.invalidateQueries({ queryKey: orpc.mercato.getGiocatoriSvincolati.queryKey({ input: { ruolo, stagione: Configurazione.stagione } }) })
       setSnackbar({ open: true, message: 'Proposta inviata con successo', severity: 'success' })
     },
   })
 
-  const deleteProposta = api.mercato.deleteProposta.useMutation({
+  const deleteProposta = useMutation({
+    ...orpc.mercato.deleteProposta.mutationOptions(),
     onSuccess: () => {
-      void utils.mercato.getMieProposte.invalidate()
-      void utils.mercato.getSessioneAttiva.invalidate()
+      void queryClient.invalidateQueries({ queryKey: orpc.mercato.getMieProposte.queryKey() })
+      void queryClient.invalidateQueries({ queryKey: orpc.mercato.getSessioneAttiva.queryKey() })
     },
   })
 

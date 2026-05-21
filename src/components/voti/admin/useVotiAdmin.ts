@@ -2,8 +2,7 @@
 import { useState, useEffect } from 'react'
 import { type AutocompleteOption } from '~/components/autocomplete/GenericAutocomplete'
 import { type votoType, type votoListType } from '~/types/voti'
-import { useQuery } from '@tanstack/react-query'
-import { api } from '~/utils/api'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
 import { votoSchema } from '~/schemas/giocatore'
 
@@ -31,27 +30,26 @@ export function useVotiAdmin() {
   const [voto, setVoto] = useState<votoType>(defaultVoto)
 
   // ── queries ───────────────────────────────────────────────────────────────
-  const votiList = api.voti.list.useQuery(
-    { idGiocatore: selectedGiocatoreId! },
-    { enabled: !!selectedGiocatoreId },
-  )
+  const votiList = useQuery(orpc.voti.list.queryOptions({
+    input: { idGiocatore: selectedGiocatoreId! },
+    enabled: !!selectedGiocatoreId,
+  }))
   const giocatoriList = useQuery(
     orpc.giocatori.listAll.queryOptions({
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
     }),
   )
-  const votoOne = api.voti.get.useQuery(
-    { idVoto: selectedVotoId! },
-    {
-      enabled: !!selectedVotoId,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-    },
-  )
+  const votoOne = useQuery(orpc.voti.get.queryOptions({
+    input: { idVoto: selectedVotoId! },
+    enabled: !!selectedVotoId,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  }))
 
   // ── mutations ─────────────────────────────────────────────────────────────
-  const votoUpdate = api.voti.update.useMutation({
+  const votoUpdate = useMutation({
+    ...orpc.voti.update.mutationOptions(),
     onSuccess: async () => {
       await votiList.refetch()
     },

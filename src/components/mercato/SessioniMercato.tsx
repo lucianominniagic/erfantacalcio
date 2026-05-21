@@ -18,7 +18,8 @@ import {
   Typography,
 } from '@mui/material'
 import { ExpandMore, Storefront } from '@mui/icons-material'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import PageHeader from '~/components/PageHeader'
 
 // ── Helper ───────────────────────────────────────────────────────────────────
@@ -36,10 +37,10 @@ function fmtDate(d: Date | string | undefined) {
 // ── Main component ────────────────────────────────────────────────────────────
 export default function SessioniMercato() {
   const { data: sessioni, isLoading, isError } =
-    api.mercato.getSessioniMercato.useQuery(undefined, {
+    useQuery(orpc.mercato.getSessioniMercato.queryOptions({
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    })
+    }))
 
   if (isLoading) {
     return (

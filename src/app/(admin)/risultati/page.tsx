@@ -13,7 +13,6 @@ import {
   InputLabel,
 } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { api } from '~/utils/api'
 import { orpc } from '~/utils/orpc'
 import { getDescrizioneGiornata, getIdNextGiornata } from '~/utils/helper'
 import CardPartiteAdmin from '~/components/cardPartite/CardPartiteAdmin'
@@ -31,10 +30,12 @@ export default function Risultati() {
     z.infer<typeof calendarioSchema>[]
   >([])
   const [selectedGiornata, setSelectedGiornata] = useState<GiornataAdminType>()
-  const calendarioList = api.calendario.list.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
+  const calendarioList = useQuery(
+    orpc.calendario.list.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
+  )
   const partiteList = useQuery(
     orpc.risultati.getGiornataPartite.queryOptions({
       input: {

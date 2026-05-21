@@ -2,7 +2,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { type SelectChangeEvent } from '@mui/material'
 import { z } from 'zod'
-import { api } from '~/utils/api'
+import { useQuery, useMutation } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import { getIdNextGiornata } from '~/utils/helper'
 import { type iVotoGiocatore } from '~/types/voti'
 import { calendarioSchema } from '~/schemas/calendario'
@@ -27,15 +28,17 @@ export function useUploadVotiAdmin() {
   const [alert, setAlert] = useState<AlertState>(null)
 
   // ── queries / mutations ───────────────────────────────────────────────────
-  const calendarioList = api.calendario.list.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  })
-  const uploadFileVercel = api.voti.uploadVercel.useMutation()
-  const resetVoti = api.voti.resetVoti.useMutation()
-  const readVoti = api.voti.readVoti.useMutation()
-  const processVoti = api.voti.processVoti.useMutation()
-  const refreshStats = api.voti.refreshStats.useMutation()
+  const calendarioList = useQuery(
+    orpc.calendario.list.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
+  )
+  const uploadFileVercel = useMutation(orpc.voti.uploadVercel.mutationOptions())
+  const resetVoti = useMutation(orpc.voti.resetVoti.mutationOptions())
+  const readVoti = useMutation(orpc.voti.readVoti.mutationOptions())
+  const processVoti = useMutation(orpc.voti.processVoti.mutationOptions())
+  const refreshStats = useMutation(orpc.voti.refreshStats.mutationOptions())
 
   // ── effects ───────────────────────────────────────────────────────────────
   const getGiornataSerieA = useCallback(

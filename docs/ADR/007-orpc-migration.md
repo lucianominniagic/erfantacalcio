@@ -134,8 +134,8 @@ publicProcedure
 | 13 | `giocatori` | 8 | 🟡 Media | ✅ Migrato |
 | 14 | `formazione` | 4 | 🟠 Alta | ✅ Migrato |
 | 15 | `nuovastagione` | 6 | 🔴 Alta | ✅ Migrato |
-| 16 | `calendario` | 11 | 🟠 Alta | ⏳ |
-| 17 | `mercato` | 8 | 🔴 Alta | ⏳ |
-| 18 | `voti` | 9 | 🔴 Alta | ⏳ |
+| 16 | `calendario` | 12 | 🟠 Alta | ✅ Migrato |
+| 17 | `mercato` | 9 | 🔴 Alta | ✅ Migrato |
+| 18 | `voti` | 10 | 🔴 Alta | ✅ Migrato |
 
 > **Strategia consigliata:** iniziare dal pilota `classifica` (1 procedura, solo lettura) per validare il setup oRPC end-to-end prima di toccare router critici.

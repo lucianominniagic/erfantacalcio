@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState, useMemo } from 'react'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import {
   Alert,
   Box,
@@ -25,14 +26,14 @@ export default function Calendario({
 }: CalendarioProps) {
   const calendarioList =
     tipo === 'prossima'
-      ? api.calendario.getProssimeGiornate.useQuery(undefined, {
+      ? useQuery(orpc.calendario.getProssimeGiornate.queryOptions({
           refetchOnWindowFocus: false,
           refetchOnReconnect: false,
-        })
-      : api.calendario.getUltimiRisultati.useQuery(undefined, {
+        }))
+      : useQuery(orpc.calendario.getUltimiRisultati.queryOptions({
           refetchOnWindowFocus: false,
           refetchOnReconnect: false,
-        })
+        }))
   const [errorMessage, setErrorMessage] = useState('')
   // selectedTorneo now stores the tournament name (key) so that entries with the same name are grouped together
   const [selectedTorneo, setSelectedTorneo] = useState<string | null>(null)
