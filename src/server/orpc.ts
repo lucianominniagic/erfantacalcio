@@ -45,7 +45,22 @@ export async function createORPCContext(): Promise<ORPCContext> {
  * Builder radice con context tipato.
  * Le procedure lo ricevono come initial context passato dall'handler.
  */
-const base = os.$context<ORPCContext>()
+/**
+ * Middleware globale: converte `Error` nativi in `ORPCError` così il messaggio
+ * arriva al client (come avveniva con tRPC). Solo `ORPCError` viene lasciato
+ * passare invariato.
+ */
+const base = os.$context<ORPCContext>().use(async ({ next }) => {
+  try {
+    return await next()
+  } catch (error) {
+    if (error instanceof ORPCError) throw error
+    if (error instanceof Error) {
+      throw new ORPCError('INTERNAL_SERVER_ERROR', { message: error.message })
+    }
+    throw error
+  }
+})
 
 // ---------------------------------------------------------------------------
 // 3. PROCEDURE GUARDS
