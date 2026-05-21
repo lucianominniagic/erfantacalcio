@@ -1,6 +1,6 @@
 # ADR 002 — tRPC + TanStack Query for Client-Server Communication
 
-**Status:** ✅ Accepted  
+**Status:** ⛔ Superseded by ADR-007  
 **Date:** 2025-07-14  
 **Author:** mccarthy (Backend / API Engineer)
 

@@ -51,8 +51,8 @@ Esistono due livelli di accesso: **admin** (gestisce la lega) e **presidente** (
 | Framework | Next.js 16 (App Router) | Turbopack in dev |
 | Linguaggio | TypeScript 5.8 | Strict mode |
 | UI | MUI v5 | Tema custom dark/light |
-| API | tRPC 11 | HTTP batch link, SuperJSON |
-| Data fetching | TanStack Query 5 | Gestito via tRPC |
+| API | oRPC | HTTP handler, SuperJSON, OpenAPI in dev |
+| Data fetching | TanStack Query 5 | Gestito via oRPC (`@orpc/tanstack-query`) |
 | Auth | NextAuth v5 (beta) | Credentials provider, JWT |
 | ORM | TypeORM | Active Record, PostgreSQL |
 | Database | PostgreSQL ≥ 14 | snake_case columns |
