@@ -39,6 +39,7 @@
     "@orpc/client": "^1.14.3",
     "@orpc/openapi": "^1.14.3",
     "@orpc/server": "^1.14.3",
+    "@orpc/tanstack-query": "^1.14.3",
     "@orpc/zod": "^1.14.3",
     "@t3-oss/env-nextjs": "^0.7.3",
     "@tanstack/react-query": "^5.90.12",

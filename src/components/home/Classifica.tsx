@@ -1,12 +1,13 @@
 import React, { useMemo } from 'react'
-import { api } from '~/utils/api'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import { Avatar, Box, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { getNomeTorneo } from '~/utils/helper'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { autosizeOptions, createSkeletonRows } from '~/utils/datatable'
 import { z } from 'zod'
 import { classificaSchema } from '~/schemas/classifica'
-import { EmojiEvents, MilitaryTech } from '@mui/icons-material'
+import { MilitaryTech } from '@mui/icons-material'
 
 interface ClassificaProps {
   nomeTorneo: string
@@ -21,14 +22,13 @@ export default function Classifica({
 }: ClassificaProps) {
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
-
-  const classificaList = api.classifica.list.useQuery(
-    { idTorneo: idTorneo! },
-    {
+  const classificaList = useQuery(
+    orpc.classifica.list.queryOptions({
+      input: { idTorneo: idTorneo! },
       enabled: !!idTorneo,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
 
   const rows = useMemo<z.infer<typeof classificaSchema>[]>(

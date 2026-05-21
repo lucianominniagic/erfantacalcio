@@ -38,27 +38,80 @@ tRPC v11 viene sostituito da **oRPC** come layer di comunicazione client-server.
 
 ---
 
+## Architettura degli endpoint (`src/app/api/`)
+
+La migrazione introduce **tre route files** con scopi distinti:
+
+| File | Endpoint | Usato da | Ambiente |
+|---|---|---|---|
+| `api/orpc/[...rest]/route.ts` | `/api/orpc` | Web app (React via `RPCLink`) | Dev + Prod |
+| `api/rest/[...rest]/route.ts` | `/api/rest` | Swagger, Postman, curl | Dev only |
+| `api/docs/route.ts` | `/api/docs` | Swagger UI (HTML) | Dev only |
+
+### `/api/orpc` — Protocollo nativo oRPC
+Equivalente di `/api/trpc`. Parla il protocollo oRPC: body `{"json": input}`, supporta SuperJSON per la serializzazione di `Date` e tipi complessi. È l'unico endpoint usato dal client React in produzione.
+
+### `/api/rest` — REST/OpenAPI
+Accetta JSON plain standard (es. `{"idTorneo": 2}`) ed espone la specifica OpenAPI. Usato da Swagger e Postman per testare le procedure senza dover conoscere il protocollo oRPC. **Attivo solo in `NODE_ENV === 'development'`**.
+
+### `/api/docs` — Swagger UI
+Serve la pagina HTML di Swagger all'URL `http://localhost:8080/api/docs`. Punta a `/api/rest` per eseguire le chiamate di test. Accetta `?format=json` per ottenere la specifica OpenAPI grezza. **Attivo solo in `NODE_ENV === 'development'`**.
+
+### In produzione
+Solo `/api/trpc` (router ancora su tRPC) e `/api/orpc` (router migrati) sono attivi. I file `/api/rest` e `/api/docs` non vengono deployati.
+
+---
+
+## Setup del client oRPC (`src/utils/orpc.ts`)
+
+### ⚠️ URL assoluto obbligatorio per RPCLink
+
+`RPCLink` di oRPC costruisce internamente un oggetto `URL` (tramite `new URL(...)`), che **richiede un URL assoluto**. Al contrario, tRPC usa `fetch(relativeString)` che accetta URL relative senza base.
+
+```typescript
+// ✅ CORRETTO — usa window.location.origin nel browser
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined') return window.location.origin
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  return `http://localhost:${process.env.PORT ?? 8080}`
+}
+
+// ❌ SBAGLIATO — stringa vuota provoca "TypeError: Failed to construct 'URL': Invalid URL"
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined') return ''  // NON funziona con oRPC
+  ...
+}
+```
+
+### `'use client'` e boundary server→client
+
+`'use client'` va dichiarato solo sul componente che **attraversa il boundary** server→client (tipicamente la pagina o il layout genitore). I componenti figli importati all'interno di un Client Component ereditano automaticamente il contesto client e **non** hanno bisogno di ripetere la direttiva.
+
+Esempio: se `HomePage` (la pagina) ha `'use client'`, allora `<Classifica>` — pur usando `useQuery` — funziona correttamente senza `'use client'`.
+
+---
+
 ## Piano di migrazione — Router per complessità
 
-| # | Router | Procedure | Complessità | Note |
-|---|--------|-----------|-------------|------|
-| 1 | `classifica` | 1 | 🟢 Bassa | Solo lettura |
-| 2 | `economia` | 1 | 🟢 Bassa | Solo lettura |
-| 3 | `squadreSerieA` | 1 | 🟢 Bassa | Solo lettura |
-| 4 | `albo` | 2 | 🟢 Bassa | Solo lettura |
-| 5 | `partita` | 2 | 🟢 Bassa | Solo lettura |
-| 6 | `tornei` | 2 | 🟡 Media | ChampionsBracket ha logica |
-| 7 | `risultati` | 3 | 🟡 Media | Admin, scrittura |
-| 8 | `statisticheSquadre` | 3 | 🟡 Media | Solo lettura |
-| 9 | `auth` | 2 | 🟡 Media | Email, token reset |
-| 10 | `formazione` | 4 | 🟠 Alta | Logica critica, deadline |
-| 11 | `squadre` | 6 | 🟡 Media | Maglia, Vercel Blob |
-| 12 | `trasferimenti` | 6 | 🟡 Media | Scrittura con transazioni |
-| 13 | `nuovaStagione` | 6 | 🔴 Alta | Admin, operazioni distruttive |
-| 14 | `profilo` | 5 | 🟡 Media | Upload foto Vercel Blob |
-| 15 | `giocatori` | 7 | 🟡 Media | CRUD + statistiche |
-| 16 | `mercato` | 8 | 🔴 Alta | Logica business critica |
-| 17 | `calendario` | 11 | 🟠 Alta | Router più grande |
-| 18 | `voti` | 9 | 🔴 Alta | Upload CSV, admin, file parsing |
+| # | Router | Procedure | Complessità | Stato |
+|---|--------|-----------|-------------|-------|
+| 1 | `classifica` | 1 | 🟢 Bassa | ✅ Migrato |
+| 2 | `economia` | 1 | 🟢 Bassa | ⏳ |
+| 3 | `squadreSerieA` | 1 | 🟢 Bassa | ⏳ |
+| 4 | `albo` | 2 | 🟢 Bassa | ⏳ |
+| 5 | `partita` | 2 | 🟢 Bassa | ⏳ |
+| 6 | `tornei` | 2 | 🟡 Media | ⏳ |
+| 7 | `risultati` | 3 | 🟡 Media | ⏳ |
+| 8 | `statisticheSquadre` | 3 | 🟡 Media | ⏳ |
+| 9 | `auth` | 2 | 🟡 Media | ⏳ |
+| 10 | `formazione` | 4 | 🟠 Alta | ⏳ |
+| 11 | `squadre` | 6 | 🟡 Media | ⏳ |
+| 12 | `trasferimenti` | 6 | 🟡 Media | ⏳ |
+| 13 | `nuovaStagione` | 6 | 🔴 Alta | ⏳ |
+| 14 | `profilo` | 5 | 🟡 Media | ⏳ |
+| 15 | `giocatori` | 7 | 🟡 Media | ⏳ |
+| 16 | `mercato` | 8 | 🔴 Alta | ⏳ |
+| 17 | `calendario` | 11 | 🟠 Alta | ⏳ |
+| 18 | `voti` | 9 | 🔴 Alta | ⏳ |
 
 > **Strategia consigliata:** iniziare dal pilota `classifica` (1 procedura, solo lettura) per validare il setup oRPC end-to-end prima di toccare router critici.
