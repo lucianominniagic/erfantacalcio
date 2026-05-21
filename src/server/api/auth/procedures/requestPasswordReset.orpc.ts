@@ -2,7 +2,7 @@ import { randomBytes } from 'crypto'
 import { publicProcedure } from '~/server/orpc'
 import { requestPasswordResetSchema } from '~/schemas/auth'
 import { Utenti } from '~/server/db/entities'
-import { ReSendMailAsync } from '~/service/mailSender'
+import { ReSendMailAsync } from '~/server/services/mailSender'
 
 function buildResetPasswordHtml(data: { presidente: string; resetUrl: string }): string {
   return `Notifica automatica da erFantacalcio.com<br><br>

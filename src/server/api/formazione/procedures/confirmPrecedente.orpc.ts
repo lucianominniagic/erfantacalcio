@@ -7,7 +7,7 @@ import {
   getProssimaGiornata,
   getProssimaGiornataSerieA,
 } from '~/server/utils/common'
-import { ReSendMailAsync } from '~/service/mailSender'
+import { ReSendMailAsync } from '~/server/services/mailSender'
 import { formatDateTime, nowInItalyIso } from '~/utils/dateUtils'
 import { getDescrizioneGiornata } from '~/utils/helper'
 import { Configurazione } from '~/config'

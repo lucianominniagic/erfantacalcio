@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { protectedProcedure } from '~/server/orpc'
 import { formatDateTime, nowInItalyIso } from '~/utils/dateUtils'
-import { ReSendMailAsync } from '~/service/mailSender'
+import { ReSendMailAsync } from '~/server/services/mailSender'
 import { env } from 'process'
 import { Partite } from '~/server/db/entities'
 import { getDescrizioneGiornata } from '~/utils/helper'
