@@ -49,7 +49,7 @@ npm run migration:show:prod
 
 ```bash
 npm run build    # production build (Next.js + TypeScript check)
-npm run dev      # dev server on http://localhost:8080 (Turbopack)
+npm run dev      # dev server on http://localhost:3001 (Turbopack)
 ```
 
 ## Rules You Must Follow

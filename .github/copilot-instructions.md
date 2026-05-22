@@ -3,7 +3,7 @@
 ## Build, Lint & Format
 
 ```bash
-npm run dev          # Dev server on http://localhost:8080 (Turbopack)
+npm run dev          # Dev server on http://localhost:3001 (Turbopack)
 npm run build        # Production build
 npm run lint         # ESLint
 npm run format       # Prettier

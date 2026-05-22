@@ -55,7 +55,7 @@ Equivalente di `/api/trpc`. Parla il protocollo oRPC: body `{"json": input}`, su
 Accetta JSON plain standard (es. `{"idTorneo": 2}`) ed espone la specifica OpenAPI. Usato da Swagger e Postman per testare le procedure senza dover conoscere il protocollo oRPC. **Attivo solo in `NODE_ENV === 'development'`**.
 
 ### `/api/docs` — Swagger UI
-Serve la pagina HTML di Swagger all'URL `http://localhost:8080/api/docs`. Punta a `/api/rest` per eseguire le chiamate di test. Accetta `?format=json` per ottenere la specifica OpenAPI grezza. **Attivo solo in `NODE_ENV === 'development'`**.
+Serve la pagina HTML di Swagger all'URL `http://localhost:3001/api/docs`. Punta a `/api/rest` per eseguire le chiamate di test. Accetta `?format=json` per ottenere la specifica OpenAPI grezza. **Attivo solo in `NODE_ENV === 'development'`**.
 
 ### In produzione
 Solo `/api/trpc` (router ancora su tRPC) e `/api/orpc` (router migrati) sono attivi. I file `/api/rest` e `/api/docs` non vengono deployati.
@@ -73,7 +73,7 @@ Solo `/api/trpc` (router ancora su tRPC) e `/api/orpc` (router migrati) sono att
 const getBaseUrl = () => {
   if (typeof window !== 'undefined') return window.location.origin
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
-  return `http://localhost:${process.env.PORT ?? 8080}`
+  return `http://localhost:${process.env.PORT ?? 3001}`
 }
 
 // ❌ SBAGLIATO — stringa vuota provoca "TypeError: Failed to construct 'URL': Invalid URL"

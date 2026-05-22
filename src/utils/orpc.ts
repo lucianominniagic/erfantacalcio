@@ -17,7 +17,7 @@ import type { ORPCRouter } from '~/server/orpc-root'
 const getBaseUrl = () => {
   if (typeof window !== 'undefined') return window.location.origin
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
-  return `http://localhost:${process.env.PORT ?? 8080}`
+  return `http://localhost:${process.env.PORT ?? 3001}`
 }
 
 const link = new RPCLink({

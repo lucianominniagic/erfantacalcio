@@ -211,7 +211,7 @@ npm run migration:run:local
 npm run dev
 ```
 
-L'applicazione sarà disponibile su `http://localhost:8080`
+L'applicazione sarà disponibile su `http://localhost:3001`
 
 ---
 
@@ -232,7 +232,7 @@ TYPEORM_LOGGING="true"
 
 # NextAuth
 NEXTAUTH_SECRET="your-secret-key"
-NEXTAUTH_URL="http://localhost:8080"
+NEXTAUTH_URL="http://localhost:3001"
 
 # Configurazione Stagione
 NEXT_PUBLIC_STAGIONE="2024-2025"
@@ -526,9 +526,9 @@ export const updateGiocatore = adminProcedure
 ### Sviluppo
 
 ```bash
-npm run dev          # Avvia server sviluppo con Turbopack (porta 8080)
+npm run dev          # Avvia server sviluppo con Turbopack (porta 3001)
 npm run build        # Build ottimizzata per produzione
-npm start            # Avvia server produzione (porta 8080)
+npm start            # Avvia server produzione (porta 3001)
 npm run lint         # Lint del codice con ESLint
 npm run format       # Formattazione con Prettier
 ```
@@ -615,11 +615,11 @@ cp .env.example .env
 # 4. Applica le migrations al DB locale
 npm run migration:run:local
 
-# 5. Avvia il server di sviluppo (Turbopack, porta 8080)
+# 5. Avvia il server di sviluppo (Turbopack, porta 3001)
 npm run dev
 ```
 
-L'app sarà disponibile su `http://localhost:8080`.
+L'app sarà disponibile su `http://localhost:3001`.
 
 ### Workflow branch
 
