@@ -10,7 +10,6 @@ import {
 } from './utils'
 import { type GiocatoreFormazioneType } from '~/types/squadre'
 import { type Moduli } from '~/types/common'
-import { moduloDefault } from '~/utils/helper'
 import React, { useState } from 'react'
 
 interface AlertState {
@@ -27,14 +26,11 @@ export function useFormazioneActions(
     giornate,
     idPartita,
     campo,
-    setCampo,
     panca,
-    setPanca,
     rosa,
-    setRosa,
     modulo,
-    setModulo,
     idSquadra,
+    dispatch,
   } = data
 
   const [saving, setSaving] = useState(false)
@@ -64,37 +60,10 @@ export function useFormazioneActions(
     })
 
     if (isValid) {
-      const moduloFormatted = formatModulo(newStateStr)
-      setModulo(moduloFormatted as Moduli)
+      dispatch({ type: 'SET_MODULO', payload: formatModulo(newStateStr) as Moduli })
     }
 
     return isValid
-  }
-
-  const updateLists = (
-    playerSelected: GiocatoreFormazioneType,
-    targetArray: GiocatoreFormazioneType[],
-    setTargetArray: (value: GiocatoreFormazioneType[]) => void,
-    sourceArray: GiocatoreFormazioneType[],
-    setSourceArray: (value: GiocatoreFormazioneType[]) => void,
-    orderTargetList = true,
-    orderSourceList = false,
-  ) => {
-    if (
-      playerSelected &&
-      !targetArray.find((c) => c.idGiocatore === playerSelected.idGiocatore)
-    ) {
-      const updatedSourceArray = sourceArray.filter(
-        (player) => player.idGiocatore !== playerSelected.idGiocatore,
-      )
-      const updatedTargetArray = [...targetArray, playerSelected]
-      orderSourceList
-        ? setSourceArray(sortPlayersByRoleDescThenRiserva(updatedSourceArray))
-        : setSourceArray(updatedSourceArray)
-      orderTargetList
-        ? setTargetArray(sortPlayersByRoleDescThenRiserva(updatedTargetArray))
-        : setTargetArray(updatedTargetArray)
-    }
   }
 
   const handleClickPlayer = (playerClicked: GiocatoreFormazioneType) => {
@@ -103,17 +72,27 @@ export function useFormazioneActions(
 
     const canAdd = canAddPlayer(playerClicked.ruolo)
 
+    let newRosa = rosa
+    let newCampo = campo
+    let newPanca = panca
+
     if (rosa.some((c) => c.idGiocatore === playerClicked.idGiocatore) && canAdd) {
       playerClicked.titolare = true
-      updateLists(playerClicked, campo, setCampo, rosa, setRosa, false)
+      newRosa = rosa.filter((p) => p.idGiocatore !== playerClicked.idGiocatore)
+      newCampo = [...campo, playerClicked]
     } else if (rosa.some((c) => c.idGiocatore === playerClicked.idGiocatore)) {
       playerClicked.riserva = 100
-      updateLists(playerClicked, panca, setPanca, rosa, setRosa, true)
+      newRosa = rosa.filter((p) => p.idGiocatore !== playerClicked.idGiocatore)
+      newPanca = sortPlayersByRoleDescThenRiserva([...panca, playerClicked])
     } else if (campo.some((c) => c.idGiocatore === playerClicked.idGiocatore)) {
-      updateLists(playerClicked, rosa, setRosa, campo, setCampo, true)
+      newCampo = campo.filter((p) => p.idGiocatore !== playerClicked.idGiocatore)
+      newRosa = sortPlayersByRoleDescThenRiserva([...rosa, playerClicked])
     } else if (panca.some((c) => c.idGiocatore === playerClicked.idGiocatore)) {
-      updateLists(playerClicked, rosa, setRosa, panca, setPanca, false, true)
+      newPanca = panca.filter((p) => p.idGiocatore !== playerClicked.idGiocatore)
+      newRosa = [...rosa, playerClicked]
     }
+
+    dispatch({ type: 'UPDATE_LISTS', payload: { rosa: newRosa, campo: newCampo, panca: newPanca } })
   }
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -161,14 +140,14 @@ export function useFormazioneActions(
   const handleModalCalendarioClose = () => setOpenModalCalendario(false)
 
   const resetFormazione = (newIdTorneo?: number) => {
-    setModulo(moduloDefault)
-    setCampo([])
-    setPanca([])
     if (newIdTorneo !== undefined) {
-      setRosa([])
+      dispatch({ type: 'RESET_FOR_GIORNATA' })
       data.setIdTorneo(newIdTorneo)
     } else {
-      setRosa(sortPlayersByRoleDescThenCostoDesc(rosa.concat(campo, panca)))
+      dispatch({
+        type: 'RESET',
+        payload: sortPlayersByRoleDescThenCostoDesc([...rosa, ...campo, ...panca]),
+      })
     }
   }
 
@@ -186,3 +165,4 @@ export function useFormazioneActions(
 }
 
 export type FormazioneActionsState = ReturnType<typeof useFormazioneActions>
+

@@ -1,5 +1,5 @@
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { type Dispatch, useEffect, useReducer, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 import { orpc } from '~/utils/orpc'
@@ -16,6 +16,73 @@ import {
   sortPlayersByRoleDescThenRiserva,
 } from './utils'
 
+export type FormazioneState = {
+  rosa: GiocatoreFormazioneType[]
+  campo: GiocatoreFormazioneType[]
+  panca: GiocatoreFormazioneType[]
+  modulo: Moduli
+  idPartita: number
+}
+
+export type FormazioneAction =
+  | { type: 'INIT_FROM_ROSA'; payload: GiocatoreFormazioneType[] }
+  | {
+      type: 'INIT_FROM_FORMAZIONE'
+      payload: {
+        rosa: GiocatoreFormazioneType[]
+        campo: GiocatoreFormazioneType[]
+        panca: GiocatoreFormazioneType[]
+        modulo: Moduli
+        idPartita: number
+      }
+    }
+  | {
+      type: 'UPDATE_LISTS'
+      payload: {
+        rosa: GiocatoreFormazioneType[]
+        campo: GiocatoreFormazioneType[]
+        panca: GiocatoreFormazioneType[]
+      }
+    }
+  | { type: 'SET_MODULO'; payload: Moduli }
+  | { type: 'SET_ID_PARTITA'; payload: number }
+  | { type: 'RESET'; payload: GiocatoreFormazioneType[] }
+  | { type: 'RESET_FOR_GIORNATA' }
+
+export type FormazioneDispatch = Dispatch<FormazioneAction>
+
+const initialState: FormazioneState = {
+  rosa: [],
+  campo: [],
+  panca: [],
+  modulo: moduloDefault,
+  idPartita: 0,
+}
+
+function formazioneReducer(
+  state: FormazioneState,
+  action: FormazioneAction,
+): FormazioneState {
+  switch (action.type) {
+    case 'INIT_FROM_ROSA':
+      return { ...state, rosa: action.payload }
+    case 'INIT_FROM_FORMAZIONE':
+      return { ...state, ...action.payload }
+    case 'UPDATE_LISTS':
+      return { ...state, ...action.payload }
+    case 'SET_MODULO':
+      return { ...state, modulo: action.payload }
+    case 'SET_ID_PARTITA':
+      return { ...state, idPartita: action.payload }
+    case 'RESET':
+      return { ...state, rosa: action.payload, campo: [], panca: [], modulo: moduloDefault }
+    case 'RESET_FOR_GIORNATA':
+      return initialState
+    default:
+      return state
+  }
+}
+
 export function useFormazioneData() {
   const session = useSession()
   const idSquadra = parseInt(session.data?.user?.id ?? '0')
@@ -25,11 +92,7 @@ export function useFormazioneData() {
   const [message, setMessage] = useState('')
   const [giornate, setGiornate] = useState<z.infer<typeof giornataSchema>[]>([])
   const [idTorneo, setIdTorneo] = useState<number>()
-  const [rosa, setRosa] = useState<GiocatoreFormazioneType[]>([])
-  const [campo, setCampo] = useState<GiocatoreFormazioneType[]>([])
-  const [panca, setPanca] = useState<GiocatoreFormazioneType[]>([])
-  const [idPartita, setIdPartita] = useState<number>(0)
-  const [modulo, setModulo] = useState<Moduli>(moduloDefault)
+  const [state, dispatch] = useReducer(formazioneReducer, initialState)
 
   const calendarioProssima = useQuery(
     orpc.formazione.getGiornateDaGiocare.queryOptions({
@@ -84,35 +147,41 @@ export function useFormazioneData() {
   }, [calendarioProssima.data])
 
   useEffect(() => {
-    if (rosaList.data) {
-      const rosaConRuolo = rosaList.data.map((giocatore: GiocatoreType) => ({
-        ...giocatore,
-        titolare: false,
-        riserva: null,
-      }))
-      setRosa(rosaConRuolo)
-    }
-  }, [rosaList.data, idTorneo])
-
-  useEffect(() => {
+    // INIT_FROM_FORMAZIONE always wins; INIT_FROM_ROSA is the fallback when no saved formation exists
     if (formazioneList.data) {
-      setIdPartita(formazioneList.data.idPartita)
-      setModulo(formazioneList.data.modulo as Moduli)
-      setCampo(formazioneList.data.giocatori.filter((c) => c.titolare))
-      setRosa(
-        sortPlayersByRoleDescThenCostoDesc(
-          formazioneList.data.giocatori.filter(
-            (c) => !c.titolare && c.riserva === null,
+      dispatch({
+        type: 'INIT_FROM_FORMAZIONE',
+        payload: {
+          idPartita: formazioneList.data.idPartita,
+          modulo: formazioneList.data.modulo as Moduli,
+          campo: formazioneList.data.giocatori.filter((c) => c.titolare),
+          rosa: sortPlayersByRoleDescThenCostoDesc(
+            formazioneList.data.giocatori.filter(
+              (c) => !c.titolare && c.riserva === null,
+            ),
           ),
-        ),
-      )
-      setPanca(
-        sortPlayersByRoleDescThenRiserva(
-          formazioneList.data.giocatori.filter((c) => !c.titolare && c.riserva),
-        ),
-      )
+          panca: sortPlayersByRoleDescThenRiserva(
+            formazioneList.data.giocatori.filter((c) => !c.titolare && c.riserva),
+          ),
+        },
+      })
+    } else if (rosaList.data) {
+      dispatch({
+        type: 'INIT_FROM_ROSA',
+        payload: rosaList.data.map((giocatore: GiocatoreType) => ({
+          ...giocatore,
+          titolare: false,
+          riserva: null,
+        })),
+      })
     }
-  }, [formazioneList.isFetching, formazioneList.isSuccess, formazioneList.data])
+  }, [
+    rosaList.data,
+    idTorneo,
+    formazioneList.data,
+    formazioneList.isFetching,
+    formazioneList.isSuccess,
+  ])
 
   const isLoading =
     (rosaList.isLoading && enableRosa) || calendarioProssima.isLoading
@@ -125,18 +194,11 @@ export function useFormazioneData() {
     giornate,
     idTorneo,
     setIdTorneo,
-    rosa,
-    setRosa,
-    campo,
-    setCampo,
-    panca,
-    setPanca,
-    idPartita,
-    setIdPartita,
-    modulo,
-    setModulo,
+    ...state,
+    setIdPartita: (id: number) => dispatch({ type: 'SET_ID_PARTITA', payload: id }),
     isLoading,
     formazioneList,
+    dispatch,
   }
 }
 
