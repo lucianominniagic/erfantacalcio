@@ -18,7 +18,7 @@ type UploadVotoGiocatoreType = z.infer<typeof uploadVotoGiocatoreSchema>
 
 type GiocatoreInfo = {
   idGiocatore: number | undefined
-  id_pf: number | null | undefined
+  id_pf: number | null
   nome: string
 }
 
