@@ -162,6 +162,11 @@ export default function HomePage() {
             {new Date() >= Configurazione.dataGiornata1SerieA && (
               <>
                 <Grid item xs={12} sm={6} sx={!isXs ? { pt: '15px' } : {}}>
+                  <Calendario
+                    tipo={'risultati'}
+                    prefixTitle="Risultati:"
+                    enableTabs={true}
+                  ></Calendario>
                   {stagionefinita ? (
                     <Box
                       sx={{
@@ -204,105 +209,100 @@ export default function HomePage() {
                     </Box>
                   ) : (
                     <>
-                  <Calendario
-                    tipo={'risultati'}
-                    prefixTitle="Risultati:"
-                    enableTabs={true}
-                  ></Calendario>
-                  <Calendario
-                    tipo={'prossima'}
-                    prefixTitle=""
-                    enableTabs={true}
-                  ></Calendario>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      '& > *': { m: 1 },
-                    }}
-                  >
-                    <ButtonGroup
-                      size="small"
-                      color="primary"
-                      aria-label="Small button group"
-                    >
-                      <Tooltip title="Calendario partite ultimo periodo">
-                        <Button
-                          onClick={() =>
-                            handleCalendario(undefined, true, false, false)
-                          }
-                          startIcon={<AccessAlarm color="error" />}
-                        ></Button>
-                      </Tooltip>
-                      <Tooltip title="Calendario girone 1">
-                        <Button
-                          onClick={() =>
-                            handleCalendario(1, false, false, false)
-                          }
-                          startIcon={<LooksOneOutlined />}
-                        ></Button>
-                      </Tooltip>
-                      <Tooltip title="Calendario girone 2">
-                        <Button
-                          onClick={() =>
-                            handleCalendario(2, false, false, false)
-                          }
-                          startIcon={<LooksTwoOutlined />}
+                      <Calendario
+                        tipo={'prossima'}
+                        prefixTitle=""
+                        enableTabs={true}
+                      ></Calendario>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          '& > *': { m: 1 },
+                        }}
+                      >
+                        <ButtonGroup
+                          size="small"
+                          color="primary"
+                          aria-label="Small button group"
                         >
-                          &nbsp;
-                        </Button>
-                      </Tooltip>
-                      <Tooltip title="Calendario girone 3">
-                        <Button
-                          onClick={() =>
-                            handleCalendario(3, false, false, false)
-                          }
-                          startIcon={<Looks3Outlined />}
-                        >
-                          &nbsp;
-                        </Button>
-                      </Tooltip>
-                      <Tooltip title="Calendario girone 4">
-                        <Button
-                          onClick={() =>
-                            handleCalendario(4, false, false, false)
-                          }
-                          startIcon={<Looks4Outlined />}
-                        >
-                          &nbsp;
-                        </Button>
-                      </Tooltip>
-                      <Tooltip title="Calendario girone 5">
-                        <Button
-                          onClick={() =>
-                            handleCalendario(5, false, false, false)
-                          }
-                          startIcon={<Looks5Outlined />}
-                        >
-                          &nbsp;
-                        </Button>
-                      </Tooltip>
-                      <Tooltip title="Calendario Champions">
-                        <Button
-                          onClick={() =>
-                            handleCalendario(undefined, false, false, true)
-                          }
-                          startIcon={<EmojiEvents color="success" />}
-                        >
-                          &nbsp;
-                        </Button>
-                      </Tooltip>
-                      <Tooltip title="Partite da recuperare">
-                        <Button
-                          onClick={() =>
-                            handleCalendario(undefined, false, true, false)
-                          }
-                          startIcon={<PendingActions color="action" />}
-                        ></Button>
-                      </Tooltip>
-                    </ButtonGroup>
-                  </Box>
+                          <Tooltip title="Calendario partite ultimo periodo">
+                            <Button
+                              onClick={() =>
+                                handleCalendario(undefined, true, false, false)
+                              }
+                              startIcon={<AccessAlarm color="error" />}
+                            ></Button>
+                          </Tooltip>
+                          <Tooltip title="Calendario girone 1">
+                            <Button
+                              onClick={() =>
+                                handleCalendario(1, false, false, false)
+                              }
+                              startIcon={<LooksOneOutlined />}
+                            ></Button>
+                          </Tooltip>
+                          <Tooltip title="Calendario girone 2">
+                            <Button
+                              onClick={() =>
+                                handleCalendario(2, false, false, false)
+                              }
+                              startIcon={<LooksTwoOutlined />}
+                            >
+                              &nbsp;
+                            </Button>
+                          </Tooltip>
+                          <Tooltip title="Calendario girone 3">
+                            <Button
+                              onClick={() =>
+                                handleCalendario(3, false, false, false)
+                              }
+                              startIcon={<Looks3Outlined />}
+                            >
+                              &nbsp;
+                            </Button>
+                          </Tooltip>
+                          <Tooltip title="Calendario girone 4">
+                            <Button
+                              onClick={() =>
+                                handleCalendario(4, false, false, false)
+                              }
+                              startIcon={<Looks4Outlined />}
+                            >
+                              &nbsp;
+                            </Button>
+                          </Tooltip>
+                          <Tooltip title="Calendario girone 5">
+                            <Button
+                              onClick={() =>
+                                handleCalendario(5, false, false, false)
+                              }
+                              startIcon={<Looks5Outlined />}
+                            >
+                              &nbsp;
+                            </Button>
+                          </Tooltip>
+                          <Tooltip title="Calendario Champions">
+                            <Button
+                              onClick={() =>
+                                handleCalendario(undefined, false, false, true)
+                              }
+                              startIcon={<EmojiEvents color="success" />}
+                            >
+                              &nbsp;
+                            </Button>
+                          </Tooltip>
+                          <Tooltip title="Partite da recuperare">
+                            <Button
+                              onClick={() =>
+                                handleCalendario(undefined, false, true, false)
+                              }
+                              startIcon={<PendingActions color="action" />}
+                            ></Button>
+                          </Tooltip>
+                        </ButtonGroup>
+                      </Box>
                     </>
                   )}
                 </Grid>
