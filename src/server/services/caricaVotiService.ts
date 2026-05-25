@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { type EntityManager, In } from 'typeorm'
+import { type EntityManager, In, Not } from 'typeorm'
 import type { z } from 'zod'
 import { Configurazione } from '~/config'
 import type { uploadVotoGiocatoreSchema } from '~/schemas/giocatore'
@@ -145,6 +145,7 @@ async function findAndCreateGiocatori(
     },
     where: {
       nome: In(players.map((p) => p.nome)),
+      id_pf: Not(0),
     },
   })
 
