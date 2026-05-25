@@ -142,10 +142,10 @@ function SidebarContent() {
         {session?.user && (
           <>
             <Divider sx={{ mx: 2, my: 0.5 }} />
-            <SidebarSection title="Il mio profilo" items={profiloItems} pathname={pathname} />
+            <SidebarSection title="Il mio profilo" items={profiloItems} pathname={pathname} defaultOpen={!adminItems.some((i) => i.href === pathname)} />
           </>
         )}
-        <SidebarSection title="Lega" items={legaItems} pathname={pathname} />
+        <SidebarSection title="Lega" items={legaItems} pathname={pathname} defaultOpen={!adminItems.some((i) => i.href === pathname)} />
         {session?.user?.ruolo === RuoloUtente.admin && (
           <>
             <Divider sx={{ mx: 2, my: 0.5 }} />
@@ -153,7 +153,7 @@ function SidebarContent() {
               title="Admin"
               items={adminItems}
               pathname={pathname}
-              defaultOpen={false}
+              defaultOpen={adminItems.some((i) => i.href === pathname)}
             />
           </>
         )}
