@@ -18,7 +18,7 @@ type UploadVotoGiocatoreType = z.infer<typeof uploadVotoGiocatoreSchema>
 
 type GiocatoreInfo = {
   idGiocatore: number | undefined
-  id_pf: number | null | undefined
+  id_pf: number | null
   nome: string
 }
 
@@ -170,7 +170,7 @@ async function findAndCreateGiocatori(
   // 5️⃣ Filtra solo i giocatori non ancora in DB
   const newPlayers = players.filter((p) => {
     const match = giocatori.some(
-      (g) => (g.id_pf && g.id_pf === p.id_pf) || g.nome === p.nome,
+      (g) => (g.id_pf != null && g.id_pf === p.id_pf && g.id_pf !== 0) || g.nome === p.nome,
     )
     return !match
   })
