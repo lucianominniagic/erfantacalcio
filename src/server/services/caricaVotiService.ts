@@ -18,7 +18,7 @@ type UploadVotoGiocatoreType = z.infer<typeof uploadVotoGiocatoreSchema>
 
 type GiocatoreInfo = {
   idGiocatore: number | undefined
-  id_pf: number | null
+  id_pf: number | null | undefined
   nome: string
 }
 
@@ -124,8 +124,6 @@ async function findAndCreateGiocatori(
     .map((p) => p.id_pf)
     .filter((id): id is number => id !== null)
 
-    console.log('PfIds da cercare:', pfIds)
-
   // 1️⃣ Trova giocatori esistenti per id_pf
   const giocatori: GiocatoreInfo[] = await trx.find(Giocatori, {
     select: {
@@ -138,16 +136,12 @@ async function findAndCreateGiocatori(
     },
   })
 
-  console.dir(giocatori, { depth: null })
-
   // 2️⃣ Filtra solo i giocatori non ancora in DB
   const newPlayers = players.filter((p) => {
     return !giocatori.some(
       (g) => (g.id_pf && g.id_pf === p.id_pf) || g.nome === p.nome,
     )
   })
-
-  console.log('Giocatori da creare:', newPlayers)
 
   // 3️⃣ Crea i nuovi giocatori
   if (newPlayers.length > 0) {
