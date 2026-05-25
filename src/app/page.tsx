@@ -185,9 +185,6 @@ export default function HomePage() {
                           <CardContent>
                             <Euro sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
                             <Typography variant="h6">Economia e premi</Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              Montepremi, premi e bilanci della stagione
-                            </Typography>
                           </CardContent>
                         </CardActionArea>
                       </Card>
@@ -200,9 +197,6 @@ export default function HomePage() {
                           <CardContent>
                             <Groups sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
                             <Typography variant="h6">Statistiche squadre</Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              Riepilogo statistiche e scontri diretti della stagione
-                            </Typography>
                           </CardContent>
                         </CardActionArea>
                       </Card>
