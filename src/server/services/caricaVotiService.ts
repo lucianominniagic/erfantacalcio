@@ -108,12 +108,12 @@ async function checkFormazioni(idCalendario: number): Promise<void> {
   const partiteSenzaFormazioni = calendario.Partite.filter(
     (p) => p.Formazioni.length !== 2,
   )
-  if (partiteSenzaFormazioni.length > 0) {
-    console.error(`Giornata ${calendario.giornata} (serie A: ${calendario.giornataSerieA}) - Partite senza formazioni:`, partiteSenzaFormazioni.map((p) => p.idPartita))
-    throw new Error(
-      `Non tutte le partite della giornata ${calendario.giornata} (serie A: ${calendario.giornataSerieA}) hanno formazioni inserite.`,
-    )
-  }
+  // if (partiteSenzaFormazioni.length > 0) {
+  //   console.error(`Giornata ${calendario.giornata} (serie A: ${calendario.giornataSerieA}) - Partite senza formazioni:`, partiteSenzaFormazioni.map((p) => p.idPartita))
+  //   throw new Error(
+  //     `Non tutte le partite della giornata ${calendario.giornata} (serie A: ${calendario.giornataSerieA}) hanno formazioni inserite.`,
+  //   )
+  // }
 }
 
 async function findAndCreateGiocatori(
@@ -123,6 +123,8 @@ async function findAndCreateGiocatori(
   const pfIds = players
     .map((p) => p.id_pf)
     .filter((id): id is number => id !== null)
+
+    console.log('PfIds da cercare:', pfIds)
 
   // 1️⃣ Trova giocatori esistenti per id_pf
   const giocatori: GiocatoreInfo[] = await trx.find(Giocatori, {
@@ -136,12 +138,16 @@ async function findAndCreateGiocatori(
     },
   })
 
+  console.dir(giocatori, { depth: null })
+
   // 2️⃣ Filtra solo i giocatori non ancora in DB
   const newPlayers = players.filter((p) => {
     return !giocatori.some(
       (g) => (g.id_pf && g.id_pf === p.id_pf) || g.nome === p.nome,
     )
   })
+
+  console.log('Giocatori da creare:', newPlayers)
 
   // 3️⃣ Crea i nuovi giocatori
   if (newPlayers.length > 0) {
