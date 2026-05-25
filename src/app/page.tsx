@@ -1,16 +1,21 @@
 'use client'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
 import {
   Box,
   Button,
   ButtonGroup,
+  Card,
+  CardActionArea,
+  CardContent,
   Divider,
   Grid,
   Tab,
   Tabs,
   Tooltip,
+  Typography,
   useMediaQuery,
   useTheme,
   Slide,
@@ -18,6 +23,8 @@ import {
 import {
   AccessAlarm,
   EmojiEvents,
+  Euro,
+  Groups,
   Looks3Outlined,
   Looks4Outlined,
   Looks5Outlined,
@@ -46,6 +53,10 @@ export default function HomePage() {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   }))
+  const prossimeGiornate = useQuery(orpc.calendario.getProssimeGiornate.queryOptions({
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  }))
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
   const [openModalCalendario, setOpenModalCalendario] = useState(false)
@@ -61,6 +72,10 @@ export default function HomePage() {
     !!championsBracket.data?.semifinaliAndata?.partite.some(
       (p) => p.idHome !== null || p.idAway !== null,
     )
+  const stagionefinita =
+    !prossimeGiornate.isLoading &&
+    prossimeGiornate.isSuccess &&
+    (prossimeGiornate.data?.length ?? 1) === 0
   const [championsTab, setChampionsTab] = useState(0)
 
   const calendarioList =
@@ -147,6 +162,48 @@ export default function HomePage() {
             {new Date() >= Configurazione.dataGiornata1SerieA && (
               <>
                 <Grid item xs={12} sm={6} sx={!isXs ? { pt: '15px' } : {}}>
+                  {stagionefinita ? (
+                    <Box
+                      sx={{
+                        pt: '15px',
+                        display: 'flex',
+                        flexDirection: isXs ? 'column' : 'row',
+                        gap: 2,
+                      }}
+                    >
+                      <Card
+                        component={Link}
+                        href="/economia"
+                        sx={{ flex: 1, textDecoration: 'none', color: 'inherit' }}
+                      >
+                        <CardActionArea sx={{ height: '100%' }}>
+                          <CardContent>
+                            <Euro sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
+                            <Typography variant="h6">Economia e premi</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Montepremi, premi e bilanci della stagione
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+                      <Card
+                        component={Link}
+                        href="/statistiche_squadre"
+                        sx={{ flex: 1, textDecoration: 'none', color: 'inherit' }}
+                      >
+                        <CardActionArea sx={{ height: '100%' }}>
+                          <CardContent>
+                            <Groups sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
+                            <Typography variant="h6">Statistiche squadre</Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Riepilogo statistiche e scontri diretti della stagione
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+                    </Box>
+                  ) : (
+                    <>
                   <Calendario
                     tipo={'risultati'}
                     prefixTitle="Risultati:"
@@ -246,6 +303,8 @@ export default function HomePage() {
                       </Tooltip>
                     </ButtonGroup>
                   </Box>
+                    </>
+                  )}
                 </Grid>
                 <Grid
                   item
