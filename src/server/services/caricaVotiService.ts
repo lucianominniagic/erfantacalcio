@@ -122,7 +122,7 @@ async function findAndCreateGiocatori(
 ): Promise<GiocatoreInfo[]> {
   const pfIds = players
     .map((p) => p.id_pf)
-    .filter((id): id is number => id !== null && id > 0)
+    .filter((id): id is number => id !== null)
 
   // 1️⃣ Trova giocatori esistenti per id_pf
   const giocatoriWithPfId: GiocatoreInfo[] = await trx.find(Giocatori, {
@@ -145,7 +145,6 @@ async function findAndCreateGiocatori(
     },
     where: {
       nome: In(players.map((p) => p.nome)),
-      id_pf: Not(0),
     },
   })
 
