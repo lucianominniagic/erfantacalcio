@@ -108,12 +108,12 @@ async function checkFormazioni(idCalendario: number): Promise<void> {
   const partiteSenzaFormazioni = calendario.Partite.filter(
     (p) => p.Formazioni.length !== 2,
   )
-  // if (partiteSenzaFormazioni.length > 0) {
-  //   console.error(`Giornata ${calendario.giornata} (serie A: ${calendario.giornataSerieA}) - Partite senza formazioni:`, partiteSenzaFormazioni.map((p) => p.idPartita))
-  //   throw new Error(
-  //     `Non tutte le partite della giornata ${calendario.giornata} (serie A: ${calendario.giornataSerieA}) hanno formazioni inserite.`,
-  //   )
-  // }
+  if (partiteSenzaFormazioni.length > 0) {
+    console.error(`Giornata ${calendario.giornata} (serie A: ${calendario.giornataSerieA}) - Partite senza formazioni:`, partiteSenzaFormazioni.map((p) => p.idPartita))
+    throw new Error(
+      `Non tutte le partite della giornata ${calendario.giornata} (serie A: ${calendario.giornataSerieA}) hanno formazioni inserite.`,
+    )
+  }
 }
 
 async function findAndCreateGiocatori(
@@ -125,7 +125,7 @@ async function findAndCreateGiocatori(
     .filter((id): id is number => id !== null)
 
   // 1️⃣ Trova giocatori esistenti per id_pf
-  const giocatori: GiocatoreInfo[] = await trx.find(Giocatori, {
+  const giocatoriWithPfId: GiocatoreInfo[] = await trx.find(Giocatori, {
     select: {
       idGiocatore: true,
       id_pf: true,
@@ -136,11 +136,43 @@ async function findAndCreateGiocatori(
     },
   })
 
-  // 2️⃣ Filtra solo i giocatori non ancora in DB
+  // 2️⃣ Trova giocatori esistenti per nome
+  const giocatoriWithNome = await trx.find(Giocatori, {
+    select: {
+      idGiocatore: true,
+      id_pf: true,
+      nome: true,
+    },
+    where: {
+      nome: In(players.map((p) => p.nome)),
+    },
+  })
+
+  // 3️⃣ Unisci per nome o id_pf
+  const giocatori = _.uniqBy(
+    [...giocatoriWithPfId, ...giocatoriWithNome],
+    (g) => `${g.id_pf ?? ''}_${g.nome}`,
+  )
+
+  // 4️⃣ Aggiorna eventuali id_pf mancanti
+  await Promise.all(
+    giocatori
+      .filter((g) => g?.id_pf)
+      .map(async (g) => {
+        await trx.update(
+          Giocatori,
+          { idGiocatore: g.idGiocatore },
+          { id_pf: g.id_pf },
+        )
+      }),
+  )
+
+  // 5️⃣ Filtra solo i giocatori non ancora in DB
   const newPlayers = players.filter((p) => {
-    return !giocatori.some(
-      (g) => (g.id_pf && g.id_pf === p.id_pf) || g.nome === p.nome,
+    const match = giocatori.some(
+      (g) => (g.id_pf && g.id_pf === p.id_pf) ?? g.nome === p.nome,
     )
+    return !match
   })
 
   // 3️⃣ Crea i nuovi giocatori
