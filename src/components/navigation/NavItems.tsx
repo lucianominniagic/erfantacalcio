@@ -92,42 +92,42 @@ export function guestListItems(isXs: boolean, isAuthenticated: boolean) {
   return [
     ...(isAuthenticated
       ? [
-          listItem(
-            'guest_profilo_1',
-            `/formazione?isXs=${isXs}`,
-            'Formazione',
-            <FiberNew color="success" />,
-          ),
-          listItem(
-            'guest_profilo_2',
-            `/maglia`,
-            'Maglia',
-            <AssignmentInd color="info" />,
-          ),
+          // listItem(
+          //   'guest_profilo_1',
+          //   `/formazione?isXs=${isXs}`,
+          //   'Formazione',
+          //   <FiberNew color="success" />,
+          // ),
+          // listItem(
+          //   'guest_profilo_2',
+          //   `/maglia`,
+          //   'Maglia',
+          //   <AssignmentInd color="info" />,
+          // ),
           listItem(
             'guest_profilo_3',
             '/foto',
             'Foto profilo',
             <Badge color="success" />,
           ),
-          listItem(
-            'guest_profilo_3',
-            '/profilo',
-            'Cambio password',
-            <Badge color="success" />,
-          ),
-          listItem(
-            'mercato_proposte',
-            '/mercato',
-            'Proposta di acquisto',
-            <Gavel color="success" />,
-          ),
-          listItem(
-            'mercato_sessioni',
-            '/sessioni-mercato',
-            'Sessioni di mercato',
-            <Storefront color="info" />,
-          ),
+          // listItem(
+          //   'guest_profilo_3',
+          //   '/profilo',
+          //   'Cambio password',
+          //   <Badge color="success" />,
+          // ),
+          // listItem(
+          //   'mercato_proposte',
+          //   '/mercato',
+          //   'Proposta di acquisto',
+          //   <Gavel color="success" />,
+          // ),
+          // listItem(
+          //   'mercato_sessioni',
+          //   '/sessioni-mercato',
+          //   'Sessioni di mercato',
+          //   <Storefront color="info" />,
+          // ),
         ]
       : []),
     listItem(

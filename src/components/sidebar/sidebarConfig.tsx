@@ -58,44 +58,44 @@ export const legaItems: NavItem[] = [
 ]
 
 export const profiloItems: NavItem[] = [
-  {
-    key: 'formazione',
-    label: 'Formazione',
-    href: '/formazione',
-    icon: <FiberNew color="success" />,
-  },
-  {
-    key: 'maglia',
-    label: 'Maglia',
-    href: '/maglia',
-    icon: <AssignmentInd color="info" />,
-  },
+  // {
+  //   key: 'formazione',
+  //   label: 'Formazione',
+  //   href: '/formazione',
+  //   icon: <FiberNew color="success" />,
+  // },
+  // {
+  //   key: 'maglia',
+  //   label: 'Maglia',
+  //   href: '/maglia',
+  //   icon: <AssignmentInd color="info" />,
+  // },
   {
     key: 'foto',
     label: 'Foto profilo',
     href: '/foto',
     icon: <Badge color="error" />,
   },
-  {
-    key: 'profilo',
-    label: 'Cambio password',
-    href: '/profilo',
-    icon: <Key color="action" />,
-  },
-  {
-    key: 'mercato',
-    label: 'Proposta di acquisto',
-    href: '/mercato',
-    icon: <Gavel color="success" />,
-    authRequired: true,
-  },
-  {
-    key: 'sessioni-mercato',
-    label: 'Sessioni di mercato',
-    href: '/sessioni-mercato',
-    icon: <Storefront color="info" />,
-    authRequired: true,
-  },
+  // {
+  //   key: 'profilo',
+  //   label: 'Cambio password',
+  //   href: '/profilo',
+  //   icon: <Key color="action" />,
+  // },
+  // {
+  //   key: 'mercato',
+  //   label: 'Proposta di acquisto',
+  //   href: '/mercato',
+  //   icon: <Gavel color="success" />,
+  //   authRequired: true,
+  // },
+  // {
+  //   key: 'sessioni-mercato',
+  //   label: 'Sessioni di mercato',
+  //   href: '/sessioni-mercato',
+  //   icon: <Storefront color="info" />,
+  //   authRequired: true,
+  // },
 ]
 
 export const adminItems: NavItem[] = [
