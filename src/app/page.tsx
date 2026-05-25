@@ -8,6 +8,8 @@ import {
   ButtonGroup,
   Divider,
   Grid,
+  Tab,
+  Tabs,
   Tooltip,
   useMediaQuery,
   useTheme,
@@ -54,6 +56,13 @@ export default function HomePage() {
   const [isCalendarioRecuperi, setIsCalendarioRecuperi] =
     useState<boolean>(false)
 
+  const hasSemifinaliTeams =
+    !championsBracket.isLoading &&
+    !!championsBracket.data?.semifinaliAndata?.partite.some(
+      (p) => p.idHome !== null || p.idAway !== null,
+    )
+  const [championsTab, setChampionsTab] = useState(0)
+
   const calendarioList =
     girone && !isCalendarioAttuale && !isCalendarioRecuperi
       ? useQuery(orpc.calendario.listByGirone.queryOptions({
@@ -91,6 +100,13 @@ export default function HomePage() {
       setGiornata(calendarioList.data)
     }
   }, [calendarioList.data, calendarioList.isSuccess, calendarioList.isFetching])
+
+  useEffect(() => {
+    if (!championsBracket.isLoading) {
+      setChampionsTab(hasSemifinaliTeams ? 1 : 0)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [championsBracket.isLoading])
 
   const handleCalendario = (
     girone: number | undefined,
@@ -238,12 +254,6 @@ export default function HomePage() {
                   sx={!isXs ? { pr: '2px', pl: '15px', pt: '15px' } : {}}
                 >
                   {(() => {
-                    const hasSemifinaliTeams =
-                      !championsBracket.isLoading &&
-                      championsBracket.data?.semifinaliAndata?.partite.some(
-                        (p) => p.idHome !== null || p.idAway !== null,
-                      )
-
                     const classificheConHasClassifica = torneiList.data?.filter(
                       (t) => t.hasClassifica,
                     )
@@ -269,7 +279,20 @@ export default function HomePage() {
                     return (
                       <>
                         {classificheCampionato?.map(renderClassifica)}
-                        {hasSemifinaliTeams && (
+                        <Tabs
+                          value={championsTab}
+                          onChange={(_, v: number) => setChampionsTab(v)}
+                        >
+                          <Tab label="Classifica Champions" />
+                          <Tab
+                            label="Fase finale"
+                            disabled={!hasSemifinaliTeams}
+                          />
+                        </Tabs>
+                        {championsTab === 0 && (
+                          <><br></br>{classificheChampions?.map(renderClassifica)}</>
+                        )}
+                        {championsTab === 1 && (
                           <>
                             <ChampionsBracket
                               semifinaliAndata={
@@ -280,10 +303,9 @@ export default function HomePage() {
                               }
                               finale={championsBracket.data?.finale ?? null}
                             />
-                            <br></br>
+                            <br />
                           </>
                         )}
-                        {classificheChampions?.map(renderClassifica)}
                       </>
                     )
                   })()}
