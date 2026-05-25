@@ -170,7 +170,7 @@ async function findAndCreateGiocatori(
   // 5️⃣ Filtra solo i giocatori non ancora in DB
   const newPlayers = players.filter((p) => {
     const match = giocatori.some(
-      (g) => (g.id_pf && g.id_pf === p.id_pf) ?? g.nome === p.nome,
+      (g) => (g.id_pf && g.id_pf === p.id_pf) || g.nome === p.nome,
     )
     return !match
   })
