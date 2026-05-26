@@ -1,15 +1,11 @@
 'use client'
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
 import {
   Box,
   Button,
   ButtonGroup,
-  Card,
-  CardActionArea,
-  CardContent,
   Divider,
   Grid,
   Tab,
@@ -23,8 +19,6 @@ import {
 import {
   AccessAlarm,
   EmojiEvents,
-  Euro,
-  Groups,
   Looks3Outlined,
   Looks4Outlined,
   Looks5Outlined,
@@ -35,6 +29,8 @@ import {
 import Classifica from '~/components/home/Classifica'
 import ChampionsBracket from '~/components/home/ChampionsBracket'
 import Squadre from '~/components/home/Squadre'
+import EconomiaPreviewCard from '~/components/home/EconomiaPreviewCard'
+import StatistichePreviewCard from '~/components/home/StatistichePreviewCard'
 import Calendario from '~/components/home/Calendario'
 import Modal from '~/components/modal/Modal'
 import CardPartite from '~/components/cardPartite/CardPartite'
@@ -176,30 +172,12 @@ export default function HomePage() {
                         gap: 2,
                       }}
                     >
-                      <Card
-                        component={Link}
-                        href="/economia"
-                        sx={{ flex: 1, textDecoration: 'none', color: 'inherit' }}
-                      >
-                        <CardActionArea sx={{ height: '100%' }}>
-                          <CardContent>
-                            <Euro sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-                            <Typography variant="h6">Economia e premi</Typography>
-                          </CardContent>
-                        </CardActionArea>
-                      </Card>
-                      <Card
-                        component={Link}
-                        href="/statistiche_squadre"
-                        sx={{ flex: 1, textDecoration: 'none', color: 'inherit' }}
-                      >
-                        <CardActionArea sx={{ height: '100%' }}>
-                          <CardContent>
-                            <Groups sx={{ fontSize: 40, color: 'primary.main', mb: 1 }} />
-                            <Typography variant="h6">Statistiche squadre</Typography>
-                          </CardContent>
-                        </CardActionArea>
-                      </Card>
+                      <Box sx={{ flex: 1 }}>
+                        <EconomiaPreviewCard />
+                      </Box>
+                      <Box sx={{ flex: 1 }}>
+                        <StatistichePreviewCard />
+                      </Box>
                     </Box>
                   ) : (
                     <>
