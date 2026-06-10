@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, type Relation, BaseEntity } from 'typeorm'
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  type Relation,
+  BaseEntity,
+} from 'typeorm'
 import { Trasferimento } from './Trasferimento'
 
 @Entity({ name: 'squadra_serie_a' })

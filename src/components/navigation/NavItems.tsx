@@ -11,13 +11,16 @@ import {
   CalendarMonth,
   Euro,
   FiberNew,
+  Gavel,
   Grading,
   Group,
   HistoryEdu,
   ListAlt,
   ManageAccounts,
   Portrait,
+  Groups,
   RecentActors,
+  Storefront,
   ThumbsUpDown,
   UploadFile,
 } from '@mui/icons-material'
@@ -76,6 +79,12 @@ export function adminListItems() {
       'Nuova stagione',
       <FiberNew color="primary" />,
     ),
+    listItem(
+      'admin_mercato',
+      '/gestione-mercato',
+      'Sessioni mercato',
+      <Storefront color="primary" />,
+    ),
   ]
 }
 
@@ -86,13 +95,13 @@ export function guestListItems(isXs: boolean, isAuthenticated: boolean) {
           listItem(
             'guest_profilo_1',
             `/formazione?isXs=${isXs}`,
-            'Inserisci formazione',
+            'Formazione',
             <FiberNew color="success" />,
           ),
           listItem(
             'guest_profilo_2',
             `/maglia`,
-            'Cambia maglia',
+            'Maglia',
             <AssignmentInd color="info" />,
           ),
           listItem(
@@ -101,8 +110,32 @@ export function guestListItems(isXs: boolean, isAuthenticated: boolean) {
             'Foto profilo',
             <Badge color="success" />,
           ),
+          listItem(
+            'guest_profilo_3',
+            '/profilo',
+            'Cambio password',
+            <Badge color="success" />,
+          ),
+          listItem(
+            'mercato_proposte',
+            '/mercato',
+            'Proposta di acquisto',
+            <Gavel color="success" />,
+          ),
+          listItem(
+            'mercato_sessioni',
+            '/sessioni-mercato',
+            'Sessioni di mercato',
+            <Storefront color="info" />,
+          ),
         ]
       : []),
+    listItem(
+      'guest_profilo_4b',
+      '/statistiche_squadre',
+      'Statistiche squadre',
+      <Groups color="error" />,
+    ),
     listItem(
       'guest_profilo_4',
       '/statistiche_giocatori',

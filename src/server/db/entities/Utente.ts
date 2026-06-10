@@ -1,5 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, type Relation, BaseEntity } from 'typeorm'
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  type Relation,
+  BaseEntity,
+} from 'typeorm'
 import { Trasferimento } from './Trasferimento'
+import { PropostaMercato } from './PropostaMercato'
 import { Classifica } from './Classifica'
 import { Formazione } from './Formazione'
 import { Partita } from './Partita'
@@ -12,7 +20,7 @@ export class Utente extends BaseEntity {
   @Column({ name: 'username', type: 'varchar', length: 50 })
   username!: string
 
-  @Column({ name: 'pwd', type: 'varchar', length: 50 })
+  @Column({ name: 'pwd', type: 'varchar', length: 100 })
   pwd!: string
 
   @Column({ name: 'admin_level', type: 'boolean', default: false })
@@ -30,16 +38,40 @@ export class Utente extends BaseEntity {
   @Column({ name: 'foto', type: 'varchar', length: 500, nullable: true })
   foto!: string | null
 
-  @Column({ name: 'importo_base', type: 'decimal', precision: 9, scale: 2, default: 100 })
+  @Column({
+    name: 'importo_base',
+    type: 'decimal',
+    precision: 9,
+    scale: 2,
+    default: 100,
+  })
   importoBase!: number
 
-  @Column({ name: 'importo_multe', type: 'decimal', precision: 9, scale: 2, default: 0 })
+  @Column({
+    name: 'importo_multe',
+    type: 'decimal',
+    precision: 9,
+    scale: 2,
+    default: 0,
+  })
   importoMulte!: number
 
-  @Column({ name: 'importo_mercato', type: 'decimal', precision: 9, scale: 2, default: 0 })
+  @Column({
+    name: 'importo_mercato',
+    type: 'decimal',
+    precision: 9,
+    scale: 2,
+    default: 0,
+  })
   importoMercato!: number
 
-  @Column({ name: 'fanta_milioni', type: 'decimal', precision: 9, scale: 2, default: 600 })
+  @Column({
+    name: 'fanta_milioni',
+    type: 'decimal',
+    precision: 9,
+    scale: 2,
+    default: 600,
+  })
   fantaMilioni!: number
 
   @Column({ name: 'campionato', type: 'smallint', default: 0 })
@@ -60,6 +92,12 @@ export class Utente extends BaseEntity {
   @Column({ name: 'maglia', type: 'varchar', length: 500, nullable: true })
   maglia!: string | null
 
+  @Column({ name: 'reset_token', type: 'varchar', length: 100, nullable: true })
+  resetToken!: string | null
+
+  @Column({ name: 'reset_token_expires_at', type: 'timestamp', nullable: true })
+  resetTokenExpiresAt!: Date | null
+
   @OneToMany(() => Classifica, (c: Classifica) => c.Utente)
   Classifiche!: Relation<Classifica[]>
 
@@ -71,7 +109,10 @@ export class Utente extends BaseEntity {
 
   @OneToMany(() => Partita, (p: Partita) => p.SquadraAway)
   PartiteAway!: Relation<Partita[]>
-  
+
   @OneToMany(() => Trasferimento, (t: Trasferimento) => t.Utente)
   Trasferimenti!: Relation<Trasferimento[]>
+
+  @OneToMany(() => PropostaMercato, (p: PropostaMercato) => p.Utente)
+  ProposteMercato!: Relation<PropostaMercato[]>
 }

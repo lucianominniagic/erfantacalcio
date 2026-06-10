@@ -38,7 +38,12 @@ export class Calendario extends BaseEntity {
   @Column({ name: 'has_da_recuperare', type: 'boolean', default: false })
   hasDaRecuperare!: boolean
 
-  @Column({ name: 'data', type: 'timestamptz', default: () => "CURRENT_TIMESTAMP", nullable: true })
+  @Column({
+    name: 'data',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+    nullable: true,
+  })
   data!: Date | null
 
   @Column({ name: 'girone', type: 'smallint', nullable: true })

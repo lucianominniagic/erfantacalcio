@@ -1,4 +1,4 @@
-export type GiocatoreType = {
+export interface GiocatoreType {
   idGiocatore: number
   nome: string
   nomeFantagazzetta: string | null
@@ -6,13 +6,13 @@ export type GiocatoreType = {
 }
 
 export interface iGiocatoreStats {
-  media: Number | null
-  mediabonus: Number | null
-  golfatti: Number | null
-  golsubiti: Number | null
-  assist: Number | null
-  ammonizioni: Number | null
-  espulsioni: Number | null
+  media: number | null
+  mediabonus: number | null
+  golfatti: number | null
+  golsubiti: number | null
+  assist: number | null
+  ammonizioni: number | null
+  espulsioni: number | null
   giocate: number | null
   ruolo: string | null
   nome: string
@@ -23,4 +23,3 @@ export interface iGiocatoreStats {
   squadra: string | null
   idSquadra: number | null
 }
-

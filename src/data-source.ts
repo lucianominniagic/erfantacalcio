@@ -33,6 +33,8 @@ export const AppDataSource = new DataSource({
     Entities.SerieA,
     Entities.Partite,
     Entities.Voti,
+    Entities.SessioniMercato,
+    Entities.ProposteMercato,
   ],
   namingStrategy: new NamingStrategy(),
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
@@ -52,14 +54,14 @@ try {
 } catch (error) {
   // If pg is not present or parser cannot be set, ignore silently.
   // This shouldn't happen in normal runtime.
-  // eslint-disable-next-line no-console
+   
   console.debug('pg.types.setTypeParser not applied:', error)
 }
 
 // Persist DataSource and initialization promise across module reloads (Next.js HMR)
 export const initializeDBConnection = async (): Promise<DataSource> => {
-    if (!AppDataSource.isInitialized) {
-        await AppDataSource.initialize();
-    }
-    return AppDataSource;
-};
+  if (!AppDataSource.isInitialized) {
+    await AppDataSource.initialize()
+  }
+  return AppDataSource
+}

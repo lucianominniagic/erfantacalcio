@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod'
 
 export const utenteSchema = z.object({
   id: z.number(),
@@ -15,6 +15,6 @@ export const utenteSchema = z.object({
 })
 
 export const loginFormSchema = z.object({
-  username: z.string().min(3).max(20),
+  username: z.string().email().or(z.string().min(3).max(20)),
   password: z.string().min(6),
 })

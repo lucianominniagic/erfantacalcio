@@ -1,4 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Unique, Index, type Relation, JoinColumn, BaseEntity } from 'typeorm'
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  Unique,
+  Index,
+  type Relation,
+  JoinColumn,
+  BaseEntity,
+} from 'typeorm'
 import { Formazione } from './Formazione'
 import { Calendario } from './Calendario'
 import { Giocatore } from './Giocatore'

@@ -1,12 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import React, { useEffect, useState } from 'react'
-import { api } from '~/utils/api'
+import React, { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import { Avatar, Box, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { getNomeTorneo } from '~/utils/helper'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
-import { autosizeOptions } from '~/utils/datatable'
+import { autosizeOptions, createSkeletonRows } from '~/utils/datatable'
 import { z } from 'zod'
 import { classificaSchema } from '~/schemas/classifica'
+import { MilitaryTech } from '@mui/icons-material'
 
 interface ClassificaProps {
   nomeTorneo: string
@@ -21,26 +22,19 @@ export default function Classifica({
 }: ClassificaProps) {
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
-
-  const classificaList = api.classifica.list.useQuery(
-    { idTorneo: idTorneo! },
-    {
+  const classificaList = useQuery(
+    orpc.classifica.list.queryOptions({
+      input: { idTorneo: idTorneo! },
       enabled: !!idTorneo,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
-    },
+    }),
   )
-  const [rows, setRows] = useState<z.infer<typeof classificaSchema>[]>([])
 
-  useEffect(() => {
-    if (
-      !classificaList.isFetching &&
-      classificaList.isSuccess &&
-      classificaList.data
-    ) {
-      setRows(classificaList.data)
-    }
-  }, [classificaList.data, classificaList.isSuccess, classificaList.isFetching])
+  const rows = useMemo<z.infer<typeof classificaSchema>[]>(
+    () => (classificaList.isSuccess ? (classificaList.data ?? []) : []),
+    [classificaList.data, classificaList.isSuccess],
+  )
 
   const columns: GridColDef[] = [
     { field: 'id', hideable: true },
@@ -49,16 +43,14 @@ export default function Classifica({
       type: 'string',
       align: 'left',
       renderHeader: () => <strong>Squadra</strong>,
-      flex: 1,
-      minWidth: 100,
+      flex: isXs ? 5 : 4,
     },
     {
       field: 'punti',
       type: 'number',
       align: 'right',
-      renderHeader: () => <strong>Punti</strong>,
+      renderHeader: () => <strong>{isXs ? 'P.' : 'Punti'}</strong>,
       flex: 1,
-      width: 80,
     },
     {
       field: 'golFatti',
@@ -66,7 +58,6 @@ export default function Classifica({
       align: 'right',
       renderHeader: () => <strong>Gol+</strong>,
       flex: 1,
-      width: 80,
     },
     {
       field: 'golSubiti',
@@ -74,22 +65,22 @@ export default function Classifica({
       align: 'right',
       renderHeader: () => <strong>Gol-</strong>,
       flex: 1,
-      width: 80,
     },
     {
       field: 'giocate',
       type: 'number',
       align: 'right',
-      renderHeader: () => <strong>Giocate</strong>,
+      renderHeader: () => <strong>{isXs ? 'G.' : 'Giocate'}</strong>,
       flex: 1,
-      width: 80,
     },
     {
       field: 'fantapunti',
       type: 'number',
       align: 'right',
-      renderHeader: () => <strong>Fantapunti</strong>,
-      width: 80,
+      renderHeader: () => <strong>{isXs ? 'FP.' : 'Fantapunti'}</strong>,
+      valueFormatter: (value: number) =>
+        value != null ? value.toFixed(2) : '',
+      flex: isXs ? 3 : 2,
     },
   ]
 
@@ -113,19 +104,25 @@ export default function Classifica({
 
   const pageSize = gruppo ? 8 : 4
 
-  const skeletonRows = Array.from({ length: pageSize }, (_, index) => ({
-    id: `skeleton-${index}`,
-  }))
+  const skeletonRows = createSkeletonRows(pageSize)
 
   return (
     <>
-      <Typography variant="h4">
-        Classifica {getNomeTorneo(nomeTorneo, gruppo)}
-      </Typography>
-      <Box sx={{ padding: '0', backgroundColor: '#fff' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+        <MilitaryTech sx={{ color: theme.palette.champions.main, fontSize: '1.4rem' }} />
+        <Typography variant="h5">Classifica {getNomeTorneo(nomeTorneo, gruppo)}</Typography>
+      </Box>
+      <Box
+        sx={{
+          borderRadius: '0 0 12px 12px',
+          overflow: 'hidden',
+          border: '1px solid rgba(255,193,7,0.12)',
+          borderTop: 'none',
+        }}
+      >
         <DataGrid
-          columnHeaderHeight={45}
-          rowHeight={40}
+          columnHeaderHeight={40}
+          rowHeight={36}
           loading={classificaList.isLoading}
           initialState={{
             columns: {
@@ -156,15 +153,10 @@ export default function Classifica({
           disableRowSelectionOnClick={true}
           autosizeOptions={autosizeOptions}
           sx={{
-            backgroundColor: '#fff',
-            '& .MuiDataGrid-columnHeader': {
-              color: theme.palette.primary.main,
-              backgroundColor: theme.palette.secondary.light,
-            },
+            borderRadius: '0 0 12px 12px',
           }}
         />
       </Box>
-      <br></br>
     </>
   )
 }

@@ -1,89 +1,93 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
-@Entity("stats_d", { schema: "public" })
+@Entity('stats_d', { schema: 'public' })
 export class StatsD extends BaseEntity {
-  @PrimaryGeneratedColumn({ type: "integer", name: "id", primaryKeyConstraintName: "PK_StatsD" })
-  id!: number;
+  @PrimaryGeneratedColumn({
+    type: 'integer',
+    name: 'id',
+    primaryKeyConstraintName: 'PK_StatsD',
+  })
+  id!: number
 
-  @Column("numeric", { name: "media", nullable: true, precision: 38, scale: 6 })
-  media?: string | null;
+  @Column('numeric', { name: 'media', nullable: true, precision: 38, scale: 6 })
+  media?: string | null
 
-  @Column("numeric", {
-    name: "mediabonus",
+  @Column('numeric', {
+    name: 'mediabonus',
     nullable: true,
     precision: 38,
     scale: 6,
   })
-  mediabonus?: string | null;
+  mediabonus?: string | null
 
-  @Column("numeric", {
-    name: "golfatti",
+  @Column('numeric', {
+    name: 'golfatti',
     nullable: true,
     precision: 38,
     scale: 6,
   })
-  golfatti?: string | null;
+  golfatti?: string | null
 
-  @Column("numeric", {
-    name: "golsubiti",
+  @Column('numeric', {
+    name: 'golsubiti',
     nullable: true,
     precision: 38,
     scale: 1,
   })
-  golsubiti?: string | null;
+  golsubiti?: string | null
 
-  @Column("numeric", {
-    name: "ammonizioni",
+  @Column('numeric', {
+    name: 'ammonizioni',
     nullable: true,
     precision: 38,
     scale: 6,
   })
-  ammonizioni?: string | null;
+  ammonizioni?: string | null
 
-  @Column("numeric", {
-    name: "espulsioni",
+  @Column('numeric', {
+    name: 'espulsioni',
     nullable: true,
     precision: 38,
     scale: 6,
   })
-  espulsioni?: string | null;
+  espulsioni?: string | null
 
-  @Column("numeric", {
-    name: "assist",
+  @Column('numeric', {
+    name: 'assist',
     nullable: true,
     precision: 38,
     scale: 1,
   })
-  assist?: string | null;
+  assist?: string | null
 
-  @Column("integer", { name: "giocate", nullable: true })
-  giocate?: number | null;
+  @Column('integer', { name: 'giocate', nullable: true })
+  giocate?: number | null
 
-  @Column("character varying", { name: "ruolo", length: 1 })
-  ruolo!: string;
+  @Column('character varying', { name: 'ruolo', length: 1 })
+  ruolo!: string
 
-  @Column("character varying", { name: "nome", length: 50 })
-  nome!: string;
+  @Column('character varying', { name: 'nome', length: 50 })
+  nome!: string
 
-  @Column("character varying", {
-    name: "nomefantagazzetta",
+  @Column('character varying', {
+    name: 'nomefantagazzetta',
     nullable: true,
     length: 500,
   })
-  nomefantagazzetta?: string | null;
+  nomefantagazzetta?: string | null
 
-  @Column("integer", { name: "idgiocatore" })
-  idgiocatore!: number;
+  @Column('integer', { name: 'idgiocatore' })
+  idgiocatore!: number
 
-  @Column("character varying", { name: "maglia", length: 50 })
-  maglia!: string;
+  @Column('character varying', { name: 'maglia', length: 50 })
+  maglia!: string
 
-  @Column("character varying", { name: "squadra_serie_a", length: 50 })
-  squadraSerieA!: string;
+  @Column('character varying', { name: 'squadra_serie_a', length: 50 })
+  squadraSerieA!: string
 
-  @Column("character varying", { name: "squadra", nullable: true, length: 50 })
-  squadra?: string | null;
+  @Column('character varying', { name: 'squadra', nullable: true, length: 50 })
+  squadra?: string | null
 
-  @Column("integer", { name: "id_squadra", nullable: true })
-  idSquadra?: number | null;
+  @Column('integer', { name: 'id_squadra', nullable: true })
+  idSquadra?: number | null
 }

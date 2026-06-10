@@ -1,5 +1,3 @@
-
-
 export function generateUniqueRandomNumbers(
   min: number,
   max: number,

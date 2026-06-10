@@ -1,33 +1,84 @@
+'use client'
 import { LoginForm } from './form'
-import Avatar from '@mui/material/Avatar'
-import CssBaseline from '@mui/material/CssBaseline'
 import Box from '@mui/material/Box'
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import Typography from '@mui/material/Typography'
 import Container from '@mui/material/Container'
+import { SportsSoccer } from '@mui/icons-material'
 import { Suspense } from 'react'
+import { alpha, useTheme } from '@mui/material/styles'
 
 export default function LoginPage() {
+  const theme = useTheme()
+
   return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Avatar sx={{ m: 1, bgcolor: 'info.dark' }}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography variant="h5" color="primary">
-          Sign in
-        </Typography>
-      </Box>
-      <Suspense fallback={<div>Loading...</div>}>
-        <LoginForm />
-      </Suspense>
-    </Container>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background:
+          'radial-gradient(ellipse at 50% 0%, rgba(255,193,7,0.06) 0%, transparent 70%)',
+      }}
+    >
+      <Container maxWidth="xs">
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            p: { xs: 3, sm: 4 },
+            borderRadius: '16px',
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
+            background:
+              'linear-gradient(160deg, rgba(26,18,8,0.95) 0%, rgba(22,22,31,0.98) 100%)',
+            backdropFilter: 'blur(16px)',
+            boxShadow: `0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px ${alpha(theme.palette.primary.main, 0.06)}`,
+          }}
+        >
+          {/* Logo */}
+          <Box
+            sx={{
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mb: 2,
+              boxShadow: `0 4px 16px ${alpha(theme.palette.primary.main, 0.25)}`,
+            }}
+          >
+            <SportsSoccer sx={{ color: theme.palette.background.default, fontSize: '1.75rem' }} />
+          </Box>
+
+          <Typography
+            variant="h1"
+            sx={{
+              fontSize: '1.5rem',
+              fontWeight: 700,
+              background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.light} 100%)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              mb: 0.5,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            erFantacalcio
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{ color: 'text.secondary', mb: 3, letterSpacing: '0.06em' }}
+          >
+            Accedi al tuo account
+          </Typography>
+
+          <Suspense fallback={<div>Loading...</div>}>
+            <LoginForm />
+          </Suspense>
+        </Box>
+      </Container>
+    </Box>
   )
 }

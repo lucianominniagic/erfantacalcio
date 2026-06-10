@@ -13,7 +13,8 @@ import {
   type PartitaAdminType,
   type GiornataAdminType,
 } from '~/types/risultati'
-import { api } from '~/utils/api'
+import { useMutation } from '@tanstack/react-query'
+import { orpc } from '~/utils/orpc'
 import dayjs from 'dayjs'
 import { tabellinoSchema } from '~/schemas/calendario'
 import { CardWithActions } from '~/components/cards'
@@ -26,7 +27,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
   const [risultati, setRisultati] = useState<PartitaAdminType[]>([])
   const [message, setMessage] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
-  const updateRisultati = api.risultati.update.useMutation()
+  const updateRisultati = useMutation(orpc.risultati.update.mutationOptions())
 
   useEffect(() => {
     if (giornata) {
@@ -57,7 +58,6 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
     })
 
     setRisultati(updatedResults)
-    //console.log(updatedResults);
   }
 
   const handleCheckboxChange = (
@@ -78,7 +78,6 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
     })
 
     setRisultati(updatedResults)
-    //console.log(updatedResults);
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -140,13 +139,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
       withPaper={false}
       contentSx={{ paddingBottom: '3px', paddingTop: '10px' }}
       actions={
-        <Button
-          type="submit"
-          fullWidth
-          color="info"
-          variant="contained"
-          sx={{ mt: 3, mb: 2 }}
-        >
+        <Button type="submit" variant="contained">
           Aggiorna dati
         </Button>
       }
@@ -155,12 +148,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
       {risultati.length > 0 ? (
         risultati.map((partita) => (
           <span key={`span_${partita.idPartita}`}>
-            <Stack
-              direction="row"
-              spacing={0}
-              justifyContent="space-between"
-              key={`infopartita_${partita.idPartita}`}
-            >
+            <Stack direction="row" spacing={0} justifyContent="space-between">
               <Typography variant="h5" component="div" color="text.secondary">
                 {partita.squadraHome} - {partita.squadraAway}
               </Typography>
@@ -168,11 +156,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
                 {partita.golHome} - {partita.golAway}
               </Typography>
             </Stack>
-            <Stack
-              direction="row"
-              spacing={0}
-              key={`multe_${partita.idPartita}`}
-            >
+            <Stack direction="row" spacing={0}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -216,12 +200,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
                 label="Escludi partita"
               />
             </Stack>
-            <Stack
-              direction="row"
-              spacing={0}
-              justifyContent="space-between"
-              key={`inputpartita_${partita.idPartita}`}
-            >
+            <Stack direction="row" spacing={0} justifyContent="space-between">
               <TextField
                 margin="normal"
                 size="small"
@@ -279,7 +258,7 @@ function CardPartiteAdmin({ giornata }: GiornataCardProps) {
                 }
               />
             </Stack>
-            <Divider key={`divider_${partita.idPartita}`}></Divider>
+            <Divider />
           </span>
         ))
       ) : (

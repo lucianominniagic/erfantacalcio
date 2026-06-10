@@ -3,3 +3,7 @@ export const autosizeOptions = {
   includeOutliers: true,
   expand: true,
 }
+
+export function createSkeletonRows(count: number): { id: string }[] {
+  return Array.from({ length: count }, (_, i) => ({ id: `skeleton-${i}` }))
+}

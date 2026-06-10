@@ -15,7 +15,6 @@ import { z } from 'zod'
 import { giornataSchema } from '~/schemas/calendario'
 import { GenericCard } from '~/components/cards'
 
-
 interface GiornataCardProps {
   prefixTitle: string
   giornata: z.infer<typeof giornataSchema>[]
@@ -66,10 +65,21 @@ export default function CardPartite({
                     container
                     spacing={0}
                     padding={1}
-                    key={`grid_${partita.idPartita}`}
+                    sx={{
+                      borderRadius: '8px',
+                      transition: 'background-color 0.15s ease',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255, 193, 7, 0.07)',
+                      },
+                    }}
                   >
                     {withAvatar && (
-                      <Grid item xs={!isXs ? 1 : 1.5} alignSelf={'center'} sx={{pr:1}}>
+                      <Grid
+                        item
+                        xs={!isXs ? 1 : 1.5}
+                        alignSelf={'center'}
+                        sx={{ pr: 1 }}
+                      >
                         <Avatar
                           alt={partita.squadraHome ?? ''}
                           src={partita.fotoHome ?? ''}
@@ -82,7 +92,7 @@ export default function CardPartite({
                       xs={withAvatar ? (!isXs ? 4 : 3.7) : 5}
                       alignSelf={'center'}
                     >
-                      <Typography variant="h6">
+                      <Typography variant="h6" sx={{ fontSize: '0.75rem' }}>
                         {partita.squadraHome}
                         {partita.multaHome ?? (
                           <Tooltip title="Multa">
@@ -108,7 +118,7 @@ export default function CardPartite({
                       paddingRight={2}
                       alignSelf={'center'}
                     >
-                      <Typography variant="h6">
+                      <Typography variant="h6" sx={{ fontSize: '0.75rem' }}>
                         {partita.squadraAway}
                         {partita.multaAway ?? (
                           <Tooltip title="Multa">
@@ -133,20 +143,16 @@ export default function CardPartite({
                         ></Avatar>
                       </Grid>
                     )}
-                    {/* <Grid item xs={12}>
-                      <Divider />
-                    </Grid> */}
                   </Grid>
                 </a>
               ))
             ) : (
-              <Grid container spacing={0} key={`grid_0`}>
+              <Grid container spacing={0}>
                 <Grid item xs={12}>
                   <Typography
                     variant="body2"
                     component="div"
                     color="text.secondary"
-                    key={`CardPartiteEmpty_${g.idCalendario}`}
                   >
                     Nessuna partita in programma
                   </Typography>

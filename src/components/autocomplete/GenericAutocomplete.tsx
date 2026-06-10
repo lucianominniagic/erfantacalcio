@@ -18,7 +18,10 @@ export interface GenericAutocompleteProps<T extends AutocompleteOption> {
   /** Array of items to display in the autocomplete */
   items: T[]
   /** Callback invoked when an item is selected or text is entered */
-  onItemSelected: (selectedId: T['id'] | undefined, inputValue: string | undefined) => void
+  onItemSelected: (
+    selectedId: T['id'] | undefined,
+    inputValue: string | undefined,
+  ) => void
   /** Label for the text field */
   label?: string
   /** Placeholder text */
@@ -47,6 +50,8 @@ export interface GenericAutocompleteProps<T extends AutocompleteOption> {
   defaultValue?: T | string | null
   /** Clear button visibility */
   disableClearable?: boolean
+  /** Callback invoked when the text input changes */
+  onInputChange?: (value: string) => void
 }
 
 export default function GenericAutocomplete<T extends AutocompleteOption>({
@@ -66,11 +71,19 @@ export default function GenericAutocomplete<T extends AutocompleteOption>({
   value,
   defaultValue,
   disableClearable = false,
+  onInputChange,
 }: GenericAutocompleteProps<T>) {
   const defaultFilterOptions = React.useCallback(
     (options: T[], params: FilterParams<T>) => {
-      const filtered = filter(options as AutocompleteOption[], params as any) as T[]
-      
+      const filtered = filter(
+        options,
+        // TODO: `filter` è creato con `createFilterOptions<AutocompleteOption>()` quindi
+        // il suo secondo param attende `FilterOptionsState<AutocompleteOption>` di MUI,
+        // che ha più campi rispetto al nostro `FilterParams<T>`. Il cast è necessario per
+        // compatibilità MUI finché non si allinea `FilterParams` a `FilterOptionsState`.
+        params as any,
+      ) as T[]
+
       if (
         allowCustomInput &&
         params.inputValue !== '' &&
@@ -84,7 +97,7 @@ export default function GenericAutocomplete<T extends AutocompleteOption>({
 
       return filtered
     },
-    [items, allowCustomInput]
+    [items, allowCustomInput],
   )
 
   const handleChange = React.useCallback(
@@ -92,7 +105,11 @@ export default function GenericAutocomplete<T extends AutocompleteOption>({
       if (typeof newValue === 'string') {
         // Free text input
         onItemSelected(undefined, newValue)
-      } else if (newValue && 'label' in newValue && (newValue.id === 0 || newValue.id === '0')) {
+      } else if (
+        newValue &&
+        'label' in newValue &&
+        (newValue.id === 0 || newValue.id === '0')
+      ) {
         // Custom input suggestion
         onItemSelected(undefined, newValue.label)
       } else if (newValue && 'id' in newValue && newValue.id) {
@@ -103,7 +120,7 @@ export default function GenericAutocomplete<T extends AutocompleteOption>({
         onItemSelected(undefined, undefined)
       }
     },
-    [onItemSelected]
+    [onItemSelected],
   )
 
   const getOptionLabel = React.useCallback((option: T | string) => {
@@ -129,6 +146,7 @@ export default function GenericAutocomplete<T extends AutocompleteOption>({
       value={value}
       defaultValue={defaultValue}
       disableClearable={disableClearable}
+      onInputChange={(_, value) => onInputChange?.(value)}
       sx={{ width, ...sx }}
       renderInput={(params) => (
         <TextField

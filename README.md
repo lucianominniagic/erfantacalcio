@@ -35,6 +35,7 @@
 ## 🛠️ Stack Tecnologico
 
 ### Frontend
+
 - **[Next.js 16.0.8](https://nextjs.org)** - Framework React con App Router e Turbopack
 - **[React 19.2.1](https://react.dev)** - Libreria per interfacce utente
 - **[TypeScript 5.8](https://www.typescriptlang.org/)** - Linguaggio tipizzato
@@ -43,6 +44,7 @@
 - **[MUI X Charts 8.21.0](https://mui.com/x/react-charts/)** - Grafici e visualizzazioni
 
 ### Backend
+
 - **[tRPC 11.7.2](https://trpc.io)** - API type-safe end-to-end
 - **[NextAuth.js 5.0.0-beta.30](https://next-auth.js.org)** - Sistema di autenticazione
 - **[TypeORM](https://typeorm.io)** - ORM per PostgreSQL
@@ -50,6 +52,7 @@
 - **[Zod](https://zod.dev/)** - Validazione e schema dei dati
 
 ### Utilità
+
 - **[TanStack Query 5.90.12](https://tanstack.com/query)** - Data fetching e caching
 - **[Day.js](https://day.js.org/)** - Manipolazione date
 - **[Lodash](https://lodash.com/)** - Utility functions
@@ -119,7 +122,7 @@ erfantacalcio/
 │   │   │   └── trpc.ts          # tRPC setup
 │   │   ├── db/                  # Database entities (TypeORM)
 │   │   │   └── entities/        # Entità database
-│   │   ├── auth.ts              # Configurazione NextAuth
+│   │   ├── auth.config.ts       # Configurazione NextAuth
 │   │   └── utils/               # Utility server-side
 │   ├── schemas/                 # Zod schemas per validazione
 │   │   ├── calendario/
@@ -208,7 +211,7 @@ npm run migration:run:local
 npm run dev
 ```
 
-L'applicazione sarà disponibile su `http://localhost:8080`
+L'applicazione sarà disponibile su `http://localhost:3001`
 
 ---
 
@@ -229,7 +232,7 @@ TYPEORM_LOGGING="true"
 
 # NextAuth
 NEXTAUTH_SECRET="your-secret-key"
-NEXTAUTH_URL="http://localhost:8080"
+NEXTAUTH_URL="http://localhost:3001"
 
 # Configurazione Stagione
 NEXT_PUBLIC_STAGIONE="2024-2025"
@@ -287,41 +290,48 @@ RESEND_API_KEY="your-resend-api-key"
 ### Area Amministrazione (Admin)
 
 #### 🏁 Avvio Stagione
+
 - Creazione nuova stagione
 - Importazione giocatori Serie A da CSV
 - Configurazione tornei
 - Assegnazione squadre ai presidenti
 
 #### 📅 Gestione Calendario
+
 - Generazione automatica calendario con algoritmo Berger
 - Gestione giornate e turni
 - Calendario andata e ritorno
 
 #### ⚽ Gestione Giocatori
+
 - CRUD completo giocatori
 - Importazione massiva da CSV
 - Aggiornamento statistiche
 - Gestione trasferimenti
 
 #### 👥 Gestione Presidenti
+
 - Creazione e gestione utenti
 - Assegnazione ruoli (Admin/Presidente)
 - Reset password
 - Gestione permessi
 
 #### 📊 Gestione Risultati
+
 - Inserimento risultati partite
 - Calcolo automatico punteggi
 - Aggiornamento classifiche
 - Gestione bonus/malus
 
 #### 📤 Upload Voti
+
 - Caricamento voti da file CSV
 - Upload file su Vercel Blob Storage
 - Validazione e parsing dati
 - Associazione automatica voti-giocatori
 
 #### ✏️ Gestione Voti
+
 - Modifica manuale voti
 - Correzione errori
 - Statistiche voti per giornata
@@ -330,65 +340,77 @@ RESEND_API_KEY="your-resend-api-key"
 ### Area Utente (Presidente)
 
 #### 🏠 Homepage
+
 - Classifica in tempo reale
 - Prossime partite
 - Risultati recenti
 - Squadre partecipanti
 
 #### 🏆 Albo d'Oro
+
 - Storico vincitori
 - Statistiche stagioni precedenti
 - Record e primati
 
 #### 📄 Documenti
+
 - Regolamento
 - Guide
 - Documentazione varia
 
 #### 💰 Economia
+
 - Budget disponibile
 - Storico trasferimenti
 - Saldo cassa
 - Multe e bonus
 
 #### 📋 Formazione
+
 - Creazione formazione settimanale
 - Drag & drop giocatori
 - Validazione modulo
 - Preview punteggio stimato
 
 #### 👀 Visualizza Formazioni
+
 - Formazioni di tutte le squadre
 - Confronto formazioni
 - Statistiche formazione
 
 #### 📸 Galleria Foto
+
 - Album fotografici
 - Upload immagini
 - Condivisione momenti
 
 #### 👕 Editor Maglia
+
 - Personalizzazione maglia squadra
 - Scelta colori
 - Preview in tempo reale
 
 #### 🏃 Rosa Squadra
+
 - Lista giocatori di proprietà
 - Statistiche individuali
 - Valori di mercato
 
 #### 📈 Statistiche Giocatore
+
 - Dettaglio prestazioni singolo giocatore
 - Grafici andamento
 - Storico voti
 
 #### 📊 Statistiche Giocatori
+
 - Classifica marcatori
 - Migliori/peggiori per ruolo
 - Medie voto
 - Presenze
 
 #### 📋 Tabellini
+
 - Dettaglio partite giocate
 - Formazioni utilizzate
 - Eventi partita (gol, assist, ammonizioni)
@@ -471,6 +493,7 @@ appRouter
 ### tRPC Procedures
 
 Ogni router espone procedure di tipo:
+
 - **query** - Lettura dati (GET-like)
 - **mutation** - Modifica dati (POST/PUT/DELETE-like)
 
@@ -503,9 +526,9 @@ export const updateGiocatore = adminProcedure
 ### Sviluppo
 
 ```bash
-npm run dev          # Avvia server sviluppo con Turbopack (porta 8080)
+npm run dev          # Avvia server sviluppo con Turbopack (porta 3001)
 npm run build        # Build ottimizzata per produzione
-npm start            # Avvia server produzione (porta 8080)
+npm start            # Avvia server produzione (porta 3001)
 npm run lint         # Lint del codice con ESLint
 npm run format       # Formattazione con Prettier
 ```
@@ -555,6 +578,7 @@ npm run migration:show:prod
 ## 👨‍💻 Autore
 
 **Luciano Minni**
+
 - GitHub: [@lukmin77](https://github.com/lukmin77)
 - Email: lucianominni@gmail.com
 
@@ -572,7 +596,67 @@ Questo è un progetto privato. Per suggerimenti o segnalazioni contattare l'auto
 
 ---
 
+## 👩‍💻 How to contribute
+
+### Setup locale
+
+```bash
+# 1. Clona il repository
+git clone https://github.com/lukmin77/erfantacalcio.git
+cd erfantacalcio
+
+# 2. Installa le dipendenze
+npm install
+
+# 3. Copia e configura le variabili d'ambiente
+cp .env.example .env
+# Modifica .env con i tuoi valori (DB, NextAuth, bonus, ecc.)
+
+# 4. Applica le migrations al DB locale
+npm run migration:run:local
+
+# 5. Avvia il server di sviluppo (Turbopack, porta 3001)
+npm run dev
+```
+
+L'app sarà disponibile su `http://localhost:3001`.
+
+### Workflow branch
+
+Usa una delle seguenti convenzioni per il nome del branch:
+
+| Tipo | Pattern | Esempio |
+|---|---|---|
+| Refactoring strutturato (fasi) | `refactor/fase-N` | `refactor/fase-8` |
+| Nuova feature | `feature/<nome-kebab>` | `feature/export-classifica` |
+| Bugfix | `fix/<nome-kebab>` | `fix/voto-null-portiere` |
+
+### Prima di aprire una PR
+
+Esegui questi controlli localmente e assicurati che passino tutti:
+
+```bash
+npm run build    # Build di produzione — deve completare senza errori
+npm run lint     # ESLint — zero errori, zero warning
+```
+
+> **Nota:** non esiste una suite di test automatizzati completa. Verifica manualmente
+> le funzionalità toccate dalla tua modifica prima di aprire la PR.
+
+### Documentazione di riferimento
+
+| Documento | Contenuto |
+|---|---|
+| [`CONTEXT.md`](CONTEXT.md) | Dominio, glossario, ruoli utente, struttura directory |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Request flow, scoring flow, routers tRPC, entità DB |
+| [`docs/ADR/`](docs/ADR/) | Decisioni architetturali (password hashing, tRPC, TypeORM, MUI) |
+| [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) | Tema MUI, palette token, convenzioni di stile |
+
+Leggi `CONTEXT.md` prima di iniziare: contiene il glossario di dominio indispensabile
+per capire variabili, procedure e commenti nel codice.
+
+---
+
 ## 📞 Supporto
 
 Per assistenza o domande, contattare l'amministratore del sistema.
-

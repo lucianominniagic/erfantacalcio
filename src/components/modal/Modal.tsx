@@ -6,7 +6,7 @@ import Fade from '@mui/material/Fade'
 import Typography from '@mui/material/Typography'
 import CloseIcon from '@mui/icons-material/Close'
 
-export type TransitionsModalType = {
+export interface TransitionsModalType {
   title: string
   open: boolean
   onClose?: () => void

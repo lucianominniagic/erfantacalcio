@@ -1,4 +1,4 @@
-export type trasferimentoType = {
+export interface trasferimentoType {
   idTrasferimento: number
   idGiocatore: number
   idSquadraSerieA: number | null
@@ -8,7 +8,7 @@ export type trasferimentoType = {
   dataCessione: Date | null
 }
 
-export type trasferimentoListType = {
+export interface trasferimentoListType {
   idTrasferimento: number
   nome: string
   ruolo: string

@@ -1,3 +1,4 @@
+import { alpha } from '@mui/material/styles'
 import type { Theme } from '@mui/material/styles'
 
 // ==============================|| OVERRIDES - BUTTON ||============================== //
@@ -5,7 +6,7 @@ import type { Theme } from '@mui/material/styles'
 export default function Button(theme: Theme) {
   const disabledStyle = {
     '&.Mui-disabled': {
-      backgroundColor: theme.palette.grey[200],
+      backgroundColor: theme.palette.grey[800],
     },
   }
 
@@ -16,13 +17,29 @@ export default function Button(theme: Theme) {
       },
       styleOverrides: {
         root: {
-          fontWeight: 400,
+          fontWeight: 600,
+          borderRadius: '8px',
+          letterSpacing: '0.02em',
         },
         contained: {
           ...disabledStyle,
         },
+        containedPrimary: {
+          background: `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+          color: theme.palette.background.default,
+          '&:hover': {
+            background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+          },
+        },
         outlined: {
           ...disabledStyle,
+        },
+        outlinedPrimary: {
+          borderColor: alpha(theme.palette.primary.main, 0.5),
+          '&:hover': {
+            borderColor: theme.palette.primary.main,
+            backgroundColor: theme.palette.action.hover,
+          },
         },
       },
     },

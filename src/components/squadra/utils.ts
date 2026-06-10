@@ -1,6 +1,8 @@
 import dayjs from 'dayjs'
+import { type z } from 'zod'
+import { type giornataSchema } from '~/schemas/calendario'
 import { type Moduli } from '~/types/common'
-import { type GiocatoreFormazioneType } from '~/types/squadre'
+import { type GiocatoreFormazioneType, type GiocatoreType } from '~/types/squadre'
 import {
   convertiStringaInRuolo,
   moduliList,
@@ -14,7 +16,7 @@ export const allowedFormations: number[] = [
 export function formatModulo(moduloStr: string): string {
   return moduloStr
     .substring(1)
-    .split('')
+    .split('-')
     .map((num) => parseInt(num, 10))
     .join('-')
 }
@@ -50,9 +52,10 @@ export const sortPlayersByRoleDescThenRiserva = (
   players: GiocatoreFormazioneType[],
 ) => {
   const playersSorted: GiocatoreFormazioneType[] = []
-  const ruoliUnici = [...new Set(players.map((player) => player.ruolo))]
+  // Ensure fixed order: P > D > C > A
+  const ruoliOrder = ['P', 'D', 'C', 'A']
 
-  ruoliUnici.forEach((ruolo) => {
+  ruoliOrder.forEach((ruolo) => {
     const playersForRuolo = players.filter((player) => player.ruolo === ruolo)
     const playersSortedForRuolo = playersForRuolo.sort((a, b) => {
       if (a.riserva === null && b.riserva === null) {
@@ -65,11 +68,15 @@ export const sortPlayersByRoleDescThenRiserva = (
       return a.riserva - b.riserva
     })
 
-    playersSortedForRuolo.forEach((player, index) => {
-      if (player.riserva !== null) {
-        player.riserva = index + 1
+    // Renumber riserva indices sequentially for non-null values (clone to avoid mutating query cache)
+    let riservaIndex = 0
+    playersSortedForRuolo.forEach((player) => {
+      const cloned = { ...player }
+      if (cloned.riserva !== null) {
+        riservaIndex += 1
+        cloned.riserva = riservaIndex
       }
-      playersSorted.push(player)
+      playersSorted.push(cloned)
     })
   })
 
@@ -93,49 +100,58 @@ function findModuloCompatibile(modulo: string): Moduli {
   return (
     moduliList.find((m) => {
       const [modD, modC, modA] = m.split('-').map(Number)
-      return D! <= modD! && C! <= modC! && A! <= modA!
+      return D <= modD && C <= modC && A <= modA
     }) ?? '3-4-3'
   )
 }
 
 export function checkDataFormazione(dataIso: string | undefined) {
-  return dayjs(dataIso).toDate() >= dayjs(new Date()).toDate()
+  // Parse ISO date strings directly to ensure consistent timezone handling
+  const targetDate = new Date(dataIso ?? new Date()).getTime()
+  const now = new Date().getTime()
+  return targetDate >= now
 }
 
+export function getOpponent(
+  giornata: z.infer<typeof giornataSchema>,
+  player: Pick<GiocatoreType, 'nomeSquadraSerieA'>,
+) {
+  if (!giornata?.SerieA) return null
 
-export function getOpponent(giornata: any, player: any) {
-  if (!giornata?.SerieA) return null;
-
-  const playerTeam = player.nomeSquadraSerieA?.toLowerCase();
+  const playerTeam = player.nomeSquadraSerieA?.toLowerCase()
 
   const match = giornata.SerieA.find(
-    (c: any) =>
+    (c) =>
       c.squadraHome?.toLowerCase().trim() === playerTeam ||
-      c.squadraAway?.toLowerCase().trim() === playerTeam
-  );
+      c.squadraAway?.toLowerCase().trim() === playerTeam,
+  )
 
-  if (!match) return '';
+  if (!match) return ''
 
   return match.squadraHome?.toLowerCase().trim() === playerTeam
     ? match.squadraAway.toLowerCase().trim()
-    : match.squadraHome.toUpperCase().trim();
+    : match.squadraHome.toUpperCase().trim()
 }
 
-export function getMatch(giornata: any, player: any, withSubstring: boolean) {
-  if (!giornata?.SerieA) return null;
+export function getMatch(
+  giornata: z.infer<typeof giornataSchema>,
+  player: Pick<GiocatoreType, 'nomeSquadraSerieA'>,
+  withSubstring: boolean,
+) {
+  if (!giornata?.SerieA) return null
 
-  const playerTeam = player.nomeSquadraSerieA?.toLowerCase();
+  const playerTeam = player.nomeSquadraSerieA?.toLowerCase()
 
   const match = giornata.SerieA.find(
-    (c: any) =>
+    (c) =>
       c.squadraHome?.toLowerCase().trim() === playerTeam ||
-      c.squadraAway?.toLowerCase().trim() === playerTeam
-  );
+      c.squadraAway?.toLowerCase().trim() === playerTeam,
+  )
 
-  if (!match) return '';
+  if (!match) return ''
 
   if (withSubstring)
-    return `${match.squadraHome?.trim().substring(0,3) ?? ''} - ${match.squadraAway?.trim().substring(0,3) ?? ''}`;
+    return `${match.squadraHome?.trim().substring(0, 3) ?? ''} - ${match.squadraAway?.trim().substring(0, 3) ?? ''}`
   else
-    return `${match.squadraHome?.trim() ?? ''} - ${match.squadraAway?.trim() ?? ''}`;
+    return `${match.squadraHome?.trim() ?? ''} - ${match.squadraAway?.trim() ?? ''}`
 }

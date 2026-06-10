@@ -16,7 +16,6 @@ export const calendarioSchema = z.object({
   isSelected: z.boolean().default(false),
 })
 
-
 export const tabellinoSchema = z.object({
   idPartita: z.number(),
   escludi: z.boolean(),
@@ -28,12 +27,11 @@ export const tabellinoSchema = z.object({
   multaAway: z.boolean(),
 })
 
-
 export const serieASchema = z.object({
-      giornata: z.number(),
-      squadraHome: z.string(),
-      squadraAway: z.string(),
-    })
+  giornata: z.number(),
+  squadraHome: z.string(),
+  squadraAway: z.string(),
+})
 
 export const giornataSchema = z.object({
   idCalendario: z.number(),
@@ -70,3 +68,10 @@ export const giornataSchema = z.object({
   SubTitle: z.string(),
   SerieA: z.array(serieASchema).optional(),
 })
+
+export const calendarioByGiornataSchema = z.object({
+  idTorneo: z.number(),
+  giornata: z.number(),
+})
+
+export type CalendarioByGiornataType = z.infer<typeof calendarioByGiornataSchema>

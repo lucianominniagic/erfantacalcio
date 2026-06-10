@@ -2,43 +2,64 @@ import type { ThemeOptions } from '@mui/material/styles'
 
 export const themeOptions: ThemeOptions = {
   palette: {
+    mode: 'dark',
     primary: {
-      light: 'rgb(42, 195, 201)',
-      main: 'rgb(43, 139, 143)',
-      dark: 'rgb(29, 80, 82)',
+      light: '#FFD54F',
+      main: '#FFC107',
+      dark: '#FF8F00',
     },
     secondary: {
-      light: 'rgb(253, 252, 173)',
-      main: 'rgb(253, 251, 94)',
-      dark: 'rgb(241, 237, 2)',
+      light: '#cfcfcf',
+      main: '#9e9e9e',
+      dark: '#707070',
     },
     info: {
-      light: 'rgb(199, 239, 255)',
-      main: 'rgb(101, 203, 243)',
-      dark: 'rgb(3, 126, 175)',
+      light: '#82b1ff',
+      main: '#448aff',
+      dark: '#2962ff',
     },
     success: {
-      light: 'rgb(12, 236, 79)',
-      main: 'rgb(8, 204, 67)',
-      dark: 'rgb(3, 148, 47)',
+      light: '#0cec4f',
+      main: '#08cc43',
+      dark: '#03942f',
     },
     error: {
-      light: 'rgb(248, 92, 92)',
-      main: 'rgb(241, 55, 55)',
-      dark: 'rgb(165, 27, 27)',
+      light: '#ff6f60',
+      main: '#e53935',
+      dark: '#ab000d',
     },
     warning: {
-      light: 'rgb(253, 252, 173)',
-      main: 'rgb(252, 206, 0)',
-      dark: 'rgb(241, 137, 2)',
+      light: '#ffe57f',
+      main: '#ffd740',
+      dark: '#c8a600',
+    },
+    background: {
+      default: '#0d0d14',
+      paper: '#16161f',
     },
     action: {
-      active: 'rgb(241, 137, 2)',
-      hover: 'rgb(194, 255, 212)',
+      active: '#FFC107',
+      hover: 'rgba(255, 193, 7, 0.08)',
     },
     text: {
-      primary: 'rgb(29, 80, 82)',
-      secondary: 'rgb(29, 80, 82)',
+      primary: '#f5f5f5',
+      secondary: '#bdbdbd',
+    },
+    divider: 'rgba(255, 193, 7, 0.12)',
+    champions: {
+      main: '#c084fc',
+      light: '#d8b4fe',
+      dark: '#9333ea',
+      contrastText: '#fff',
+    },
+    // ── Token semantici di dominio ────────────────────────────────────────────
+    // Colori ruolo giocatore: P=portiere, D=difensore, C=centrocampista, A=attaccante
+    // Usare sempre theme.palette.ruolo.X — mai hardcoded nei componenti.
+    ruolo: {
+      P: '#9e9e9e', // grigio neutro — portiere
+      D: '#448aff', // blu — difensore (allineato a info.main)
+      C: '#FFC107', // ambra brand — centrocampista (allineato a primary.main)
+      A: '#e53935', // rosso — attaccante (allineato a error.main)
     },
   },
   breakpoints: {
@@ -61,95 +82,98 @@ export const themeOptions: ThemeOptions = {
   typography: {
     htmlFontSize: 16,
     fontFamily: [
-      '"Segoe UI Emoji"',
-      '"Segoe UI"',
-      '"Segoe UI Symbol"',
+      '"Montserrat"',
       '-apple-system',
       'BlinkMacSystemFont',
+      '"Segoe UI"',
       'Roboto',
       '"Helvetica Neue"',
       'Arial',
       'sans-serif',
-      '"Apple Color Emoji"',
     ].join(','),
     fontWeightLight: 300,
     fontWeightRegular: 400,
     fontWeightMedium: 500,
-    fontWeightBold: 600,
+    fontWeightBold: 700,
     h1: {
-      color: 'rgb(252, 248, 10)',
-      fontWeight: 600,
+      color: '#f5f5f5',
+      fontWeight: 700,
       fontSize: '2.0rem',
       lineHeight: 1.21,
+      letterSpacing: '-0.02em',
     },
     h2: {
-      color: 'rgb(3, 126, 175)',
-      fontWeight: 600,
+      color: '#FFD54F',
+      fontWeight: 700,
       fontSize: '1.675rem',
       lineHeight: 1.27,
+      letterSpacing: '-0.01em',
     },
     h3: {
-      color: 'rgb(3, 126, 175)',
+      color: '#FFD54F',
       fontWeight: 600,
       fontSize: '1.4rem',
       lineHeight: 1.33,
     },
     h4: {
-      //titolo classifica
-      background: 'linear-gradient(to bottom, rgb(29, 80, 82), rgb(42, 195, 201))',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-      fontWeight: 600,
+      // titolo classifica — gold gradient
+      background: 'linear-gradient(135deg, #FF8F00 0%, #FFD54F 100%)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      fontWeight: 700,
       fontSize: '1.1rem',
       lineHeight: 1.4,
+      letterSpacing: '0.02em',
     },
     h5: {
-      //titolo card partite
-      color: 'rgb(3, 126, 175)',
+      // titolo card partite
+      color: '#FFD54F',
       fontWeight: 600,
       fontSize: '0.9rem',
       lineHeight: 1.5,
     },
     h6: {
-      color: 'rgb(3, 126, 175)',
+      color: '#bdbdbd',
       fontWeight: 400,
       fontSize: '0.875rem',
       lineHeight: 1.57,
     },
     caption: {
-      color: '',
+      color: '#9e9e9e',
       fontWeight: 400,
       fontSize: '0.75rem',
       lineHeight: 1.66,
     },
     body1: {
-      color: 'rgb(3, 126, 175)',
+      color: '#bdbdbd',
       fontSize: '0.75rem',
       lineHeight: 1.57,
     },
     body2: {
-      color: 'rgb(3, 126, 175)',
+      color: '#bdbdbd',
       fontSize: '0.75rem',
       lineHeight: 1.66,
     },
     subtitle1: {
-      color: 'rgb(3, 126, 175)',
+      color: '#cfcfcf',
       fontSize: '0.875rem',
       fontWeight: 600,
       lineHeight: 1.57,
     },
     subtitle2: {
-      color: 'rgb(3, 126, 175)',
+      color: '#9e9e9e',
       fontSize: '0.75rem',
       fontWeight: 500,
       lineHeight: 1.66,
     },
     overline: {
       lineHeight: 1.66,
+      letterSpacing: '0.08em',
     },
     button: {
       textTransform: 'capitalize',
-      fontSize: '0.975rem',
+      fontSize: '0.875rem',
+      fontWeight: 600,
     },
   },
 }

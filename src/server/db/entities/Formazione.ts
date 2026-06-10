@@ -25,7 +25,11 @@ export class Formazione extends BaseEntity {
   @Column({ name: 'id_partita', type: 'int' })
   idPartita!: number
 
-  @Column({ name: 'data_ora', type: 'timestamptz', default: () => "CURRENT_TIMESTAMP" })
+  @Column({
+    name: 'data_ora',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   dataOra!: Date
 
   @Column({ name: 'modulo', type: 'varchar', length: 5 })
