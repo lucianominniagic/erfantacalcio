@@ -12,14 +12,8 @@
     "experimentalDecorators": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "src/app",
-    "src/components",
-    "src/theme",
-    "src/styles",
-    "src/**/*.test.ts"
+  "include": [
+    "src/data-source.ts",
+    "src/server/db/**/*.ts"
   ]
 }
