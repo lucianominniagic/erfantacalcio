@@ -9,6 +9,7 @@ import {
   Stepper,
   Step,
   StepLabel,
+  StepContent,
 } from '@mui/material'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
@@ -31,22 +32,27 @@ export default function AvvioStagione() {
     {
       fase: 1,
       label: 'Chiusura stagione',
+      description: 'Chiudi la stagione in corso, chiudendo i trasferimenti di tutti i giocatori e generando lo storico statistiche',
     },
     {
       fase: 2,
       label: 'Prepara nuova stagione',
+      description: 'Prepara la nuova stagione, eliminando classifiche, voti, formazioni, partite e azzerando il calendario',
     },
     {
       fase: 3,
-      label: `Sorteggia calendario: Cambia la stagione! Stagione configurata: ${Configurazione.stagione}`,
+      label: `Sorteggio utenti: Cambia la stagione! Stagione configurata: ${Configurazione.stagione}`,
+      description: 'ATTENZIONE: prima di eseguire cambia la stagione! Crea nuovi utenti temporanei con ID maggiorati di 10, sorteggia nuovi ID squadra e aggiorna gli utenti con i nuovi ID',
     },
     {
       fase: 4,
       label: 'Crea partite',
+      description: 'Crea le partite per la nuova stagione, usando le tabelle di Berger',
     },
     {
       fase: 5,
       label: 'Crea classifiche',
+      description: 'Crea le classifiche per la nuova stagione, in base ai tornei configurati',
     },
   ]
   const [activeStep, setActiveStep] = useState(0)
@@ -120,10 +126,11 @@ export default function AvvioStagione() {
           <LoadingSpinner />
         </Box>
       ) : (
-        <Stepper activeStep={activeStep}>
+        <Stepper activeStep={activeStep} orientation="vertical">
           {steps.map((step) => (
             <Step key={`step_${step.fase}`}>
               <StepLabel>{step.label}</StepLabel>
+              <StepContent>{step.description}</StepContent>
             </Step>
           ))}
         </Stepper>

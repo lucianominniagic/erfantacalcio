@@ -20,11 +20,11 @@ export const preparaIdSquadreORPCProcedure = adminProcedure
 
         const promises = utenti.map(async (utente) => {
           const newIdUtente = utente.idUtente + startNewId
-          const username = utente.username + '_temp'
+          const temporaryUsername = utente.username + '_temp'
 
-          trx.create(Utenti, {
+          await trx.insert(Utenti, {
             idUtente: newIdUtente,
-            username: username,
+            username: temporaryUsername,
             pwd: utente.pwd,
             adminLevel: utente.adminLevel,
             presidente: utente.presidente,

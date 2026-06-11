@@ -3,7 +3,7 @@ import { Configurazione } from '~/config'
 import { chiudiTrasferimentoGiocatore } from '../../../utils/common'
 import { checkVotiUltimaGiornata, updateFase } from '../services/helpers'
 import { Trasferimenti } from '~/server/db/entities'
-import { IsNull } from 'typeorm'
+import { IsNull, Not } from 'typeorm'
 import _ from 'lodash'
 import { AppDataSource } from '~/data-source'
 import { messageSchema } from '~/schemas/messageSchema'
@@ -54,6 +54,8 @@ export const chiudiStagioneORPCProcedure = adminProcedure
           await Promise.all(promises)
 
           if (giocatoritrasferimenti.length < takeNum) {
+            await trx.delete(Trasferimenti, { idSquadra: Not(IsNull()), stagione: Configurazione.stagione })
+
             await updateFase(trx, 1)
             console.info(
               `Chiusura trasferimenti stagione ${Configurazione.stagione} completato`,
