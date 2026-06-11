@@ -1,11 +1,18 @@
 import { adminProcedure } from '~/server/orpc'
-import { generateUniqueRandomNumbers } from '~/utils/numberUtils'
 import { updateFase } from '../services/helpers'
 import { AppDataSource } from '~/data-source'
 import { Utenti } from '~/server/db/entities'
-import { MoreThan } from 'typeorm'
 import { Configurazione } from '~/config'
 import { messageSchema } from '~/schemas/messageSchema'
+
+function shuffle<T>(array: T[]): T[] {
+  const result = [...array]
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
 
 export const preparaIdSquadreORPCProcedure = adminProcedure
   .route({ method: 'POST', path: '/nuovastagione/preparaIdSquadre', summary: 'Sorteggia i nuovi ID squadra per la stagione' })
@@ -16,85 +23,48 @@ export const preparaIdSquadreORPCProcedure = adminProcedure
         const utenti = await trx.find(Utenti, {
           order: { idUtente: 'asc' },
         })
-        const startNewId = 10
 
-        const promises = utenti.map(async (utente) => {
-          const newIdUtente = utente.idUtente + startNewId
-          const temporaryUsername = utente.username + '_temp'
+        if (utenti.length === 0) {
+          throw new Error('Nessun utente da sorteggiare')
+        }
 
-          await trx.insert(Utenti, {
-            idUtente: newIdUtente,
-            username: temporaryUsername,
-            pwd: utente.pwd,
-            adminLevel: utente.adminLevel,
-            presidente: utente.presidente,
-            mail: utente.mail,
-            nomeSquadra: utente.nomeSquadra,
-            foto: utente.foto,
-            importoBase: Configurazione.importoQuotaAnnuale,
-            importoMulte: 0,
-            importoMercato: 0,
-            fantaMilioni: 600,
-            Campionato: utente.Campionato,
-            Champions: utente.Champions,
-            Secondo: utente.Secondo,
-            Terzo: utente.Terzo,
-            lockLevel: utente.lockLevel,
-            maglia: utente.maglia,
-          })
-        })
-        await Promise.all(promises)
-        console.info('creati nuovi utenti temporanei')
-
-        const uniqueRandomNumbers = generateUniqueRandomNumbers(
-          startNewId + 1,
-          startNewId + 8,
-          8,
+        const shuffledData = shuffle(utenti)
+        console.info(
+          'sorteggio nuove squadre:',
+          utenti.map((u, i) => `id ${u.idUtente} -> ${shuffledData[i].presidente}`),
         )
-        console.info('sorteggiati nuovi idutente', uniqueRandomNumbers)
 
-        for (let i = 0; i <= 7; i++) {
-          const user = await trx.findOne(Utenti, {
-            where: { idUtente: uniqueRandomNumbers[i] },
-          })
+        for (let i = 0; i < utenti.length; i++) {
+          const targetId = utenti[i].idUtente
+          const source = shuffledData[i]
+
           await trx.update(
             Utenti,
-            { idUtente: i + 1 },
+            { idUtente: targetId },
             {
-              username: `${user?.username.replace('_temp', '_new')}`,
-              adminLevel: user?.adminLevel,
-              lockLevel: user?.lockLevel,
-              mail: user?.mail,
-              nomeSquadra: user?.nomeSquadra,
-              presidente: user?.presidente,
-              foto: user?.foto,
-              pwd: user?.pwd,
-              Campionato: user?.Campionato,
-              Champions: user?.Champions,
-              fantaMilioni: user?.fantaMilioni,
-              importoBase: user?.importoBase,
-              importoMercato: user?.importoMercato,
-              importoMulte: user?.importoMulte,
-              Secondo: user?.Secondo,
-              Terzo: user?.Terzo,
-              maglia: user?.maglia,
+              username: source.username,
+              pwd: source.pwd,
+              adminLevel: source.adminLevel,
+              lockLevel: source.lockLevel,
+              presidente: source.presidente,
+              mail: source.mail,
+              nomeSquadra: source.nomeSquadra,
+              foto: source.foto,
+              maglia: source.maglia,
+              Campionato: source.Campionato,
+              Champions: source.Champions,
+              Secondo: source.Secondo,
+              Terzo: source.Terzo,
+              importoBase: Configurazione.importoQuotaAnnuale,
+              importoMulte: 0,
+              importoMercato: 0,
+              fantaMilioni: 600,
             },
           )
           console.info(
-            `aggiornato utente: ${i + 1} con utente estratto: ${uniqueRandomNumbers[i]}`,
+            `aggiornato utente id=${targetId} con dati di ${source.presidente}`,
           )
         }
-
-        await trx.delete(Utenti, { idUtente: MoreThan(8) })
-        console.info('eliminati utenti con idutente > 8')
-
-        await trx
-          .createQueryBuilder()
-          .update(Utenti)
-          .set({ username: () => "REPLACE(username, '_new', '')" })
-          .execute()
-
-        console.info('aggiornati usernames utenti')
 
         await updateFase(trx, 3)
       })
