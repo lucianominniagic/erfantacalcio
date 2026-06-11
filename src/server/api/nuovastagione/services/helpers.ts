@@ -134,8 +134,9 @@ export async function creaPartiteEmpty(
     throw new Error('Impossibile creare partite vuote, calendario non trovato')
   }
   for (let i = 0; i < partite; i++) {
+    const calendarioRow = calendario[i % calendario.length]
     await trx.insert(Partite, {
-      idCalendario: calendario.pop()?.idCalendario!,
+      idCalendario: calendarioRow.idCalendario,
       idSquadraH: null,
       idSquadraA: null,
       fattoreCasalingo,
