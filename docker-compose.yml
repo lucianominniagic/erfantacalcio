@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: pg-docker
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Admin123!
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+    external: true
+    name: "51f6d1a92309039d11e8b09230e49a775950463c70001a6b80854330624d4a5c"

@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001",
+    "dev": "node scripts/start-db.js && next dev -p 3001",
+    "db:start": "node scripts/start-db.js",
+    "db:stop": "docker stop pg-docker",
     "build": "next build",
     "start": "next start -p 3001",
     "lint": "eslint .",
