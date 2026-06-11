@@ -47,7 +47,7 @@ export default function AvvioStagione() {
     {
       fase: 4,
       label: 'Crea partite',
-      description: 'Crea le partite per la nuova stagione, usando le tabelle di Berger',
+      description: 'Prima di eseguire questo step esegui un nuovo login! Crea le partite per la nuova stagione, usando le tabelle di Berger',
     },
     {
       fase: 5,
