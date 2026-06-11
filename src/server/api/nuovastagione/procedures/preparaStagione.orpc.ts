@@ -50,26 +50,26 @@ export const preparaStagioneORPCProcedure = adminProcedure
         }
       } else {
         await AppDataSource.transaction(async (trx) => {
-          trx.deleteAll(Classifiche)
-          trx.deleteAll(Voti)
-          trx.deleteAll(Formazioni)
-          trx.deleteAll(Partite)
-          trx.update(
-            Calendario,
-            {},
-            {
+          await trx.createQueryBuilder().delete().from(Classifiche).execute()
+          await trx.createQueryBuilder().delete().from(Voti).execute()
+          await trx.createQueryBuilder().delete().from(Formazioni).execute()
+          await trx.createQueryBuilder().delete().from(Partite).execute()
+          await trx
+            .createQueryBuilder()
+            .update(Calendario)
+            .set({
               hasGiocata: false,
               data: toUtcDate(new Date()),
               dataFine: toUtcDate(new Date()),
-            },
-          )
+            })
+            .execute()
 
           await updateFase(trx, 2)
         })
 
         // Cleanup dati mercato della stagione precedente
-        await ProposteMercato.delete({})
-        await SessioniMercato.delete({})
+        await ProposteMercato.createQueryBuilder().delete().execute()
+        await SessioniMercato.createQueryBuilder().delete().execute()
 
         console.info(
           `Azzeramento dati della scorsa stagione ${Configurazione.stagione}`,
