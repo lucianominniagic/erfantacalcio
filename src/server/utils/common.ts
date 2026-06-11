@@ -21,7 +21,6 @@ import {
   MoreThan,
   LessThan,
 } from 'typeorm'
-import _ from 'lodash'
 
 export async function chiudiTrasferimentoGiocatore(
   trx: EntityManager,
@@ -51,32 +50,41 @@ export async function chiudiTrasferimentoGiocatore(
         'dati ultimo trasferimento idgiocatore: ' + idGiocatore,
         oldTrasferimento,
       )
-      //cerca i voti nel periodo dall'ultima data di acuisto ad oggi
-      let voti = await trx.find(Voti, {
+      //cerca i voti nel periodo dall'ultima data di acquisto ad oggi
+      const votiTutti = await trx.find(Voti, {
         select: {
+          idVoto: true,
           voto: true,
           gol: true,
           assist: true,
           Calendario: {
+            idCalendario: true,
             giornataSerieA: true,
           },
         },
         relations: {
           Calendario: true,
-          Giocatore: { Trasferimenti: true },
         },
-        // distinct: ['voto', 'gol', 'assist'],
         where: {
           idGiocatore: idGiocatore,
           Calendario: {
-            data: Between(toUtcDate(new Date()), oldTrasferimento.dataAcquisto),
+            data: Between(oldTrasferimento.dataAcquisto, toUtcDate(new Date())),
           },
           voto: MoreThan(0),
-          Giocatore: { Trasferimenti: { dataCessione: IsNull() } },
         },
       })
 
-      voti = _.uniqBy(voti, (v) => ['voto', 'gol', 'assist'])
+      // Dedup per giornataSerieA: un giocatore può essere schierato in più
+      // partite (es. campionato + champions) nella stessa giornata di serie A,
+      // ma il voto/gol/assist reale è uno solo per quella giornata.
+      const votiPerGiornata = new Map<number, (typeof votiTutti)[number]>()
+      for (const v of votiTutti) {
+        const giornata = v.Calendario.giornataSerieA
+        if (!votiPerGiornata.has(giornata)) {
+          votiPerGiornata.set(giornata, v)
+        }
+      }
+      const voti = Array.from(votiPerGiornata.values())
 
       if (voti.length > 0) {
         console.debug(
@@ -89,10 +97,9 @@ export async function chiudiTrasferimentoGiocatore(
             acc.mediaVoto += curr.voto ?? 0
             acc.golTotali += curr.gol ?? 0
             acc.assistTotali += curr.assist ?? 0
-            acc.giocate = voti.length
             return acc
           },
-          { mediaVoto: 0, golTotali: 0, assistTotali: 0, giocate: 0 },
+          { mediaVoto: 0, golTotali: 0, assistTotali: 0, giocate: voti.length },
         )
         oldStatistica.mediaVoto = oldStatistica.mediaVoto / voti.length
         oldStatistica.golTotali =
@@ -119,8 +126,8 @@ export async function chiudiTrasferimentoGiocatore(
             nomeSquadraSerieA: oldTrasferimento.SquadraSerieA?.nome,
             nomeSquadra: oldTrasferimento.Utente?.nomeSquadra,
             media: oldStatistica.mediaVoto,
-            gol: oldStatistica.golTotali,
-            assist: oldStatistica.assistTotali,
+            gol: Math.round(oldStatistica.golTotali),
+            assist: Math.round(oldStatistica.assistTotali),
             giocate: oldStatistica.giocate,
             idSquadra: chiusuraStagione
               ? null
