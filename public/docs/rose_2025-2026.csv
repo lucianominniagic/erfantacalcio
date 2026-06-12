@@ -1,0 +1,201 @@
+"nome_squadra","nome","ruolo","serie_a","costo"
+"Cattivo Dentro","SKORUPSKI L.","P","Bologna",26
+"Cattivo Dentro","SUZUKI Z.","P","Parma",1
+"Cattivo Dentro","RAVAGLIA F.","P","Bologna",1
+"Cattivo Dentro","DI LORENZO G.","D","Napoli",45
+"Cattivo Dentro","CAMBIASO A.","D","Juventus",23
+"Cattivo Dentro","PAVLOVIC S.","D","Milan",22
+"Cattivo Dentro","OSTIGARD L.","D","Genoa",12
+"Cattivo Dentro","CARLOS AUGUSTO","D","Inter",12
+"Cattivo Dentro","DODO","D","Fiorentina",10
+"Cattivo Dentro","HIEN I.","D","Atalanta",9
+"Cattivo Dentro","CELIK Z.","D","Roma",1
+"Cattivo Dentro","DA CUNHA L.","C","Como",21
+"Cattivo Dentro","SUCIC P.","C","Inter",20
+"Cattivo Dentro","ROVELLA N.","C","Lazio",5
+"Cattivo Dentro","MCKENNIE W.","C","Juventus",5
+"Cattivo Dentro","ZARAGOZA B.","C","Roma",1
+"Cattivo Dentro","BALDANZI T.","C","Genoa",1
+"Cattivo Dentro","EKKELENKAMP J.","C","Udinese",1
+"Cattivo Dentro","GRONBAEK A.","C","Genoa",1
+"Cattivo Dentro","HOJLUND R.","A","Napoli",180
+"Cattivo Dentro","FERGUSON E.","A","Roma",80
+"Cattivo Dentro","PINAMONTI A.","A","Sassuolo",40
+"Cattivo Dentro","SIMEONE G.","A","Torino",25
+"Cattivo Dentro","GUDMUNDSSON A.","A","Fiorentina",5
+"Cattivo Dentro","CHEDDIRA W.","A","Lecce",1
+"Er Gelataro","MERET A.","P","Napoli",55
+"Er Gelataro","DI GREGORIO M.","P","Juventus",55
+"Er Gelataro","MILINKOVIC V.","P","Napoli",20
+"Er Gelataro","BELLANOVA R.","D","Atalanta",25
+"Er Gelataro","OLIVERA M.","D","Napoli",15
+"Er Gelataro","BUONGIORNO A.","D","Napoli",11
+"Er Gelataro","RAMON J.","D","Como",10
+"Er Gelataro","KRISTENSEN T.","D","Udinese",4
+"Er Gelataro","ESTUPINAN P.","D","Milan",4
+"Er Gelataro","CUADRADO J.","D","Pisa",3
+"Er Gelataro","DE WINTER K.","D","Milan",1
+"Er Gelataro","TAYLOR K.","C","Lazio",130
+"Er Gelataro","BATURINA M.","C","Como",47
+"Er Gelataro","MODRIC L.","C","Milan",41
+"Er Gelataro","LOCATELLI M.","C","Juventus",31
+"Er Gelataro","LOBOTKA S.","C","Napoli",14
+"Er Gelataro","THORSTVEDT K.","C","Sassuolo",8
+"Er Gelataro","BERNABE A.","C","Parma",8
+"Er Gelataro","FERGUSON L.","C","Bologna",4
+"Er Gelataro","VLAHOVIC D.","A","Juventus",115
+"Er Gelataro","ORBAN G.","A","Verona",100
+"Er Gelataro","DAVID J.","A","Juventus",76
+"Er Gelataro","NKUNKU C.","A","Milan",41
+"Er Gelataro","ORSOLINI R.","A","Bologna",28
+"Er Gelataro","BONAZZOLI F.","A","Cremonese",3
+"FC Bombolo","MAIGNAN M.","P","Milan",56
+"FC Bombolo","SOMMER Y.","P","Inter",25
+"FC Bombolo","CAPRILE E.","P","Cagliari",1
+"FC Bombolo","PALESTRA M.","D","Cagliari",32
+"FC Bombolo","BEUKEMA S.","D","Napoli",11
+"FC Bombolo","MARTIN A.","D","Genoa",10
+"FC Bombolo","ZORTEA N.","D","Bologna",10
+"FC Bombolo","KELLY L.","D","Juventus",2
+"FC Bombolo","GILA M.","D","Lazio",2
+"FC Bombolo","LUIS HENRIQUE","D","Inter",1
+"FC Bombolo","KEMPF M.","D","Como",1
+"FC Bombolo","NERES D.","C","Napoli",70
+"FC Bombolo","THURAM K.","C","Juventus",50
+"FC Bombolo","PASALIC M.","C","Atalanta",35
+"FC Bombolo","VERGARA A.","C","Napoli",13
+"FC Bombolo","SAELEMAEKERS A.","C","Milan",12
+"FC Bombolo","ILKHAN E.","C","Torino",1
+"FC Bombolo","ZALEWSKI N.","C","Atalanta",1
+"FC Bombolo","PERRONE M.","C","Como",1
+"FC Bombolo","RASPADORI G.","A","Atalanta",175
+"FC Bombolo","LEAO R.","A","Milan",115
+"FC Bombolo","ZACCAGNI M.","A","Lazio",40
+"FC Bombolo","CASTRO S.","A","Bologna",35
+"FC Bombolo","KRSTOVIC N.","A","Atalanta",25
+"FC Bombolo","POLITANO M.","A","Napoli",1
+"MC Boys","BIJLOW J.","P","Genoa",1
+"MC Boys","PALEARI A.","P","Torino",1
+"MC Boys","MURIC A.","P","Sassuolo",1
+"MC Boys","SOLET O.","D","Udinese",11
+"MC Boys","VALERI E.","D","Parma",10
+"MC Boys","MIRANDA J.","D","Bologna",7
+"MC Boys","TOMORI F.","D","Milan",2
+"MC Boys","LAZARO V.","D","Torino",1
+"MC Boys","ANGORI S.","D","Pisa",1
+"MC Boys","GABBIA M.","D","Milan",1
+"MC Boys","MARUSIC A.","D","Lazio",1
+"MC Boys","MCTOMINAY S.","C","Napoli",100
+"MC Boys","MALDINI D.","C","Lazio",55
+"MC Boys","RABIOT A.","C","Milan",45
+"MC Boys","VLASIC N.","C","Torino",36
+"MC Boys","KONE I.","C","Sassuolo",20
+"MC Boys","KARLSTROM J.","C","Udinese",8
+"MC Boys","TOURE ID.","C","Pisa",2
+"MC Boys","FAGIOLI N.","C","Fiorentina",1
+"MC Boys","KEAN M.","A","Fiorentina",195
+"MC Boys","MORATA A.","A","Como",25
+"MC Boys","RATKOV P.","A","Lazio",15
+"MC Boys","VARDY J.","A","Cremonese",2
+"MC Boys","ESPOSITO S.","A","Cagliari",1
+"MC Boys","DOUVIKAS T.","A","Como",1
+"Mocks United","DE GEA D.","P","Fiorentina",38
+"Mocks United","SCUFFET S.","P","Pisa",1
+"Mocks United","FALCONE W.","P","Lecce",1
+"Mocks United","BASTONI A.","D","Inter",28
+"Mocks United","ZAPPACOSTA D.","D","Atalanta",7
+"Mocks United","BIRAGHI C.","D","Torino",5
+"Mocks United","SCALVINI G.","D","Atalanta",4
+"Mocks United","DARMIAN M.","D","Inter",3
+"Mocks United","CASALE N.","D","Bologna",1
+"Mocks United","VOJVODA M.","D","Como",1
+"Mocks United","RUGANI D.","D","Juventus",1
+"Mocks United","CALHANOGLU H.","C","Inter",87
+"Mocks United","FRATTESI D.","C","Inter",50
+"Mocks United","EDERSON","C","Atalanta",21
+"Mocks United","BERNARDESCHI F.","C","Bologna",13
+"Mocks United","DE ROON M.","C","Atalanta",12
+"Mocks United","POBEGA T.","C","Bologna",5
+"Mocks United","KOSTIC F.","C","Juventus",1
+"Mocks United","SULEMANA K.","C","Cagliari",0
+"Mocks United","DYBALA P.","A","Roma",103
+"Mocks United","MALEN D.","A","Roma",96
+"Mocks United","ADAMS C.","A","Torino",70
+"Mocks United","SCAMACCA G.","A","Atalanta",31
+"Mocks United","LUKAKU R.","A","Napoli",28
+"Mocks United","CAMBIAGHI N.","A","Bologna",1
+"Odio Bombolo","PROVEDEL I.","P","Lazio",36
+"Odio Bombolo","FURLANETTO A.","P","Lazio",1
+"Odio Bombolo","MOTTA E.","P","Lazio",1
+"Odio Bombolo","DIMARCO F.","D","Inter",33
+"Odio Bombolo","BREMER G.","D","Juventus",31
+"Odio Bombolo","NUNO TAVARES","D","Lazio",13
+"Odio Bombolo","DEL PRATO E.","D","Parma",4
+"Odio Bombolo","MINA Y.","D","Cagliari",4
+"Odio Bombolo","ROMAGNOLI A.","D","Lazio",2
+"Odio Bombolo","ACERBI F.","D","Inter",1
+"Odio Bombolo","NORTON-CUFFY B.","D","Genoa",1
+"Odio Bombolo","ZIELINSKI P.","C","Inter",102
+"Odio Bombolo","DE BRUYNE K.","C","Napoli",71
+"Odio Bombolo","BARELLA N.","C","Inter",51
+"Odio Bombolo","MIRETTI F.","C","Juventus",31
+"Odio Bombolo","MKHITARYAN H.","C","Inter",6
+"Odio Bombolo","BRESCIANINI M.","C","Fiorentina",1
+"Odio Bombolo","FOFANA Y.","C","Milan",1
+"Odio Bombolo","RICCI S.","C","Milan",1
+"Odio Bombolo","MARTINEZ L.","A","Inter",221
+"Odio Bombolo","BERARDI D.","A","Sassuolo",2
+"Odio Bombolo","ESPOSITO F.","A","Inter",2
+"Odio Bombolo","DIA B.","A","Lazio",1
+"Odio Bombolo","COLOMBO L.","A","Genoa",1
+"Odio Bombolo","PEDRO","A","Lazio",1
+"Romulea","BUTEZ J.","P","Como",23
+"Romulea","AUDERO E.","P","Cremonese",1
+"Romulea","CAVLINA N.","P","Como",1
+"Romulea","DUMFRIES D.","D","Inter",24
+"Romulea","GOSENS ROBIN","D","Fiorentina",21
+"Romulea","WESLEY","D","Roma",13
+"Romulea","NDICKA E.","D","Roma",9
+"Romulea","BISSECK Y.","D","Inter",9
+"Romulea","SPINAZZOLA L.","D","Napoli",4
+"Romulea","AKANJI M.","D","Inter",3
+"Romulea","DJIMSITI B.","D","Atalanta",1
+"Romulea","PAZ N.","C","Como",112
+"Romulea","ANGUISSA A.","C","Napoli",43
+"Romulea","STREFEZZA G.","C","Parma",21
+"Romulea","KONE M.","C","Roma",21
+"Romulea","MANDRAGORA R.","C","Fiorentina",9
+"Romulea","TRAMONI M.","C","Pisa",5
+"Romulea","ATTA A.","C","Udinese",4
+"Romulea","ELMAS E.","C","Napoli",1
+"Romulea","THURAM M.","A","Inter",173
+"Romulea","SOULE M.","A","Roma",56
+"Romulea","DAVIS K.","A","Udinese",29
+"Romulea","PELLEGRINO M.","A","Parma",12
+"Romulea","BONNY A.","A","Inter",7
+"Romulea","KILICSOY S.","A","Cagliari",1
+"Talent mosció","SVILAR M.","P","Roma",38
+"Talent mosció","CARNESECCHI M.","P","Atalanta",21
+"Talent mosció","SAVA R.","P","Udinese",1
+"Talent mosció","BARTESAGHI D.","D","Milan",28
+"Talent mosció","ANGELINO J.","D","Roma",21
+"Talent mosció","MANCINI G.","D","Roma",11
+"Talent mosció","RRAHMANI A.","D","Napoli",10
+"Talent mosció","GUTIERREZ M.","D","Napoli",8
+"Talent mosció","KALULU P.","D","Juventus",5
+"Talent mosció","HERMOSO M.","D","Roma",1
+"Talent mosció","BASCHIROTTO F.","D","Cremonese",1
+"Talent mosció","ZANIOLO N.","C","Udinese",95
+"Talent mosció","KOOPMEINERS T.","C","Juventus",75
+"Talent mosció","LOFTUS-CHEEK R.","C","Milan",41
+"Talent mosció","MALINOVSKYI R.","C","Genoa",10
+"Talent mosció","JASHARI A.","C","Milan",4
+"Talent mosció","CONCEICAO F.","C","Juventus",1
+"Talent mosció","CRISTANTE B.","C","Roma",1
+"Talent mosció","PELLEGRINI LO.","C","Roma",1
+"Talent mosció","YILDIZ K.","A","Juventus",92
+"Talent mosció","PULISIC C.","A","Milan",81
+"Talent mosció","FULLKRUG N.","A","Milan",45
+"Talent mosció","DE KETELAERE C.","A","Atalanta",35
+"Talent mosció","RODRIGUEZ J.","A","Como",11
+"Talent mosció","KUHN N.","A","Como",2
