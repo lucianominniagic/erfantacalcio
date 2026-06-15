@@ -20,6 +20,7 @@ export const listSessioniORPCProcedure = adminProcedure
       dataApertura: s.dataApertura,
       dataChiusura: s.dataChiusura,
       maxProposte: s.maxProposte,
+      acquistiEffettivi: s.acquistiEffettivi,
       tipoValuta: s.tipoValuta,
       stato: calcolaStato(s, now),
     }))

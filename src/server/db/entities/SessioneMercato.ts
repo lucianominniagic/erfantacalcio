@@ -22,6 +22,9 @@ export class SessioneMercato extends BaseEntity {
   @Column({ name: 'max_proposte', type: 'smallint' })
   maxProposte!: number
 
+  @Column({ name: 'acquisti_effettivi', type: 'smallint' })
+  acquistiEffettivi!: number
+
   @Column({
     name: 'tipo_valuta',
     type: 'varchar',

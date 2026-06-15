@@ -12,6 +12,8 @@ const mockEntityManager = {
   create: vi.fn(),
   update: vi.fn(),
   delete: vi.fn(),
+  decrement: vi.fn(),
+  increment: vi.fn(),
 } as unknown as EntityManager
 
 vi.mock('~/data-source', () => ({
@@ -62,7 +64,7 @@ vi.mock('~/schemas/mercato', () => ({
 }))
 
 // Import AFTER mocks are defined
-import { createProposta, deleteProposta, getSessioneAttiva, getSessioniMercato, getMieProposte, getGiocatoriSvincolati } from './mercatoService'
+import { createProposta, deleteProposta, getSessioneAttiva, getSessioniMercato, getMieProposte, getGiocatoriSvincolati, riordinaProposte } from './mercatoService'
 
 import { SessioneMercato, PropostaMercato, Trasferimento, Utente } from '~/server/db/entities'
 
@@ -279,7 +281,7 @@ describe('createProposta', () => {
     )
     vi.mocked(Utente.findOne).mockResolvedValue(utente as any)
     vi.mocked(PropostaMercato.find).mockResolvedValue([
-      makePropostaMercato({ idSquadra: 1, prezzoOfferto: 80, deletedAt: null }), // Already spent 80
+      makePropostaMercato({ idSquadra: 1, prezzoOfferto: 80, deletedAt: null }) as any, // Already spent 80
     ])
 
     const input = {
@@ -304,10 +306,13 @@ describe('createProposta', () => {
     )
     vi.mocked(Utente.findOne).mockResolvedValue(utente as any)
     vi.mocked(PropostaMercato.find).mockResolvedValue([
-      makePropostaMercato({ idSquadra: 1, prezzoOfferto: 100, deletedAt: null }),
+      makePropostaMercato({ idSquadra: 1, prezzoOfferto: 100, deletedAt: null }) as any,
     ])
     vi.mocked(PropostaMercato.create).mockReturnValue(makePropostaMercato() as any)
     vi.mocked(PropostaMercato.save).mockResolvedValue(makePropostaMercato() as any)
+    vi.mocked(mockEntityManager.find).mockResolvedValue([])
+    vi.mocked(mockEntityManager.create).mockReturnValue(makePropostaMercato() as any)
+    vi.mocked(mockEntityManager.save).mockResolvedValue(makePropostaMercato() as any)
 
     const input = {
       idGiocatore: 100,
@@ -333,6 +338,9 @@ describe('createProposta', () => {
     vi.mocked(PropostaMercato.find).mockResolvedValue([]) // No existing proposte
     vi.mocked(PropostaMercato.create).mockReturnValue(makePropostaMercato() as any)
     vi.mocked(PropostaMercato.save).mockResolvedValue(makePropostaMercato() as any)
+    vi.mocked(mockEntityManager.find).mockResolvedValue([])
+    vi.mocked(mockEntityManager.create).mockReturnValue(makePropostaMercato() as any)
+    vi.mocked(mockEntityManager.save).mockResolvedValue(makePropostaMercato() as any)
 
     const input = {
       idGiocatore: 100,
@@ -414,6 +422,11 @@ describe('deleteProposta', () => {
       ...proposta,
       deletedAt: new Date(),
     } as any)
+    vi.mocked(mockEntityManager.save).mockResolvedValue({
+      ...proposta,
+      deletedAt: new Date(),
+    } as any)
+    vi.mocked(mockEntityManager.decrement).mockResolvedValue({ affected: 0 } as any)
 
     const input = {
       idProposta: 1,
@@ -707,5 +720,209 @@ describe('getGiocatoriSvincolati', () => {
         relations: expect.objectContaining({ SquadraSerieA: true }),
       }),
     )
+  })
+})
+
+// ============================================================================
+// Tests: createProposta — priorità auto-assegnate
+// ============================================================================
+
+describe('createProposta — priorità auto-assegnate', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('should assign priorita = 1 for the first proposta of a squadra', async () => {
+    const ctx = makeMockContext()
+    const sessione = makeSessioneMercato()
+    const utente = makeUtente()
+
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(Trasferimento.findOne).mockResolvedValue(
+      makeTrasferimento({ idSquadra: null, dataCessione: null }) as any,
+    )
+    vi.mocked(Utente.findOne).mockResolvedValue(utente as any)
+    vi.mocked(PropostaMercato.find).mockResolvedValue([])
+    vi.mocked(mockEntityManager.find).mockResolvedValue([]) // no esistenti in transazione
+    vi.mocked(mockEntityManager.create).mockImplementation(((_e: unknown, data: any) => data) as any)
+    vi.mocked(mockEntityManager.save).mockImplementation(((_e: unknown, data: any) => Promise.resolve(data)) as any)
+
+    await createProposta({
+      ctx,
+      input: { idGiocatore: 100, prezzoOfferto: 50 },
+    })
+
+    expect(vi.mocked(mockEntityManager.create)).toHaveBeenCalledWith(
+      PropostaMercato,
+      expect.objectContaining({ priorita: 1 }),
+    )
+  })
+
+  it('should assign priorita = MAX(priorita)+1 when other proposte exist', async () => {
+    const ctx = makeMockContext()
+    const sessione = makeSessioneMercato()
+    const utente = makeUtente()
+
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(Trasferimento.findOne).mockResolvedValue(
+      makeTrasferimento({ idSquadra: null, dataCessione: null }) as any,
+    )
+    vi.mocked(Utente.findOne).mockResolvedValue(utente as any)
+    vi.mocked(PropostaMercato.find).mockResolvedValue([])
+    // 3 proposte esistenti con priorità 1, 2, 3
+    vi.mocked(mockEntityManager.find).mockResolvedValue([
+      { priorita: 1 } as any,
+      { priorita: 3 } as any,
+      { priorita: 2 } as any,
+    ])
+    vi.mocked(mockEntityManager.create).mockImplementation(((_e: unknown, data: any) => data) as any)
+    vi.mocked(mockEntityManager.save).mockImplementation(((_e: unknown, data: any) => Promise.resolve(data)) as any)
+
+    await createProposta({
+      ctx,
+      input: { idGiocatore: 101, prezzoOfferto: 30 },
+    })
+
+    expect(vi.mocked(mockEntityManager.create)).toHaveBeenCalledWith(
+      PropostaMercato,
+      expect.objectContaining({ priorita: 4 }),
+    )
+  })
+})
+
+// ============================================================================
+// Tests: deleteProposta — compattazione priorità
+// ============================================================================
+
+describe('deleteProposta — compattazione priorità', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('should decrement priorita for siblings with priorita > deleted one', async () => {
+    const ctx = makeMockContext()
+    const proposta = makePropostaMercato({
+      id: 42,
+      idSquadra: 1,
+      idSessione: 7,
+      deletedAt: null,
+    }) as any
+    proposta.priorita = 2
+
+    vi.mocked(PropostaMercato.findOne).mockResolvedValue(proposta)
+    vi.mocked(mockEntityManager.save).mockResolvedValue({ ...proposta, deletedAt: new Date() })
+    vi.mocked(mockEntityManager.decrement).mockResolvedValue({ affected: 3 } as any)
+
+    await deleteProposta({ ctx, input: { idProposta: 42 } })
+
+    expect(vi.mocked(mockEntityManager.decrement)).toHaveBeenCalledWith(
+      PropostaMercato,
+      expect.objectContaining({
+        idSessione: 7,
+        idSquadra: 1,
+      }),
+      'priorita',
+      1,
+    )
+  })
+})
+
+// ============================================================================
+// Tests: riordinaProposte
+// ============================================================================
+
+describe('riordinaProposte', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('should throw NOT_FOUND when no sessione attiva', async () => {
+    const ctx = makeMockContext()
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(null)
+
+    await expect(
+      riordinaProposte({
+        ctx,
+        input: { ordineIdProposte: [1, 2, 3] },
+      }),
+    ).rejects.toThrow()
+  })
+
+  it('should throw BAD_REQUEST when input length differs from active proposte count', async () => {
+    const ctx = makeMockContext()
+    const sessione = makeSessioneMercato()
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(mockEntityManager.find).mockResolvedValue([
+      makePropostaMercato({ id: 1, idSquadra: 1, deletedAt: null }) as any,
+      makePropostaMercato({ id: 2, idSquadra: 1, deletedAt: null }) as any,
+    ])
+
+    await expect(
+      riordinaProposte({
+        ctx,
+        input: { ordineIdProposte: [1] }, // mismatch: 1 vs 2
+      }),
+    ).rejects.toThrow()
+  })
+
+  it('should throw BAD_REQUEST when input contains duplicates', async () => {
+    const ctx = makeMockContext()
+    const sessione = makeSessioneMercato()
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(mockEntityManager.find).mockResolvedValue([
+      makePropostaMercato({ id: 1, idSquadra: 1, deletedAt: null }) as any,
+      makePropostaMercato({ id: 2, idSquadra: 1, deletedAt: null }) as any,
+    ])
+
+    await expect(
+      riordinaProposte({
+        ctx,
+        input: { ordineIdProposte: [1, 1] }, // duplicato
+      }),
+    ).rejects.toThrow()
+  })
+
+  it('should throw BAD_REQUEST when input contains an id not belonging to the squadra', async () => {
+    const ctx = makeMockContext()
+    const sessione = makeSessioneMercato()
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(mockEntityManager.find).mockResolvedValue([
+      makePropostaMercato({ id: 1, idSquadra: 1, deletedAt: null }) as any,
+      makePropostaMercato({ id: 2, idSquadra: 1, deletedAt: null }) as any,
+    ])
+
+    await expect(
+      riordinaProposte({
+        ctx,
+        input: { ordineIdProposte: [1, 999] }, // 999 non appartiene
+      }),
+    ).rejects.toThrow()
+  })
+
+  it('should update priorità in two phases (negative then final)', async () => {
+    const ctx = makeMockContext()
+    const sessione = makeSessioneMercato()
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(mockEntityManager.find).mockResolvedValue([
+      makePropostaMercato({ id: 10, idSquadra: 1, deletedAt: null }) as any,
+      makePropostaMercato({ id: 20, idSquadra: 1, deletedAt: null }) as any,
+      makePropostaMercato({ id: 30, idSquadra: 1, deletedAt: null }) as any,
+    ])
+    vi.mocked(mockEntityManager.update).mockResolvedValue({ affected: 1 } as any)
+
+    await riordinaProposte({
+      ctx,
+      input: { ordineIdProposte: [30, 10, 20] },
+    })
+
+    const calls = vi.mocked(mockEntityManager.update).mock.calls
+    // Fase 1: 3 update con priorità negative
+    expect(calls[0]).toEqual([PropostaMercato, { id: 30 }, { priorita: -1 }])
+    expect(calls[1]).toEqual([PropostaMercato, { id: 10 }, { priorita: -2 }])
+    expect(calls[2]).toEqual([PropostaMercato, { id: 20 }, { priorita: -3 }])
+    // Fase 2: 3 update con priorità finali 1, 2, 3 nell'ordine richiesto
+    expect(calls[3]).toEqual([PropostaMercato, { id: 30 }, { priorita: 1 }])
+    expect(calls[4]).toEqual([PropostaMercato, { id: 10 }, { priorita: 2 }])
+    expect(calls[5]).toEqual([PropostaMercato, { id: 20 }, { priorita: 3 }])
   })
 })

@@ -35,11 +35,16 @@ export const createSessioneSchema = z
     dataApertura: z.coerce.date(),
     dataChiusura: z.coerce.date(),
     maxProposte: z.number().int().min(1),
+    acquistiEffettivi: z.number().int().min(1),
     tipoValuta: tipoValutaEnum.default('fantamilioni'),
   })
   .refine((data) => data.dataChiusura > data.dataApertura, {
     message: 'dataChiusura deve essere successiva a dataApertura',
     path: ['dataChiusura'],
+  })
+  .refine((data) => data.acquistiEffettivi <= data.maxProposte, {
+    message: 'acquistiEffettivi deve essere minore o uguale a maxProposte',
+    path: ['acquistiEffettivi'],
   })
 
 export type CreateSessioneInput = z.infer<typeof createSessioneSchema>
@@ -100,3 +105,35 @@ export const getGiocatoriSvincolatiSchema = z.object({
 })
 
 export type GetGiocatoriSvincolatiInput = z.infer<typeof getGiocatoriSvincolatiSchema>
+
+// ---------------------------------------------------------------------------
+// riordinaProposteSchema — protectedProcedure
+// ---------------------------------------------------------------------------
+
+/**
+ * Input per riordinare le proposte di una squadra nella sessione attiva.
+ * L'array `ordineIdProposte` rappresenta la nuova sequenza desiderata:
+ * la posizione 0 dell'array diventa priorità 1, la posizione 1 priorità 2, ecc.
+ *
+ * Il backend valida che gli id corrispondano esattamente all'insieme delle
+ * proposte non-deleted della squadra nella sessione attiva.
+ */
+export const riordinaProposteSchema = z.object({
+  ordineIdProposte: z.array(z.number().int().positive()).min(1),
+})
+
+export type RiordinaProposteInput = z.infer<typeof riordinaProposteSchema>
+
+// ---------------------------------------------------------------------------
+// aggiudicaSessioneSchema — adminProcedure
+// ---------------------------------------------------------------------------
+
+/**
+ * Input per calcolare l'esito dell'aggiudicazione di una sessione chiusa.
+ * È solo un calcolo: non scrive nulla nel DB.
+ */
+export const aggiudicaSessioneSchema = z.object({
+  idSessione: z.number().int().positive(),
+})
+
+export type AggiudicaSessioneInput = z.infer<typeof aggiudicaSessioneSchema>

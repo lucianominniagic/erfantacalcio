@@ -29,10 +29,10 @@ import { orpc } from '~/utils/orpc'
 import LoadingSpinner from '~/components/LinearProgressBar/LoadingSpinner'
 import PageHeader from '~/components/PageHeader'
 
-// ── Sub-component: proposte per una sessione chiusa ──────────────────────────
-function ProposteSessione({ idSessione }: { idSessione: number }) {
+// ── Sub-component: aggiudicazione di una sessione chiusa ────────────────────
+function AggiudicazioneSessione({ idSessione }: { idSessione: number }) {
   const { data, isLoading, isError } = useQuery(
-    orpc.mercato.getProposteSessione.queryOptions({
+    orpc.mercato.aggiudicaSessione.queryOptions({
       input: { idSessione },
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
@@ -43,39 +43,146 @@ function ProposteSessione({ idSessione }: { idSessione: number }) {
   if (isError)
     return (
       <Alert severity="error" sx={{ mt: 1 }}>
-        Errore nel caricamento delle proposte
+        Errore nel calcolo dell&apos;aggiudicazione
       </Alert>
     )
-  if (!data?.length)
-    return (
-      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-        Nessuna proposta ricevuta
-      </Typography>
-    )
+  if (!data) return null
+
+  const labelValuta = data.tipoValuta === 'euro' ? '€' : 'FM'
+
+  const esitoChip = (esito: 'VINTA' | 'PERSA', motivo: string) => {
+    if (esito === 'VINTA')
+      return <Chip size="small" color="success" label="VINTA" />
+    if (motivo === 'rilasciata_per_cap')
+      return (
+        <Chip
+          size="small"
+          color="warning"
+          label="PERSA · cap raggiunto"
+          title="Vinta in un primo round ma rilasciata per il limite di acquisti effettivi"
+        />
+      )
+    return <Chip size="small" color="default" label="PERSA · superata" />
+  }
 
   return (
-    <TableContainer component={Paper} variant="outlined" sx={{ mt: 1 }}>
-      <Table size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Giocatore</TableCell>
-            <TableCell>ID Squadra</TableCell>
-            <TableCell align="right">Prezzo offerto</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.map((p) => (
-            <TableRow key={p.id}>
-              <TableCell>{p.Giocatore.nome}</TableCell>
-              <TableCell>{p.Utente.presidente}</TableCell>
-              <TableCell align="right">{p.prezzoOfferto}</TableCell>
+    <Box sx={{ mt: 2 }}>
+      <Alert severity="info" variant="outlined" sx={{ mb: 2 }}>
+        Aggiudicazione calcolata in base a: prezzo più alto vince, parità →
+        proposta più vecchia, ogni squadra ottiene al massimo{' '}
+        <strong>{data.acquistiEffettivi}</strong> acquisti (cap). Nessuna
+        scrittura sui trasferimenti: l&apos;esito è solo informativo.
+      </Alert>
+
+      {/* ── Tabella per giocatore ── */}
+      <Typography variant="subtitle2" sx={{ mb: 1 }}>
+        Esiti per giocatore
+      </Typography>
+      <TableContainer component={Paper} variant="outlined" sx={{ mb: 3 }}>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>Giocatore</TableCell>
+              <TableCell>Vincitore</TableCell>
+              <TableCell align="right">Prezzo</TableCell>
+              <TableCell>Offerte ricevute</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {data.giocatori.map((g) => (
+              <TableRow key={g.idGiocatore}>
+                <TableCell>{g.nomeGiocatore}</TableCell>
+                <TableCell>
+                  {g.vincitore ? (
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Chip
+                        size="small"
+                        color="success"
+                        label={g.vincitore.presidente}
+                      />
+                      <Typography variant="caption" color="text.secondary">
+                        prio {g.vincitore.priorita}
+                      </Typography>
+                    </Stack>
+                  ) : (
+                    <Typography variant="caption" color="text.secondary">
+                      Nessuno
+                    </Typography>
+                  )}
+                </TableCell>
+                <TableCell align="right">
+                  {g.vincitore
+                    ? `${g.vincitore.prezzo} ${labelValuta}`
+                    : '—'}
+                </TableCell>
+                <TableCell>
+                  <Stack direction="row" flexWrap="wrap" gap={0.5}>
+                    {g.offerte.map((o) => (
+                      <Chip
+                        key={o.idProposta}
+                        size="small"
+                        variant="outlined"
+                        label={`${o.presidente} ${o.prezzoOfferto}${labelValuta} (p${o.priorita})`}
+                        color={
+                          o.esito === 'VINTA'
+                            ? 'success'
+                            : o.motivo === 'rilasciata_per_cap'
+                              ? 'warning'
+                              : 'default'
+                        }
+                      />
+                    ))}
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* ── Tabella dettaglio per proposta ── */}
+      <Typography variant="subtitle2" sx={{ mb: 1 }}>
+        Dettaglio per proposta
+      </Typography>
+      <TableContainer component={Paper} variant="outlined">
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>Presidente</TableCell>
+              <TableCell>Giocatore</TableCell>
+              <TableCell align="right">Priorità</TableCell>
+              <TableCell align="right">Prezzo</TableCell>
+              <TableCell>Esito</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {[...data.dettaglio]
+              .sort(
+                (a, b) =>
+                  a.presidente.localeCompare(b.presidente) ||
+                  a.priorita - b.priorita,
+              )
+              .map((d) => (
+                <TableRow key={d.idProposta}>
+                  <TableCell>{d.presidente}</TableCell>
+                  <TableCell>{d.nomeGiocatore}</TableCell>
+                  <TableCell align="right">{d.priorita}</TableCell>
+                  <TableCell align="right">
+                    {d.prezzoOfferto} {labelValuta}
+                  </TableCell>
+                  <TableCell>{esitoChip(d.esito, d.motivo)}</TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   )
 }
+
+// ── Sub-component: proposte per una sessione chiusa ──────────────────────────
+// (Deprecato: sostituito da AggiudicazioneSessione, che mostra le proposte
+//  insieme all'esito calcolato. Mantenuto per riferimento — non più referenziato.)
 
 // ── Helper ───────────────────────────────────────────────────────────────────
 function fmtDate(d: Date | string) {
@@ -104,6 +211,7 @@ export default function MercatoAdmin() {
   const [dataApertura, setDataApertura] = useState('')
   const [dataChiusura, setDataChiusura] = useState('')
   const [maxProposte, setMaxProposte] = useState(3)
+  const [acquistiEffettivi, setAcquistiEffettivi] = useState(3)
   const [tipoValuta, setTipoValuta] = useState<'fantamilioni' | 'euro'>(
     'fantamilioni',
   )
@@ -144,10 +252,15 @@ export default function MercatoAdmin() {
       setFormError('Compila tutte le date')
       return
     }
+    if (acquistiEffettivi > maxProposte) {
+      setFormError('Acquisti effettivi deve essere ≤ max proposte')
+      return
+    }
     createSessione.mutate({
       dataApertura: new Date(dataApertura),
       dataChiusura: new Date(dataChiusura),
       maxProposte,
+      acquistiEffettivi,
       tipoValuta,
     })
   }
@@ -155,7 +268,11 @@ export default function MercatoAdmin() {
   const toggleEspandi = (id: number) => {
     setEspansi((prev) => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
       return next
     })
   }
@@ -200,6 +317,20 @@ export default function MercatoAdmin() {
                 inputProps={{ min: 1 }}
                 fullWidth
               />
+              <TextField
+                label="Acquisti effettivi"
+                type="number"
+                value={acquistiEffettivi}
+                onChange={(e) =>
+                  setAcquistiEffettivi(
+                    Math.max(1, parseInt(e.target.value) || 1),
+                  )
+                }
+                inputProps={{ min: 1, max: maxProposte }}
+                helperText={`≤ ${maxProposte}`}
+                error={acquistiEffettivi > maxProposte}
+                fullWidth
+              />
               <Select
                 value={tipoValuta}
                 onChange={(e: SelectChangeEvent) =>
@@ -217,7 +348,10 @@ export default function MercatoAdmin() {
               <Button
                 variant="contained"
                 onClick={handleCrea}
-                disabled={createSessione.isPending}
+                disabled={
+                  createSessione.isPending ||
+                  acquistiEffettivi > maxProposte
+                }
               >
                 {createSessione.isPending ? 'Creazione…' : 'Crea sessione'}
               </Button>
@@ -254,7 +388,8 @@ export default function MercatoAdmin() {
                         {fmtDate(s.dataApertura)} → {fmtDate(s.dataChiusura)}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Max proposte: {s.maxProposte} &nbsp;·&nbsp;{' '}
+                        Max proposte: {s.maxProposte} &nbsp;·&nbsp; Acquisti:{' '}
+                        {s.acquistiEffettivi} &nbsp;·&nbsp;{' '}
                         {s.tipoValuta === 'fantamilioni'
                           ? 'Fantamilioni'
                           : 'Euro reali'}
@@ -268,7 +403,7 @@ export default function MercatoAdmin() {
                           variant="outlined"
                           onClick={() => toggleEspandi(s.id)}
                         >
-                          {espansi.has(s.id) ? 'Nascondi' : 'Vedi proposte'}
+                          {espansi.has(s.id) ? 'Nascondi' : 'Aggiudica'}
                         </Button>
                       )}
                     </Stack>
@@ -276,7 +411,7 @@ export default function MercatoAdmin() {
 
                   {s.stato === 'chiusa' && (
                     <Collapse in={espansi.has(s.id)}>
-                      <ProposteSessione idSessione={s.id} />
+                      <AggiudicazioneSessione idSessione={s.id} />
                     </Collapse>
                   )}
                 </Paper>

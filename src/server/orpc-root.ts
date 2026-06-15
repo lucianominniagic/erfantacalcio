@@ -90,6 +90,8 @@ import { getGiocatoriSvincolatiORPCProcedure } from '~/server/api/mercato/proced
 import { deletePropostaORPCProcedure } from '~/server/api/mercato/procedures/deleteProposta.orpc'
 import { createSessioneORPCProcedure } from '~/server/api/mercato/procedures/createSessione.orpc'
 import { createPropostaORPCProcedure } from '~/server/api/mercato/procedures/createProposta.orpc'
+import { riordinaProposteORPCProcedure } from '~/server/api/mercato/procedures/riordinaProposte.orpc'
+import { aggiudicaSessioneORPCProcedure } from '~/server/api/mercato/procedures/aggiudicaSessione.orpc'
 // voti
 import { listVotiORPCProcedure } from '~/server/api/voti/procedures/list.orpc'
 import { getVotoORPCProcedure } from '~/server/api/voti/procedures/get.orpc'
@@ -208,6 +210,8 @@ export const orpcRouter = {
     deleteProposta: deletePropostaORPCProcedure,
     createSessione: createSessioneORPCProcedure,
     createProposta: createPropostaORPCProcedure,
+    riordinaProposte: riordinaProposteORPCProcedure,
+    aggiudicaSessione: aggiudicaSessioneORPCProcedure,
   },
   voti: {
     list: listVotiORPCProcedure,

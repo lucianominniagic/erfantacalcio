@@ -28,6 +28,9 @@ export class PropostaMercato extends BaseEntity {
   @Column({ name: 'prezzo_offerto', type: 'decimal', precision: 9, scale: 2 })
   prezzoOfferto!: number
 
+  @Column({ name: 'priorita', type: 'smallint' })
+  priorita!: number
+
   @Column({
     name: 'created_at',
     type: 'timestamptz',

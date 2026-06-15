@@ -7,6 +7,7 @@ import {
   Chip,
   Divider,
   FormControlLabel,
+  IconButton,
   InputAdornment,
   Paper,
   Skeleton,
@@ -24,7 +25,7 @@ import {
   useMediaQuery,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
-import { Gavel } from '@mui/icons-material'
+import { ArrowDownward, ArrowUpward, Gavel } from '@mui/icons-material'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
 import PageHeader from '~/components/PageHeader'
@@ -105,6 +106,31 @@ export default function MercatoUtente() {
     },
   })
 
+  const riordinaProposte = useMutation({
+    ...orpc.mercato.riordinaProposte.mutationOptions(),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: orpc.mercato.getMieProposte.queryKey() })
+    },
+    onError: (err) => {
+      setSnackbar({ open: true, message: err.message, severity: 'error' })
+    },
+  })
+
+  // Sposta una proposta di una posizione in su o in giù nella lista priorità.
+  const handleSposta = (idProposta: number, direzione: 'su' | 'giu') => {
+    if (!mieProposte || mieProposte.length < 2) return
+    const ordinate = [...mieProposte].sort((a, b) => a.priorita - b.priorita)
+    const idx = ordinate.findIndex((p) => p.id === idProposta)
+    if (idx === -1) return
+    const target = direzione === 'su' ? idx - 1 : idx + 1
+    if (target < 0 || target >= ordinate.length) return
+    const swapped = [...ordinate]
+    const tmp = swapped[idx]
+    swapped[idx] = swapped[target]!
+    swapped[target] = tmp!
+    riordinaProposte.mutate({ ordineIdProposte: swapped.map((p) => p.id) })
+  }
+
   // ── Handlers ──
   const handleProponi = (idGiocatore: number) => {
     const prezzo = parseFloat(prezzi[idGiocatore] ?? '0')
@@ -170,6 +196,10 @@ export default function MercatoUtente() {
             </strong>
           </Typography>
           <Typography variant="body2">
+            Acquisti effettivi (cap per squadra):{' '}
+            <strong>{sessione.acquistiEffettivi}</strong>
+          </Typography>
+          <Typography variant="body2">
             Valuta:{' '}
             <strong>
               {sessione.tipoValuta === 'fantamilioni'
@@ -203,6 +233,8 @@ export default function MercatoUtente() {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
+                      <TableCell sx={{ width: 60 }}>Prio</TableCell>
+                      <TableCell sx={{ width: 110 }}>Riordina</TableCell>
                       <TableCell>Giocatore</TableCell>
                       <TableCell align="right">Offerta</TableCell>
                       <TableCell align="right">Data/Ora</TableCell>
@@ -210,34 +242,65 @@ export default function MercatoUtente() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {mieProposte.map((p) => {
-                      return (
-                        <TableRow key={p.id}>
-                          <TableCell>
-                            {p.Giocatore?.nome ?? `#${p.idGiocatore}`}
-                          </TableCell>
-                          <TableCell align="right">
-                            {p.prezzoOfferto} {labelValuta}
-                          </TableCell>
-                          <TableCell align="right">
-                            {formatDateFromIso(p.createdAt, 'DD/MM/YYYY')} alle {formatDateFromIso(p.createdAt, 'HH:mm')}
-                          </TableCell>
-                          <TableCell>
-                            <Button
-                              size="small"
-                              color="error"
-                              variant="outlined"
-                              onClick={() =>
-                                deleteProposta.mutate({ idProposta: p.id })
-                              }
-                              disabled={deleteProposta.isPending}
-                            >
-                              Elimina
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
+                    {[...mieProposte]
+                      .sort((a, b) => a.priorita - b.priorita)
+                      .map((p, idx, arr) => {
+                        const isFirst = idx === 0
+                        const isLast = idx === arr.length - 1
+                        return (
+                          <TableRow key={p.id}>
+                            <TableCell>
+                              <Chip
+                                size="small"
+                                color="primary"
+                                label={p.priorita}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <Stack direction="row" spacing={0.5}>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleSposta(p.id, 'su')}
+                                  disabled={isFirst || riordinaProposte.isPending}
+                                  aria-label="Sposta su"
+                                >
+                                  <ArrowUpward fontSize="small" />
+                                </IconButton>
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleSposta(p.id, 'giu')}
+                                  disabled={isLast || riordinaProposte.isPending}
+                                  aria-label="Sposta giù"
+                                >
+                                  <ArrowDownward fontSize="small" />
+                                </IconButton>
+                              </Stack>
+                            </TableCell>
+                            <TableCell>
+                              {p.Giocatore?.nome ?? `#${p.idGiocatore}`}
+                            </TableCell>
+                            <TableCell align="right">
+                              {p.prezzoOfferto} {labelValuta}
+                            </TableCell>
+                            <TableCell align="right">
+                              {formatDateFromIso(String(p.createdAt), 'DD/MM/YYYY')} alle {formatDateFromIso(String(p.createdAt), 'HH:mm')}
+                            </TableCell>
+                            <TableCell>
+                              <Button
+                                size="small"
+                                color="error"
+                                variant="outlined"
+                                onClick={() =>
+                                  deleteProposta.mutate({ idProposta: p.id })
+                                }
+                                disabled={deleteProposta.isPending}
+                              >
+                                Elimina
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
                   </TableBody>
                 </Table>
               </TableContainer>
