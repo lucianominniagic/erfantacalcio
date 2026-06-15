@@ -21,7 +21,7 @@ import { ExpandMore, Storefront } from '@mui/icons-material'
 import { useQuery } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
 import PageHeader from '~/components/PageHeader'
-import { formatDateFromIso } from '~/utils/dateUtils'
+import { formatDateTime } from '~/utils/dateUtils'
 
 // ── Helper ───────────────────────────────────────────────────────────────────
 function fmtDate(d: Date | string | undefined) {
@@ -181,7 +181,7 @@ export default function SessioniMercato() {
                                 <TableCell>{p.Giocatore}</TableCell>
                                 <TableCell>{p.Presidente}</TableCell>
                                 <TableCell align="right">
-                                  {formatDateFromIso(p.createdAt, 'DD/MM/YYYY')} alle {formatDateFromIso(p.createdAt, 'HH:mm')}
+                                  {formatDateTime(p.createdAt)}
                                 </TableCell>
                                 <TableCell align="right">
                                   {p.prezzoOfferto}{' '}
