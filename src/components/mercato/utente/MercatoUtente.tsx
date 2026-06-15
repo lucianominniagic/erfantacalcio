@@ -31,6 +31,7 @@ import PageHeader from '~/components/PageHeader'
 import { type Ruoli } from '~/types/common'
 import { getRuoloEsteso } from '~/utils/helper'
 import { Configurazione } from '~/config'
+import { formatDateFromIso } from '~/utils/dateUtils'
 
 // ── Helper ───────────────────────────────────────────────────────────────────
 function fmtDate(d: Date | string) {
@@ -204,6 +205,7 @@ export default function MercatoUtente() {
                     <TableRow>
                       <TableCell>Giocatore</TableCell>
                       <TableCell align="right">Offerta</TableCell>
+                      <TableCell align="right">Data/Ora</TableCell>
                       <TableCell />
                     </TableRow>
                   </TableHead>
@@ -218,6 +220,9 @@ export default function MercatoUtente() {
                             {p.prezzoOfferto} {labelValuta}
                           </TableCell>
                           <TableCell align="right">
+                            {formatDateFromIso(p.createdAt, 'DD/MM/YYYY')} alle {formatDateFromIso(p.createdAt, 'HH:mm')}
+                          </TableCell>
+                          <TableCell>
                             <Button
                               size="small"
                               color="error"

@@ -21,6 +21,7 @@ import { ExpandMore, Storefront } from '@mui/icons-material'
 import { useQuery } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
 import PageHeader from '~/components/PageHeader'
+import { formatDateFromIso } from '~/utils/dateUtils'
 
 // ── Helper ───────────────────────────────────────────────────────────────────
 function fmtDate(d: Date | string | undefined) {
@@ -170,6 +171,7 @@ export default function SessioniMercato() {
                             <TableRow>
                               <TableCell>ID Giocatore</TableCell>
                               <TableCell>ID Squadra</TableCell>
+                              <TableCell align="right">Data/Ora</TableCell>
                               <TableCell align="right">Prezzo</TableCell>
                             </TableRow>
                           </TableHead>
@@ -178,6 +180,9 @@ export default function SessioniMercato() {
                               <TableRow key={idx}>
                                 <TableCell>{p.Giocatore}</TableCell>
                                 <TableCell>{p.Presidente}</TableCell>
+                                <TableCell align="right">
+                                  {formatDateFromIso(p.createdAt, 'DD/MM/YYYY')} alle {formatDateFromIso(p.createdAt, 'HH:mm')}
+                                </TableCell>
                                 <TableCell align="right">
                                   {p.prezzoOfferto}{' '}
                                   {s.tipoValuta === 'fantamilioni'

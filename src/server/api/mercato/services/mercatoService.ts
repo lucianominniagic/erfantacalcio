@@ -32,6 +32,7 @@ export async function getMieProposte({ ctx }: { ctx: MercatoCtx; input: Record<s
       idSquadra: ctx.session.user.idSquadra,
       deletedAt: IsNull(),
     },
+    order: { createdAt: 'ASC' },
     relations: { Giocatore: true },
   })
 }
@@ -76,7 +77,7 @@ export async function getSessioneAttiva({ ctx }: { ctx: MercatoCtx; input: Recor
 export async function getSessioniMercato({ ctx: _ctx }: { ctx: MercatoCtx; input: Record<string, never> }) {
   const sessioni = await SessioneMercato.find({
     relations: { ProposteMercato: { Giocatore: true, Utente: true } },
-    order: { id: 'DESC', ProposteMercato: { Giocatore: { nome: 'ASC' } } },
+    order: { id: 'DESC', ProposteMercato: { Giocatore: { nome: 'ASC' }, prezzoOfferto: 'DESC', createdAt: 'ASC' } },
   })
 
   const now = new Date()
@@ -90,6 +91,7 @@ export async function getSessioniMercato({ ctx: _ctx }: { ctx: MercatoCtx; input
         .map((p) => ({
           idGiocatore: p.idGiocatore,
           prezzoOfferto: p.prezzoOfferto,
+          createdAt: p.createdAt,
           idSquadra: p.idSquadra,
           Giocatore: p.Giocatore.nome,
           Presidente: p.Utente.presidente,
