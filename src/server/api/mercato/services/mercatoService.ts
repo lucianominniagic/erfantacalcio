@@ -2,7 +2,7 @@ import { ORPCError } from '@orpc/server'
 import { IsNull, LessThanOrEqual, MoreThan, MoreThanOrEqual, Not } from 'typeorm'
 import { AppDataSource } from '~/data-source'
 import { SessioneMercato, PropostaMercato, Trasferimento, Utente } from '~/server/db/entities'
-import type { GetGiocatoriSvincolatiInput, CreatePropostaInput, DeletePropostaInput, RiordinaProposteInput, AggiudicaSessioneInput } from '~/schemas/mercato'
+import type { CreateSessioneInput, GetGiocatoriSvincolatiInput, CreatePropostaInput, DeletePropostaInput, RiordinaProposteInput, AggiudicaSessioneInput } from '~/schemas/mercato'
 import { aggiudica, type PropostaInput } from './aggiudicazione'
 
 export interface MercatoCtx {
@@ -121,6 +121,47 @@ export async function getSessioniMercato({ ctx: _ctx }: { ctx: MercatoCtx; input
       stato,
     }
   })
+}
+
+export async function createSessione({ input }: { input: CreateSessioneInput }) {
+  const now = new Date()
+
+  const [esistente] = await SessioneMercato.find({
+    order: { id: 'DESC' },
+    take: 1,
+  })
+
+  if (esistente) {
+    const start = esistente.dataApertura
+    const end = esistente.dataChiusura
+    const inputStart = new Date(input.dataApertura)
+    const inputEnd = new Date(input.dataChiusura)
+
+    const isAttiva = start <= now && end >= now
+    const isFutura = start > now
+
+    if (isAttiva || isFutura) {
+      throw new ORPCError('CONFLICT', {
+        message: 'Esiste già una sessione attiva o futura',
+      })
+    }
+
+    if (inputStart <= end && inputEnd >= start) {
+      throw new ORPCError('CONFLICT', {
+        message: 'Le date si sovrappongono a una sessione esistente',
+      })
+    }
+  }
+
+  const sessione = SessioneMercato.create({
+    dataApertura: new Date(input.dataApertura),
+    dataChiusura: new Date(input.dataChiusura),
+    maxProposte: input.maxProposte,
+    acquistiEffettivi: input.acquistiEffettivi,
+    tipoValuta: input.tipoValuta,
+  })
+
+  return await SessioneMercato.save(sessione)
 }
 
 export async function getGiocatoriSvincolati({
@@ -410,12 +451,31 @@ export async function aggiudicaSessione({
     })
   }
 
+  return buildEsitoSessione(sessione)
+}
+
+export async function getEsitoUltimaSessioneChiusa({
+  ctx: _ctx,
+}: {
+  ctx: MercatoCtx
+  input: Record<string, never>
+}) {
+  const sessione = await SessioneMercato.findOne({
+    where: { dataChiusura: LessThanOrEqual(new Date()) },
+    order: { dataChiusura: 'DESC' },
+  })
+
+  if (!sessione) return null
+
+  return buildEsitoSessione(sessione)
+}
+
+async function buildEsitoSessione(sessione: SessioneMercato) {
   const proposte = await PropostaMercato.find({
     where: { idSessione: sessione.id, deletedAt: IsNull() },
     relations: { Giocatore: true, Utente: true },
   })
 
-  // Costruisci l'input per l'algoritmo (pure function).
   const algoInput: PropostaInput[] = proposte.map((p) => ({
     idProposta: p.id,
     idSquadra: p.idSquadra,
@@ -430,10 +490,8 @@ export async function aggiudicaSessione({
     proposte: algoInput,
   })
 
-  // Indici per arricchire l'output con nomi giocatore / squadra.
   const propostaById = new Map(proposte.map((p) => [p.id, p]))
 
-  // Dettaglio per-proposta (per la tabella admin).
   const dettaglio = esiti.map((e) => {
     const p = propostaById.get(e.idProposta)!
     return {
@@ -450,7 +508,6 @@ export async function aggiudicaSessione({
     }
   })
 
-  // Aggregato per giocatore (per la vista "chi vince cosa").
   const perGiocatore = new Map<
     number,
     {
@@ -480,7 +537,6 @@ export async function aggiudicaSessione({
     perGiocatore.set(d.idGiocatore, existing)
   }
 
-  // Ordina le offerte di ogni giocatore per prezzo DESC, poi createdAt ASC.
   const giocatori = Array.from(perGiocatore.values()).map((g) => ({
     ...g,
     offerte: g.offerte.sort((a, b) => b.prezzoOfferto - a.prezzoOfferto),
@@ -488,6 +544,7 @@ export async function aggiudicaSessione({
 
   return {
     idSessione: sessione.id,
+    dataChiusura: sessione.dataChiusura,
     acquistiEffettivi: sessione.acquistiEffettivi,
     maxProposte: sessione.maxProposte,
     tipoValuta: sessione.tipoValuta,

@@ -64,7 +64,7 @@ vi.mock('~/schemas/mercato', () => ({
 }))
 
 // Import AFTER mocks are defined
-import { createProposta, deleteProposta, getSessioneAttiva, getSessioniMercato, getMieProposte, getGiocatoriSvincolati, riordinaProposte } from './mercatoService'
+import { createProposta, createSessione, deleteProposta, getSessioneAttiva, getSessioniMercato, getMieProposte, getGiocatoriSvincolati, riordinaProposte } from './mercatoService'
 
 import { SessioneMercato, PropostaMercato, Trasferimento, Utente } from '~/server/db/entities'
 
@@ -924,5 +924,38 @@ describe('riordinaProposte', () => {
     expect(calls[3]).toEqual([PropostaMercato, { id: 30 }, { priorita: 1 }])
     expect(calls[4]).toEqual([PropostaMercato, { id: 10 }, { priorita: 2 }])
     expect(calls[5]).toEqual([PropostaMercato, { id: 20 }, { priorita: 3 }])
+  })
+})
+
+// ============================================================================
+// createSessione - regression: acquistiEffettivi must propagate to entity
+// ============================================================================
+
+describe('createSessione', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('propaga acquistiEffettivi a SessioneMercato.create (regression: not-null violation)', async () => {
+    vi.mocked(SessioneMercato.find).mockResolvedValue([])
+    vi.mocked(SessioneMercato.create).mockImplementation((data) => data as any)
+    vi.mocked(SessioneMercato.save).mockImplementation(async (e) => e as any)
+
+    const now = Date.now()
+    const input = {
+      dataApertura: new Date(now + 3600000),
+      dataChiusura: new Date(now + 7200000),
+      maxProposte: 5,
+      acquistiEffettivi: 3,
+      tipoValuta: 'fantamilioni' as const,
+    }
+
+    await createSessione({ input })
+
+    expect(SessioneMercato.create).toHaveBeenCalledTimes(1)
+    const callArg = vi.mocked(SessioneMercato.create).mock.calls[0]![0] as any
+    expect(callArg.acquistiEffettivi).toBe(3)
+    expect(callArg.maxProposte).toBe(5)
+    expect(callArg.tipoValuta).toBe('fantamilioni')
   })
 })

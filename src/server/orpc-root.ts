@@ -92,6 +92,7 @@ import { createSessioneORPCProcedure } from '~/server/api/mercato/procedures/cre
 import { createPropostaORPCProcedure } from '~/server/api/mercato/procedures/createProposta.orpc'
 import { riordinaProposteORPCProcedure } from '~/server/api/mercato/procedures/riordinaProposte.orpc'
 import { aggiudicaSessioneORPCProcedure } from '~/server/api/mercato/procedures/aggiudicaSessione.orpc'
+import { getEsitoUltimaSessioneChiusaORPCProcedure } from '~/server/api/mercato/procedures/getEsitoUltimaSessioneChiusa.orpc'
 // voti
 import { listVotiORPCProcedure } from '~/server/api/voti/procedures/list.orpc'
 import { getVotoORPCProcedure } from '~/server/api/voti/procedures/get.orpc'
@@ -212,6 +213,7 @@ export const orpcRouter = {
     createProposta: createPropostaORPCProcedure,
     riordinaProposte: riordinaProposteORPCProcedure,
     aggiudicaSessione: aggiudicaSessioneORPCProcedure,
+    getEsitoUltimaSessioneChiusa: getEsitoUltimaSessioneChiusaORPCProcedure,
   },
   voti: {
     list: listVotiORPCProcedure,

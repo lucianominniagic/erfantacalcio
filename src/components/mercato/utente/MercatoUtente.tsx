@@ -33,6 +33,7 @@ import { type Ruoli } from '~/types/common'
 import { getRuoloEsteso } from '~/utils/helper'
 import { Configurazione } from '~/config'
 import { formatDateFromIso } from '~/utils/dateUtils'
+import EsitoAggiudicazione from '~/components/mercato/shared/EsitoAggiudicazione'
 
 // ── Helper ───────────────────────────────────────────────────────────────────
 function fmtDate(d: Date | string) {
@@ -72,6 +73,13 @@ export default function MercatoUtente() {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       enabled: !!sessione,
+    }))
+
+  const { data: esitoUltima, isLoading: loadingEsitoUltima } =
+    useQuery(orpc.mercato.getEsitoUltimaSessioneChiusa.queryOptions({
+      input: {},
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
     }))
 
   // ── Prezzi per giocatore (form state) ──
@@ -233,8 +241,8 @@ export default function MercatoUtente() {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell sx={{ width: 60 }}>Prio</TableCell>
-                      <TableCell sx={{ width: 110 }}>Riordina</TableCell>
+                      <TableCell sx={{ width: 70 }}>Priorità</TableCell>
+                      <TableCell sx={{ width: 90 }}>Riordina</TableCell>
                       <TableCell>Giocatore</TableCell>
                       <TableCell align="right">Offerta</TableCell>
                       <TableCell align="right">Data/Ora</TableCell>
@@ -449,6 +457,22 @@ export default function MercatoUtente() {
           </Box>
         </>
       )}
+
+      {/* ── Riepilogo esito ultima sessione chiusa (sempre visibile) ── */}
+      {loadingEsitoUltima ? (
+        <Skeleton variant="rounded" height={200} />
+      ) : esitoUltima ? (
+        <Box>
+          <Typography variant="h6" sx={{ mb: 1 }}>
+            Esito ultima sessione chiusa
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Chiusa il {fmtDate(esitoUltima.dataChiusura)}
+          </Typography>
+          <EsitoAggiudicazione data={esitoUltima} />
+        </Box>
+      ) : null}
+
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
