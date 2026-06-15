@@ -194,7 +194,7 @@ export default function DocumentiPage() {
           <DocumentCard
             title="Regolamento"
             image="/images/regolamento.jpg"
-            href="/docs/Regolamento_erFantacalcio.pdf"
+            href="/docs/Regolamento_erFantacalcio-26-27.pdf"
             fileType="pdf"
           />
         </Grid>
