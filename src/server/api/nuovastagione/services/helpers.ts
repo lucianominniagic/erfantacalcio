@@ -1,6 +1,6 @@
 import { toUtcDate } from '~/utils/dateUtils'
 import { Configurazione } from '~/config'
-import { getCalendario } from '../../../utils/common'
+import { getCalendario } from '~/server/api/calendario/repository'
 import { type Partita, RoundRobin4, RoundRobin8 } from '~/utils/bergerTables'
 import {
   Calendario,

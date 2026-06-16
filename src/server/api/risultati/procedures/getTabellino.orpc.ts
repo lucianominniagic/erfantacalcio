@@ -1,6 +1,6 @@
 import { adminProcedure } from '~/server/orpc'
 import { tabellinoInputSchema } from '~/schemas/risultati'
-import { getTabellino } from '../../../utils/common'
+import { getTabellino } from '~/server/services/tabelliniService'
 import { Configurazione } from '~/config'
 import { getFormazione } from '../services/partiteMapping'
 import { calcolaFantapunti } from '~/server/services/tabelliniService'

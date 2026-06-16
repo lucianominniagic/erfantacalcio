@@ -1,5 +1,5 @@
 import { protectedProcedure } from '~/server/orpc'
-import { getProssimaGiornata, getProssimaGiornataSerieA } from '~/server/utils/common'
+import { getProssimaGiornata, getProssimaGiornataSerieA } from '~/server/api/calendario/repository'
 
 export const giornateDaGiocareORPCProcedure = protectedProcedure
   .route({ method: 'GET', path: '/formazione/getGiornateDaGiocare', summary: 'Giornate da giocare per la squadra utente' })

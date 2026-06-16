@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { publicProcedure } from '~/server/orpc'
-import { getGiocatoreById } from '~/server/utils/common'
+import { getGiocatoreById } from '~/server/api/giocatori/services/giocatoriRepository'
 
 export const showGiocatoreORPCProcedure = publicProcedure
   .route({ method: 'GET', path: '/giocatori/get', summary: 'Dettaglio giocatore' })

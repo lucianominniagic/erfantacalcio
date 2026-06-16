@@ -6,8 +6,8 @@ import {
   getDescrizioneGiornata,
   getTorneoTitle,
   getTorneoSubTitle,
-  getCalendario,
-} from '../../../utils/common'
+} from '~/utils/torneo'
+import { getCalendario } from '~/server/api/calendario/repository'
 import { mapPartite } from '../services/partiteMapping'
 
 export const getGiornataPartiteORPCProcedure = publicProcedure

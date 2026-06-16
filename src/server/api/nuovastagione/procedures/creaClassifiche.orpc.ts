@@ -5,7 +5,7 @@ import {
   updateFase,
   checkCountClassifiche,
 } from '../services/helpers'
-import { getTornei } from '../../../utils/common'
+import { getTornei } from '~/server/api/tornei/repository'
 import { AppDataSource } from '~/data-source'
 import { messageSchema } from '~/schemas/messageSchema'
 

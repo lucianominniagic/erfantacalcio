@@ -1,6 +1,6 @@
 import { adminProcedure } from '~/server/orpc'
 import { Configurazione } from '~/config'
-import { chiudiTrasferimentoGiocatore } from '../../../utils/common'
+import { chiudiTrasferimentoGiocatore } from '~/server/api/trasferimenti/services/trasferimentoService'
 import { checkVotiUltimaGiornata, updateFase } from '../services/helpers'
 import { Trasferimenti } from '~/server/db/entities'
 import { IsNull, Not } from 'typeorm'

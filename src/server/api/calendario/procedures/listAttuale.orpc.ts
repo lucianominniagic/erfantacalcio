@@ -1,5 +1,5 @@
 import { publicProcedure } from '~/server/orpc'
-import { getCalendario, mapCalendario } from '~/server/utils/common'
+import { getCalendario, mapCalendario } from '~/server/api/calendario/repository'
 import { Between, MoreThan } from 'typeorm'
 
 export const listAttualeORPCProcedure = publicProcedure

@@ -6,7 +6,7 @@ import { Formazioni, Partite, Utenti } from '~/server/db/entities'
 import {
   getProssimaGiornata,
   getProssimaGiornataSerieA,
-} from '~/server/utils/common'
+} from '~/server/api/calendario/repository'
 import { ReSendMailAsync } from '~/server/services/mailSender'
 import { formatDateTime, nowInItalyIso } from '~/utils/dateUtils'
 import { getDescrizioneGiornata } from '~/utils/helper'

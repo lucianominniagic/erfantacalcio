@@ -1,5 +1,5 @@
 /**
- * Tests for pure (non-async, no DB) functions exported from server/utils/common.ts
+ * Tests for pure (non-async, no DB) functions — now in ~/server/services/tabelliniService.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
@@ -28,7 +28,7 @@ import {
   getCountRiserve,
   getVotoBonus,
   getGiocatoriVotoInfluente,
-} from '~/server/utils/common'
+} from '~/server/services/tabelliniService'
 
 // ---------------------------------------------------------------------------
 // getBonusModulo

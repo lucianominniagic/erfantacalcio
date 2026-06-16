@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { publicProcedure } from '~/server/orpc'
-import { getCalendario, mapCalendario } from '~/server/utils/common'
+import { getCalendario, mapCalendario } from '~/server/api/calendario/repository'
 import { In } from 'typeorm'
 
 export const listByTorneoORPCProcedure = publicProcedure

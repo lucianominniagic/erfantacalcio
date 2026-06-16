@@ -2,7 +2,7 @@ import { publicProcedure } from '~/server/orpc'
 import {
   getProssimaGiornata,
   getProssimaGiornataSerieA,
-} from '~/server/utils/common'
+} from '~/server/api/calendario/repository'
 
 export const getProssimeGiornateORPCProcedure = publicProcedure
   .route({ method: 'GET', path: '/calendario/getProssimeGiornate', summary: 'Restituisce le prossime giornate del calendario' })
