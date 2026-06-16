@@ -1,13 +1,6 @@
 import { adminProcedure } from '~/server/orpc'
 import { SessioneMercato } from '~/server/db/entities'
-
-type StatoSessione = 'futura' | 'attiva' | 'chiusa'
-
-function calcolaStato(sessione: SessioneMercato, now: Date): StatoSessione {
-  if (sessione.dataApertura > now) return 'futura'
-  if (sessione.dataChiusura < now) return 'chiusa'
-  return 'attiva'
-}
+import { calcolaStato } from '../services/sessioneMercatoRepository'
 
 export const listSessioniORPCProcedure = adminProcedure
   .route({ method: 'GET', path: '/mercato/listSessioni', summary: 'Lista sessioni di mercato (admin)' })
