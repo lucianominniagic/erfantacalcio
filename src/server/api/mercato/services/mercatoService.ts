@@ -2,7 +2,7 @@ import { ORPCError } from '@orpc/server'
 import { IsNull, LessThanOrEqual, MoreThan, Not } from 'typeorm'
 import { AppDataSource } from '~/data-source'
 import { SessioneMercato, PropostaMercato, Trasferimento, Utente } from '~/server/db/entities'
-import type { CreateSessioneInput, GetGiocatoriSvincolatiInput, CreatePropostaInput, DeletePropostaInput, RiordinaProposteInput, AggiudicaSessioneInput } from '~/schemas/mercato'
+import type { CreateSessioneInput, GetGiocatoriSvincolatiInput, CreatePropostaInput, DeletePropostaInput, RiordinaProposteInput, AggiudicaSessioneInput, GetProposteSessioneInput } from '~/schemas/mercato'
 import { aggiudica, type PropostaInput } from './aggiudicazione'
 import {
   type StatoSessione,
@@ -521,4 +521,39 @@ async function buildEsitoSessione(sessione: SessioneMercato) {
     dettaglio,
     giocatori,
   }
+}
+
+export async function listSessioni() {
+  const sessioni = await SessioneMercato.find({ order: { id: 'DESC' } })
+  const now = new Date()
+  return sessioni.map((s) => ({
+    id: s.id,
+    dataApertura: s.dataApertura,
+    dataChiusura: s.dataChiusura,
+    maxProposte: s.maxProposte,
+    acquistiEffettivi: s.acquistiEffettivi,
+    tipoValuta: s.tipoValuta,
+    stato: calcolaStato(s, now),
+  }))
+}
+
+export async function getProposteSessione({ input }: { input: GetProposteSessioneInput }) {
+  const sessione = await SessioneMercato.findOne({
+    where: { id: input.idSessione },
+  })
+
+  if (!sessione) {
+    throw new ORPCError('NOT_FOUND', { message: 'Sessione non trovata' })
+  }
+
+  if (sessione.dataChiusura >= new Date()) {
+    throw new ORPCError('BAD_REQUEST', {
+      message: 'La sessione non è ancora chiusa',
+    })
+  }
+
+  return PropostaMercato.find({
+    where: { idSessione: input.idSessione, deletedAt: IsNull() },
+    relations: { Utente: true, Giocatore: true },
+  })
 }
