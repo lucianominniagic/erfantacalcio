@@ -1,11 +1,7 @@
 import { adminProcedure } from '~/server/orpc'
 import { Configurazione } from '~/config'
-import {
-  checkCountPartite,
-  creaPartite,
-  creaPartiteEmpty,
-  updateFase,
-} from '../services/helpers'
+import { creaPartite, creaPartiteEmpty } from '../repositories/partiteRepository'
+import { checkCountPartite, updateFase } from '../repositories/flowFaseRepository'
 import { getTornei } from '~/server/api/tornei/repository'
 import { AppDataSource } from '~/data-source'
 import { messageSchema } from '~/schemas/messageSchema'
