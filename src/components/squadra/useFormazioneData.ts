@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 import { orpc } from '~/utils/orpc'
 import { type Moduli } from '~/types/common'
-import { moduloDefault } from '~/utils/helper'
+import { moduloDefault } from '~/utils/formazione'
 import {
   type GiocatoreFormazioneType,
   type GiocatoreType,

@@ -6,7 +6,7 @@
  */
 
 import {
-  getDescrizioneGiornata,
+  getDescrizioneGiornataExtended,
   getTorneoTitle,
   getTorneoSubTitle,
 } from '~/utils/torneo'
@@ -135,7 +135,7 @@ export async function mapCalendario(result: Calendario[]) {
     girone: c.girone,
     partite: mapPartite(c.Partite),
     Torneo: c.Torneo.nome,
-    Descrizione: getDescrizioneGiornata(
+    Descrizione: getDescrizioneGiornataExtended(
       c.Torneo.nome,
       c.giornata,
       c.giornataSerieA,
@@ -163,7 +163,7 @@ export async function mapCalendarioWithSerieA(
     girone: c.girone,
     partite: mapPartite(c.Partite),
     Torneo: c.Torneo.nome,
-    Descrizione: getDescrizioneGiornata(
+    Descrizione: getDescrizioneGiornataExtended(
       c.Torneo.nome,
       c.giornata,
       c.giornataSerieA,

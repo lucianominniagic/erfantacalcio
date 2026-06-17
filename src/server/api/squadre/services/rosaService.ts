@@ -6,7 +6,8 @@
  */
 
 import { Configurazione } from '~/config'
-import { getRuoloEsteso, normalizeCampioncinoUrl } from '~/utils/helper'
+import { getRuoloEsteso } from '~/utils/formazione'
+import { normalizeCampioncinoUrl } from '~/utils/giocatori'
 import { toUtcDate } from '~/utils/dateUtils'
 import { type GiocatoreType } from '~/types/squadre'
 import { Trasferimenti } from '~/server/db/entities'

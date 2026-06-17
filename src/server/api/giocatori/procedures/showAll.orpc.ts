@@ -1,5 +1,5 @@
 import { publicProcedure } from '~/server/orpc'
-import { getRuoloEsteso } from '~/utils/helper'
+import { getRuoloEsteso } from '~/utils/formazione'
 import { Giocatori } from '~/server/db/entities'
 
 export const showAllORPCProcedure = publicProcedure

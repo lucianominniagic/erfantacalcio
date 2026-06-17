@@ -4,7 +4,7 @@ import { type SelectChangeEvent } from '@mui/material'
 import { z } from 'zod'
 import { useQuery } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
-import { getIdNextGiornata } from '~/utils/helper'
+import { getIdNextGiornata } from '~/utils/torneo'
 import { calendarioSchema } from '~/schemas/calendario'
 
 type AlertState = {

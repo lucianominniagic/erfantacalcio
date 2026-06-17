@@ -19,7 +19,7 @@ import { AppDataSource } from '~/data-source'
 import { Voti } from '~/server/db/entities'
 import { caricaVoti } from '~/server/services/caricaVotiService'
 import { uploadFile } from '~/utils/blobVercelUtils'
-import { normalizeNomeGiocatore } from '~/utils/helper'
+import { normalizeNomeGiocatore } from '~/utils/giocatori'
 import { formatToDecimalValue } from '~/utils/numberUtils'
 import type { iVotoGiocatore } from '~/types/voti'
 

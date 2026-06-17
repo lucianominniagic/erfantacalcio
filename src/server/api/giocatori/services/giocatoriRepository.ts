@@ -5,7 +5,7 @@
  * usate da più procedure in domini diversi.
  */
 
-import { getRuoloEsteso } from '~/utils/helper'
+import { getRuoloEsteso } from '~/utils/formazione'
 import { Giocatori, Voti } from '~/server/db/entities'
 import { type EntityManager } from 'typeorm'
 

@@ -22,7 +22,7 @@ import {
 import { scriviFormazione, type GiocatoreInput } from '~/server/services/scriviFormazione'
 import { ReSendMailAsync } from '~/server/services/mailSender'
 import { formatDateTime, nowInItalyIso } from '~/utils/dateUtils'
-import { getDescrizioneGiornata } from '~/utils/helper'
+import { getDescrizioneGiornataCompact } from '~/utils/torneo'
 import { Configurazione } from '~/config'
 import {
   buildFormazioneCreatedHtml,
@@ -91,7 +91,7 @@ export async function salvaFormazione(input: SalvaFormazioneInput): Promise<void
     console.log(`Invio notifica mail inserimento formazione`)
     const { to, cc, avversario } = resolveFormazioneMailRecipients(partita, idSquadra)
     const subject = `ErFantacalcio: Formazione partita ${partita.SquadraHome?.nomeSquadra} - ${partita.SquadraAway?.nomeSquadra}`
-    const descrizioneGiornata = getDescrizioneGiornata(
+    const descrizioneGiornata = getDescrizioneGiornataCompact(
       partita.Calendario.giornataSerieA,
       partita.Calendario.Torneo.nome,
       partita.Calendario.giornata,
@@ -191,7 +191,7 @@ export async function confermaPrecedente(idSquadra: number): Promise<void> {
       giocatori: lastFormazione.Voti,
     })
 
-    const descrizioneGiornata = getDescrizioneGiornata(
+    const descrizioneGiornata = getDescrizioneGiornataCompact(
       partita.Calendario.giornataSerieA,
       partita.Calendario.Torneo.nome,
       partita.Calendario.giornata,

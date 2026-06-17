@@ -1,7 +1,11 @@
-import { z } from 'zod'
-import { calendarioSchema } from '~/schemas/calendario'
+/**
+ * Utility per la gestione delle formazioni: moduli, ruoli, posizioni campo.
+ *
+ * Nessuna dipendenza da DB, tRPC o sessione.
+ * Usate sia lato server (validazione) sia lato client (UI).
+ */
+
 import { type Moduli, type Ruoli } from '~/types/common'
-import { countOccurrences } from '~/utils/stringUtils'
 
 export function getRuoloEsteso(ruolo: string, pluralize?: boolean) {
   switch (ruolo) {
@@ -18,99 +22,16 @@ export function getRuoloEsteso(ruolo: string, pluralize?: boolean) {
   }
 }
 
-export function getDescrizioneGiornata(
-  giornataSerieA: number,
-  nomeTorneo: string,
-  giornata: number,
-  gruppoFase: string | null,
-) {
-  return `Serie A ${giornataSerieA} - ${nomeTorneo} ${giornata === 0 ? '' : giornata} ${gruppoFase ? (gruppoFase.length === 1 ? `girone ${gruppoFase}` : gruppoFase) : ''}`
-}
-
-export function getNomeTorneo(nome: string, gruppo: string | null) {
-  return `${nome} ${gruppo ? `girone ${gruppo}` : ''}`.trim()
-}
-
-export function normalizeCampioncinoUrl(
-  link: string,
-  nome: string,
-  nomeFantagazzetta?: string | null,
-): string {
-  // se `nomeFantagazzetta` è un URL assoluto, lo ritorniamo direttamente
-  // se `link` indica la versione small, sostituiamo '/card/' con '/small/' nell'URL
-  if (nomeFantagazzetta) {
-    try {
-      // `new URL()` lancia se non è un URL valido/assoluto
-      new URL(nomeFantagazzetta)
-      if (link && link.toLowerCase().includes('small')) {
-        return nomeFantagazzetta.replace('/card/', '/small/')
-      }
-      return nomeFantagazzetta
-    } catch {
-      // non è un URL: prosegui con la logica normale
-    }
-  }
-
-  let url = ''
-
-  if (!nomeFantagazzetta) {
-    if (countOccurrences(nome, ' ') === 0) {
-      // esempio: TOTTI --> TOTTI
-      url = link.replace('{giocatore}', nome.replace('.', ''))
-    } else if (
-      countOccurrences(nome, ' ') === 1 &&
-      countOccurrences(nome, '.') > 0
-    ) {
-      // esempio: TOTTI F. --> TOTTI
-      url = link.replace(
-        '{giocatore}',
-        nome.substring(0, nome.lastIndexOf(' ')),
-      )
-    } else if (
-      countOccurrences(nome, ' ') > 1 &&
-      countOccurrences(nome, '.') > 0
-    ) {
-      // esempio: DE VRIJ J. --> DE-VRIJ
-      url = link.replace(
-        '{giocatore}',
-        nome.substring(0, nome.lastIndexOf(' ')).replace(' ', '-'),
-      )
-    } else if (
-      countOccurrences(nome, ' ') === 1 &&
-      countOccurrences(nome, '.') === 0
-    ) {
-      // esempio: ALEX SANDRO --> ALEX-SANDRO
-      url = link.replace('{giocatore}', nome.replace(' ', '-'))
-    }
+export function convertiStringaInRuolo(str: string): Ruoli | null {
+  const ruoloUpperCase = str.toUpperCase()
+  if (ruoliList.includes(ruoloUpperCase as Ruoli)) {
+    return ruoloUpperCase as Ruoli
   } else {
-    url = link.replace('{giocatore}', nomeFantagazzetta)
+    return null
   }
-
-  return url
 }
 
-export function normalizeNomeGiocatore(nome: string): string {
-  return nome
-    .toUpperCase()
-    .trim()
-    .replace('À', "A'")
-    .replace('Á', "A'")
-    .replace('È', "E'")
-    .replace('É', "E'")
-    .replace('Ì', "I'")
-    .replace('Í', "I'")
-    .replace('Ò', "O'")
-    .replace('Ó', "O'")
-    .replace('Ú', "O'")
-    .replace('Ù', "O'")
-}
-
-export function getIdNextGiornata(
-  calendarioList: z.infer<typeof calendarioSchema>[],
-) {
-  return calendarioList?.find((item) => item.isSelected)?.id ?? undefined
-}
-
+export const ruoliList: Ruoli[] = ['P', 'D', 'C', 'A']
 export const moduliList: Moduli[] = [
   '3-4-3',
   '4-3-3',
@@ -120,7 +41,6 @@ export const moduliList: Moduli[] = [
   '5-4-1',
   '4-5-1',
 ]
-export const ruoliList: Ruoli[] = ['P', 'D', 'C', 'A']
 export const moduloDefault = '3-4-3'
 
 export const ModuloPositions = {
@@ -253,37 +173,4 @@ export const ModuloPositions = {
     ],
     A: [{ bottom: '80%', left: '36%', transform: 'translate(0%, 0)' }],
   },
-}
-
-export function convertiStringaInRuolo(str: string): Ruoli | null {
-  const ruoloUpperCase = str.toUpperCase()
-
-  if (ruoliList.includes(ruoloUpperCase as Ruoli)) {
-    return ruoloUpperCase as Ruoli
-  } else {
-    return null
-  }
-}
-
-export function getShortName(s: string, maxLength?: number) {
-  if (!s || s.trim().length === 0) {
-    return s
-  }
-
-  let longestWord = ''
-  const words = s.split(' ')
-
-  words.forEach((word) => {
-    if (word.length > 2 && !word.includes('.')) {
-      if (word.length > longestWord.length) {
-        longestWord = word
-      }
-    }
-  })
-
-  return maxLength
-    ? longestWord.length > maxLength
-      ? longestWord.substring(0, maxLength)
-      : longestWord
-    : longestWord
 }

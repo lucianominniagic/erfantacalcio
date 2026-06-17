@@ -12,7 +12,7 @@ import {
   Style,
 } from '@mui/icons-material'
 import Image from 'next/image'
-import { getShortName } from '~/utils/helper'
+import { getShortName } from '~/utils/giocatori'
 import { getColorByRuolo, getVotoBonus, type Tabellino } from './tabellinoHelpers'
 
 interface TabellinoVotiListProps {

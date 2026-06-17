@@ -3,11 +3,7 @@ import { type z } from 'zod'
 import { type giornataSchema } from '~/schemas/calendario'
 import { type Moduli } from '~/types/common'
 import { type GiocatoreFormazioneType, type GiocatoreType } from '~/types/squadre'
-import {
-  convertiStringaInRuolo,
-  moduliList,
-  ModuloPositions,
-} from '~/utils/helper'
+import { convertiStringaInRuolo, moduliList, ModuloPositions } from '~/utils/formazione'
 
 export const allowedFormations: number[] = [
   1343, 1352, 1451, 1442, 1433, 1541, 1532,

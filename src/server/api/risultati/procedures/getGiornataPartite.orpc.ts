@@ -2,10 +2,10 @@ import { z } from 'zod'
 import { publicProcedure } from '~/server/orpc'
 import { RuoloUtente } from '~/utils/enums'
 import {
-  getTorneo,
-  getDescrizioneGiornata,
+  getDescrizioneGiornataExtended,
   getTorneoTitle,
   getTorneoSubTitle,
+  getTorneo,
 } from '~/utils/torneo'
 import { getCalendario } from '~/server/api/calendario/repository'
 import { mapPartite } from '../services/partiteMapping'
@@ -47,7 +47,7 @@ export const getGiornataPartiteORPCProcedure = publicProcedure
             calendario.Torneo.nome,
             calendario.Torneo.gruppoFase,
           ),
-          Descrizione: getDescrizioneGiornata(
+          Descrizione: getDescrizioneGiornataExtended(
             calendario.Torneo.nome,
             calendario.giornata,
             calendario.giornataSerieA,

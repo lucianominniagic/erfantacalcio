@@ -20,7 +20,7 @@ import React from 'react'
 import { type z } from 'zod'
 import { type giornataSchema } from '~/schemas/calendario'
 import { type GiocatoreFormazioneType } from '~/types/squadre'
-import { getShortName } from '~/utils/helper'
+import { getShortName } from '~/utils/giocatori'
 import { getMatch } from './utils'
 
 interface FormaData {
