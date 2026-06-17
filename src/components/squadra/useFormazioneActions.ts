@@ -2,14 +2,11 @@ import { useMutation } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
 import type { FormazioneDataState } from './useFormazioneData'
 import {
-  allowedFormations,
-  calcolaCodiceFormazione,
-  formatModulo,
-  sortPlayersByRoleDescThenRiserva,
   sortPlayersByRoleDescThenCostoDesc,
+  validateAndGetModulo,
+  applyPlayerClick,
 } from './utils'
 import { type GiocatoreFormazioneType } from '~/types/squadre'
-import { type Moduli } from '~/types/common'
 import React, { useState } from 'react'
 
 interface AlertState {
@@ -46,53 +43,17 @@ export function useFormazioneActions(
   )
 
   function canAddPlayer(ruoloGiocatore: string): boolean {
-    const newState = calcolaCodiceFormazione(campo, ruoloGiocatore)
-    const newStateStr = newState.toString().padStart(4, '0')
-
-    const isValid = allowedFormations.some((formation) => {
-      const formationStr = formation.toString().padStart(4, '0')
-      for (let i = 0; i < 4; i++) {
-        const currentRoleCount = parseInt(newStateStr.charAt(i), 10)
-        const maxRoleCount = parseInt(formationStr.charAt(i), 10)
-        if (currentRoleCount > maxRoleCount) return false
-      }
-      return true
-    })
-
-    if (isValid) {
-      dispatch({ type: 'SET_MODULO', payload: formatModulo(newStateStr) as Moduli })
+    const newModulo = validateAndGetModulo(campo, ruoloGiocatore)
+    if (newModulo !== null) {
+      dispatch({ type: 'SET_MODULO', payload: newModulo })
     }
-
-    return isValid
+    return newModulo !== null
   }
 
   const handleClickPlayer = (playerClicked: GiocatoreFormazioneType) => {
-    playerClicked.riserva = null
-    playerClicked.titolare = false
-
     const canAdd = canAddPlayer(playerClicked.ruolo)
-
-    let newRosa = rosa
-    let newCampo = campo
-    let newPanca = panca
-
-    if (rosa.some((c) => c.idGiocatore === playerClicked.idGiocatore) && canAdd) {
-      playerClicked.titolare = true
-      newRosa = rosa.filter((p) => p.idGiocatore !== playerClicked.idGiocatore)
-      newCampo = [...campo, playerClicked]
-    } else if (rosa.some((c) => c.idGiocatore === playerClicked.idGiocatore)) {
-      playerClicked.riserva = 100
-      newRosa = rosa.filter((p) => p.idGiocatore !== playerClicked.idGiocatore)
-      newPanca = sortPlayersByRoleDescThenRiserva([...panca, playerClicked])
-    } else if (campo.some((c) => c.idGiocatore === playerClicked.idGiocatore)) {
-      newCampo = campo.filter((p) => p.idGiocatore !== playerClicked.idGiocatore)
-      newRosa = sortPlayersByRoleDescThenRiserva([...rosa, playerClicked])
-    } else if (panca.some((c) => c.idGiocatore === playerClicked.idGiocatore)) {
-      newPanca = panca.filter((p) => p.idGiocatore !== playerClicked.idGiocatore)
-      newRosa = [...rosa, playerClicked]
-    }
-
-    dispatch({ type: 'UPDATE_LISTS', payload: { rosa: newRosa, campo: newCampo, panca: newPanca } })
+    const result = applyPlayerClick(rosa, campo, panca, playerClicked, canAdd)
+    dispatch({ type: 'UPDATE_LISTS', payload: result })
   }
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
