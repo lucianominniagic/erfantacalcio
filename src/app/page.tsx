@@ -45,10 +45,24 @@ export default function HomePage() {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   }))
-  const championsBracket = useQuery(orpc.tornei.championsBracket.queryOptions({
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  }))
+  const championsBracket = useQuery(
+    orpc.tornei.coppaBracket.queryOptions(
+      {
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        input: { nomeTorneo: 'champions' }
+      }
+    ),
+  )
+  const coppaPerdentiBracket = useQuery(
+    orpc.tornei.coppaBracket.queryOptions(
+      {
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+        input: { nomeTorneo: 'coppa dei perdenti' }
+      }
+    ),
+  )
   const prossimeGiornate = useQuery(orpc.calendario.getProssimeGiornate.queryOptions({
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -68,11 +82,16 @@ export default function HomePage() {
     !!championsBracket.data?.semifinaliAndata?.partite.some(
       (p) => p.idHome !== null || p.idAway !== null,
     )
+  const hasSemifinaliTeamsCoppaPerdenti =
+    !coppaPerdentiBracket.isLoading &&
+    !!coppaPerdentiBracket.data?.semifinaliAndata?.partite.some(
+      (p) => p.idHome !== null || p.idAway !== null,
+    )
   const stagionefinita =
     !prossimeGiornate.isLoading &&
     prossimeGiornate.isSuccess &&
     (prossimeGiornate.data?.length ?? 1) === 0
-  const [championsTab, setChampionsTab] = useState(0)
+  const [coppaTab, setCoppaTab] = useState(0)
 
   const calendarioList =
     girone && !isCalendarioAttuale && !isCalendarioRecuperi
@@ -114,11 +133,12 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!championsBracket.isLoading) {
-      setChampionsTab(hasSemifinaliTeams ? 1 : 0)
+      setCoppaTab(hasSemifinaliTeams ? 1 : 0)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [championsBracket.isLoading])
-
+  
+  
   const handleCalendario = (
     girone: number | undefined,
     isAttuale: boolean,
@@ -311,19 +331,23 @@ export default function HomePage() {
                       <>
                         {classificheCampionato?.map(renderClassifica)}
                         <Tabs
-                          value={championsTab}
-                          onChange={(_, v: number) => setChampionsTab(v)}
+                          value={coppaTab}
+                          onChange={(_, v: number) => setCoppaTab(v)}
                         >
                           <Tab label="Classifica Champions" />
                           <Tab
-                            label="Fase finale"
+                            label="Fase finale Champions"
                             disabled={!hasSemifinaliTeams}
                           />
+                          <Tab
+                            label="Coppa Perdenti"
+                            disabled={!hasSemifinaliTeamsCoppaPerdenti}
+                          />
                         </Tabs>
-                        {championsTab === 0 && (
+                        {coppaTab === 0 && (
                           <><br></br>{classificheChampions?.map(renderClassifica)}</>
                         )}
-                        {championsTab === 1 && (
+                        {coppaTab === 1 && (
                           <>
                             <ChampionsBracket
                               semifinaliAndata={
@@ -333,6 +357,20 @@ export default function HomePage() {
                                 championsBracket.data?.semifinaliRitorno ?? null
                               }
                               finale={championsBracket.data?.finale ?? null}
+                            />
+                            <br />
+                          </>
+                        )}
+                        {coppaTab === 2 && (
+                          <>
+                            <ChampionsBracket
+                              semifinaliAndata={
+                                coppaPerdentiBracket.data?.semifinaliAndata ?? null
+                              }
+                              semifinaliRitorno={
+                                coppaPerdentiBracket.data?.semifinaliRitorno ?? null
+                              }
+                              finale={coppaPerdentiBracket.data?.finale ?? null}
                             />
                             <br />
                           </>

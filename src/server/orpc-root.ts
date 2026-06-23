@@ -14,7 +14,7 @@ import { listSquadreSerieAORPCProcedure } from '~/server/api/squadreSerieA/proce
 import { getTabelliniORPCProcedure } from '~/server/api/partita/procedures/getTabellini.orpc'
 import { getFormazioniORPCProcedure } from '~/server/api/partita/procedures/getFormazioni.orpc'
 import { listTorneiORPCProcedure } from '~/server/api/tornei/procedures/list.orpc'
-import { championsBracketORPCProcedure } from '~/server/api/tornei/procedures/championsBracket.orpc'
+import { coppaBracketORPCProcedure } from '~/server/api/tornei/procedures/championsBracket.orpc'
 // risultati
 import { getGiornataPartiteORPCProcedure } from '~/server/api/risultati/procedures/getGiornataPartite.orpc'
 import { getTabellinoORPCProcedure } from '~/server/api/risultati/procedures/getTabellino.orpc'
@@ -121,7 +121,7 @@ export const orpcRouter = {
   },
   tornei: {
     list: listTorneiORPCProcedure,
-    championsBracket: championsBracketORPCProcedure,
+    coppaBracket: coppaBracketORPCProcedure,
   },
   risultati: {
     update: updateRisultatiORPCProcedure,

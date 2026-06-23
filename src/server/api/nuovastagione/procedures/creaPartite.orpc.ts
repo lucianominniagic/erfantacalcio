@@ -55,6 +55,7 @@ export const creaPartiteORPCProcedure = adminProcedure
             )
           await creaPartite(trx, 4, idTorneo, false, 4)
 
+          //fase finale champions
           idTorneo = tornei.find(
             (c: { nome: string; gruppoFase?: string | null; idTorneo: number }) =>
               c.nome.toLowerCase() === 'champions' &&
@@ -85,6 +86,40 @@ export const creaPartiteORPCProcedure = adminProcedure
           if (!idTorneo)
             throw new Error(
               "Nessun torneo trovato con il nome 'champions' e fase 'finale'.",
+            )
+          await creaPartiteEmpty(trx, 1, idTorneo, false)
+
+          //fase finale coppa dei perdenti
+          idTorneo = tornei.find(
+            (c: { nome: string; gruppoFase?: string | null; idTorneo: number }) =>
+              c.nome.toLowerCase() === 'coppa dei perdenti' &&
+              c.gruppoFase?.toLowerCase() === 'semifinali andata',
+          )?.idTorneo
+          if (!idTorneo)
+            throw new Error(
+              "Nessun torneo trovato con il nome 'coppa dei perdenti' e fase 'semifinali andata'.",
+            )
+          await creaPartiteEmpty(trx, 2, idTorneo, true)
+
+          idTorneo = tornei.find(
+            (c: { nome: string; gruppoFase?: string | null; idTorneo: number }) =>
+              c.nome.toLowerCase() === 'coppa dei perdenti' &&
+              c.gruppoFase?.toLowerCase() === 'semifinali ritorno',
+          )?.idTorneo
+          if (!idTorneo)
+            throw new Error(
+              "Nessun torneo trovato con il nome 'coppa dei perdenti' e fase 'semifinali ritorno'.",
+            )
+          await creaPartiteEmpty(trx, 2, idTorneo, true)
+
+          idTorneo = tornei.find(
+            (c: { nome: string; gruppoFase?: string | null; idTorneo: number }) =>
+              c.nome.toLowerCase() === 'coppa dei perdenti' &&
+              c.gruppoFase?.toLowerCase() === 'finale',
+          )?.idTorneo
+          if (!idTorneo)
+            throw new Error(
+              "Nessun torneo trovato con il nome 'coppa dei perdenti' e fase 'finale'.",
             )
           await creaPartiteEmpty(trx, 1, idTorneo, false)
 

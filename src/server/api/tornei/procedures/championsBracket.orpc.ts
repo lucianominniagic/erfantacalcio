@@ -1,17 +1,19 @@
 import { publicProcedure } from '~/server/orpc'
 import { getCalendario, mapCalendario } from '~/server/api/calendario/repository'
 import { getTornei } from '~/server/api/tornei/repository'
+import z from 'zod'
 
-export const championsBracketORPCProcedure = publicProcedure
-  .route({ method: 'GET', path: '/tornei/championsBracket', summary: 'Bracket Champions League' })
-  .handler(async () => {
+export const coppaBracketORPCProcedure = publicProcedure
+  .route({ method: 'GET', path: '/tornei/coppaBracket', summary: 'Bracket Coppa' })
+  .input(z.object({ nomeTorneo: z.string() }))
+  .handler(async ({ input }) => {
     try {
       const tornei = await getTornei()
-      const champions = tornei.filter((t) => t.nome.toLowerCase() === 'champions')
+      const coppa = tornei.filter((t) => t.nome.toLowerCase() === input.nomeTorneo.toLowerCase())
 
-      const semifinaliAndandoTorneo = champions.find((t) => t.gruppoFase?.toLowerCase() === 'semifinali andata')
-      const semifinaliRitornoTorneo = champions.find((t) => t.gruppoFase?.toLowerCase() === 'semifinali ritorno')
-      const finaleTorneo = champions.find((t) => t.gruppoFase?.toLowerCase() === 'finale')
+      const semifinaliAndandoTorneo = coppa.find((t) => t.gruppoFase?.toLowerCase() === 'semifinali andata')
+      const semifinaliRitornoTorneo = coppa.find((t) => t.gruppoFase?.toLowerCase() === 'semifinali ritorno')
+      const finaleTorneo = coppa.find((t) => t.gruppoFase?.toLowerCase() === 'finale')
 
       const fetchGiornata = async (idTorneo: number | undefined) => {
         if (idTorneo === undefined) return null
@@ -29,7 +31,7 @@ export const championsBracketORPCProcedure = publicProcedure
 
       return { semifinaliAndata, semifinaliRitorno, finale }
     } catch (error) {
-      console.error('Si è verificato un errore in championsBracket', error)
+      console.error('Si è verificato un errore in coppaBracket', error)
       throw error
     }
   })
