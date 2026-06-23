@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { publicProcedure } from '~/server/orpc'
-import { getCalendario, mapCalendario } from '../../../utils/common'
+import { getCalendario, mapCalendario } from '~/server/api/calendario/repository'
 import { getAltrePartite, getFormazioni } from './helpers'
 
 export const getFormazioniORPCProcedure = publicProcedure

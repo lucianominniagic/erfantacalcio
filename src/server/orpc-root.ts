@@ -99,10 +99,7 @@ import { getVotoORPCProcedure } from '~/server/api/voti/procedures/get.orpc'
 import { getStatisticaVotiORPCProcedure } from '~/server/api/voti/procedures/getStatisticaVoti.orpc'
 import { updateVotoORPCProcedure } from '~/server/api/voti/procedures/update.orpc'
 import { uploadVercelORPCProcedure } from '~/server/api/voti/procedures/uploadVercel.orpc'
-import { resetVotiORPCProcedure } from '~/server/api/voti/procedures/resetVoti.orpc'
-import { readVotiORPCProcedure } from '~/server/api/voti/procedures/readVoti.orpc'
-import { processVotiORPCProcedure } from '~/server/api/voti/procedures/processVoti.orpc'
-import { refreshStatsORPCProcedure } from '~/server/api/voti/procedures/refreshStats.orpc'
+import { importaVotiGiornataORPCProcedure } from '~/server/api/voti/procedures/importaVotiGiornata.orpc'
 
 export const orpcRouter = {
   albo: {
@@ -221,10 +218,7 @@ export const orpcRouter = {
     getStatisticaVoti: getStatisticaVotiORPCProcedure,
     update: updateVotoORPCProcedure,
     uploadVercel: uploadVercelORPCProcedure,
-    resetVoti: resetVotiORPCProcedure,
-    readVoti: readVotiORPCProcedure,
-    processVoti: processVotiORPCProcedure,
-    refreshStats: refreshStatsORPCProcedure,
+    importaVotiGiornata: importaVotiGiornataORPCProcedure,
   },
 }
 

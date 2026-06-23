@@ -3,11 +3,7 @@ import { type z } from 'zod'
 import { type giornataSchema } from '~/schemas/calendario'
 import { type Moduli } from '~/types/common'
 import { type GiocatoreFormazioneType, type GiocatoreType } from '~/types/squadre'
-import {
-  convertiStringaInRuolo,
-  moduliList,
-  ModuloPositions,
-} from '~/utils/helper'
+import { convertiStringaInRuolo, moduliList, ModuloPositions } from '~/utils/formazione'
 
 export const allowedFormations: number[] = [
   1343, 1352, 1451, 1442, 1433, 1541, 1532,
@@ -110,6 +106,75 @@ export function checkDataFormazione(dataIso: string | undefined) {
   const targetDate = new Date(dataIso ?? new Date()).getTime()
   const now = new Date().getTime()
   return targetDate >= now
+}
+
+/**
+ * Determina se aggiungere un giocatore di `ruoloGiocatore` al campo è valido
+ * rispetto ai moduli consentiti. Restituisce il nuovo modulo calcolato, o null
+ * se nessuna formazione ammette l'aggiunta.
+ */
+export function validateAndGetModulo(
+  campo: GiocatoreFormazioneType[],
+  ruoloGiocatore: string,
+): Moduli | null {
+  const newState = calcolaCodiceFormazione(campo, ruoloGiocatore)
+  const newStateStr = newState.toString().padStart(4, '0')
+  const isValid = allowedFormations.some((formation) => {
+    const formationStr = formation.toString().padStart(4, '0')
+    for (let i = 0; i < 4; i++) {
+      const currentRoleCount = parseInt(newStateStr.charAt(i), 10)
+      const maxRoleCount = parseInt(formationStr.charAt(i), 10)
+      if (currentRoleCount > maxRoleCount) return false
+    }
+    return true
+  })
+  return isValid ? (formatModulo(newStateStr) as Moduli) : null
+}
+
+/**
+ * Applica il click su un giocatore calcolando la nuova distribuzione
+ * rosa / campo / panca. Funzione pura: non muta l'input, non ha side effect.
+ *
+ * @param canAdd - pre-calcolato da validateAndGetModulo (non null → true)
+ */
+export function applyPlayerClick(
+  rosa: GiocatoreFormazioneType[],
+  campo: GiocatoreFormazioneType[],
+  panca: GiocatoreFormazioneType[],
+  playerClicked: GiocatoreFormazioneType,
+  canAdd: boolean,
+): { rosa: GiocatoreFormazioneType[]; campo: GiocatoreFormazioneType[]; panca: GiocatoreFormazioneType[] } {
+  const base: GiocatoreFormazioneType = { ...playerClicked, riserva: null, titolare: false }
+
+  if (rosa.some((c) => c.idGiocatore === base.idGiocatore) && canAdd) {
+    return {
+      rosa: rosa.filter((p) => p.idGiocatore !== base.idGiocatore),
+      campo: [...campo, { ...base, titolare: true }],
+      panca,
+    }
+  }
+  if (rosa.some((c) => c.idGiocatore === base.idGiocatore)) {
+    return {
+      rosa: rosa.filter((p) => p.idGiocatore !== base.idGiocatore),
+      campo,
+      panca: sortPlayersByRoleDescThenRiserva([...panca, { ...base, riserva: 100 }]),
+    }
+  }
+  if (campo.some((c) => c.idGiocatore === base.idGiocatore)) {
+    return {
+      rosa: sortPlayersByRoleDescThenRiserva([...rosa, base]),
+      campo: campo.filter((p) => p.idGiocatore !== base.idGiocatore),
+      panca,
+    }
+  }
+  if (panca.some((c) => c.idGiocatore === base.idGiocatore)) {
+    return {
+      rosa: [...rosa, base],
+      campo,
+      panca: panca.filter((p) => p.idGiocatore !== base.idGiocatore),
+    }
+  }
+  return { rosa, campo, panca }
 }
 
 export function getOpponent(

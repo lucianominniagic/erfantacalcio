@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { adminProcedure } from '~/server/orpc'
-import { deleteGiocatore, deleteVotiGiocatore } from '../../../utils/common'
+import { deleteGiocatore, deleteVotiGiocatore } from '~/server/api/giocatori/services/giocatoriRepository'
 import { AppDataSource } from '~/data-source'
 import { Trasferimenti } from '~/server/db/entities'
 

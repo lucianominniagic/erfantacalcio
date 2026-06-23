@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { adminProcedure } from '~/server/orpc'
 import { calendarioSchema } from '~/schemas/calendario'
-import { getCalendario } from '~/server/utils/common'
+import { getCalendario } from '~/server/api/calendario/repository'
 
 export const listCalendarioORPCProcedure = adminProcedure
   .route({ method: 'GET', path: '/calendario/list', summary: 'Lista completa del calendario (admin)' })

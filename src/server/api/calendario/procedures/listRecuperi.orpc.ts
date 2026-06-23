@@ -1,5 +1,5 @@
 import { publicProcedure } from '~/server/orpc'
-import { getCalendario, mapCalendario } from '~/server/utils/common'
+import { getCalendario, mapCalendario } from '~/server/api/calendario/repository'
 
 export const listRecuperiORPCProcedure = publicProcedure
   .route({ method: 'GET', path: '/calendario/listRecuperi', summary: 'Lista partite di recupero del calendario' })

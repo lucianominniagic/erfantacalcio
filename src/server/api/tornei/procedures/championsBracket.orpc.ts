@@ -1,5 +1,6 @@
 import { publicProcedure } from '~/server/orpc'
-import { getCalendario, mapCalendario, getTornei } from '~/server/utils/common'
+import { getCalendario, mapCalendario } from '~/server/api/calendario/repository'
+import { getTornei } from '~/server/api/tornei/repository'
 
 export const championsBracketORPCProcedure = publicProcedure
   .route({ method: 'GET', path: '/tornei/championsBracket', summary: 'Bracket Champions League' })

@@ -15,7 +15,7 @@ import {
 import CheckIcon from '@mui/icons-material/CheckCircle'
 import { GenericCard } from '~/components/cards'
 import { type GiocatoreType } from '~/types/giocatori'
-import { ruoliList, getRuoloEsteso } from '~/utils/helper'
+import { ruoliList, getRuoloEsteso } from '~/utils/formazione'
 
 interface GiocatoreFormPanelProps {
   giocatore: GiocatoreType

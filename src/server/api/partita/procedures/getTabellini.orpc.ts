@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { publicProcedure } from '~/server/orpc'
-import { getCalendario, mapCalendario } from '../../../utils/common'
-import { getTabellino } from '../../../utils/common'
+import { getCalendario, mapCalendario } from '~/server/api/calendario/repository'
+import { getTabellino } from '~/server/services/tabelliniService'
 import { Partite } from '~/server/db/entities'
 import {
   mapVotoToTabellinoEntry,

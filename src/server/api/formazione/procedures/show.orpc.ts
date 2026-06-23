@@ -3,10 +3,10 @@ import { protectedProcedure } from '~/server/orpc'
 import {
   getProssimaGiornata,
   getProssimaGiornataSerieA,
-  getRosaDisponibile,
-} from '~/server/utils/common'
+} from '~/server/api/calendario/repository'
+import { getRosaDisponibile } from '~/server/api/squadre/services/rosaService'
 import { GiocatoreFormazioneType } from '~/types/squadre'
-import { moduloDefault } from '~/utils/helper'
+import { moduloDefault } from '~/utils/formazione'
 import { Formazioni, Voti } from '~/server/db/entities'
 
 export const showFormazioneORPCProcedure = protectedProcedure

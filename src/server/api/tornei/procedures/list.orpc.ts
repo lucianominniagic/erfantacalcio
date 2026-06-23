@@ -1,5 +1,5 @@
 import { publicProcedure } from '~/server/orpc'
-import { getTornei } from '../../../utils/common'
+import { getTornei } from '~/server/api/tornei/repository'
 
 export const listTorneiORPCProcedure = publicProcedure
   .route({ method: 'GET', path: '/tornei/list', summary: 'Lista tornei' })

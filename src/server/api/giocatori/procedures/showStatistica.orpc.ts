@@ -1,7 +1,8 @@
 import { z } from 'zod'
 import { publicProcedure } from '~/server/orpc'
 import { Configurazione } from '~/config'
-import { getRuoloEsteso, normalizeCampioncinoUrl } from '~/utils/helper'
+import { getRuoloEsteso } from '~/utils/formazione'
+import { normalizeCampioncinoUrl } from '~/utils/giocatori'
 import { Giocatori, Trasferimenti, Voti } from '~/server/db/entities'
 import { IsNull } from 'typeorm'
 

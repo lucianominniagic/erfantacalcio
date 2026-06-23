@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { publicProcedure } from '~/server/orpc'
-import { getGiocatoriVenduti, getRosaDisponibile } from '../../../utils/common'
+import { getGiocatoriVenduti, getRosaDisponibile } from '~/server/api/squadre/services/rosaService'
 import { Voti } from '~/server/db/entities'
 import { In, MoreThan } from 'typeorm'
 

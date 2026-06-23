@@ -1,23 +1,14 @@
-import { toUtcDate } from '~/utils/dateUtils'
-import { Configurazione } from '~/config'
-import { getCalendario } from '../../../utils/common'
-import { type Partita, RoundRobin4, RoundRobin8 } from '~/utils/bergerTables'
-import {
-  Calendario,
-  Classifiche,
-  FlowNewSeason,
-  Partite,
-  Voti,
-} from '~/server/db/entities'
-import { EntityManager, LessThanOrEqual } from 'typeorm'
+/**
+ * partiteRepository — creazione partite per il flusso nuova stagione.
+ *
+ * Espone: creaPartite (round-robin), creaPartiteEmpty (placeholder knockout).
+ */
 
-export async function updateFase(trx: EntityManager, idFase: number) {
-  await trx.update(
-    FlowNewSeason,
-    { idFase },
-    { active: true, data: toUtcDate(new Date()) },
-  )
-}
+import { Configurazione } from '~/config'
+import { getCalendario } from '~/server/api/calendario/repository'
+import { type Partita, RoundRobin4, RoundRobin8 } from '~/utils/bergerTables'
+import { Partite } from '~/server/db/entities'
+import { type EntityManager } from 'typeorm'
 
 export async function creaPartite(
   trx: EntityManager,
@@ -95,33 +86,6 @@ export async function creaPartite(
   }
 }
 
-export async function creaClassifica(
-  trx: EntityManager,
-  idTorneo: number,
-  from: number,
-  to: number,
-) {
-  for (let i = from; i <= to; i++) {
-    await trx.insert(Classifiche, {
-      idSquadra: i,
-      idTorneo,
-      differenzaReti: 0,
-      giocate: 0,
-      golFatti: 0,
-      golSubiti: 0,
-      pareggiCasa: 0,
-      pareggiTrasferta: 0,
-      perseCasa: 0,
-      perseTrasferta: 0,
-      punti: 0,
-      vinteCasa: 0,
-      vinteTrasferta: 0,
-    })
-  }
-
-  console.info(`create classifiche per idTorneo: ${idTorneo}`)
-}
-
 export async function creaPartiteEmpty(
   trx: EntityManager,
   partite: number,
@@ -151,29 +115,4 @@ export async function creaPartiteEmpty(
     })
   }
   console.info(`create partite calendario per idTorneo: ${idTorneo}`)
-}
-
-export async function checkVotiUltimaGiornata() {
-  return (
-    (await Voti.count({
-      where: { Calendario: { giornataSerieA: 38 } },
-      relations: { Calendario: true },
-    })) > 0
-  )
-}
-
-export async function checkCountPartite() {
-  return (await Partite.count()) === 0
-}
-
-export async function checkCountClassifiche() {
-  return (await Classifiche.count()) === 0
-}
-
-export async function checkVerificaPartiteGiocate() {
-  return (
-    (await Calendario.count({
-      where: { hasGiocata: false, idTorneo: LessThanOrEqual(6) },
-    })) === 0
-  )
 }

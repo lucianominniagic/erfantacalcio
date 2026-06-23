@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { publicProcedure } from '~/server/orpc'
-import { getCalendario, mapCalendario } from '~/server/utils/common'
+import { getCalendario, mapCalendario } from '~/server/api/calendario/repository'
 
 export const getByIdCalendarioORPCProcedure = publicProcedure
   .route({ method: 'GET', path: '/calendario/getByIdCalendario', summary: 'Recupera partite del calendario per idCalendario' })

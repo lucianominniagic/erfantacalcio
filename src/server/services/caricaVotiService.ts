@@ -12,7 +12,7 @@ import {
   Voti,
 } from '~/server/db/entities'
 import { calcBonusVoto } from '~/server/services/votiService'
-import { normalizeNomeGiocatore } from '~/utils/helper'
+import { normalizeNomeGiocatore } from '~/utils/giocatori'
 
 type UploadVotoGiocatoreType = z.infer<typeof uploadVotoGiocatoreSchema>
 

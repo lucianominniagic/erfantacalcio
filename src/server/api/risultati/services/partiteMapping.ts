@@ -1,5 +1,5 @@
 import { Configurazione } from '~/config'
-import { getTabellino } from '../../../utils/common'
+import { getTabellino } from '~/server/services/tabelliniService'
 import { Formazioni, Partite } from '~/server/db/entities'
 import { calcolaFantapunti } from '~/server/services/tabelliniService'
 

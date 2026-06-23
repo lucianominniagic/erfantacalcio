@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { adminProcedure } from '~/server/orpc'
-import { chiudiTrasferimentoGiocatore } from '../../../utils/common'
+import { chiudiTrasferimentoGiocatore } from '~/server/api/trasferimenti/services/trasferimentoService'
 import { Configurazione } from '~/config'
 import { toUtcDate } from '~/utils/dateUtils'
 import { AppDataSource } from '~/data-source'

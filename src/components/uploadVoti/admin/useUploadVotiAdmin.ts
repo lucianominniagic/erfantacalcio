@@ -2,10 +2,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { type SelectChangeEvent } from '@mui/material'
 import { z } from 'zod'
-import { useQuery, useMutation } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
-import { getIdNextGiornata } from '~/utils/helper'
-import { type iVotoGiocatore } from '~/types/voti'
+import { getIdNextGiornata } from '~/utils/torneo'
 import { calendarioSchema } from '~/schemas/calendario'
 
 type AlertState = {
@@ -16,37 +15,26 @@ type AlertState = {
 
 export function useUploadVotiAdmin() {
   const [selectedIdCalendario, setSelectedIdCalendario] = useState<number>()
-  const [selectedGiornataSerieA, setSelectedGiornataSerieA] =
-    useState<number>(0)
-  const [calendario, setCalendario] = useState<
-    z.infer<typeof calendarioSchema>[]
-  >([])
+  const [selectedGiornataSerieA, setSelectedGiornataSerieA] = useState<number>(0)
+  const [calendario, setCalendario] = useState<z.infer<typeof calendarioSchema>[]>([])
   const [infofile, setInfofile] = useState('')
   const [file, setFile] = useState<File | undefined>()
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
   const [alert, setAlert] = useState<AlertState>(null)
 
-  // ── queries / mutations ───────────────────────────────────────────────────
+  // ── queries ───────────────────────────────────────────────────────────────
   const calendarioList = useQuery(
     orpc.calendario.list.queryOptions({
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
     }),
   )
-  const uploadFileVercel = useMutation(orpc.voti.uploadVercel.mutationOptions())
-  const resetVoti = useMutation(orpc.voti.resetVoti.mutationOptions())
-  const readVoti = useMutation(orpc.voti.readVoti.mutationOptions())
-  const processVoti = useMutation(orpc.voti.processVoti.mutationOptions())
-  const refreshStats = useMutation(orpc.voti.refreshStats.mutationOptions())
 
   // ── effects ───────────────────────────────────────────────────────────────
   const getGiornataSerieA = useCallback(
     (idCalendario: number | undefined) => {
-      return (
-        calendarioList.data?.find((item) => item.id === idCalendario)
-          ?.giornataSerieA ?? 0
-      )
+      return calendarioList.data?.find((item) => item.id === idCalendario)?.giornataSerieA ?? 0
     },
     [calendarioList.data],
   )
@@ -77,17 +65,6 @@ export function useUploadVotiAdmin() {
     return true
   }
 
-  async function processRecords(voti: iVotoGiocatore[]): Promise<void> {
-    const chunkSize = 10
-    const idCalendario = selectedIdCalendario ?? 0
-    for (let i = 0; i < voti.length; i += chunkSize) {
-      const chunk = voti.slice(i, i + chunkSize)
-      const progressVoti = (i * 90) / voti.length + 10
-      await processVoti.mutateAsync({ idCalendario, votiGiocatori: chunk })
-      setProgress(progressVoti)
-    }
-  }
-
   // ── handlers ──────────────────────────────────────────────────────────────
   const handleChangeCalendario = (event: SelectChangeEvent) => {
     const idCalendario = event.target.value
@@ -106,87 +83,54 @@ export function useUploadVotiAdmin() {
     setUploading(false)
     if (event.target.files?.[0]) {
       const f = event.target.files[0]
-      setInfofile(
-        `Nome file: ${f.name}, dimensioni del file: ${f.size / 1000} Kb, tipo: ${f.type}`,
-      )
+      setInfofile(`Nome file: ${f.name}, dimensioni del file: ${f.size / 1000} Kb, tipo: ${f.type}`)
     }
   }
 
   const handleUploadVercel = async () => {
     if (!validateForm(file)) return
+
     const filename = `voti_${selectedGiornataSerieA}_${selectedIdCalendario}.csv`
-    setUploading(true)
+    const blob = file!.slice(0, file!.size)
+    const reader = new FileReader()
 
-    const MAX_SIZE = 4.5 * 1024 * 1024
-    let offset = 0
+    reader.onload = async () => {
+      if (!reader.result || typeof reader.result === 'string') return
 
-    const readAndUploadBlock = () => {
-      if (file) {
-        const blob = file.slice(offset, offset + MAX_SIZE)
-        const reader = new FileReader()
+      const fileData = Buffer.from(new Uint8Array(reader.result)).toString('base64')
+      setUploading(true)
+      setProgress(0)
 
-        reader.onload = async () => {
-          if (reader.result && typeof reader.result !== 'string') {
-            const blockData = new Uint8Array(reader.result)
-            const fileData = Buffer.from(blockData).toString('base64')
-            const contentLength = blockData.length
-            offset += contentLength
+      try {
+        const stream = await orpc.voti.importaVotiGiornata.call({
+          idCalendario: selectedIdCalendario ?? 0,
+          fileName: filename,
+          fileData,
+        })
 
-            setProgress(0)
-
-            try {
-              const serverPathfilename = await uploadFileVercel.mutateAsync({
-                idCalendario: selectedIdCalendario ?? 0,
-                fileName: filename,
-                fileData: fileData,
-              })
-              setProgress(5)
-
-              await resetVoti.mutateAsync({ idCalendario: selectedIdCalendario ?? 0 })
-              setProgress(10)
-
-              const voti = await readVoti.mutateAsync({ fileUrl: serverPathfilename })
-              try {
-                await processRecords(voti)
-              } catch (error) {
-                setProgress(0)
-                setAlert({
-                  severity: 'error',
-                  message:
-                    error instanceof Error
-                      ? error.message
-                      : 'Errore sconosciuto durante il processamento dei voti',
-                  title: 'Errore',
-                })
-                return
-              }
-              setProgress(90)
-              await refreshStats.mutateAsync({ ruolo: 'P' })
-              setProgress(92)
-              await refreshStats.mutateAsync({ ruolo: 'D' })
-              setProgress(95)
-              await refreshStats.mutateAsync({ ruolo: 'C' })
-              setProgress(98)
-              await refreshStats.mutateAsync({ ruolo: 'A' })
-              setProgress(100)
-
-              setUploading(false)
-              setAlert({
-                severity: 'success',
-                message: `File processato correttamente: ${serverPathfilename}`,
-                title: 'File inviato',
-              })
-            } catch {
-              setAlert({ severity: 'error', message: 'Errore caricamento file', title: 'Errore' })
-            }
+        for await (const event of stream) {
+          setProgress(event.progress)
+          if (event.step === 'done') {
+            setUploading(false)
+            setAlert({
+              severity: 'success',
+              message: `File processato correttamente: ${event.fileUrl}`,
+              title: 'File inviato',
+            })
           }
         }
-
-        reader.readAsArrayBuffer(blob)
+      } catch (error) {
+        setUploading(false)
+        setProgress(0)
+        setAlert({
+          severity: 'error',
+          message: error instanceof Error ? error.message : 'Errore caricamento file',
+          title: 'Errore',
+        })
       }
     }
 
-    readAndUploadBlock()
+    reader.readAsArrayBuffer(blob)
   }
 
   return {

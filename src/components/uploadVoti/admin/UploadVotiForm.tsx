@@ -18,7 +18,7 @@ import {
 import { CloudUpload } from '@mui/icons-material'
 import { z } from 'zod'
 import { calendarioSchema } from '~/schemas/calendario'
-import { getDescrizioneGiornata } from '~/utils/helper'
+import { getDescrizioneGiornataCompact } from '~/utils/torneo'
 import LinearProgressBar from '~/components/LinearProgressBar/LinearProgressBar'
 
 type AlertState = {
@@ -73,7 +73,7 @@ export default function UploadVotiForm({
               >
                 {calendario.map((item) => (
                   <MenuItem key={item.id} value={item.id.toString()}>
-                    {getDescrizioneGiornata(
+                    {getDescrizioneGiornataCompact(
                       item.giornataSerieA,
                       item.nome,
                       item.giornata,

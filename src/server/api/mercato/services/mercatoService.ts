@@ -1,30 +1,22 @@
 import { ORPCError } from '@orpc/server'
-import { IsNull, LessThanOrEqual, MoreThan, MoreThanOrEqual, Not } from 'typeorm'
+import { IsNull, LessThanOrEqual, MoreThan, Not } from 'typeorm'
 import { AppDataSource } from '~/data-source'
 import { SessioneMercato, PropostaMercato, Trasferimento, Utente } from '~/server/db/entities'
-import type { CreateSessioneInput, GetGiocatoriSvincolatiInput, CreatePropostaInput, DeletePropostaInput, RiordinaProposteInput, AggiudicaSessioneInput } from '~/schemas/mercato'
+import type { CreateSessioneInput, GetGiocatoriSvincolatiInput, CreatePropostaInput, DeletePropostaInput, RiordinaProposteInput, AggiudicaSessioneInput, GetProposteSessioneInput } from '~/schemas/mercato'
 import { aggiudica, type PropostaInput } from './aggiudicazione'
+import {
+  type StatoSessione,
+  calcolaStato,
+  findSessioneAttiva,
+} from './sessioneMercatoRepository'
 
 export interface MercatoCtx {
   session: { user: { id: string; ruolo?: string; idSquadra: number } }
 }
 
-export type StatoSessione = 'futura' | 'attiva' | 'chiusa'
-
-function calcolaStato(sessione: SessioneMercato, now: Date): StatoSessione {
-  if (sessione.dataApertura > now) return 'futura'
-  if (sessione.dataChiusura < now) return 'chiusa'
-  return 'attiva'
-}
 
 export async function getMieProposte({ ctx }: { ctx: MercatoCtx; input: Record<string, never> }) {
-  const sessione = await SessioneMercato.findOne({
-    where: {
-      dataApertura: LessThanOrEqual(new Date()),
-      dataChiusura: MoreThanOrEqual(new Date()),
-    },
-    order: { id: 'DESC' },
-  })
+  const sessione = await findSessioneAttiva()
 
   if (!sessione) return []
 
@@ -40,13 +32,7 @@ export async function getMieProposte({ ctx }: { ctx: MercatoCtx; input: Record<s
 }
 
 export async function getSessioneAttiva({ ctx }: { ctx: MercatoCtx; input: Record<string, never> }) {
-  const sessione = await SessioneMercato.findOne({
-    where: {
-      dataApertura: LessThanOrEqual(new Date()),
-      dataChiusura: MoreThanOrEqual(new Date()),
-    },
-    order: { id: 'DESC' },
-  })
+  const sessione = await findSessioneAttiva()
 
   if (!sessione) return null
 
@@ -203,29 +189,19 @@ export async function createProposta({
   ctx: MercatoCtx
   input: CreatePropostaInput
 }) {
-  const sessione = await SessioneMercato.findOne({
-    where: {
-      dataApertura: LessThanOrEqual(new Date()),
-      dataChiusura: MoreThanOrEqual(new Date()),
-    },
-    relations: { ProposteMercato: true },
-    order: { id: 'DESC' },
-  })
+  const sessione = await findSessioneAttiva()
 
   if (!sessione) {
-    throw new ORPCError('NOT_FOUND', { message: 'Nessuna sessione trovata' })
-  }
-
-  const now = new Date()
-  const isAttiva = sessione.dataApertura <= now && sessione.dataChiusura >= now
-
-  if (!isAttiva) {
     throw new ORPCError('NOT_FOUND', { message: 'Nessuna sessione di mercato attiva' })
   }
 
-  const myProposte = (sessione.ProposteMercato ?? []).filter(
-    (p) => p.idSquadra === ctx.session.user.idSquadra && p.deletedAt === null,
-  )
+  const myProposte = await PropostaMercato.find({
+    where: {
+      idSessione: sessione.id,
+      idSquadra: ctx.session.user.idSquadra,
+      deletedAt: IsNull(),
+    },
+  })
 
   if (myProposte.length >= sessione.maxProposte) {
     throw new ORPCError('BAD_REQUEST', {
@@ -358,13 +334,7 @@ export async function riordinaProposte({
 }) {
   // Recupera la sessione attiva: il riordino è permesso solo finché la
   // sessione è aperta (altrimenti l'aggiudicazione sarebbe falsificabile).
-  const sessione = await SessioneMercato.findOne({
-    where: {
-      dataApertura: LessThanOrEqual(new Date()),
-      dataChiusura: MoreThanOrEqual(new Date()),
-    },
-    order: { id: 'DESC' },
-  })
+  const sessione = await findSessioneAttiva()
 
   if (!sessione) {
     throw new ORPCError('NOT_FOUND', {
@@ -551,4 +521,39 @@ async function buildEsitoSessione(sessione: SessioneMercato) {
     dettaglio,
     giocatori,
   }
+}
+
+export async function listSessioni() {
+  const sessioni = await SessioneMercato.find({ order: { id: 'DESC' } })
+  const now = new Date()
+  return sessioni.map((s) => ({
+    id: s.id,
+    dataApertura: s.dataApertura,
+    dataChiusura: s.dataChiusura,
+    maxProposte: s.maxProposte,
+    acquistiEffettivi: s.acquistiEffettivi,
+    tipoValuta: s.tipoValuta,
+    stato: calcolaStato(s, now),
+  }))
+}
+
+export async function getProposteSessione({ input }: { input: GetProposteSessioneInput }) {
+  const sessione = await SessioneMercato.findOne({
+    where: { id: input.idSessione },
+  })
+
+  if (!sessione) {
+    throw new ORPCError('NOT_FOUND', { message: 'Sessione non trovata' })
+  }
+
+  if (sessione.dataChiusura >= new Date()) {
+    throw new ORPCError('BAD_REQUEST', {
+      message: 'La sessione non è ancora chiusa',
+    })
+  }
+
+  return PropostaMercato.find({
+    where: { idSessione: input.idSessione, deletedAt: IsNull() },
+    relations: { Utente: true, Giocatore: true },
+  })
 }

@@ -41,6 +41,7 @@ Esistono due livelli di accesso: **admin** (gestisce la lega) e **presidente** (
 | **saldo** | Differenza tra il premio ricevuto e il totale versato da un presidente (quote + multe + mercato). Positivo = credito, negativo = debito. |
 | **caricamento voti** | Processo admin che importa i voti da CSV FantaGazzetta per una giornata: parsing del file → lookup/creazione giocatori → auto-trasferimento se mancante → upsert voti su DB. |
 | **punteggioPartita** | Punti classifica assegnati a una squadra per una partita: vittoria = 3, pareggio = 1, sconfitta = 0, multa = 0. Regola applicata solo ai tornei con `hasClassifica = true`. |
+| **sessioneMercato** | Finestra temporale in cui i presidenti possono fare proposte di acquisto per giocatori svincolati. Ogni sessione ha `dataApertura`, `dataChiusura`, `maxProposte` e `tipoValuta`. Lo stato è `futura` / `attiva` / `chiusa` derivato dalle date. |
 
 ---
 

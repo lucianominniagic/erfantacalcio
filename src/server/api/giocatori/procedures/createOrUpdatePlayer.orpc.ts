@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { adminProcedure } from '~/server/orpc'
-import { normalizeNomeGiocatore } from '~/utils/helper'
+import { normalizeNomeGiocatore } from '~/utils/giocatori'
 import { Giocatori } from '~/server/db/entities'
 
 function isAbsoluteUrl(value?: string | null): boolean {

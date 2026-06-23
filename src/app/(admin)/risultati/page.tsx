@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
-import { getDescrizioneGiornata, getIdNextGiornata } from '~/utils/helper'
+import { getDescrizioneGiornataCompact, getIdNextGiornata } from '~/utils/torneo'
 import CardPartiteAdmin from '~/components/cardPartite/CardPartiteAdmin'
 import { type GiornataAdminType } from '~/types/risultati'
 import { z } from 'zod'
@@ -105,7 +105,7 @@ export default function Risultati() {
                       >
                         {calendario.map((item) => (
                           <MenuItem key={item.id} value={item.id}>
-                            {getDescrizioneGiornata(
+                            {getDescrizioneGiornataCompact(
                               item.giornataSerieA,
                               item.nome,
                               item.giornata,

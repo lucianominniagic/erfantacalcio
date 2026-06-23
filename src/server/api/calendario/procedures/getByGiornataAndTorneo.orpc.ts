@@ -1,6 +1,6 @@
 import { publicProcedure } from '~/server/orpc'
 import { calendarioByGiornataSchema } from '~/schemas/calendario'
-import { getCalendario, mapCalendario } from '~/server/utils/common'
+import { getCalendario, mapCalendario } from '~/server/api/calendario/repository'
 
 export const getByGiornataAndTorneoORPCProcedure = publicProcedure
   .route({ method: 'GET', path: '/calendario/getByGiornataAndTorneo', summary: 'Recupera partite del calendario per giornata e torneo' })
