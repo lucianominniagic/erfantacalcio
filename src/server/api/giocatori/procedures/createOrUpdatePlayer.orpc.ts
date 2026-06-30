@@ -21,6 +21,7 @@ export const createOrUpdatePlayerORPCProcedure = adminProcedure
       ruolo: z.string(),
       nome: z.string(),
       nomeFantagazzetta: z.string().nullable(),
+      id_pf: z.number().int().positive().nullable().optional(),
     }),
   )
   .handler(async ({ input }) => {
@@ -34,6 +35,7 @@ export const createOrUpdatePlayerORPCProcedure = adminProcedure
             : normalizeNomeGiocatore(input.nomeFantagazzetta)
           : null,
         ruolo: input.ruolo,
+        id_pf: input.id_pf ?? null,
       })
       return giocatore.idGiocatore
     } catch (error) {

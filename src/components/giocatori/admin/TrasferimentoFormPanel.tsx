@@ -1,3 +1,7 @@
+/**
+ * @deprecated Usare TrasferimentoDialog al posto di questo componente.
+ * Questo file sarà rimosso in una prossima versione.
+ */
 'use client'
 import {
   Alert,

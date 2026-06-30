@@ -5,6 +5,7 @@ export const giocatoreSchema = z.object({
   nome: z.string().min(3),
   nomeFantagazzetta: z.string().nullable().optional(),
   ruolo: z.string(),
+  id_pf: z.number().int().positive().nullable().optional(),
 })
 
 export const trasferimentoSchema = z.object({

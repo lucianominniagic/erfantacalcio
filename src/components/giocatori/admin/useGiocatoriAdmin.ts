@@ -18,6 +18,7 @@ const defaultGiocatore: GiocatoreType = {
   nome: '',
   nomeFantagazzetta: '',
   ruolo: 'P',
+  id_pf: null,
 }
 
 const defaultTrasferimento: trasferimentoType = {
@@ -50,6 +51,8 @@ export function useGiocatoriAdmin() {
   const [giocatore, setGiocatore] = useState<GiocatoreType>(defaultGiocatore)
   const [trasferimento, setTrasferimento] =
     useState<trasferimentoType>(defaultTrasferimento)
+  const [giocatoreDialogOpen, setGiocatoreDialogOpen] = useState(false)
+  const [trasferimentoDialogOpen, setTrasferimentoDialogOpen] = useState(false)
 
   // ── tRPC queries ──────────────────────────────────────────────────────────
   const trasferimentiList = useQuery(
@@ -180,10 +183,24 @@ export function useGiocatoriAdmin() {
   ])
 
   // ── handlers: trasferimento ───────────────────────────────────────────────
+  const handleOpenTrasferimentoDialog = (isNew: boolean) => {
+    if (isNew) {
+      setTrasferimento(defaultTrasferimento)
+      setSelectedTrasferimentoId(undefined)
+      setSelectedTrasferimentoStagione(Configurazione.stagione)
+    }
+    setErrorMessageTrasferimento('')
+    setMessageTrasferimento('')
+    setTrasferimentoDialogOpen(true)
+  }
+
   const handleCancelTrasferimento = async () => {
+    setTrasferimentoDialogOpen(false)
     setSelectedTrasferimentoId(undefined)
     setSelectedTrasferimentoStagione(Configurazione.stagione)
     setTrasferimento(defaultTrasferimento)
+    setErrorMessageTrasferimento('')
+    setMessageTrasferimento('')
     document?.getElementById('search_items')?.focus()
   }
 
@@ -197,15 +214,42 @@ export function useGiocatoriAdmin() {
     setSelectedTrasferimentoId(undefined)
     setSelectedTrasferimentoStagione(Configurazione.stagione)
     setGiocatore(defaultGiocatore)
+    setTrasferimento(defaultTrasferimento)
+    setErrorMessageGiocatore('')
+    setMessageGiocatore('')
     await handleCancelTrasferimento()
   }
 
+  const handleOpenGiocatoreDialog = (isNew: boolean) => {
+    if (isNew) {
+      setGiocatore(defaultGiocatore)
+      setSelectedGiocatoreId(undefined)
+      setSelectedGiocatore(undefined)
+    }
+    setErrorMessageGiocatore('')
+    setMessageGiocatore('')
+    setGiocatoreDialogOpen(true)
+  }
+
   const handleCancelGiocatore = async () => {
+    setGiocatoreDialogOpen(false)
+    setGiocatore(
+      selectedGiocatoreId ? giocatore : defaultGiocatore,
+    )
+    setErrorMessageGiocatore('')
+    setMessageGiocatore('')
+    document?.getElementById('search_items')?.focus()
+  }
+
+  const handleCloseGiocatoreDialog = () => {
+    setGiocatoreDialogOpen(false)
     setGiocatore(defaultGiocatore)
     setSelectedGiocatoreId(undefined)
     setSelectedGiocatore(undefined)
     setSelectedTrasferimentoId(undefined)
     setSelectedTrasferimentoStagione(Configurazione.stagione)
+    setErrorMessageGiocatore('')
+    setMessageGiocatore('')
     document?.getElementById('search_items')?.focus()
   }
 
@@ -231,11 +275,11 @@ export function useGiocatoriAdmin() {
           nome: giocatore.nome,
           nomeFantagazzetta: giocatore.nomeFantagazzetta,
           ruolo: giocatore.ruolo,
+          id_pf: giocatore.id_pf,
         })
         setSelectedGiocatoreId(idGiocatore)
         setSelectedTrasferimentoStagione(Configurazione.stagione)
         setMessageGiocatore('Salvataggio completato')
-        document?.getElementById('costo')?.focus()
       } catch {
         setErrorMessageGiocatore(
           "Si è verificato un errore nel salvataggio dell'anagrafica giocatore",
@@ -250,8 +294,12 @@ export function useGiocatoriAdmin() {
     if (selectedGiocatoreId) {
       try {
         await giocatoreDelete.mutateAsync(selectedGiocatoreId)
-        await handleCancelGiocatore()
-        setMessageGiocatore('Eliminazione completata')
+        setGiocatoreDialogOpen(false)
+        setGiocatore(defaultGiocatore)
+        setSelectedGiocatoreId(undefined)
+        setSelectedGiocatore(undefined)
+        setSelectedTrasferimentoId(undefined)
+        setSelectedTrasferimentoStagione(Configurazione.stagione)
         document?.getElementById('search_items')?.focus()
       } catch {
         setErrorMessageGiocatore(
@@ -264,7 +312,7 @@ export function useGiocatoriAdmin() {
   // ── handlers: trasferimento (continued) ───────────────────────────────────
   const handleEditTrasferimento = async (_idTrasferimento: number) => {
     setSelectedTrasferimentoId(_idTrasferimento)
-    document?.getElementById('costo')?.focus()
+    setTrasferimentoDialogOpen(true)
   }
 
   const handleUpsertTrasferimento = async (
@@ -309,8 +357,10 @@ export function useGiocatoriAdmin() {
     setMessageTrasferimento('')
     try {
       await trasferimentoDelete.mutateAsync(trasferimento.idTrasferimento)
-      await handleCancelTrasferimento()
-      setMessageTrasferimento('Eliminazione completata')
+      setTrasferimentoDialogOpen(false)
+      setSelectedTrasferimentoId(undefined)
+      setSelectedTrasferimentoStagione(Configurazione.stagione)
+      setTrasferimento(defaultTrasferimento)
       document?.getElementById('search_items')?.focus()
     } catch {
       setErrorMessageTrasferimento(
@@ -325,29 +375,25 @@ export function useGiocatoriAdmin() {
     form: 'anagrafica' | 'trasferimento',
   ) => {
     const { name, value, type, checked } = event.currentTarget
+    const parsedValue =
+      type === 'number'
+        ? value === ''
+          ? null
+          : +value
+        : type === 'checkbox'
+          ? checked
+          : type === 'datetime-local'
+            ? dayjs(value).toDate()
+            : value
     if (form === 'anagrafica')
       setGiocatore((prevState) => ({
         ...prevState,
-        [name]:
-          type === 'number'
-            ? +value
-            : type === 'checkbox'
-              ? checked
-              : type === 'datetime-local'
-                ? dayjs(value).toDate()
-                : value,
+        [name]: parsedValue,
       }))
     if (form === 'trasferimento')
       setTrasferimento((prevState) => ({
         ...prevState,
-        [name]:
-          type === 'number'
-            ? +value
-            : type === 'checkbox'
-              ? checked
-              : type === 'datetime-local'
-                ? dayjs(value).toDate()
-                : value,
+        [name]: parsedValue,
       }))
   }
 
@@ -389,11 +435,16 @@ export function useGiocatoriAdmin() {
     trasferimentiIsLoading: trasferimentiList.isLoading,
     trasferimentiIsSuccess: trasferimentiList.isSuccess,
     giocatoreNome: giocatoreOne.data?.nome,
+    giocatoreDialogOpen,
+    trasferimentoDialogOpen,
     // handlers
     handleGiocatoreSelected,
+    handleOpenGiocatoreDialog,
+    handleCloseGiocatoreDialog,
     handleCancelGiocatore,
     handleUpsertGiocatore,
     handleDeleteGiocatore,
+    handleOpenTrasferimentoDialog,
     handleCancelTrasferimento,
     handleEditTrasferimento,
     handleUpsertTrasferimento,

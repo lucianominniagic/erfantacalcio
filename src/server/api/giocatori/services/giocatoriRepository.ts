@@ -23,6 +23,7 @@ export async function getGiocatoreById(idGiocatore: number) {
       nomeFantagazzetta: giocatore.nomeFantaGazzetta,
       ruolo: giocatore.ruolo,
       ruoloEsteso: getRuoloEsteso(giocatore.ruolo),
+      id_pf: giocatore.id_pf,
     }
   }
 }

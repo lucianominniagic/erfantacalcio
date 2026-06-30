@@ -130,7 +130,6 @@ export default function TrasferimentiGrid({
 
   return (
     <>
-      <Typography variant="h5">Trasferimenti {giocatoreNome}</Typography>
       <Box
         sx={{ width: '100%', overflowX: 'auto', contain: 'inline-size' }}
       >

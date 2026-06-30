@@ -3,6 +3,7 @@ export interface GiocatoreType {
   nome: string
   nomeFantagazzetta: string | null
   ruolo: string
+  id_pf: number | null
 }
 
 export interface iGiocatoreStats {
