@@ -8,15 +8,19 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
   type SelectChangeEvent,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import CheckIcon from '@mui/icons-material/CheckCircle'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import SearchIcon from '@mui/icons-material/Search'
 import { type GiocatoreType } from '~/types/giocatori'
 import { ruoliList, getRuoloEsteso } from '~/utils/formazione'
 
@@ -111,16 +115,58 @@ export default function GiocatoreDialog({
             </Select>
           </FormControl>
 
-          <TextField
-            size="small"
-            fullWidth
-            label="Nome Fantagazzetta"
-            name="nomeFantagazzetta"
-            value={giocatore.nomeFantagazzetta ?? ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              onInputChange(e, 'anagrafica')
-            }
-          />
+          <Stack direction="row" spacing={1} alignItems="center">
+            <TextField
+              size="small"
+              fullWidth
+              label="Nome Fantagazzetta"
+              name="nomeFantagazzetta"
+              value={giocatore.nomeFantagazzetta ?? ''}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onInputChange(e, 'anagrafica')
+              }
+            />
+            <Tooltip title="Cerca su Fantacalcio.it">
+              <span>
+                <IconButton
+                  size="small"
+                  disabled={!giocatore.nomeFantagazzetta}
+                  onClick={() => {
+                    const query = encodeURIComponent(
+                      giocatore.nomeFantagazzetta ?? '',
+                    )
+                    window.open(
+                      `https://www.fantacalcio.it/ricerca?q=${query}`,
+                      '_blank',
+                      'noopener,noreferrer',
+                    )
+                  }}
+                >
+                  <OpenInNewIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title="Cerca su Google">
+              <span>
+                <IconButton
+                  size="small"
+                  disabled={!giocatore.nomeFantagazzetta}
+                  onClick={() => {
+                    const query = encodeURIComponent(
+                      `${giocatore.nomeFantagazzetta ?? ''} fantacalcio`,
+                    )
+                    window.open(
+                      `https://www.google.com/search?q=${query}`,
+                      '_blank',
+                      'noopener,noreferrer',
+                    )
+                  }}
+                >
+                  <SearchIcon fontSize="small" />
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Stack>
 
           <TextField
             size="small"
