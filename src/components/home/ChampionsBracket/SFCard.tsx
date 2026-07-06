@@ -155,7 +155,8 @@ function SFCard({
     <Paper
       elevation={2}
       sx={{
-        p: 1,
+        pt: 1,
+        pb: 1, 
         borderRadius: 1.5,
         border: `1px solid ${alpha(championsColor, 0.2)}`,
       }}

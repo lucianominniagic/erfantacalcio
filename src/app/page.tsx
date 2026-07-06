@@ -4,29 +4,16 @@ import { useQuery } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
 import {
   Box,
-  Button,
-  ButtonGroup,
   Divider,
   Grid,
   Tab,
   Tabs,
-  Tooltip,
-  Typography,
   useMediaQuery,
   useTheme,
   Slide,
 } from '@mui/material'
-import {
-  AccessAlarm,
-  EmojiEvents,
-  Looks3Outlined,
-  Looks4Outlined,
-  Looks5Outlined,
-  LooksOneOutlined,
-  LooksTwoOutlined,
-  PendingActions,
-} from '@mui/icons-material'
 import Classifica from '~/components/home/Classifica'
+import CalendarioButtonGroup from '~/components/home/CalendarioButtonGroup'
 import ChampionsBracket from '~/components/home/ChampionsBracket'
 import Squadre from '~/components/home/Squadre'
 import EconomiaPreviewCard from '~/components/home/EconomiaPreviewCard'
@@ -41,32 +28,32 @@ import { giornataSchema } from '~/schemas/calendario'
 
 export default function HomePage() {
   const { data: session } = useSession()
-  const torneiList = useQuery(orpc.tornei.list.queryOptions({
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  }))
+  const torneiList = useQuery(
+    orpc.tornei.list.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
+  )
   const championsBracket = useQuery(
-    orpc.tornei.coppaBracket.queryOptions(
-      {
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-        input: { nomeTorneo: 'champions' }
-      }
-    ),
+    orpc.tornei.coppaBracket.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      input: { nomeTorneo: 'champions' },
+    }),
   )
   const coppaPerdentiBracket = useQuery(
-    orpc.tornei.coppaBracket.queryOptions(
-      {
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-        input: { nomeTorneo: 'coppa dei perdenti' }
-      }
-    ),
+    orpc.tornei.coppaBracket.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      input: { nomeTorneo: 'coppa dei perdenti' },
+    }),
   )
-  const prossimeGiornate = useQuery(orpc.calendario.getProssimeGiornate.queryOptions({
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  }))
+  const prossimeGiornate = useQuery(
+    orpc.calendario.getProssimeGiornate.queryOptions({
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    }),
+  )
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
   const [openModalCalendario, setOpenModalCalendario] = useState(false)
@@ -92,33 +79,42 @@ export default function HomePage() {
     prossimeGiornate.isSuccess &&
     (prossimeGiornate.data?.length ?? 1) === 0
   const [coppaTab, setCoppaTab] = useState(0)
+  const [classificaTab, setClassificaTab] = useState(0)
 
   const calendarioList =
     girone && !isCalendarioAttuale && !isCalendarioRecuperi
-      ? useQuery(orpc.calendario.listByGirone.queryOptions({
-          input: girone,
-          enabled: true,
-          refetchOnWindowFocus: false,
-          refetchOnReconnect: false,
-        }))
-      : isCalendarioAttuale
-        ? useQuery(orpc.calendario.listAttuale.queryOptions({
-            enabled: isCalendarioAttuale,
+      ? useQuery(
+          orpc.calendario.listByGirone.queryOptions({
+            input: girone,
+            enabled: true,
             refetchOnWindowFocus: false,
             refetchOnReconnect: false,
-          }))
+          }),
+        )
+      : isCalendarioAttuale
+        ? useQuery(
+            orpc.calendario.listAttuale.queryOptions({
+              enabled: isCalendarioAttuale,
+              refetchOnWindowFocus: false,
+              refetchOnReconnect: false,
+            }),
+          )
         : isChampions
-          ? useQuery(orpc.calendario.listByTorneo.queryOptions({
-              input: [2, 3, 4, 5, 6],
-              enabled: isChampions,
-              refetchOnWindowFocus: false,
-              refetchOnReconnect: false,
-            }))
-          : useQuery(orpc.calendario.listRecuperi.queryOptions({
-              enabled: isCalendarioRecuperi,
-              refetchOnWindowFocus: false,
-              refetchOnReconnect: false,
-            }))
+          ? useQuery(
+              orpc.calendario.listByTorneo.queryOptions({
+                input: [2, 3, 4, 5, 6],
+                enabled: isChampions,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
+              }),
+            )
+          : useQuery(
+              orpc.calendario.listRecuperi.queryOptions({
+                enabled: isCalendarioRecuperi,
+                refetchOnWindowFocus: false,
+                refetchOnReconnect: false,
+              }),
+            )
   const [giornata, setGiornata] = useState<z.infer<typeof giornataSchema>[]>()
 
   useEffect(() => {
@@ -133,12 +129,11 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!championsBracket.isLoading) {
-      setCoppaTab(hasSemifinaliTeams ? 1 : 0)
+      setCoppaTab(0)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [championsBracket.isLoading])
-  
-  
+
   const handleCalendario = (
     girone: number | undefined,
     isAttuale: boolean,
@@ -214,86 +209,7 @@ export default function HomePage() {
                           '& > *': { m: 1 },
                         }}
                       >
-                        <ButtonGroup
-                          size="small"
-                          color="primary"
-                          aria-label="Small button group"
-                        >
-                          <Tooltip title="Calendario partite ultimo periodo">
-                            <Button
-                              onClick={() =>
-                                handleCalendario(undefined, true, false, false)
-                              }
-                              startIcon={<AccessAlarm color="error" />}
-                            ></Button>
-                          </Tooltip>
-                          <Tooltip title="Calendario girone 1">
-                            <Button
-                              onClick={() =>
-                                handleCalendario(1, false, false, false)
-                              }
-                              startIcon={<LooksOneOutlined />}
-                            ></Button>
-                          </Tooltip>
-                          <Tooltip title="Calendario girone 2">
-                            <Button
-                              onClick={() =>
-                                handleCalendario(2, false, false, false)
-                              }
-                              startIcon={<LooksTwoOutlined />}
-                            >
-                              &nbsp;
-                            </Button>
-                          </Tooltip>
-                          <Tooltip title="Calendario girone 3">
-                            <Button
-                              onClick={() =>
-                                handleCalendario(3, false, false, false)
-                              }
-                              startIcon={<Looks3Outlined />}
-                            >
-                              &nbsp;
-                            </Button>
-                          </Tooltip>
-                          <Tooltip title="Calendario girone 4">
-                            <Button
-                              onClick={() =>
-                                handleCalendario(4, false, false, false)
-                              }
-                              startIcon={<Looks4Outlined />}
-                            >
-                              &nbsp;
-                            </Button>
-                          </Tooltip>
-                          <Tooltip title="Calendario girone 5">
-                            <Button
-                              onClick={() =>
-                                handleCalendario(5, false, false, false)
-                              }
-                              startIcon={<Looks5Outlined />}
-                            >
-                              &nbsp;
-                            </Button>
-                          </Tooltip>
-                          <Tooltip title="Calendario Champions">
-                            <Button
-                              onClick={() =>
-                                handleCalendario(undefined, false, false, true)
-                              }
-                              startIcon={<EmojiEvents color="success" />}
-                            >
-                              &nbsp;
-                            </Button>
-                          </Tooltip>
-                          <Tooltip title="Partite da recuperare">
-                            <Button
-                              onClick={() =>
-                                handleCalendario(undefined, false, true, false)
-                              }
-                              startIcon={<PendingActions color="action" />}
-                            ></Button>
-                          </Tooltip>
-                        </ButtonGroup>
+                        <CalendarioButtonGroup onSelect={handleCalendario} />
                       </Box>
                     </>
                   )}
@@ -308,33 +224,49 @@ export default function HomePage() {
                     const classificheConHasClassifica = torneiList.data?.filter(
                       (t) => t.hasClassifica,
                     )
-                    const classificheCampionato = classificheConHasClassifica?.filter(
-                      (t) => t.nome.toLowerCase() === 'campionato',
-                    )
-                    const classificheChampions = classificheConHasClassifica?.filter(
-                      (t) => t.nome.toLowerCase() !== 'campionato',
-                    )
+                    const classificheCampionato =
+                      classificheConHasClassifica?.filter(
+                        (t) => t.nome.toLowerCase() === 'campionato',
+                      )
+                    const classificheChampions =
+                      classificheConHasClassifica?.filter(
+                        (t) => t.nome.toLowerCase() !== 'campionato',
+                      )
 
-                    const renderClassifica = (torneo: NonNullable<typeof classificheConHasClassifica>[0]) => (
+                    const renderClassifica = (
+                      torneo: NonNullable<
+                        typeof classificheConHasClassifica
+                      >[0],
+                    ) => (
                       <>
+                        <br></br>
                         <Classifica
                           key={torneo.idTorneo}
                           nomeTorneo={torneo.nome ?? ''}
                           idTorneo={torneo.idTorneo}
                           gruppo={torneo.gruppoFase ?? ''}
                         />
-                        <br></br>
                       </>
                     )
 
                     return (
-                      <>
-                        {classificheCampionato?.map(renderClassifica)}
+                      <Box>
+                        <Tabs
+                          value={classificaTab}
+                          onChange={(_, v: number) => setClassificaTab(v)}
+                        >
+                          <Tab label="Campionato" />
+                          <Tab label="Champions" />
+                        </Tabs>
+                        {classificaTab === 0 &&
+                          classificheCampionato?.map(renderClassifica)}
+                        {classificaTab === 1 &&
+                          classificheChampions?.map(renderClassifica)}
+                        <br></br>
                         <Tabs
                           value={coppaTab}
                           onChange={(_, v: number) => setCoppaTab(v)}
                         >
-                          <Tab label="Classifica Champions" />
                           <Tab
                             label="Fase finale Champions"
                             disabled={!hasSemifinaliTeams}
@@ -345,10 +277,8 @@ export default function HomePage() {
                           />
                         </Tabs>
                         {coppaTab === 0 && (
-                          <><br></br>{classificheChampions?.map(renderClassifica)}</>
-                        )}
-                        {coppaTab === 1 && (
                           <>
+                            <br></br>
                             <ChampionsBracket
                               semifinaliAndata={
                                 championsBracket.data?.semifinaliAndata ?? null
@@ -358,11 +288,11 @@ export default function HomePage() {
                               }
                               finale={championsBracket.data?.finale ?? null}
                             />
-                            <br />
                           </>
                         )}
-                        {coppaTab === 2 && (
+                        {coppaTab === 1 && (
                           <>
+                            <br></br>
                             <ChampionsBracket
                               semifinaliAndata={
                                 coppaPerdentiBracket.data?.semifinaliAndata ?? null
@@ -372,10 +302,9 @@ export default function HomePage() {
                               }
                               finale={coppaPerdentiBracket.data?.finale ?? null}
                             />
-                            <br />
                           </>
                         )}
-                      </>
+                      </Box>
                     )
                   })()}
                 </Grid>

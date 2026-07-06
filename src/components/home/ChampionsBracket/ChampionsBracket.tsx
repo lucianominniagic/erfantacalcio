@@ -135,7 +135,7 @@ export default function ChampionsBracket({
         {/* ── Semifinali column ── */}
         <Box sx={{ flex: 3, minWidth: 0 }}>
           <ColumnHeader label="Semifinali" championsColor={championsColor} />
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
             {renderSFCards(true)}
           </Box>
         </Box>
