@@ -1,5 +1,6 @@
 'use client'
 import {
+  CheckCircle,
   HourglassTop,
   ResetTv,
   Save,
@@ -188,6 +189,22 @@ function Formazione() {
                         sx={{ fontSize: { xs: '11px', md: '14px' } }}
                       >
                         {saving ? 'Attendere...' : 'Salva'}
+                      </Button>
+                      <Button
+                        type="button"
+                        disabled={confirmingPrecedente}
+                        endIcon={
+                          confirmingPrecedente ? <HourglassTop /> : <CheckCircle />
+                        }
+                        variant="contained"
+                        color="info"
+                        size="medium"
+                        onClick={() => void handleConfirmPrecedente(false)}
+                        sx={{ fontSize: { xs: '11px', md: '14px' } }}
+                      >
+                        {confirmingPrecedente
+                          ? 'Attendere...'
+                          : 'Conferma precedente'}
                       </Button>
                     </Stack>
                   </Box>

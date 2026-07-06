@@ -30,9 +30,9 @@ export function useFormazionePrecedente(
 
   const confirmingPrecedente = confirmPrecedenteMutation.isPending
 
-  const handleConfirmPrecedente = async () => {
+  const handleConfirmPrecedente = async (verificaEsistenti = true) => {
     try {
-      await confirmPrecedenteMutation.mutateAsync(undefined)
+      await confirmPrecedenteMutation.mutateAsync({ verificaEsistenti })
       await data.formazioneList.refetch()
       alert.setAlertMessage('Formazione precedente confermata con successo')
       alert.setAlertSeverity('success')

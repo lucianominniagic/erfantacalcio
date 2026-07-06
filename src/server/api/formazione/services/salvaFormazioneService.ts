@@ -115,7 +115,7 @@ export async function salvaFormazione(input: SalvaFormazioneInput): Promise<void
 
 // ─── confermaPrecedente ───────────────────────────────────────────────────────
 
-export async function confermaPrecedente(idSquadra: number): Promise<void> {
+export async function confermaPrecedente(idSquadra: number, verificaEsistenti = true): Promise<void> {
   // 1. Recupera le giornate correnti e filtra per l'utente
   const giornataSerieA = await getProssimaGiornataSerieA(false, 'asc')
   const prossimeGiornate = await getProssimaGiornata(giornataSerieA, true)
@@ -132,13 +132,15 @@ export async function confermaPrecedente(idSquadra: number): Promise<void> {
   )
 
   // 2. Verifica che l'utente non abbia già una formazione per le partite correnti
-  const formazioniEsistenti = await Formazioni.count({
-    where: { idSquadra, idPartita: In(idPartiteCorrente) },
-  })
-  if (formazioniEsistenti > 0) {
-    throw new ORPCError('CONFLICT', {
-      message: 'Hai già inserito la formazione per questa giornata',
+  if (verificaEsistenti) {
+    const formazioniEsistenti = await Formazioni.count({
+      where: { idSquadra, idPartita: In(idPartiteCorrente) },
     })
+    if (formazioniEsistenti > 0) {
+      throw new ORPCError('CONFLICT', {
+        message: 'Hai già inserito la formazione per questa giornata',
+      })
+    }
   }
 
   // 3. Recupera l'ultima formazione precedente (escludendo le partite correnti)
