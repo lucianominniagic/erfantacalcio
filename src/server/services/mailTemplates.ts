@@ -95,7 +95,7 @@ export function buildConfermaPrecedenteHtml(
   data: ConfermaPrecedenteMailData,
 ): string {
   return `Notifica automatica da erFantacalcio.com<br><br>
-          Il tuo avversario, l'infame ${data.avversarioPresidente}, ha confermato automaticamente la formazione della giornata precedente per la prossima partita.<br><br>
+          Il tuo avversario, l'illustrissimo ${data.avversarioPresidente}, ha confermato automaticamente la formazione della giornata precedente per la prossima partita.<br><br>
           <b>Dettagli partita:</b><br>
           Giornata: ${data.descrizioneGiornata}<br>
           Data conferma formazione: ${data.dataConferma}<br>
@@ -135,6 +135,32 @@ export function buildFormazionePromemoriaHtml(data: {
           Illustrissimo ${data.presidente ?? 'Presidente'}, oggi si gioca! Ti ricordiamo di inserire (o ricontrollare) la formazione.<br><br>
           Calcio d'inizio: ${data.dataPartita}<br><br>
           Accedi al sito prima del calcio d'inizio.<br><br>
+          https://www.erfantacalcio.com <br><br>
+          Saluti dal Vostro immenso Presidente`
+}
+
+export interface SessioneMercatoCreataMailData {
+  presidente: string | undefined
+  dataApertura: string
+  dataChiusura: string
+  maxProposte: number
+  acquistiEffettivi: number
+  tipoValuta: string
+}
+
+/**
+ * HTML per la notifica a tutti i presidenti quando viene creata una nuova
+ * sessione di mercato.
+ */
+export function buildSessioneMercatoCreataHtml(data: SessioneMercatoCreataMailData): string {
+  return `Notifica automatica da erFantacalcio.com<br><br>
+          Illustrissimo ${data.presidente ?? 'Presidente'}, è stata aperta una nuova sessione di mercato!<br><br>
+          <b>Dettagli sessione:</b><br>
+          Data apertura: ${data.dataApertura}<br>
+          Data chiusura: ${data.dataChiusura}<br>
+          Numero massimo proposte: ${data.maxProposte}<br>
+          Acquisti effettivi consentiti: ${data.acquistiEffettivi}<br>
+          Tipo valuta: ${data.tipoValuta}<br><br>
           https://www.erfantacalcio.com <br><br>
           Saluti dal Vostro immenso Presidente`
 }

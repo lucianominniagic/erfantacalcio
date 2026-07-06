@@ -1,14 +1,17 @@
 import { ORPCError } from '@orpc/server'
 import { IsNull, LessThanOrEqual, MoreThan, Not } from 'typeorm'
+import { env } from 'process'
 import { AppDataSource } from '~/data-source'
-import { SessioneMercato, PropostaMercato, Trasferimento, Utente } from '~/server/db/entities'
+import { SessioneMercato, PropostaMercato, Trasferimento, Utente, Utenti } from '~/server/db/entities'
 import type { CreateSessioneInput, GetGiocatoriSvincolatiInput, CreatePropostaInput, DeletePropostaInput, RiordinaProposteInput, AggiudicaSessioneInput, GetProposteSessioneInput } from '~/schemas/mercato'
 import { aggiudica, type PropostaInput } from './aggiudicazione'
 import {
-  type StatoSessione,
   calcolaStato,
   findSessioneAttiva,
 } from './sessioneMercatoRepository'
+import { ReSendMailAsync } from '~/server/services/mailSender'
+import { buildSessioneMercatoCreataHtml } from '~/server/services/mailTemplates'
+import { formatDateTime } from '~/utils/dateUtils'
 
 export interface MercatoCtx {
   session: { user: { id: string; ruolo?: string; idSquadra: number } }
@@ -147,7 +150,52 @@ export async function createSessione({ input }: { input: CreateSessioneInput }) 
     tipoValuta: input.tipoValuta,
   })
 
-  return await SessioneMercato.save(sessione)
+  const saved = await SessioneMercato.save(sessione)
+
+  await notificaSessioneMercatoCreata(saved)
+
+  return saved
+}
+
+/**
+ * Invia una mail a tutti i presidenti (Utenti, admin inclusi) con le
+ * informazioni della sessione di mercato appena creata. Invio best-effort:
+ * eventuali errori vengono solo loggati, senza impattare la creazione della
+ * sessione (già avvenuta con successo a questo punto).
+ */
+async function notificaSessioneMercatoCreata(sessione: SessioneMercato): Promise<void> {
+  const mailEnabled = env.MAIL_ENABLED === 'true'
+  if (!mailEnabled) {
+    console.info('Mail disabilitata (MAIL_ENABLED != true), skip notifica creazione sessione mercato')
+    return
+  }
+
+  try {
+    const presidenti = await Utenti.find({
+      select: { idUtente: true, mail: true, presidente: true },
+    })
+
+    const dataApertura = formatDateTime(sessione.dataApertura)
+    const dataChiusura = formatDateTime(sessione.dataChiusura)
+    const subject = 'ErFantacalcio: Nuova sessione di mercato aperta'
+
+    for (const presidente of presidenti) {
+      if (!presidente.mail) continue
+
+      const htmlMessage = buildSessioneMercatoCreataHtml({
+        presidente: presidente.presidente,
+        dataApertura,
+        dataChiusura,
+        maxProposte: sessione.maxProposte,
+        acquistiEffettivi: sessione.acquistiEffettivi,
+        tipoValuta: sessione.tipoValuta,
+      })
+
+      await ReSendMailAsync(presidente.mail, presidente.mail, subject, htmlMessage)
+    }
+  } catch (error) {
+    console.error('Errore invio notifica creazione sessione mercato:', error)
+  }
 }
 
 export async function getGiocatoriSvincolati({
