@@ -72,8 +72,7 @@ export default function EsitoAggiudicazione({ data, bannerVariant = 'outlined' }
       <Alert severity="info" variant={bannerVariant} sx={{ mb: 2 }}>
         Aggiudicazione calcolata in base a: prezzo più alto vince, parità →
         proposta più vecchia, ogni squadra ottiene al massimo{' '}
-        <strong>{data.acquistiEffettivi}</strong> acquisti (cap). Nessuna
-        scrittura sui trasferimenti: l&apos;esito è solo informativo.
+        <strong>{data.acquistiEffettivi}</strong> acquisti (cap). 
       </Alert>
 
       <Typography variant="subtitle2" sx={{ mb: 1 }}>
