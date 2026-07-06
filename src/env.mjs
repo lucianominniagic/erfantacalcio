@@ -21,6 +21,10 @@ export const env = createEnv({
     ),
     // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
     JWT_SECRET: z.string().optional(),
+    CRON_SECRET:
+      process.env.NODE_ENV === 'production'
+        ? z.string().min(1)
+        : z.string().min(1).optional(),
   },
 
   /**
@@ -55,6 +59,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     JWT_SECRET: process.env.JWT_SECRET,
+    CRON_SECRET: process.env.CRON_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     NEXT_PUBLIC_STAGIONE: process.env.NEXT_PUBLIC_STAGIONE,
     NEXT_PUBLIC_RECORDCOUNT: Number(process.env.NEXT_PUBLIC_RECORDCOUNT),

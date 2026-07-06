@@ -121,3 +121,20 @@ export function buildConfermaPrecedenteAdminHtml(
           <b>Multa applicata:</b> €${data.importoMulta}<br><br>
           https://www.erfantacalcio.com`
 }
+
+/**
+ * HTML per il promemoria di formazione (cron giornaliero).
+ * Ricorda al presidente che oggi si gioca, indipendentemente dal fatto che la
+ * formazione sia già stata inserita o meno.
+ */
+export function buildFormazionePromemoriaHtml(data: {
+  presidente: string | undefined
+  dataPartita: string
+}): string {
+  return `Notifica automatica da erFantacalcio.com<br><br>
+          Illustrissimo ${data.presidente ?? 'Presidente'}, oggi si gioca! Ti ricordiamo di inserire (o ricontrollare) la formazione.<br><br>
+          Calcio d'inizio: ${data.dataPartita}<br><br>
+          Accedi al sito prima del calcio d'inizio.<br><br>
+          https://www.erfantacalcio.com <br><br>
+          Saluti dal Vostro immenso Presidente`
+}
