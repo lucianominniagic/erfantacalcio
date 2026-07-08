@@ -12,6 +12,7 @@ import {
   Groups,
   ListAlt,
   ManageAccounts,
+  MenuBook,
   Portrait,
   Storefront,
   ThumbsUpDown,
@@ -49,6 +50,12 @@ export const legaItems: NavItem[] = [
     icon: <Euro />,
   },
   { key: 'albo', label: "Albo d'oro", href: '/albo', icon: <EmojiEvents /> },
+  {
+    key: 'regolamento',
+    label: 'Regolamento',
+    href: '/regolamento',
+    icon: <MenuBook />,
+  },
   {
     key: 'documenti',
     label: 'Documenti',
