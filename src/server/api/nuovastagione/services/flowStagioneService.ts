@@ -99,7 +99,7 @@ export async function preparaNuovaStagione(): Promise<StageMessage> {
  * Chiamare ripetutamente finché `isComplete === true`.
  */
 export async function chiudiStagione(): Promise<StageMessage> {
-  const takeNum = 30
+  const takeNum = 10
   let message: StageMessage = {
     isError: true,
     isComplete: true,
