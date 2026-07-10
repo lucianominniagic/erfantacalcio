@@ -94,7 +94,10 @@ export default function AvvioStagione() {
 
     switch (activeStep) {
       case 0:
-        message = await chiudiStagione.mutateAsync(undefined)
+        do {
+          message = await chiudiStagione.mutateAsync(undefined)
+          if (!message.isError && !message.isComplete) setMessage(message.message)
+        } while (!message.isError && !message.isComplete)
         break
       case 1:
         message = await preparaStagione.mutateAsync(undefined)
