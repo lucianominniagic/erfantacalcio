@@ -19,8 +19,10 @@ export async function GET(request: Request) {
   }
 
   try {
+    console.log('[cron/formazione-reminder] Inizio invio promemoria formazioni mancanti')
     await initializeDBConnection()
     const result = await inviaPromemoriaFormazioniMancanti()
+    console.log('[cron/formazione-reminder] Fine invio promemoria formazioni mancanti')
     return NextResponse.json({ ok: true, ...result })
   } catch (error) {
     console.error('[cron/formazione-reminder]', error)
