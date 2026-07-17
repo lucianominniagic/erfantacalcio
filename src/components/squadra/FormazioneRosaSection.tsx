@@ -8,6 +8,7 @@ import {
 import {
   Badge,
   Box,
+  Chip,
   Grid,
   IconButton,
   List,
@@ -151,7 +152,44 @@ export function FormazioneRosaSection({
                       title={player.nomeSquadraSerieA ?? ''}
                     />
                     <ListItemText
-                      primary={`${getShortName(player.nome)}${player.percentualeTitolarita ? ` (${player.percentualeTitolarita}%)` : ''}`}
+                      disableTypography
+                      primary={
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.75,
+                            minWidth: 0,
+                          }}
+                        >
+                          <Typography noWrap>{getShortName(player.nome)}</Typography>
+                          {player.percentualeTitolarita != null && (
+                            <Tooltip title="Probabilità di titolarità">
+                              <Chip
+                                label={`${player.percentualeTitolarita}%`}
+                                color={
+                                  player.percentualeTitolarita >= 70
+                                    ? 'success'
+                                    : player.percentualeTitolarita >= 40
+                                      ? 'warning'
+                                      : 'error'
+                                }
+                                size="small"
+                                sx={{
+                                  height: 21,
+                                  flexShrink: 0,
+                                  fontWeight: 800,
+                                  boxShadow: 1,
+                                  '& .MuiChip-label': {
+                                    px: 0.8,
+                                    fontSize: '0.7rem',
+                                  },
+                                }}
+                              />
+                            </Tooltip>
+                          )}
+                        </Box>
+                      }
                       secondary={`(${player.nomeSquadraSerieA
                         ?.toUpperCase()
                         .substring(0, 3)}) - ${getMatch(giornate[0], player, false)}`}
