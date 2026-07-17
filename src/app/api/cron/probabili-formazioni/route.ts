@@ -1,8 +1,9 @@
 /**
  * Endpoint cron — GET /api/cron/probabili-formazioni
  *
- * Chiamato ogni ora da Vercel Cron (vercel.json). Protetto da secret:
- * richiede header `Authorization: Bearer <CRON_SECRET>`.
+ * Chiamato ogni ora da una schedule Upstash QStash (`0 * * * *`).
+ * QStash inoltra `Authorization: Bearer <CRON_SECRET>` tramite l'header
+ * `Upstash-Forward-Authorization` configurato nella console.
  *
  * Si esegue solo nella finestra temporale [dataInizio - 48h, dataInizio)
  * Europe/Rome. Fuori finestra risponde con { ok: true, status: "skipped" }.
