@@ -1,6 +1,5 @@
 import React from 'react'
 import {
-  AddAPhoto,
   AssignmentInd,
   Badge,
   Calculate,
@@ -14,6 +13,7 @@ import {
   ManageAccounts,
   MenuBook,
   Portrait,
+  Schedule,
   Storefront,
   ThumbsUpDown,
   UploadFile,
@@ -143,5 +143,11 @@ export const adminItems: NavItem[] = [
     label: 'Sessioni mercato',
     href: '/gestione-mercato',
     icon: <Storefront />,
+  },
+  {
+    key: 'jobs',
+    label: 'Job pianificati',
+    href: '/jobs',
+    icon: <Schedule />,
   },
 ]

@@ -100,6 +100,9 @@ import { getStatisticaVotiORPCProcedure } from '~/server/api/voti/procedures/get
 import { updateVotoORPCProcedure } from '~/server/api/voti/procedures/update.orpc'
 import { uploadVercelORPCProcedure } from '~/server/api/voti/procedures/uploadVercel.orpc'
 import { importaVotiGiornataORPCProcedure } from '~/server/api/voti/procedures/importaVotiGiornata.orpc'
+// jobs
+import { runFormazioneReminderORPCProcedure } from '~/server/api/jobs/procedures/runFormazioneReminder.orpc'
+import { runProbabiliFormazioniORPCProcedure } from '~/server/api/jobs/procedures/runProbabiliFormazioni.orpc'
 
 export const orpcRouter = {
   albo: {
@@ -219,6 +222,10 @@ export const orpcRouter = {
     update: updateVotoORPCProcedure,
     uploadVercel: uploadVercelORPCProcedure,
     importaVotiGiornata: importaVotiGiornataORPCProcedure,
+  },
+  jobs: {
+    runFormazioneReminder: runFormazioneReminderORPCProcedure,
+    runProbabiliFormazioni: runProbabiliFormazioniORPCProcedure,
   },
 }
 

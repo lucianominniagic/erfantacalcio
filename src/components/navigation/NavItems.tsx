@@ -3,28 +3,24 @@ import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import {
-  AddAPhoto,
   AssignmentInd,
   Badge,
-  Ballot,
   Calculate,
   CalendarMonth,
   Euro,
   FiberNew,
   Gavel,
-  Grading,
   Group,
   HistoryEdu,
   ListAlt,
   ManageAccounts,
   Portrait,
   Groups,
-  RecentActors,
+  Schedule,
   Storefront,
   ThumbsUpDown,
   UploadFile,
 } from '@mui/icons-material'
-import { Configurazione } from '~/config'
 
 const listItem = (
   key: string,
@@ -84,6 +80,12 @@ export function adminListItems() {
       '/gestione-mercato',
       'Sessioni mercato',
       <Storefront color="primary" />,
+    ),
+    listItem(
+      'admin_jobs',
+      '/jobs',
+      'Job pianificati',
+      <Schedule color="primary" />,
     ),
   ]
 }

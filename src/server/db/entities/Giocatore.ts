@@ -9,6 +9,7 @@ import {
 import { Trasferimento } from './Trasferimento'
 import { Voto } from './Voto'
 import { PropostaMercato } from './PropostaMercato'
+import { ProbabileFormazioneGiocatore } from './ProbabileFormazioneGiocatore'
 
 @Entity({ name: 'giocatore' })
 export class Giocatore extends BaseEntity {
@@ -40,4 +41,10 @@ export class Giocatore extends BaseEntity {
 
   @OneToMany(() => PropostaMercato, (p: PropostaMercato) => p.Giocatore)
   ProposteMercato!: Relation<PropostaMercato[]>
+
+  @OneToMany(
+    () => ProbabileFormazioneGiocatore,
+    (pfg: ProbabileFormazioneGiocatore) => pfg.Giocatore,
+  )
+  ProbabileFormazioneGiocatori!: Relation<ProbabileFormazioneGiocatore[]>
 }

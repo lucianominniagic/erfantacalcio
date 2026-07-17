@@ -16,5 +16,19 @@ export { SerieA } from './SerieA'
 export { Partita as Partite } from './Partita'
 export { Migrations } from './Migration'
 export { Voto as Voti } from './Voto'
-export { SessioneMercato, SessioneMercato as SessioniMercato } from './SessioneMercato'
-export { PropostaMercato, PropostaMercato as ProposteMercato } from './PropostaMercato'
+export {
+  SessioneMercato,
+  SessioneMercato as SessioniMercato,
+} from './SessioneMercato'
+export {
+  PropostaMercato,
+  PropostaMercato as ProposteMercato,
+} from './PropostaMercato'
+export {
+  ProbabileFormazione,
+  ProbabileFormazione as ProbabileFormazioni,
+} from './ProbabileFormazione'
+export {
+  ProbabileFormazioneGiocatore,
+  ProbabileFormazioneGiocatore as ProbabileFormazioneGiocatori,
+} from './ProbabileFormazioneGiocatore'

@@ -151,7 +151,7 @@ export function FormazioneRosaSection({
                       title={player.nomeSquadraSerieA ?? ''}
                     />
                     <ListItemText
-                      primary={getShortName(player.nome)}
+                      primary={`${getShortName(player.nome)}${player.percentualeTitolarita ? ` (${player.percentualeTitolarita}%)` : ''}`}
                       secondary={`(${player.nomeSquadraSerieA
                         ?.toUpperCase()
                         .substring(0, 3)}) - ${getMatch(giornate[0], player, false)}`}

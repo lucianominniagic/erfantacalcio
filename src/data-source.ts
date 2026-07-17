@@ -35,6 +35,8 @@ export const AppDataSource = new DataSource({
     Entities.Voti,
     Entities.SessioniMercato,
     Entities.ProposteMercato,
+    Entities.ProbabileFormazioni,
+    Entities.ProbabileFormazioneGiocatori,
   ],
   namingStrategy: new NamingStrategy(),
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
@@ -54,7 +56,7 @@ try {
 } catch (error) {
   // If pg is not present or parser cannot be set, ignore silently.
   // This shouldn't happen in normal runtime.
-   
+
   console.debug('pg.types.setTypeParser not applied:', error)
 }
 

@@ -15,6 +15,7 @@ export interface GiocatoreType {
   idGiocatore: number
   nome: string
   nomeFantagazzetta: string | null
+  percentualeTitolarita: number | null
   ruolo: string
   ruoloEsteso: string
   costo: number

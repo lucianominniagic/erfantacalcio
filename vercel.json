@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/formazione-reminder",
       "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/probabili-formazioni",
+      "schedule": "0 * * * *"
     }
   ]
 }
