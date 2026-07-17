@@ -15,8 +15,15 @@ import { initializeDBConnection } from '~/data-source'
 import { importaProbabiliFormazioni } from '~/server/api/formazione/services/probabiliFormazioniService'
 
 export async function GET(request: Request) {
+  console.info('[cron/probabili-formazioni] Richiesta ricevuta', {
+    timestamp: new Date().toISOString(),
+    qstashMessageId: request.headers.get('upstash-message-id'),
+    userAgent: request.headers.get('user-agent'),
+  })
+
   const authHeader = request.headers.get('authorization')
   if (authHeader !== `Bearer ${env.CRON_SECRET}`) {
+    console.warn('[cron/probabili-formazioni] Richiesta non autorizzata')
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
