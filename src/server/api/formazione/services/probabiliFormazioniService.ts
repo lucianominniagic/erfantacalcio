@@ -67,7 +67,6 @@ export interface ProbabiliFormazioniResult {
 
 export async function importaProbabiliFormazioni(): Promise<ProbabiliFormazioniResult> {
   const now = dayjs().tz(TIMEZONE)
-
   // ── 1. Prossima giornata Serie A non giocata ─────────────────────────────
   const giornataSerieA = await getProssimaGiornataSerieA(false, 'asc')
 
