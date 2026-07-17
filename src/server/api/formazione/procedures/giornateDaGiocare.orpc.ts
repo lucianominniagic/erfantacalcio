@@ -7,6 +7,7 @@ export const giornateDaGiocareORPCProcedure = protectedProcedure
     try {
       const idSquadraUtente = context.session.user.idSquadra
       const giornataSerieA = await getProssimaGiornataSerieA(false, 'asc')
+      console.log('Giornata Serie A:', giornataSerieA)
       const prossimeGiornate = await getProssimaGiornata(giornataSerieA, true)
       const giornateFiltrate = prossimeGiornate.filter((giornata) =>
         giornata.partite.some(
