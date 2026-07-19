@@ -12,7 +12,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
 import PageHeader from '~/components/PageHeader'
 import LoadingSpinner from '~/components/LinearProgressBar/LoadingSpinner'
@@ -67,6 +67,13 @@ function formatProbabiliResult(data: ProbabiliResult): string {
   return righe.join(' · ')
 }
 
+function formatDataOra(data: string): string {
+  return new Intl.DateTimeFormat('it-IT', {
+    dateStyle: 'short',
+    timeStyle: 'medium',
+  }).format(new Date(data))
+}
+
 // ─── Pagina ───────────────────────────────────────────────────────────────────
 
 export default function JobsPage() {
@@ -102,6 +109,9 @@ export default function JobsPage() {
   const probabiliMutation = useMutation(
     orpc.jobs.runProbabiliFormazioni.mutationOptions(),
   )
+  const ultimaImportazioneProbabili = useQuery(
+    orpc.jobs.getUltimaImportazioneProbabili.queryOptions(),
+  )
 
   const handleProbabiliClick = async () => {
     setProbabiliResult(null)
@@ -117,6 +127,10 @@ export default function JobsPage() {
       setProbabiliError(msg)
     }
   }
+
+  const ultimaImportazione =
+    probabiliResult?.fetchedAt ??
+    ultimaImportazioneProbabili.data?.fetchedAt
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -191,6 +205,15 @@ export default function JobsPage() {
                   configurata. Il job si esegue efficacemente solo nella
                   finestra temporale prevista (48 h prima del calcio d&apos;inizio);
                   fuori finestra restituisce uno stato <em>saltato</em>.
+                </Typography>
+
+                <Typography variant="body2" color="text.secondary">
+                  Ultima importazione:{' '}
+                  <Box component="span" sx={{ fontWeight: 600 }}>
+                    {ultimaImportazione
+                      ? formatDataOra(ultimaImportazione)
+                      : 'mai eseguita'}
+                  </Box>
                 </Typography>
 
                 <Stack spacing={1}>
