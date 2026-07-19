@@ -2,8 +2,9 @@
  * probabiliFormazioniService — orchestrazione del cron "probabili formazioni".
  *
  * Flusso:
- * 1. Controlla la finestra temporale: [dataInizio - 48h, dataInizio) Europe/Rome.
- *    Se fuori finestra → restituisce risultato skipped senza toccare il DB.
+ * 1. Controlla la finestra temporale: [dataInizio - 48h, dataInizio) Europe/Rome,
+ *    salvo bypass esplicito. Se fuori finestra → restituisce risultato skipped
+ *    senza toccare il DB.
  * 2. Scarica l'HTML dalla fonte.
  * 3. Valida il parsing completo (parser lancia se non valido).
  * 4. In una singola transazione:
@@ -65,7 +66,9 @@ export interface ProbabiliFormazioniResult {
 
 // ─── Entry point ─────────────────────────────────────────────────────────────
 
-export async function importaProbabiliFormazioni(): Promise<ProbabiliFormazioniResult> {
+export async function importaProbabiliFormazioni(
+  bypassFinestraTemporale = false,
+): Promise<ProbabiliFormazioniResult> {
   const now = dayjs().tz(TIMEZONE)
   // ── 1. Prossima giornata Serie A non giocata ─────────────────────────────
   const giornataSerieA = await getProssimaGiornataSerieA(false, 'asc')
@@ -99,7 +102,7 @@ export async function importaProbabiliFormazioni(): Promise<ProbabiliFormazioniR
     dataInizioTz.toDate(),
   )
 
-  if (!inWindow) {
+  if (!bypassFinestraTemporale && !inWindow) {
     return {
       status: 'skipped',
       reason:

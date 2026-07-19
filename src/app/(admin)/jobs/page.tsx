@@ -6,6 +6,8 @@ import {
   Button,
   Card,
   CardContent,
+  Checkbox,
+  FormControlLabel,
   Grid,
   Stack,
   Typography,
@@ -95,6 +97,7 @@ export default function JobsPage() {
   const [probabiliResult, setProbabiliResult] =
     useState<ProbabiliResult | null>(null)
   const [probabiliError, setProbabiliError] = useState<string | null>(null)
+  const [bypassFinestraTemporale, setBypassFinestraTemporale] = useState(false)
 
   const probabiliMutation = useMutation(
     orpc.jobs.runProbabiliFormazioni.mutationOptions(),
@@ -104,7 +107,9 @@ export default function JobsPage() {
     setProbabiliResult(null)
     setProbabiliError(null)
     try {
-      const result = await probabiliMutation.mutateAsync(undefined)
+      const result = await probabiliMutation.mutateAsync({
+        bypassFinestraTemporale,
+      })
       setProbabiliResult(result)
     } catch (err: unknown) {
       const msg =
@@ -188,7 +193,20 @@ export default function JobsPage() {
                   fuori finestra restituisce uno stato <em>saltato</em>.
                 </Typography>
 
-                <Box>
+                <Stack spacing={1}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={bypassFinestraTemporale}
+                        onChange={(event) =>
+                          setBypassFinestraTemporale(event.target.checked)
+                        }
+                        disabled={probabiliMutation.isPending}
+                      />
+                    }
+                    label="Ignora la finestra temporale"
+                  />
+
                   <Button
                     variant="contained"
                     startIcon={<SportsSoccer />}
@@ -197,7 +215,7 @@ export default function JobsPage() {
                   >
                     Importa probabili formazioni
                   </Button>
-                </Box>
+                </Stack>
 
                 {probabiliMutation.isPending && <LoadingSpinner />}
 
