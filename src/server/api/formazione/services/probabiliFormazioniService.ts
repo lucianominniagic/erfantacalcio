@@ -69,7 +69,6 @@ export interface ProbabiliFormazioniResult {
 export async function importaProbabiliFormazioni(
   bypassFinestraTemporale = false,
 ): Promise<ProbabiliFormazioniResult> {
-  const now = dayjs().tz(TIMEZONE)
   // ── 1. Prossima giornata Serie A non giocata ─────────────────────────────
   const giornataSerieA = await getProssimaGiornataSerieA(false, 'asc')
 
@@ -95,19 +94,21 @@ export async function importaProbabiliFormazioni(
 
   // ── 3. Controllo finestra temporale ──────────────────────────────────────
   const dataInizioTz = dayjs(dataInizio).tz(TIMEZONE)
-  const windowStart = dataInizioTz.subtract(WINDOW_HOURS, 'hour')
+  if (!bypassFinestraTemporale) {
+    const now = dayjs().tz(TIMEZONE)
+    const windowStart = dataInizioTz.subtract(WINDOW_HOURS, 'hour')
+    const inWindow = isInProbabiliFormazioniWindow(
+      now.toDate(),
+      dataInizioTz.toDate(),
+    )
 
-  const inWindow = isInProbabiliFormazioniWindow(
-    now.toDate(),
-    dataInizioTz.toDate(),
-  )
-
-  if (!bypassFinestraTemporale && !inWindow) {
-    return {
-      status: 'skipped',
-      reason:
-        `Fuori dalla finestra temporale. now=${now.toISOString()}, ` +
-        `finestra=[${windowStart.toISOString()}, ${dataInizioTz.toISOString()})`,
+    if (!inWindow) {
+      return {
+        status: 'skipped',
+        reason:
+          `Fuori dalla finestra temporale. now=${now.toISOString()}, ` +
+          `finestra=[${windowStart.toISOString()}, ${dataInizioTz.toISOString()})`,
+      }
     }
   }
 
