@@ -366,12 +366,25 @@ export async function createProposta({
 
 /**
  * Logica offerta per sessioni astaInChiaro:
- * - Il prezzo deve essere strettamente superiore all'offerta massima corrente
- *   per quel giocatore (di qualsiasi squadra).
- * - Se la squadra ha già un'offerta → UPDATE prezzoOfferto.
- * - Se non ce l'ha → INSERT con priorita=1, previa verifica cap offerte attive.
- * - Blocco proattivo: se la squadra ha già vinto acquistiEffettivi aste → errore.
- * - Blocco: se il timer del giocatore è scaduto → errore.
+ *
+ * Cap "leader corrente":
+ *   Una squadra può essere il miglior offerente su al più `acquistiEffettivi`
+ *   giocatori distinti nella sessione, contando sia aste attive che scadute.
+ *   Se la squadra NON è ancora leader sul giocatore target e ha già raggiunto
+ *   il cap, l'offerta viene rifiutata.
+ *
+ * Self-outbid:
+ *   Se la squadra è già il leader corrente sul giocatore target, non può
+ *   rilanciare contro sé stessa (coerente con il vincolo imposto dal frontend).
+ *
+ * Serializzazione concorrente:
+ *   Tutta la logica critica (lettura + scrittura) avviene dentro una singola
+ *   transazione. Il lock di sessione tramite pg_advisory_xact_lock serializza
+ *   le richieste concorrenti sulla stessa sessione ed evita race condition
+ *   che consentirebbero di superare il cap con due offerte simultanee.
+ *
+ * Altre regole mantenute: timer giocatore, prezzo strettamente superiore,
+ * sessione attiva, maxProposte, giocatore svincolato.
  */
 async function createPropostaAstaInChiaro({
   ctx,
@@ -382,9 +395,8 @@ async function createPropostaAstaInChiaro({
   input: CreatePropostaInput
   sessione: SessioneMercato
 }) {
-  const now = new Date()
-
-  // Verifica che il giocatore non sia già svincolato/assegnato
+  // Verifica disponibilità giocatore fuori dalla sezione critica:
+  // è una precondizione rapida che non dipende dal lock di sessione.
   const trasferimento = await Trasferimento.findOne({
     where: { idGiocatore: input.idGiocatore, dataCessione: IsNull() },
   })
@@ -392,116 +404,126 @@ async function createPropostaAstaInChiaro({
     throw new ORPCError('BAD_REQUEST', { message: 'Il giocatore non è svincolato' })
   }
 
-  // Tutte le offerte attive per questo giocatore nella sessione
-  const proposteGiocatore = await PropostaMercato.find({
-    where: { idSessione: sessione.id, idGiocatore: input.idGiocatore, deletedAt: IsNull() },
-    relations: { Utente: true },
-  })
+  return AppDataSource.transaction(async (trx) => {
+    // Lock esclusivo per la sessione: serializza le richieste concorrenti.
+    // pg_advisory_xact_lock si rilascia automaticamente a fine transazione.
+    await trx.query('SELECT pg_advisory_xact_lock($1)', [sessione.id])
 
-  // Calcola scadenza asta del giocatore (se già ci sono offerte)
-  if (proposteGiocatore.length > 0) {
-    const primaOfferta = proposteGiocatore.reduce(
-      (min, p) => (p.createdAt < min ? p.createdAt : min),
-      proposteGiocatore[0]!.createdAt,
+    const now = new Date()
+
+    // Legge tutte le offerte attive della sessione in un'unica query,
+    // dentro la transazione, per garantire visione coerente post-lock.
+    const tutteLeOfferte = await trx.find(PropostaMercato, {
+      where: { idSessione: sessione.id, deletedAt: IsNull() },
+    })
+
+    // Offerte per il giocatore target
+    const proposteGiocatore = tutteLeOfferte.filter((p) => p.idGiocatore === input.idGiocatore)
+
+    // Controlla scadenza asta del giocatore target
+    if (proposteGiocatore.length > 0) {
+      const primaOfferta = proposteGiocatore.reduce(
+        (min, p) => (p.createdAt < min ? p.createdAt : min),
+        proposteGiocatore[0]!.createdAt,
+      )
+      const scadenza = new Date(Math.min(
+        primaOfferta.getTime() + 24 * 60 * 60 * 1000,
+        sessione.dataChiusura.getTime(),
+      ))
+      if (scadenza <= now) {
+        throw new ORPCError('BAD_REQUEST', { message: "L'asta per questo giocatore è già chiusa" })
+      }
+    }
+
+    // Prezzo massimo corrente sul giocatore target
+    const prezzoMax = proposteGiocatore.reduce(
+      (max, p) => Math.max(max, Number(p.prezzoOfferto)),
+      0,
     )
-    const scadenza = new Date(Math.min(
-      primaOfferta.getTime() + 24 * 60 * 60 * 1000,
-      sessione.dataChiusura.getTime(),
-    ))
-    if (scadenza <= now) {
-      throw new ORPCError('BAD_REQUEST', { message: "L'asta per questo giocatore è già chiusa" })
+
+    // Self-outbid: la squadra è già il leader corrente?
+    // Il check avviene prima della verifica del prezzo per dare un messaggio
+    // d'errore specifico anziché il generico "offerta non superiore al max".
+    if (prezzoMax > 0) {
+      const topOfferta = proposteGiocatore.reduce((top, p) =>
+        Number(p.prezzoOfferto) > Number(top.prezzoOfferto) ? p : top,
+      )
+      if (topOfferta.idSquadra === ctx.session.user.idSquadra) {
+        throw new ORPCError('BAD_REQUEST', {
+          message: 'Sei già il miglior offerente su questo giocatore: non puoi rilanciare contro te stesso',
+        })
+      }
     }
-  }
 
-  // Verifica offerta massima corrente: il nuovo prezzo deve essere strettamente superiore
-  const prezzoMax = proposteGiocatore.reduce(
-    (max, p) => Math.max(max, Number(p.prezzoOfferto)),
-    0,
-  )
-  if (input.prezzoOfferto <= prezzoMax) {
-    throw new ORPCError('BAD_REQUEST', {
-      message: `L'offerta deve essere superiore all'offerta massima corrente (${prezzoMax})`,
-    })
-  }
-
-  // Blocco proattivo: conta aste già vinte dalla squadra in questa sessione
-  const tutte = await PropostaMercato.find({
-    where: { idSessione: sessione.id, deletedAt: IsNull() },
-    select: { idGiocatore: true, idSquadra: true, prezzoOfferto: true, createdAt: true },
-  })
-
-  // Raggruppa per giocatore: trova giocatori la cui asta è scaduta e chi è il vincitore
-  const perGiocatoreMap = new Map<number, { primaOfferta: Date; offerte: typeof tutte }>()
-  for (const p of tutte) {
-    const g = perGiocatoreMap.get(p.idGiocatore) ?? { primaOfferta: p.createdAt, offerte: [] }
-    if (p.createdAt < g.primaOfferta) g.primaOfferta = p.createdAt
-    g.offerte.push(p)
-    perGiocatoreMap.set(p.idGiocatore, g)
-  }
-
-  let asteVinteDallaSquadra = 0
-  for (const [idGiocatore, { primaOfferta, offerte }] of perGiocatoreMap) {
-    // Ignora il giocatore che si sta offrendo ora (non è ancora vinto)
-    if (idGiocatore === input.idGiocatore) continue
-    const scadenza = new Date(Math.min(
-      primaOfferta.getTime() + 24 * 60 * 60 * 1000,
-      sessione.dataChiusura.getTime(),
-    ))
-    if (scadenza > now) continue // asta ancora aperta
-
-    // Asta chiusa: controlla se questa squadra è il miglior offerente
-    const maxPrezzo = Math.max(...offerte.map((o) => Number(o.prezzoOfferto)))
-    const vincitrici = offerte.filter((o) => Number(o.prezzoOfferto) === maxPrezzo)
-    // In caso di parità (non dovrebbe accadere, ma per sicurezza) considera la più vecchia
-    vincitrici.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
-    if (vincitrici[0]?.idSquadra === ctx.session.user.idSquadra) {
-      asteVinteDallaSquadra++
+    // Verifica che l'offerta superi il prezzo massimo corrente
+    if (input.prezzoOfferto <= prezzoMax) {
+      throw new ORPCError('BAD_REQUEST', {
+        message: `L'offerta deve essere superiore all'offerta massima corrente (${prezzoMax})`,
+      })
     }
-  }
 
-  if (asteVinteDallaSquadra >= sessione.acquistiEffettivi) {
-    throw new ORPCError('BAD_REQUEST', {
-      message: `Hai già raggiunto il limite di ${sessione.acquistiEffettivi} acquisti consentiti`,
-    })
-  }
+    // Cap "leader corrente": conta i giocatori distinti per cui la squadra
+    // è il miglior offerente (leader), sia su aste attive che scadute.
+    // Il giocatore target è escluso: a questo punto non ne siamo leader
+    // (altrimenti il self-outbid check avrebbe rifiutato sopra).
+    const perGiocatoreMap = new Map<number, PropostaMercato[]>()
+    for (const p of tutteLeOfferte) {
+      if (p.idGiocatore === input.idGiocatore) continue
+      const offerte = perGiocatoreMap.get(p.idGiocatore) ?? []
+      offerte.push(p)
+      perGiocatoreMap.set(p.idGiocatore, offerte)
+    }
 
-  // Upsert: se esiste già un'offerta della squadra → UPDATE, altrimenti → INSERT
-  const miaOfferta = proposteGiocatore.find((p) => p.idSquadra === ctx.session.user.idSquadra)
+    let slotOccupati = 0
+    for (const offerte of perGiocatoreMap.values()) {
+      const maxPrezzo = Math.max(...offerte.map((o) => Number(o.prezzoOfferto)))
+      const candidati = offerte.filter((o) => Number(o.prezzoOfferto) === maxPrezzo)
+      // In caso di parità (non dovrebbe accadere) considera la più vecchia
+      candidati.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+      if (candidati[0]?.idSquadra === ctx.session.user.idSquadra) {
+        slotOccupati++
+      }
+    }
 
-  if (miaOfferta) {
-    miaOfferta.prezzoOfferto = input.prezzoOfferto
-    return PropostaMercato.save(miaOfferta)
-  }
+    if (slotOccupati >= sessione.acquistiEffettivi) {
+      throw new ORPCError('BAD_REQUEST', {
+        message: `Sei già in testa in ${slotOccupati} aste su un massimo di ${sessione.acquistiEffettivi}: attendi di essere superato prima di fare nuove offerte`,
+      })
+    }
 
-  // Nuova offerta: verifica cap proposte attive della squadra
-  const myProposte = await PropostaMercato.find({
-    where: {
+    // Upsert: la squadra ha già un'offerta → UPDATE, altrimenti → INSERT.
+    // A questo punto la squadra NON è leader sul target (verificato sopra),
+    // quindi l'UPDATE è legittimo (sta superando il leader corrente).
+    const miaOfferta = proposteGiocatore.find((p) => p.idSquadra === ctx.session.user.idSquadra)
+
+    if (miaOfferta) {
+      miaOfferta.prezzoOfferto = input.prezzoOfferto
+      return trx.save(PropostaMercato, miaOfferta)
+    }
+
+    // Nuova offerta: verifica cap proposte attive della squadra
+    const myProposte = tutteLeOfferte.filter((p) => p.idSquadra === ctx.session.user.idSquadra)
+    if (myProposte.length >= sessione.maxProposte) {
+      throw new ORPCError('BAD_REQUEST', {
+        message: `Hai già raggiunto il massimo di ${sessione.maxProposte} proposte attive`,
+      })
+    }
+
+    const proposta = trx.create(PropostaMercato, {
       idSessione: sessione.id,
       idSquadra: ctx.session.user.idSquadra,
-      deletedAt: IsNull(),
-    },
-  })
-
-  if (myProposte.length >= sessione.maxProposte) {
-    throw new ORPCError('BAD_REQUEST', {
-      message: `Hai già raggiunto il massimo di ${sessione.maxProposte} proposte attive`,
+      idGiocatore: input.idGiocatore,
+      prezzoOfferto: input.prezzoOfferto,
+      priorita: 1,
+      // Discriminante denormalizzato: esclude questa riga dal partial unique
+      // index UQ_proposta_mercato_priorita_active (che si applica solo alle
+      // sessioni al buio, dove la priorità è significativa).
+      astaInChiaro: true,
+      deletedAt: null,
     })
-  }
 
-  const proposta = PropostaMercato.create({
-    idSessione: sessione.id,
-    idSquadra: ctx.session.user.idSquadra,
-    idGiocatore: input.idGiocatore,
-    prezzoOfferto: input.prezzoOfferto,
-    priorita: 1,
-    // Discriminante denormalizzato: esclude questa riga dal partial unique
-    // index UQ_proposta_mercato_priorita_active (che si applica solo alle
-    // sessioni al buio, dove la priorità è significativa).
-    astaInChiaro: true,
-    deletedAt: null,
+    return trx.save(PropostaMercato, proposta)
   })
-
-  return PropostaMercato.save(proposta)
 }
 
 export async function deleteProposta({
