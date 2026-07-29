@@ -78,6 +78,7 @@ export default function MercatoAdmin() {
   const [dataChiusura, setDataChiusura] = useState('')
   const [maxProposte, setMaxProposte] = useState(3)
   const [acquistiEffettivi, setAcquistiEffettivi] = useState(3)
+  const [modalitaAsta, setModalitaAsta] = useState<'buio' | 'chiaro'>('buio')
   const [tipoValuta, setTipoValuta] = useState<'fantamilioni' | 'euro'>(
     'fantamilioni',
   )
@@ -102,6 +103,8 @@ export default function MercatoAdmin() {
       setFormError('')
       setDataApertura('')
       setDataChiusura('')
+      setModalitaAsta('buio')
+      setTipoValuta('fantamilioni')
       void refetch()
     },
     onError: (err) => {
@@ -173,6 +176,20 @@ export default function MercatoAdmin() {
             </Stack>
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+              <Select
+                value={modalitaAsta}
+                onChange={(e: SelectChangeEvent) => {
+                  const nextModalita = e.target.value as 'buio' | 'chiaro'
+                  setModalitaAsta(nextModalita)
+                  if (nextModalita === 'chiaro') {
+                    setTipoValuta('euro')
+                  }
+                }}
+                fullWidth
+              >
+                <MenuItem value="buio">Asta al buio</MenuItem>
+                <MenuItem value="chiaro">Asta in chiaro (rilancio in euro)</MenuItem>
+              </Select>
               <TextField
                 label="Max proposte"
                 type="number"
@@ -204,6 +221,7 @@ export default function MercatoAdmin() {
                 }
                 fullWidth
                 displayEmpty
+                disabled={modalitaAsta === 'chiaro'}
               >
                 <MenuItem value="fantamilioni">Fantamilioni</MenuItem>
                 <MenuItem value="euro">Euro reali</MenuItem>
