@@ -34,6 +34,7 @@ import { getRuoloEsteso } from '~/utils/formazione'
 import { Configurazione } from '~/config'
 import { formatDateFromIso } from '~/utils/dateUtils'
 import EsitoAggiudicazione from '~/components/mercato/shared/EsitoAggiudicazione'
+import AstaInChiaroUtente from '~/components/mercato/utente/AstaInChiaroUtente'
 
 // ── Helper ───────────────────────────────────────────────────────────────────
 function fmtDate(d: Date | string) {
@@ -193,34 +194,55 @@ export default function MercatoUtente() {
           <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
             Sessione attiva
           </Typography>
+          <Stack direction="row" spacing={1} sx={{ mt: 0.5, mb: 0.5 }} flexWrap="wrap">
+            <Chip
+              size="small"
+              variant="outlined"
+              color={sessione.astaInChiaro ? 'warning' : 'default'}
+              label={sessione.astaInChiaro ? 'Asta in chiaro' : 'Asta al buio'}
+            />
+            <Chip
+              size="small"
+              variant="outlined"
+              label={sessione.tipoValuta === 'fantamilioni' ? 'Fantamilioni' : 'Euro reali'}
+            />
+          </Stack>
           <Typography variant="body2">
             Scadenza: <strong>{fmtDate(sessione.dataChiusura)}</strong>
           </Typography>
-          <Typography variant="body2">
-            Proposte rimanenti:{' '}
-            <strong>
-              {sessione.maxProposte - sessione.myCount} /{' '}
-              {sessione.maxProposte}
-            </strong>
-          </Typography>
-          <Typography variant="body2">
-            Acquisti effettivi (cap per squadra):{' '}
-            <strong>{sessione.acquistiEffettivi}</strong>
-          </Typography>
-          <Typography variant="body2">
-            Valuta:{' '}
-            <strong>
-              {sessione.tipoValuta === 'fantamilioni'
-                ? 'Fantamilioni'
-                : 'Euro reali'}
-            </strong>
-          </Typography>
+          {!sessione.astaInChiaro && (
+            <>
+              <Typography variant="body2">
+                Proposte rimanenti:{' '}
+                <strong>
+                  {sessione.maxProposte - sessione.myCount} /{' '}
+                  {sessione.maxProposte}
+                </strong>
+              </Typography>
+              <Typography variant="body2">
+                Acquisti effettivi (cap per squadra):{' '}
+                <strong>{sessione.acquistiEffettivi}</strong>
+              </Typography>
+            </>
+          )}
+          {sessione.astaInChiaro && (
+            <Typography variant="body2">
+              Acquisti effettivi (cap per squadra):{' '}
+              <strong>{sessione.acquistiEffettivi}</strong>
+            </Typography>
+          )}
         </Alert>
       )}
 
       {/* ── Contenuto visibile solo con sessione attiva ── */}
       {sessione && (
         <>
+          {sessione.astaInChiaro ? (
+            /* ── Ramo asta in chiaro ── */
+            <AstaInChiaroUtente />
+          ) : (
+            /* ── Ramo asta al buio (comportamento invariato) ── */
+            <>
         {/* ── Le mie proposte ── */}
           <Box>
             <Typography variant="h6" sx={{ mb: 1 }}>
@@ -455,6 +477,8 @@ export default function MercatoUtente() {
               </TableContainer>
             )}
           </Box>
+            </>
+          )}
         </>
       )}
 

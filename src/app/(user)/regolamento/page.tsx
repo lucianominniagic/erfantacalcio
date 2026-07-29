@@ -341,30 +341,69 @@ const sections: Section[] = [
       },
       {
         type: 'p',
-        text: 'Ciascun presidente può effettuare delle proposte di acquisto indicando il costo, in soldi reali o fantamilioni restanti e la priorità della proposta.',
+        text: 'Per le sessioni di mercato in fantamilioni è previsto all\'apertura di ogni sessione un extra bonus di 30 fantamilioni oltre a quelli restanti del mercato di settembre/gennaio. Per le sessioni in soldi reali non sono previsti extra bonus e l\'offerta non è legata a vincoli.',
       },
       {
         type: 'p',
-        text: "Le proposte di acquisto non sono visibili agli altri presidenti fino a chiusura della data fine della sessione di mercato (le proposte sono criptate, non visibili nemmeno dall'amministratore).",
+        text: 'Esistono due modalità di mercato, selezionabili dall\'amministratore al momento della creazione della sessione:',
       },
+    ],
+    subsections: [
       {
-        type: 'p',
-        text: "Alla scadenza della sessione di mercato le offerte pervenute saranno visibili da tutti in trasparenza e si procederà all'acquisto dichiarando il giocatore da cedere.",
-      },
-      {
-        type: 'p',
-        text: "L'aggiudicazione di un giocatore avviene nel seguente modo:",
-      },
-      {
-        type: 'list',
-        items: [
-          'regola base: per ogni giocatore vince la squadra che ha offerto il prezzo più alto. A parità di prezzo, vince chi ha inviato la proposta prima',
-          'Cap acquisti: ogni squadra può aggiudicarsi al massimo gli acquisti effettivi concessi, quindi se un presidente effettua 5 proposte e gli acquisti consentiti sono 2 prende i primi 2 giocatori in ordine di priorità, su cui è il miglior offerente',
+        title: 'Modalità Asta al Buio (fantamilioni o euro)',
+        blocks: [
+          {
+            type: 'p',
+            text: 'Ciascun presidente può effettuare delle proposte di acquisto indicando il costo e la priorità della proposta.',
+          },
+          {
+            type: 'p',
+            text: "Le proposte di acquisto non sono visibili agli altri presidenti fino alla chiusura della sessione di mercato (le proposte sono criptate, non visibili nemmeno dall'amministratore).",
+          },
+          {
+            type: 'p',
+            text: "Alla scadenza della sessione le offerte pervenute saranno visibili da tutti in trasparenza e si procederà all'acquisto dichiarando il giocatore da cedere.",
+          },
+          {
+            type: 'p',
+            text: "L'aggiudicazione avviene nel seguente modo:",
+          },
+          {
+            type: 'list',
+            items: [
+              'regola base: per ogni giocatore vince la squadra che ha offerto il prezzo più alto. A parità di prezzo, vince chi ha inviato la proposta prima',
+              'Cap acquisti: ogni squadra può aggiudicarsi al massimo gli acquisti effettivi concessi; se un presidente effettua 5 proposte e gli acquisti consentiti sono 2, prende i primi 2 giocatori in ordine di priorità su cui è il miglior offerente',
+            ],
+          },
         ],
       },
       {
-        type: 'p',
-        text: 'Per le sessioni di mercato se procediamo con l\'acquisto in fantamilioni è previsto all\'apertura di ogni sessione un extra bonus di 30 fantamilioni oltre a quelli restanti del mercato di settembre/gennaio. Se procediamo con soldi reali non sono previsti extra bonus e l\'offerta non è legata a vincoli.',
+        title: 'Modalità Asta in Chiaro (solo euro)',
+        blocks: [
+          {
+            type: 'p',
+            text: 'La modalità asta in chiaro è disponibile esclusivamente per le sessioni in soldi reali. A differenza dell\'asta al buio, tutte le offerte sono visibili in tempo reale a tutti i presidenti: per ogni giocatore si vede chi sta offrendo e a quale prezzo.',
+          },
+          {
+            type: 'p',
+            text: 'Le regole principali sono:',
+          },
+          {
+            type: 'list',
+            items: [
+              'Tutti i giocatori svincolati sono disponibili contemporaneamente per tutta la durata della sessione',
+              'Ogni squadra può fare un\'offerta su ciascun giocatore; l\'offerta può essere aggiornata (rilancio) in qualsiasi momento, ma deve essere strettamente superiore all\'offerta massima corrente sul quel giocatore',
+              'Non è possibile ritirare un\'offerta già inviata',
+              'Una volta fatta la prima offerta su un giocatore, si avvia un timer di 24 ore. Alla scadenza (o alla chiusura generale della sessione, se precedente) il giocatore viene aggiudicato al miglior offerente',
+              'Il giocatore scompare dall\'elenco degli acquistabili non appena il suo timer scade, anche prima della conferma formale dell\'amministratore',
+              'Cap acquisti: se una squadra ha già vinto un numero di aste pari agli acquisti effettivi consentiti, i successivi rilanci vengono bloccati automaticamente',
+            ],
+          },
+          {
+            type: 'p',
+            text: "L'aggiudicazione effettiva di ogni giocatore viene confermata dall'amministratore al termine delle singole aste.",
+          },
+        ],
       },
     ],
   },

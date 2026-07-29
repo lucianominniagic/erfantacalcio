@@ -33,6 +33,9 @@ export class SessioneMercato extends BaseEntity {
   })
   tipoValuta!: 'fantamilioni' | 'euro'
 
+  @Column({ name: 'asta_in_chiaro', type: 'boolean', default: false })
+  astaInChiaro!: boolean
+
   @OneToMany(() => PropostaMercato, (p: PropostaMercato) => p.SessioneMercato)
   ProposteMercato!: Relation<PropostaMercato[]>
 }

@@ -14,6 +14,8 @@ const mockEntityManager = {
   delete: vi.fn(),
   decrement: vi.fn(),
   increment: vi.fn(),
+  // Usato da createPropostaAstaInChiaro per il lock di sessione
+  query: vi.fn().mockResolvedValue(undefined),
 } as unknown as EntityManager
 
 vi.mock('~/data-source', () => ({
@@ -61,6 +63,10 @@ vi.mock('~/schemas/mercato', () => ({
   getGiocatoriSvincolatiSchema: {
     parse: vi.fn((data) => data),
   },
+}))
+
+vi.mock('~/server/services/mailSender', () => ({
+  ReSendMailAsync: vi.fn().mockResolvedValue(undefined),
 }))
 
 // Import AFTER mocks are defined
@@ -932,6 +938,7 @@ describe('riordinaProposte', () => {
 // ============================================================================
 
 describe('createSessione', () => {
+
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -957,5 +964,360 @@ describe('createSessione', () => {
     expect(callArg.acquistiEffettivi).toBe(3)
     expect(callArg.maxProposte).toBe(5)
     expect(callArg.tipoValuta).toBe('fantamilioni')
+  })
+})
+
+// ============================================================================
+// Regression: createProposta — astaInChiaro unique violation
+//
+// Bug: UQ_proposta_mercato_priorita_active collide quando la stessa squadra
+// fa più di un'offerta in una sessione astaInChiaro perché ogni INSERT usa
+// priorita=1 e il partial index non distingue tra modalità al buio e in chiaro.
+//
+// Fix: campo `astaInChiaro` denormalizzato su proposta_mercato; l'indice è
+// ridefinito con `WHERE deleted_at IS NULL AND asta_in_chiaro = false`.
+// Il service imposta `astaInChiaro: true` ad ogni INSERT in modalità in chiaro.
+//
+// NOTA: dopo il refactoring del locking (createPropostaAstaInChiaro wrappata
+// in AppDataSource.transaction), le query interne usano trx.* (mockEntityManager)
+// anziché i metodi statici dell'entità.
+// ============================================================================
+
+describe('createProposta — regressione unique violation astaInChiaro', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  /**
+   * Verifica che ogni nuova offerta (INSERT path) in una sessione astaInChiaro
+   * imposti `astaInChiaro: true` sull'entità, garantendo così che la riga
+   * ricada fuori dal partial unique index e non produca una unique violation
+   * quando la stessa squadra ha già un'altra offerta (priorita=1) nella sessione.
+   *
+   * Setup: squadra 1 ha già un'offerta su giocatore 99 (è il leader lì);
+   * fa una nuova offerta su giocatore 100 (primo offerente).
+   */
+  it('deve impostare astaInChiaro=true sul nuovo INSERT in sessione in chiaro', async () => {
+    const ctx = makeMockContext({ session: { user: { id: '1', ruolo: 'contributor', idSquadra: 1 } } })
+
+    const sessione = {
+      ...makeSessioneMercato({ id: 10, maxProposte: 5 }),
+      astaInChiaro: true,
+      acquistiEffettivi: 3,
+    }
+
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(Trasferimento.findOne).mockResolvedValue(
+      makeTrasferimento({ idSquadra: null, dataCessione: null }) as any,
+    )
+
+    // tutteLeOfferte (singola query trx.find dentro la transazione):
+    // squadra 1 è leader su giocatore 99 (1 slot occupato su 3), nessuna offerta su 100.
+    const offertaEsistente99 = makePropostaMercato({ idSquadra: 1, idGiocatore: 99, prezzoOfferto: 10, deletedAt: null })
+    vi.mocked(mockEntityManager.find).mockResolvedValueOnce([offertaEsistente99 as any])
+    vi.mocked(mockEntityManager.create).mockImplementation(((_e: unknown, data: any) => data) as any)
+    vi.mocked(mockEntityManager.save).mockImplementation(((_e: unknown, data: any) => Promise.resolve(data)) as any)
+
+    await createProposta({ ctx, input: { idGiocatore: 100, prezzoOfferto: 10 } })
+
+    // La chiamata a trx.create deve includere astaInChiaro: true
+    // per escludere la riga dal partial unique index sulle proposte al buio.
+    expect(vi.mocked(mockEntityManager.create)).toHaveBeenCalledWith(
+      PropostaMercato,
+      expect.objectContaining({ astaInChiaro: true, priorita: 1, idGiocatore: 100 }),
+    )
+  })
+
+  /**
+   * Verifica che due INSERT successivi della stessa squadra su giocatori
+   * diversi nella stessa sessione astaInChiaro producano entrambi
+   * astaInChiaro=true — il che nel DB reale escluderebbe entrambi dall'indice
+   * evitando la unique violation (idGiocatore diverso, stessa priorita=1).
+   */
+  it('seconda offerta stessa squadra giocatore diverso → astaInChiaro=true entrambe le volte', async () => {
+    const ctx = makeMockContext({ session: { user: { id: '1', ruolo: 'contributor', idSquadra: 1 } } })
+
+    const sessione = {
+      ...makeSessioneMercato({ id: 10, maxProposte: 5 }),
+      astaInChiaro: true,
+      acquistiEffettivi: 3,
+    }
+
+    // ── Prima offerta (giocatore 101): tutteLeOfferte = [] ─────────────────
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(Trasferimento.findOne).mockResolvedValue(
+      makeTrasferimento({ idSquadra: null, dataCessione: null }) as any,
+    )
+    vi.mocked(mockEntityManager.find).mockResolvedValueOnce([])
+    vi.mocked(mockEntityManager.create).mockImplementation(((_e: unknown, data: any) => data) as any)
+    vi.mocked(mockEntityManager.save).mockImplementation(((_e: unknown, data: any) => Promise.resolve(data)) as any)
+
+    await createProposta({ ctx, input: { idGiocatore: 101, prezzoOfferto: 10 } })
+
+    const firstCallArg = vi.mocked(mockEntityManager.create).mock.calls[0]![1] as any
+    expect(firstCallArg.astaInChiaro).toBe(true)
+    expect(firstCallArg.priorita).toBe(1)
+    expect(firstCallArg.idGiocatore).toBe(101)
+
+    vi.clearAllMocks()
+
+    // ── Seconda offerta (giocatore 102, stesso team) ──────────────────────
+    // tutteLeOfferte = [offerta di squadra 1 su 101]: squadra 1 è leader su 101
+    // (1 slot occupato su 3 → cap ok).
+    const primaOfferta = makePropostaMercato({ idSquadra: 1, idGiocatore: 101, prezzoOfferto: 10, deletedAt: null })
+
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(Trasferimento.findOne).mockResolvedValue(
+      makeTrasferimento({ idSquadra: null, dataCessione: null }) as any,
+    )
+    vi.mocked(mockEntityManager.find).mockResolvedValueOnce([primaOfferta as any])
+    vi.mocked(mockEntityManager.create).mockImplementation(((_e: unknown, data: any) => data) as any)
+    vi.mocked(mockEntityManager.save).mockImplementation(((_e: unknown, data: any) => Promise.resolve(data)) as any)
+
+    await createProposta({ ctx, input: { idGiocatore: 102, prezzoOfferto: 10 } })
+
+    const secondCallArg = vi.mocked(mockEntityManager.create).mock.calls[0]![1] as any
+    // REGRESSIONE: senza il fix, questa riga avrebbe astaInChiaro=false (default)
+    // causando una unique violation in DB perché (sessione=10, squadra=1, priorita=1)
+    // esiste già nell'indice.
+    expect(secondCallArg.astaInChiaro).toBe(true)
+    expect(secondCallArg.priorita).toBe(1)
+    expect(secondCallArg.idGiocatore).toBe(102)
+  })
+
+  /**
+   * Verifica che il path UPDATE (squadra ha già un'offerta sullo stesso giocatore
+   * ma non è il leader corrente) non passi per create — nessun INSERT, nessun
+   * problema di indice.
+   *
+   * Setup: squadra 1 aveva offerta 5, squadra 2 ha offerta 10 (è leader).
+   * Squadra 1 aggiorna la sua offerta a 20 per superare la squadra 2.
+   */
+  it('UPDATE path (offerta esistente stesso giocatore, non leader) non chiama trx.create', async () => {
+    const ctx = makeMockContext({ session: { user: { id: '1', ruolo: 'contributor', idSquadra: 1 } } })
+
+    const sessione = {
+      ...makeSessioneMercato({ id: 10, maxProposte: 5 }),
+      astaInChiaro: true,
+      acquistiEffettivi: 3,
+    }
+
+    // Squadra 1 ha offerta di 5, squadra 2 ha offerta di 10 (leader)
+    const offerta1 = makePropostaMercato({ id: 1, idSquadra: 1, idGiocatore: 100, prezzoOfferto: 5, deletedAt: null })
+    const offerta2 = makePropostaMercato({ id: 2, idSquadra: 2, idGiocatore: 100, prezzoOfferto: 10, deletedAt: null })
+
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(Trasferimento.findOne).mockResolvedValue(
+      makeTrasferimento({ idSquadra: null, dataCessione: null }) as any,
+    )
+
+    // tutteLeOfferte: entrambe le offerte su giocatore 100
+    vi.mocked(mockEntityManager.find).mockResolvedValueOnce([offerta1 as any, offerta2 as any])
+    vi.mocked(mockEntityManager.save).mockResolvedValue({ ...offerta1, prezzoOfferto: 20 } as any)
+
+    await createProposta({ ctx, input: { idGiocatore: 100, prezzoOfferto: 20 } })
+
+    // UPDATE path: nessun create, nessun rischio indice
+    expect(vi.mocked(mockEntityManager.create)).not.toHaveBeenCalled()
+    expect(vi.mocked(mockEntityManager.save)).toHaveBeenCalledWith(
+      PropostaMercato,
+      expect.objectContaining({ idGiocatore: 100, prezzoOfferto: 20 }),
+    )
+  })
+})
+
+// ============================================================================
+// createPropostaAstaInChiaro — cap "leader corrente"
+//
+// Una squadra può essere il miglior offerente su al più acquistiEffettivi
+// giocatori distinti nella sessione (aste attive + scadute).
+//
+// Tutte le query critiche avvengono dentro AppDataSource.transaction con
+// pg_advisory_xact_lock, quindi i mock usano mockEntityManager.*.
+// ============================================================================
+
+describe('createPropostaAstaInChiaro — cap leader corrente', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  /** Helper: sessione astaInChiaro con cap configurabile */
+  function makeSessioneInChiaro(acquistiEffettivi: number, maxProposte = 10) {
+    return {
+      ...makeSessioneMercato({ id: 20, maxProposte }),
+      astaInChiaro: true,
+      acquistiEffettivi,
+    }
+  }
+
+  /**
+   * Cap=2, squadra è leader su 2 giocatori → offerta su un terzo rifiutata.
+   * Verifica che il conteggio includa sia aste attive (timer non scaduto)
+   * che aste scadute (l'unica discriminante è chi ha il prezzo più alto).
+   */
+  it('cap=2, leader su 2 giocatori: offerta su terzo rifiutata', async () => {
+    const ctx = makeMockContext({ session: { user: { id: '1', ruolo: 'contributor', idSquadra: 1 } } })
+    const sessione = makeSessioneInChiaro(2)
+
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(Trasferimento.findOne).mockResolvedValue(
+      makeTrasferimento({ idSquadra: null, dataCessione: null }) as any,
+    )
+
+    // Squadra 1 è leader su giocatori 10 e 11 (prezzi massimi tra i rispettivi offerenti)
+    const offerteEsistenti = [
+      makePropostaMercato({ id: 10, idSquadra: 1, idGiocatore: 10, prezzoOfferto: 50, deletedAt: null }),
+      makePropostaMercato({ id: 11, idSquadra: 2, idGiocatore: 10, prezzoOfferto: 30, deletedAt: null }), // 1 batte 2 su g10
+      makePropostaMercato({ id: 20, idSquadra: 1, idGiocatore: 11, prezzoOfferto: 40, deletedAt: null }), // 1 è solo leader su g11
+    ]
+
+    vi.mocked(mockEntityManager.find).mockResolvedValueOnce(offerteEsistenti as any)
+
+    // Offerta su giocatore 12 (terzo) deve essere rifiutata: cap raggiunto
+    await expect(
+      createProposta({ ctx, input: { idGiocatore: 12, prezzoOfferto: 20 } }),
+    ).rejects.toThrow(/attendi di essere superato/i)
+  })
+
+  /**
+   * Cap=2, squadra superata su uno dei due giocatori → libera un slot →
+   * può diventare leader su un altro giocatore.
+   */
+  it('dopo essere superata su uno, può guidare un\'altra asta', async () => {
+    const ctx = makeMockContext({ session: { user: { id: '1', ruolo: 'contributor', idSquadra: 1 } } })
+    const sessione = makeSessioneInChiaro(2)
+
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(Trasferimento.findOne).mockResolvedValue(
+      makeTrasferimento({ idSquadra: null, dataCessione: null }) as any,
+    )
+
+    // Squadra 1 è leader su g10, ma è stata superata su g11 (squadra 2 ha 60 > 40)
+    const offerteEsistenti = [
+      makePropostaMercato({ id: 10, idSquadra: 1, idGiocatore: 10, prezzoOfferto: 50, deletedAt: null }), // 1 leader su g10
+      makePropostaMercato({ id: 20, idSquadra: 1, idGiocatore: 11, prezzoOfferto: 40, deletedAt: null }), // 1 non leader su g11
+      makePropostaMercato({ id: 21, idSquadra: 2, idGiocatore: 11, prezzoOfferto: 60, deletedAt: null }), // 2 leader su g11
+    ]
+
+    vi.mocked(mockEntityManager.find).mockResolvedValueOnce(offerteEsistenti as any)
+    vi.mocked(mockEntityManager.create).mockImplementation(((_e: unknown, data: any) => data) as any)
+    vi.mocked(mockEntityManager.save).mockImplementation(((_e: unknown, data: any) => Promise.resolve(data)) as any)
+
+    // slotOccupati=1 (solo g10) < cap=2 → l'offerta su g12 deve essere accettata
+    const result = await createProposta({ ctx, input: { idGiocatore: 12, prezzoOfferto: 20 } })
+    expect(result).toBeDefined()
+    expect(vi.mocked(mockEntityManager.create)).toHaveBeenCalledWith(
+      PropostaMercato,
+      expect.objectContaining({ idGiocatore: 12, astaInChiaro: true }),
+    )
+  })
+
+  /**
+   * Aste scadute vinte (timer = now - 2h) contano ancora nel cap
+   * perché il vincolo si applica finché la sessione non è aggiudicata.
+   */
+  it('aste scadute con squadra leader contano nel cap (non solo aste attive)', async () => {
+    const ctx = makeMockContext({ session: { user: { id: '1', ruolo: 'contributor', idSquadra: 1 } } })
+    const sessione = makeSessioneInChiaro(2)
+
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(Trasferimento.findOne).mockResolvedValue(
+      makeTrasferimento({ idSquadra: null, dataCessione: null }) as any,
+    )
+
+    const now = new Date()
+    // g10: asta scaduta 2 ore fa, squadra 1 è vincitrice
+    const scadutaCreatedAt = new Date(now.getTime() - 26 * 60 * 60 * 1000) // 26h fa → timer scaduto da 2h
+    const offerteEsistenti = [
+      { ...makePropostaMercato({ id: 10, idSquadra: 1, idGiocatore: 10, prezzoOfferto: 50, deletedAt: null }), createdAt: scadutaCreatedAt },
+      // g11: asta attiva, squadra 1 è leader
+      makePropostaMercato({ id: 20, idSquadra: 1, idGiocatore: 11, prezzoOfferto: 40, deletedAt: null }),
+    ]
+
+    vi.mocked(mockEntityManager.find).mockResolvedValueOnce(offerteEsistenti as any)
+
+    // Nonostante g10 sia scaduta, occupa ancora uno slot → cap=2 raggiunto
+    await expect(
+      createProposta({ ctx, input: { idGiocatore: 12, prezzoOfferto: 20 } }),
+    ).rejects.toThrow(/attendi di essere superato/i)
+  })
+
+  /**
+   * Self-outbid: la squadra è già il miglior offerente corrente sul giocatore
+   * target → l'offerta viene rifiutata con errore esplicito, indipendentemente
+   * dal cap (non occupa slot aggiuntivi).
+   */
+  it('rilancio del leader sullo stesso giocatore rifiutato (self-outbid)', async () => {
+    const ctx = makeMockContext({ session: { user: { id: '1', ruolo: 'contributor', idSquadra: 1 } } })
+    const sessione = makeSessioneInChiaro(3) // cap=3, ampio
+
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(Trasferimento.findOne).mockResolvedValue(
+      makeTrasferimento({ idSquadra: null, dataCessione: null }) as any,
+    )
+
+    // Squadra 1 è l'unico offerente su g10 → è il leader corrente
+    vi.mocked(mockEntityManager.find).mockResolvedValueOnce([
+      makePropostaMercato({ id: 10, idSquadra: 1, idGiocatore: 10, prezzoOfferto: 50, deletedAt: null }) as any,
+    ])
+
+    // Tentativo di rilanciare contro sé stessa: prezzoOfferto 60 > 50 ma è self-outbid
+    await expect(
+      createProposta({ ctx, input: { idGiocatore: 10, prezzoOfferto: 60 } }),
+    ).rejects.toThrow(/non puoi rilanciare contro te stesso/i)
+  })
+
+  /**
+   * Serializzazione: verifica che pg_advisory_xact_lock venga invocato
+   * con l'id della sessione dentro la transazione. Garantisce che le
+   * richieste concorrenti sulla stessa sessione siano serializzate.
+   */
+  it('invoca pg_advisory_xact_lock con id sessione dentro la transazione', async () => {
+    const ctx = makeMockContext({ session: { user: { id: '1', ruolo: 'contributor', idSquadra: 1 } } })
+    const sessione = makeSessioneInChiaro(3)
+
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(Trasferimento.findOne).mockResolvedValue(
+      makeTrasferimento({ idSquadra: null, dataCessione: null }) as any,
+    )
+
+    vi.mocked(mockEntityManager.find).mockResolvedValueOnce([])
+    vi.mocked(mockEntityManager.create).mockImplementation(((_e: unknown, data: any) => data) as any)
+    vi.mocked(mockEntityManager.save).mockImplementation(((_e: unknown, data: any) => Promise.resolve(data)) as any)
+
+    await createProposta({ ctx, input: { idGiocatore: 100, prezzoOfferto: 10 } })
+
+    // Il lock deve essere il PRIMO statement eseguito nella transazione
+    expect(vi.mocked(mockEntityManager.query)).toHaveBeenCalledWith(
+      'SELECT pg_advisory_xact_lock($1)',
+      [sessione.id],
+    )
+  })
+
+  /**
+   * Offerta valida quando la squadra non è ancora leader su nessun giocatore.
+   * Verifica il percorso "happy path" senza cap.
+   */
+  it('prima offerta (nessun slot occupato) accettata normalmente', async () => {
+    const ctx = makeMockContext({ session: { user: { id: '1', ruolo: 'contributor', idSquadra: 1 } } })
+    const sessione = makeSessioneInChiaro(2)
+
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(sessione as any)
+    vi.mocked(Trasferimento.findOne).mockResolvedValue(
+      makeTrasferimento({ idSquadra: null, dataCessione: null }) as any,
+    )
+
+    // Nessuna offerta nella sessione
+    vi.mocked(mockEntityManager.find).mockResolvedValueOnce([])
+    vi.mocked(mockEntityManager.create).mockImplementation(((_e: unknown, data: any) => data) as any)
+    vi.mocked(mockEntityManager.save).mockImplementation(((_e: unknown, data: any) => Promise.resolve({ ...data, id: 99 })) as any)
+
+    const result = await createProposta({ ctx, input: { idGiocatore: 100, prezzoOfferto: 15 } })
+
+    expect(result).toBeDefined()
+    expect(vi.mocked(mockEntityManager.create)).toHaveBeenCalledWith(
+      PropostaMercato,
+      expect.objectContaining({ idGiocatore: 100, prezzoOfferto: 15, astaInChiaro: true }),
+    )
   })
 })
