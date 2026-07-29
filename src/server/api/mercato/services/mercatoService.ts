@@ -96,6 +96,7 @@ export async function getSessioniMercato({ ctx: _ctx }: { ctx: MercatoCtx; input
         tipoValuta: s.tipoValuta,
         maxProposte: s.maxProposte,
         acquistiEffettivi: s.acquistiEffettivi,
+        astaInChiaro: s.astaInChiaro,
         stato,
         proposte,
       }
@@ -108,6 +109,7 @@ export async function getSessioniMercato({ ctx: _ctx }: { ctx: MercatoCtx; input
       tipoValuta: s.tipoValuta,
       maxProposte: s.maxProposte,
       acquistiEffettivi: s.acquistiEffettivi,
+      astaInChiaro: s.astaInChiaro,
       stato,
     }
   })
@@ -492,6 +494,10 @@ async function createPropostaAstaInChiaro({
     idGiocatore: input.idGiocatore,
     prezzoOfferto: input.prezzoOfferto,
     priorita: 1,
+    // Discriminante denormalizzato: esclude questa riga dal partial unique
+    // index UQ_proposta_mercato_priorita_active (che si applica solo alle
+    // sessioni al buio, dove la priorità è significativa).
+    astaInChiaro: true,
     deletedAt: null,
   })
 

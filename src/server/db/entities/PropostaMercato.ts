@@ -41,6 +41,19 @@ export class PropostaMercato extends BaseEntity {
   @Column({ name: 'deleted_at', type: 'timestamptz', nullable: true })
   deletedAt!: Date | null
 
+  /**
+   * Discriminante denormalizzato dalla sessione padre.
+   * `true`  → offerta inserita in una sessione astaInChiaro.
+   * `false` → offerta inserita in una sessione asta al buio.
+   *
+   * Necessario per confinare il partial unique index
+   * `UQ_proposta_mercato_priorita_active` alle sole righe al buio,
+   * dove la priorità è semanticamente significativa e deve essere univoca.
+   * Nelle sessioni in chiaro `priorita` è sempre 1 e non deve essere vincolata.
+   */
+  @Column({ name: 'asta_in_chiaro', type: 'boolean', default: false })
+  astaInChiaro!: boolean
+
   @ManyToOne(
     () => SessioneMercato,
     (s: SessioneMercato) => s.ProposteMercato,

@@ -81,7 +81,7 @@ export default function SessioniMercato() {
           icon={<Storefront />}
         >
           <Stack spacing={0.5}>
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                 Sessione{' '}
                 {banner.stato === 'attiva' ? 'in corso' : 'programmata'}
@@ -91,6 +91,14 @@ export default function SessioniMercato() {
                 color={banner.stato === 'attiva' ? 'success' : 'info'}
                 label={banner.stato === 'attiva' ? 'Attiva' : 'Futura'}
               />
+              {'astaInChiaro' in banner && (
+                <Chip
+                  size="small"
+                  variant="outlined"
+                  color={banner.astaInChiaro ? 'warning' : 'default'}
+                  label={banner.astaInChiaro ? 'Asta in chiaro' : 'Asta al buio'}
+                />
+              )}
             </Stack>
             {'dataApertura' in banner && (
               <Typography variant="body2">
@@ -150,6 +158,14 @@ export default function SessioniMercato() {
                             : 'Euro reali'
                         }
                       />
+                      {'astaInChiaro' in s && (
+                        <Chip
+                          size="small"
+                          variant="outlined"
+                          color={s.astaInChiaro ? 'warning' : 'default'}
+                          label={s.astaInChiaro ? 'Asta in chiaro' : 'Asta al buio'}
+                        />
+                      )}
                       <Typography
                         variant="body2"
                         color="text.secondary"
