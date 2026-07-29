@@ -61,6 +61,7 @@ export async function getSessioneAttiva({ ctx }: { ctx: MercatoCtx; input: Recor
     maxProposte: sessione.maxProposte,
     acquistiEffettivi: sessione.acquistiEffettivi,
     tipoValuta: sessione.tipoValuta,
+    astaInChiaro: sessione.astaInChiaro,
     myCount,
     countPerSquadra,
   }
@@ -148,6 +149,7 @@ export async function createSessione({ input }: { input: CreateSessioneInput }) 
     maxProposte: input.maxProposte,
     acquistiEffettivi: input.acquistiEffettivi,
     tipoValuta: input.tipoValuta,
+    astaInChiaro: input.astaInChiaro,
   })
 
   const saved = await SessioneMercato.save(sessione)
@@ -217,17 +219,50 @@ export async function getGiocatoriSvincolati({
     order: { Giocatore: { nome: 'ASC' } },
   })
 
-  return svincolati.map((t) => ({
-    idGiocatore: t.idGiocatore,
-    idTrasferimento: t.idTrasferimento,
-    nome: t.Giocatore?.nome,
-    ruolo: t.Giocatore?.ruolo,
-    stagione: t.stagione,
-    nomeSquadraSerieA: t.SquadraSerieA?.nome,
-    maglia: t.SquadraSerieA?.maglia
-      ? `/images/maglie/${t.SquadraSerieA.maglia}`
-      : null,
-  }))
+  // Nelle sessioni astaInChiaro, escludi i giocatori la cui asta è già scaduta
+  // (MIN(proposta.createdAt) + 24h ≤ now OPPURE sessione.dataChiusura ≤ now).
+  const sessione = await findSessioneAttiva()
+  const giocatoriAggiudicatiIds = new Set<number>()
+
+  if (sessione?.astaInChiaro) {
+    const now = new Date()
+    const proposteAttive = await PropostaMercato.find({
+      where: { idSessione: sessione.id, deletedAt: IsNull() },
+      select: { idGiocatore: true, createdAt: true },
+    })
+
+    const primaOffertaPerGiocatore = new Map<number, Date>()
+    for (const p of proposteAttive) {
+      const existing = primaOffertaPerGiocatore.get(p.idGiocatore)
+      if (!existing || p.createdAt < existing) {
+        primaOffertaPerGiocatore.set(p.idGiocatore, p.createdAt)
+      }
+    }
+
+    for (const [idGiocatore, primaOfferta] of primaOffertaPerGiocatore) {
+      const scadenza = new Date(Math.min(
+        primaOfferta.getTime() + 24 * 60 * 60 * 1000,
+        sessione.dataChiusura.getTime(),
+      ))
+      if (scadenza <= now) {
+        giocatoriAggiudicatiIds.add(idGiocatore)
+      }
+    }
+  }
+
+  return svincolati
+    .filter((t) => !giocatoriAggiudicatiIds.has(t.idGiocatore))
+    .map((t) => ({
+      idGiocatore: t.idGiocatore,
+      idTrasferimento: t.idTrasferimento,
+      nome: t.Giocatore?.nome,
+      ruolo: t.Giocatore?.ruolo,
+      stagione: t.stagione,
+      nomeSquadraSerieA: t.SquadraSerieA?.nome,
+      maglia: t.SquadraSerieA?.maglia
+        ? `/images/maglie/${t.SquadraSerieA.maglia}`
+        : null,
+    }))
 }
 
 export async function createProposta({
@@ -242,6 +277,12 @@ export async function createProposta({
   if (!sessione) {
     throw new ORPCError('NOT_FOUND', { message: 'Nessuna sessione di mercato attiva' })
   }
+
+  if (sessione.astaInChiaro) {
+    return createPropostaAstaInChiaro({ ctx, input, sessione })
+  }
+
+  // ── Modalità asta al buio ─────────────────────────────────────────────────
 
   const myProposte = await PropostaMercato.find({
     where: {
@@ -321,6 +362,142 @@ export async function createProposta({
   })
 }
 
+/**
+ * Logica offerta per sessioni astaInChiaro:
+ * - Il prezzo deve essere strettamente superiore all'offerta massima corrente
+ *   per quel giocatore (di qualsiasi squadra).
+ * - Se la squadra ha già un'offerta → UPDATE prezzoOfferto.
+ * - Se non ce l'ha → INSERT con priorita=1, previa verifica cap offerte attive.
+ * - Blocco proattivo: se la squadra ha già vinto acquistiEffettivi aste → errore.
+ * - Blocco: se il timer del giocatore è scaduto → errore.
+ */
+async function createPropostaAstaInChiaro({
+  ctx,
+  input,
+  sessione,
+}: {
+  ctx: MercatoCtx
+  input: CreatePropostaInput
+  sessione: SessioneMercato
+}) {
+  const now = new Date()
+
+  // Verifica che il giocatore non sia già svincolato/assegnato
+  const trasferimento = await Trasferimento.findOne({
+    where: { idGiocatore: input.idGiocatore, dataCessione: IsNull() },
+  })
+  if (trasferimento && trasferimento.idSquadra !== null) {
+    throw new ORPCError('BAD_REQUEST', { message: 'Il giocatore non è svincolato' })
+  }
+
+  // Tutte le offerte attive per questo giocatore nella sessione
+  const proposteGiocatore = await PropostaMercato.find({
+    where: { idSessione: sessione.id, idGiocatore: input.idGiocatore, deletedAt: IsNull() },
+    relations: { Utente: true },
+  })
+
+  // Calcola scadenza asta del giocatore (se già ci sono offerte)
+  if (proposteGiocatore.length > 0) {
+    const primaOfferta = proposteGiocatore.reduce(
+      (min, p) => (p.createdAt < min ? p.createdAt : min),
+      proposteGiocatore[0]!.createdAt,
+    )
+    const scadenza = new Date(Math.min(
+      primaOfferta.getTime() + 24 * 60 * 60 * 1000,
+      sessione.dataChiusura.getTime(),
+    ))
+    if (scadenza <= now) {
+      throw new ORPCError('BAD_REQUEST', { message: "L'asta per questo giocatore è già chiusa" })
+    }
+  }
+
+  // Verifica offerta massima corrente: il nuovo prezzo deve essere strettamente superiore
+  const prezzoMax = proposteGiocatore.reduce(
+    (max, p) => Math.max(max, Number(p.prezzoOfferto)),
+    0,
+  )
+  if (input.prezzoOfferto <= prezzoMax) {
+    throw new ORPCError('BAD_REQUEST', {
+      message: `L'offerta deve essere superiore all'offerta massima corrente (${prezzoMax})`,
+    })
+  }
+
+  // Blocco proattivo: conta aste già vinte dalla squadra in questa sessione
+  const tutte = await PropostaMercato.find({
+    where: { idSessione: sessione.id, deletedAt: IsNull() },
+    select: { idGiocatore: true, idSquadra: true, prezzoOfferto: true, createdAt: true },
+  })
+
+  // Raggruppa per giocatore: trova giocatori la cui asta è scaduta e chi è il vincitore
+  const perGiocatoreMap = new Map<number, { primaOfferta: Date; offerte: typeof tutte }>()
+  for (const p of tutte) {
+    const g = perGiocatoreMap.get(p.idGiocatore) ?? { primaOfferta: p.createdAt, offerte: [] }
+    if (p.createdAt < g.primaOfferta) g.primaOfferta = p.createdAt
+    g.offerte.push(p)
+    perGiocatoreMap.set(p.idGiocatore, g)
+  }
+
+  let asteVinteDallaSquadra = 0
+  for (const [idGiocatore, { primaOfferta, offerte }] of perGiocatoreMap) {
+    // Ignora il giocatore che si sta offrendo ora (non è ancora vinto)
+    if (idGiocatore === input.idGiocatore) continue
+    const scadenza = new Date(Math.min(
+      primaOfferta.getTime() + 24 * 60 * 60 * 1000,
+      sessione.dataChiusura.getTime(),
+    ))
+    if (scadenza > now) continue // asta ancora aperta
+
+    // Asta chiusa: controlla se questa squadra è il miglior offerente
+    const maxPrezzo = Math.max(...offerte.map((o) => Number(o.prezzoOfferto)))
+    const vincitrici = offerte.filter((o) => Number(o.prezzoOfferto) === maxPrezzo)
+    // In caso di parità (non dovrebbe accadere, ma per sicurezza) considera la più vecchia
+    vincitrici.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    if (vincitrici[0]?.idSquadra === ctx.session.user.idSquadra) {
+      asteVinteDallaSquadra++
+    }
+  }
+
+  if (asteVinteDallaSquadra >= sessione.acquistiEffettivi) {
+    throw new ORPCError('BAD_REQUEST', {
+      message: `Hai già raggiunto il limite di ${sessione.acquistiEffettivi} acquisti consentiti`,
+    })
+  }
+
+  // Upsert: se esiste già un'offerta della squadra → UPDATE, altrimenti → INSERT
+  const miaOfferta = proposteGiocatore.find((p) => p.idSquadra === ctx.session.user.idSquadra)
+
+  if (miaOfferta) {
+    miaOfferta.prezzoOfferto = input.prezzoOfferto
+    return PropostaMercato.save(miaOfferta)
+  }
+
+  // Nuova offerta: verifica cap proposte attive della squadra
+  const myProposte = await PropostaMercato.find({
+    where: {
+      idSessione: sessione.id,
+      idSquadra: ctx.session.user.idSquadra,
+      deletedAt: IsNull(),
+    },
+  })
+
+  if (myProposte.length >= sessione.maxProposte) {
+    throw new ORPCError('BAD_REQUEST', {
+      message: `Hai già raggiunto il massimo di ${sessione.maxProposte} proposte attive`,
+    })
+  }
+
+  const proposta = PropostaMercato.create({
+    idSessione: sessione.id,
+    idSquadra: ctx.session.user.idSquadra,
+    idGiocatore: input.idGiocatore,
+    prezzoOfferto: input.prezzoOfferto,
+    priorita: 1,
+    deletedAt: null,
+  })
+
+  return PropostaMercato.save(proposta)
+}
+
 export async function deleteProposta({
   ctx,
   input,
@@ -330,10 +507,17 @@ export async function deleteProposta({
 }) {
   const proposta = await PropostaMercato.findOne({
     where: { id: input.idProposta },
+    relations: { SessioneMercato: true },
   })
 
   if (!proposta) {
     throw new ORPCError('NOT_FOUND', { message: 'Proposta non trovata' })
+  }
+
+  if (proposta.SessioneMercato?.astaInChiaro) {
+    throw new ORPCError('FORBIDDEN', {
+      message: "Non è possibile ritirare un'offerta in modalità asta in chiaro",
+    })
   }
 
   if (proposta.idSquadra !== ctx.session.user.idSquadra) {
@@ -387,6 +571,12 @@ export async function riordinaProposte({
   if (!sessione) {
     throw new ORPCError('NOT_FOUND', {
       message: 'Nessuna sessione di mercato attiva',
+    })
+  }
+
+  if (sessione.astaInChiaro) {
+    throw new ORPCError('FORBIDDEN', {
+      message: 'Il riordino delle proposte non è disponibile in modalità asta in chiaro',
     })
   }
 
@@ -581,6 +771,7 @@ export async function listSessioni() {
     maxProposte: s.maxProposte,
     acquistiEffettivi: s.acquistiEffettivi,
     tipoValuta: s.tipoValuta,
+    astaInChiaro: s.astaInChiaro,
     stato: calcolaStato(s, now),
   }))
 }
@@ -603,5 +794,85 @@ export async function getProposteSessione({ input }: { input: GetProposteSession
   return PropostaMercato.find({
     where: { idSessione: input.idSessione, deletedAt: IsNull() },
     relations: { Utente: true, Giocatore: true },
+  })
+}
+
+/**
+ * Restituisce lo stato corrente delle aste in una sessione astaInChiaro attiva.
+ * Per ogni giocatore che ha almeno un'offerta, espone:
+ * - scadenza: MIN(prima_offerta + 24h, dataChiusura)
+ * - offertaMassima: { prezzo, nomeSquadra } del leader corrente
+ * - miaOfferta: prezzo offerto dalla squadra del richiedente, se presente
+ */
+export async function getProposteAstaInChiaro({ ctx }: { ctx: MercatoCtx; input: Record<string, never> }) {
+  const sessione = await findSessioneAttiva()
+
+  if (!sessione) {
+    throw new ORPCError('NOT_FOUND', { message: 'Nessuna sessione di mercato attiva' })
+  }
+
+  if (!sessione.astaInChiaro) {
+    throw new ORPCError('BAD_REQUEST', {
+      message: 'La sessione corrente non è in modalità asta in chiaro',
+    })
+  }
+
+  const proposte = await PropostaMercato.find({
+    where: { idSessione: sessione.id, deletedAt: IsNull() },
+    relations: { Giocatore: true, Utente: true },
+    order: { createdAt: 'ASC' },
+  })
+
+  // Raggruppa per giocatore
+  const perGiocatore = new Map<
+    number,
+    {
+      idGiocatore: number
+      nomeGiocatore: string
+      primaOfferta: Date
+      offerte: PropostaMercato[]
+    }
+  >()
+
+  for (const p of proposte) {
+    const g = perGiocatore.get(p.idGiocatore) ?? {
+      idGiocatore: p.idGiocatore,
+      nomeGiocatore: p.Giocatore?.nome ?? `#${p.idGiocatore}`,
+      primaOfferta: p.createdAt,
+      offerte: [],
+    }
+    if (p.createdAt < g.primaOfferta) g.primaOfferta = p.createdAt
+    g.offerte.push(p)
+    perGiocatore.set(p.idGiocatore, g)
+  }
+
+  const now = new Date()
+
+  return Array.from(perGiocatore.values()).map(({ idGiocatore, nomeGiocatore, primaOfferta, offerte }) => {
+    const scadenza = new Date(Math.min(
+      primaOfferta.getTime() + 24 * 60 * 60 * 1000,
+      sessione.dataChiusura.getTime(),
+    ))
+
+    // Leader: offerta con prezzo massimo; parità → più vecchia (non dovrebbe accadere)
+    const sorted = [...offerte].sort((a, b) => {
+      const diff = Number(b.prezzoOfferto) - Number(a.prezzoOfferto)
+      return diff !== 0 ? diff : a.createdAt.getTime() - b.createdAt.getTime()
+    })
+    const leader = sorted[0]!
+
+    const miaOfferta = offerte.find((p) => p.idSquadra === ctx.session.user.idSquadra)
+
+    return {
+      idGiocatore,
+      nomeGiocatore,
+      scadenza,
+      aggiudicato: scadenza <= now,
+      offertaMassima: {
+        prezzo: Number(leader.prezzoOfferto),
+        nomeSquadra: leader.Utente?.nomeSquadra ?? `Squadra ${leader.idSquadra}`,
+      },
+      miaOfferta: miaOfferta ? Number(miaOfferta.prezzoOfferto) : null,
+    }
   })
 }

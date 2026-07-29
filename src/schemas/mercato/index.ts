@@ -37,6 +37,7 @@ export const createSessioneSchema = z
     maxProposte: z.number().int().min(1),
     acquistiEffettivi: z.number().int().min(1),
     tipoValuta: tipoValutaEnum.default('fantamilioni'),
+    astaInChiaro: z.boolean().default(false),
   })
   .refine((data) => data.dataChiusura > data.dataApertura, {
     message: 'dataChiusura deve essere successiva a dataApertura',
@@ -45,6 +46,10 @@ export const createSessioneSchema = z
   .refine((data) => data.acquistiEffettivi <= data.maxProposte, {
     message: 'acquistiEffettivi deve essere minore o uguale a maxProposte',
     path: ['acquistiEffettivi'],
+  })
+  .refine((data) => !data.astaInChiaro || data.tipoValuta === 'euro', {
+    message: 'astaInChiaro è disponibile solo per sessioni in euro',
+    path: ['astaInChiaro'],
   })
 
 export type CreateSessioneInput = z.infer<typeof createSessioneSchema>
