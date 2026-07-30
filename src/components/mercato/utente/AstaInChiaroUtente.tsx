@@ -632,7 +632,6 @@ export default function AstaInChiaroUtente() {
                           >
                             <span style={{ display: 'block', width: '100%' }}>
                               <TextField
-                                sx={{ width: 90 }}
                                 size="small"
                                 type="number"
                                 placeholder={placeholderMin(asta.idGiocatore)}
@@ -658,7 +657,7 @@ export default function AstaInChiaroUtente() {
                                 }}
                                 disabled={sonoIlLeader}
                                 sx={{
-                                  width: '100%',
+                                  width: '90',
                                   '& .MuiInputBase-root': { minWidth: 0 },
                                 }}
                               />

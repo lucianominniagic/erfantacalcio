@@ -139,6 +139,52 @@ export function buildFormazionePromemoriaHtml(data: {
           Saluti dal Vostro immenso Presidente`
 }
 
+import {
+  tipoAstaDaBoolean,
+  REGOLE_PER_TIPO_ASTA,
+  SEZIONE_SESSIONI_MERCATO,
+  type Block,
+} from '~/content/regolamentoMercato'
+
+// ─── Escape helper (sicurezza HTML) ──────────────────────────────────────────
+
+function esc(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+// ─── Block renderer ───────────────────────────────────────────────────────────
+
+/**
+ * Converte un array di `Block` (da `regolamentoMercato.ts`) in HTML sicuro
+ * per email.
+ */
+function renderBlocksHtml(blocks: Block[]): string {
+  return blocks
+    .map((block) => {
+      if (block.type === 'p') return `<p>${esc(block.text)}</p>`
+
+      if (block.type === 'list') {
+        const items = block.items.map((i) => `<li>${esc(i)}</li>`).join('\n')
+        return `<ul>\n${items}\n</ul>`
+      }
+
+      if (block.type === 'table') {
+        const headers = block.headers.map((h) => `<th>${esc(h)}</th>`).join('')
+        const rows = block.rows
+          .map((row) => `<tr>${row.map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`)
+          .join('\n')
+        return `<table border="1" cellpadding="4" cellspacing="0">\n<tr>${headers}</tr>\n${rows}\n</table>`
+      }
+
+      return ''
+    })
+    .join('\n')
+}
+
 export interface SessioneMercatoCreataMailData {
   presidente: string | undefined
   dataApertura: string
@@ -146,21 +192,57 @@ export interface SessioneMercatoCreataMailData {
   maxProposte: number
   acquistiEffettivi: number
   tipoValuta: string
+  /** Indica se la sessione è in modalità asta in chiaro (`true`) o al buio (`false`). */
+  astaInChiaro: boolean
+  /** URL assoluto alla sezione regolamento (opzionale). */
+  linkRegolamento?: string
+}
+
+const LABEL_VALUTA: Record<string, string> = {
+  fantamilioni: 'Fantamilioni',
+  euro: 'Euro',
+}
+
+const LABEL_TIPO_ASTA: Record<string, string> = {
+  alBuio: 'Al Buio',
+  inChiaro: 'In Chiaro',
 }
 
 /**
  * HTML per la notifica a tutti i presidenti quando viene creata una nuova
  * sessione di mercato.
+ *
+ * Include:
+ * - Tutti i parametri configurati per la sessione
+ * - Riepilogo del regolamento specifico per tipo di asta (al buio / in chiaro)
+ * - Link assoluto alla sezione regolamento (se fornito)
  */
 export function buildSessioneMercatoCreataHtml(data: SessioneMercatoCreataMailData): string {
+  const tipoAsta = tipoAstaDaBoolean(data.astaInChiaro)
+  const regolaSezione = REGOLE_PER_TIPO_ASTA[tipoAsta]
+  const labelValuta = LABEL_VALUTA[data.tipoValuta] ?? data.tipoValuta
+  const labelTipoAsta = LABEL_TIPO_ASTA[tipoAsta] ?? tipoAsta
+
+  const linkSection = data.linkRegolamento
+    ? `Per il regolamento completo: <a href="${data.linkRegolamento}">Sezione regolamento — Sessioni di mercato</a><br><br>`
+    : ''
+
+  const regolamentoHtml = `
+<b>Regolamento — ${esc(regolaSezione.title)}:</b><br>
+${renderBlocksHtml(regolaSezione.blocks)}
+<br>
+${linkSection}`
+
   return `Notifica automatica da erFantacalcio.com<br><br>
-          Illustrissimo ${data.presidente ?? 'Presidente'}, è stata aperta una nuova sessione di mercato!<br><br>
-          <b>Dettagli sessione:</b><br>
-          Data apertura: ${data.dataApertura}<br>
-          Data chiusura: ${data.dataChiusura}<br>
-          Numero massimo proposte: ${data.maxProposte}<br>
-          Acquisti effettivi consentiti: ${data.acquistiEffettivi}<br>
-          Tipo valuta: ${data.tipoValuta}<br><br>
-          https://www.erfantacalcio.com <br><br>
-          Saluti dal Vostro immenso Presidente`
+Illustrissimo ${esc(data.presidente ?? 'Presidente')}, è stata aperta una nuova sessione di mercato!<br><br>
+<b>Dettagli sessione:</b><br>
+Data apertura: ${esc(data.dataApertura)}<br>
+Data chiusura: ${esc(data.dataChiusura)}<br>
+Tipo di asta: <b>${labelTipoAsta}</b><br>
+Valuta: ${labelValuta}<br>
+Numero massimo proposte: ${data.maxProposte}<br>
+Acquisti effettivi consentiti: ${data.acquistiEffettivi}<br><br>
+${regolamentoHtml}
+https://www.erfantacalcio.com <br><br>
+Saluti dal Vostro immenso Presidente`
 }

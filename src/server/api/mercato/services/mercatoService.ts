@@ -12,6 +12,7 @@ import {
 import { ReSendMailAsync } from '~/server/services/mailSender'
 import { buildSessioneMercatoCreataHtml } from '~/server/services/mailTemplates'
 import { formatDateTime } from '~/utils/dateUtils'
+import { SEZIONE_SESSIONI_MERCATO } from '~/content/regolamentoMercato'
 
 export interface MercatoCtx {
   session: { user: { id: string; ruolo?: string; idSquadra: number } }
@@ -156,49 +157,88 @@ export async function createSessione({ input }: { input: CreateSessioneInput }) 
 
   const saved = await SessioneMercato.save(sessione)
 
-  await notificaSessioneMercatoCreata(saved)
+  // Notifica best-effort: la sessione è già salvata, un errore di notifica
+  // non deve bloccare la risposta all'admin né lasciare un risultato ambiguo.
+  try {
+    await notificaSessioneMercatoCreata(saved)
+  } catch (err) {
+    console.error(
+      'Notifica mail sessione mercato fallita (sessione già creata):',
+      err,
+    )
+    throw err
+  }
 
   return saved
 }
 
 /**
- * Invia una mail a tutti i presidenti (Utenti, admin inclusi) con le
- * informazioni della sessione di mercato appena creata. Invio best-effort:
- * eventuali errori vengono solo loggati, senza impattare la creazione della
- * sessione (già avvenuta con successo a questo punto).
+ * Invia una mail a tutti i presidenti (solo non-admin) con le informazioni
+ * della sessione di mercato appena creata e il riepilogo del regolamento
+ * pertinente al tipo di asta.
+ *
+ * Comportamento:
+ * - Se `MAIL_ENABLED !== 'true'` la funzione ritorna immediatamente senza
+ *   istanziare Resend né interrogare il DB.
+ * - Vengono esclusi gli utenti con `adminLevel = true` e quelli senza mail.
+ * - Le mail duplicate (stessa email per più righe DB) vengono inviate una sola volta.
+ * - Gli errori di singolo invio (da `ReSendMailAsync`) sono già gestiti/loggati
+ *   al loro livello; eventuali errori sistemici (es. fallimento query DB) vengono
+ *   rilanciati al chiamante che decide come gestirli.
  */
 async function notificaSessioneMercatoCreata(sessione: SessioneMercato): Promise<void> {
-  const mailEnabled = env.MAIL_ENABLED === 'true'
-  if (!mailEnabled) {
-    console.info('Mail disabilitata (MAIL_ENABLED != true), skip notifica creazione sessione mercato')
+  if (env.MAIL_ENABLED !== 'true') {
+    console.info(
+      'Mail disabilitata (MAIL_ENABLED != true), skip notifica creazione sessione mercato',
+    )
     return
   }
 
-  try {
-    const presidenti = await Utenti.find({
-      select: { idUtente: true, mail: true, presidente: true },
+  const tuttiUtenti = await Utenti.find({
+    where: { adminLevel: false },
+    select: { idUtente: true, mail: true, presidente: true, adminLevel: true },
+  })
+
+  // Filtra email mancanti/invalide e deduplica
+  const visti = new Set<string>()
+  const destinatari = tuttiUtenti.filter((u) => {
+    if (!u.mail || !u.mail.includes('@')) return false
+    const mailLower = u.mail.toLowerCase()
+    if (visti.has(mailLower)) return false
+    visti.add(mailLower)
+    return true
+  })
+
+  if (destinatari.length === 0) {
+    console.info('Nessun destinatario valido per notifica sessione mercato')
+    return
+  }
+
+  const dataApertura = formatDateTime(sessione.dataApertura)
+  const dataChiusura = formatDateTime(sessione.dataChiusura)
+  const subject = 'ErFantacalcio: Nuova sessione di mercato aperta'
+  // Valida e costruisci link al regolamento
+  const appUrl = env.NEXTAUTH_URL?.trim().replace(/\/$/, '')
+  if (!appUrl) {
+    throw new Error(
+      'NEXTAUTH_URL non configurato: impossibile generare link al regolamento per la notifica email',
+    )
+  }
+  const linkRegolamento = `${appUrl}/regolamento#${SEZIONE_SESSIONI_MERCATO.id}`
+
+  for (const utente of destinatari) {
+    const htmlMessage = buildSessioneMercatoCreataHtml({
+      presidente: utente.presidente,
+      dataApertura,
+      dataChiusura,
+      maxProposte: sessione.maxProposte,
+      acquistiEffettivi: sessione.acquistiEffettivi,
+      tipoValuta: sessione.tipoValuta,
+      astaInChiaro: sessione.astaInChiaro,
+      linkRegolamento,
     })
 
-    const dataApertura = formatDateTime(sessione.dataApertura)
-    const dataChiusura = formatDateTime(sessione.dataChiusura)
-    const subject = 'ErFantacalcio: Nuova sessione di mercato aperta'
-
-    for (const presidente of presidenti) {
-      if (!presidente.mail) continue
-
-      const htmlMessage = buildSessioneMercatoCreataHtml({
-        presidente: presidente.presidente,
-        dataApertura,
-        dataChiusura,
-        maxProposte: sessione.maxProposte,
-        acquistiEffettivi: sessione.acquistiEffettivi,
-        tipoValuta: sessione.tipoValuta,
-      })
-
-      await ReSendMailAsync(presidente.mail, presidente.mail, subject, htmlMessage)
-    }
-  } catch (error) {
-    console.error('Errore invio notifica creazione sessione mercato:', error)
+    await ReSendMailAsync(utente.mail, '', subject, htmlMessage)
   }
 }
 
@@ -904,3 +944,6 @@ export async function getProposteAstaInChiaro({ ctx }: { ctx: MercatoCtx; input:
     }
   })
 }
+
+
+

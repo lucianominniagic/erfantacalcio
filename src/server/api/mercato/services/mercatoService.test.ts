@@ -44,6 +44,11 @@ vi.mock('~/server/db/entities', () => ({
   },
   Utente: {
     findOne: vi.fn(),
+    find: vi.fn(),
+  },
+  // Utenti è un alias di Utente — deve comparire nel mock esplicitamente
+  Utenti: {
+    find: vi.fn(),
   },
 }))
 
@@ -72,7 +77,8 @@ vi.mock('~/server/services/mailSender', () => ({
 // Import AFTER mocks are defined
 import { createProposta, createSessione, deleteProposta, getSessioneAttiva, getSessioniMercato, getMieProposte, getGiocatoriSvincolati, riordinaProposte } from './mercatoService'
 
-import { SessioneMercato, PropostaMercato, Trasferimento, Utente } from '~/server/db/entities'
+import { SessioneMercato, PropostaMercato, Trasferimento, Utente, Utenti } from '~/server/db/entities'
+import { ReSendMailAsync } from '~/server/services/mailSender'
 
 // ============================================================================
 // Mock Context Builder
@@ -955,6 +961,7 @@ describe('createSessione', () => {
       maxProposte: 5,
       acquistiEffettivi: 3,
       tipoValuta: 'fantamilioni' as const,
+      astaInChiaro: false,
     }
 
     await createSessione({ input })
@@ -964,6 +971,144 @@ describe('createSessione', () => {
     expect(callArg.acquistiEffettivi).toBe(3)
     expect(callArg.maxProposte).toBe(5)
     expect(callArg.tipoValuta).toBe('fantamilioni')
+  })
+
+  // ── Notifica mail ────────────────────────────────────────────────────────
+
+  it('non invia mail quando MAIL_ENABLED != true', async () => {
+    vi.stubEnv('MAIL_ENABLED', 'false')
+
+    vi.mocked(SessioneMercato.find).mockResolvedValue([])
+    vi.mocked(SessioneMercato.create).mockImplementation((data) => data as any)
+    vi.mocked(SessioneMercato.save).mockImplementation(async (e) => e as any)
+
+    const now = Date.now()
+    await createSessione({
+      input: {
+        dataApertura: new Date(now + 3600000),
+        dataChiusura: new Date(now + 7200000),
+        maxProposte: 5,
+        acquistiEffettivi: 3,
+        tipoValuta: 'fantamilioni',
+        astaInChiaro: false,
+      },
+    })
+
+    expect(vi.mocked(ReSendMailAsync)).not.toHaveBeenCalled()
+    expect(vi.mocked(Utenti.find)).not.toHaveBeenCalled()
+
+    vi.unstubAllEnvs()
+  })
+
+  it('invia mail solo ai presidenti non-admin quando MAIL_ENABLED=true', async () => {
+    vi.stubEnv('MAIL_ENABLED', 'true')
+
+    vi.mocked(SessioneMercato.find).mockResolvedValue([])
+    vi.mocked(SessioneMercato.create).mockImplementation((data) => data as any)
+    vi.mocked(SessioneMercato.save).mockImplementation(async (e) => e as any)
+
+    const presidentiNonAdmin = [
+      { idUtente: 1, mail: 'alfa@test.com', presidente: 'Alfa', adminLevel: false },
+      { idUtente: 2, mail: 'beta@test.com', presidente: 'Beta', adminLevel: false },
+    ]
+    vi.mocked(Utenti.find).mockResolvedValue(presidentiNonAdmin as any)
+
+    const now = Date.now()
+    await createSessione({
+      input: {
+        dataApertura: new Date(now + 3600000),
+        dataChiusura: new Date(now + 7200000),
+        maxProposte: 5,
+        acquistiEffettivi: 3,
+        tipoValuta: 'fantamilioni',
+        astaInChiaro: false,
+      },
+    })
+
+    // Utenti.find deve essere chiamato filtrando adminLevel: false
+    expect(vi.mocked(Utenti.find)).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { adminLevel: false } }),
+    )
+
+    // ReSendMailAsync deve essere chiamato una volta per ciascun presidente
+    expect(vi.mocked(ReSendMailAsync)).toHaveBeenCalledTimes(2)
+    expect(vi.mocked(ReSendMailAsync)).toHaveBeenCalledWith(
+      'alfa@test.com',
+      '',
+      expect.any(String),
+      expect.stringContaining('Alfa'),
+    )
+    expect(vi.mocked(ReSendMailAsync)).toHaveBeenCalledWith(
+      'beta@test.com',
+      '',
+      expect.any(String),
+      expect.stringContaining('Beta'),
+    )
+
+    vi.unstubAllEnvs()
+  })
+
+  it('deduplica email duplicate e salta utenti senza indirizzo valido', async () => {
+    vi.stubEnv('MAIL_ENABLED', 'true')
+
+    vi.mocked(SessioneMercato.find).mockResolvedValue([])
+    vi.mocked(SessioneMercato.create).mockImplementation((data) => data as any)
+    vi.mocked(SessioneMercato.save).mockImplementation(async (e) => e as any)
+
+    const utenti = [
+      { idUtente: 1, mail: 'dup@test.com', presidente: 'Dup1', adminLevel: false },
+      { idUtente: 2, mail: 'dup@test.com', presidente: 'Dup2', adminLevel: false }, // duplicato
+      { idUtente: 3, mail: '',             presidente: 'Noemail', adminLevel: false }, // email vuota
+      { idUtente: 4, mail: 'noeatsign',   presidente: 'NoAt', adminLevel: false },   // email invalida
+      { idUtente: 5, mail: 'ok@test.com', presidente: 'Ok', adminLevel: false },
+    ]
+    vi.mocked(Utenti.find).mockResolvedValue(utenti as any)
+
+    const now = Date.now()
+    await createSessione({
+      input: {
+        dataApertura: new Date(now + 3600000),
+        dataChiusura: new Date(now + 7200000),
+        maxProposte: 4,
+        acquistiEffettivi: 2,
+        tipoValuta: 'euro',
+        astaInChiaro: true,
+      },
+    })
+
+    // Solo 2 invii: dup@test.com (la prima occorrenza) e ok@test.com
+    expect(vi.mocked(ReSendMailAsync)).toHaveBeenCalledTimes(2)
+
+    vi.unstubAllEnvs()
+  })
+
+  it('errore di notifica email non è ingoiato: lancia eccezione', async () => {
+    vi.stubEnv('MAIL_ENABLED', 'true')
+
+    vi.mocked(SessioneMercato.find).mockResolvedValue([])
+    vi.mocked(SessioneMercato.create).mockImplementation((data) => data as any)
+    const savedSessione = { id: 42, maxProposte: 5, acquistiEffettivi: 3, tipoValuta: 'fantamilioni', astaInChiaro: false, dataApertura: new Date(), dataChiusura: new Date() }
+    vi.mocked(SessioneMercato.save).mockResolvedValue(savedSessione as any)
+
+    // Simuliamo un fallimento nel recupero dei presidenti
+    vi.mocked(Utenti.find).mockRejectedValue(new Error('DB connection lost'))
+
+    const now = Date.now()
+    // Attesa: l'errore non è ingoiato, ma rilanciato al chiamante
+    await expect(
+      createSessione({
+        input: {
+          dataApertura: new Date(now + 3600000),
+          dataChiusura: new Date(now + 7200000),
+          maxProposte: 5,
+          acquistiEffettivi: 3,
+          tipoValuta: 'fantamilioni',
+          astaInChiaro: false,
+        },
+      }),
+    ).rejects.toThrow('DB connection lost')
+
+    vi.unstubAllEnvs()
   })
 })
 
@@ -1319,5 +1464,200 @@ describe('createPropostaAstaInChiaro — cap leader corrente', () => {
       PropostaMercato,
       expect.objectContaining({ idGiocatore: 100, prezzoOfferto: 15, astaInChiaro: true }),
     )
+  })
+})
+
+
+
+// ============================================================================
+// Nuovi test: requisiti QA per notifica email (asta al buio/in chiaro, escaping, validazione)
+// ============================================================================
+
+describe('createSessione — email notification QA requirements', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('deduplica email case-insensitively (test@ex.com vs TEST@EX.COM)', async () => {
+    vi.stubEnv('MAIL_ENABLED', 'true')
+
+    vi.mocked(SessioneMercato.find).mockResolvedValue([])
+    vi.mocked(SessioneMercato.create).mockImplementation((data) => data as any)
+    vi.mocked(SessioneMercato.save).mockImplementation(async (e) => e as any)
+
+    const utenti = [
+      { idUtente: 1, mail: 'test@example.com', presidente: 'P1', adminLevel: false },
+      { idUtente: 2, mail: 'TEST@EXAMPLE.COM', presidente: 'P2', adminLevel: false }, // case-insensitive duplicate
+      { idUtente: 3, mail: 'other@example.com', presidente: 'P3', adminLevel: false },
+    ]
+    vi.mocked(Utenti.find).mockResolvedValue(utenti as any)
+
+    const now = Date.now()
+    await createSessione({
+      input: {
+        dataApertura: new Date(now + 3600000),
+        dataChiusura: new Date(now + 7200000),
+        maxProposte: 5,
+        acquistiEffettivi: 3,
+        tipoValuta: 'fantamilioni',
+        astaInChiaro: false,
+      },
+    })
+
+    // Deve inviare solo 2 mail (deduplicate case-insensitively)
+    expect(vi.mocked(ReSendMailAsync)).toHaveBeenCalledTimes(2)
+
+    vi.unstubAllEnvs()
+  })
+
+  it('asta al buio: il messaggio include "Modalità Asta al Buio" e regole specifiche', async () => {
+    vi.stubEnv('MAIL_ENABLED', 'true')
+    vi.stubEnv('NEXTAUTH_URL', 'https://example.com')
+
+    vi.mocked(SessioneMercato.find).mockResolvedValue([])
+    vi.mocked(SessioneMercato.create).mockImplementation((data) => data as any)
+    vi.mocked(SessioneMercato.save).mockImplementation(async (e) => e as any)
+
+    const utenti = [{ idUtente: 1, mail: 'test@example.com', presidente: 'Tester', adminLevel: false }]
+    vi.mocked(Utenti.find).mockResolvedValue(utenti as any)
+
+    const now = Date.now()
+    await createSessione({
+      input: {
+        dataApertura: new Date(now + 3600000),
+        dataChiusura: new Date(now + 7200000),
+        maxProposte: 5,
+        acquistiEffettivi: 3,
+        tipoValuta: 'fantamilioni',
+        astaInChiaro: false,
+      },
+    })
+
+    expect(vi.mocked(ReSendMailAsync)).toHaveBeenCalled()
+    const htmlCall = vi.mocked(ReSendMailAsync).mock.calls[0]![3]
+    expect(htmlCall).toContain('Modalità Asta al Buio')
+    expect(htmlCall).toContain('criptate')
+
+    vi.unstubAllEnvs()
+  })
+
+  it('asta in chiaro: il messaggio include "Modalità Asta in Chiaro" e regole specifiche', async () => {
+    vi.stubEnv('MAIL_ENABLED', 'true')
+    vi.stubEnv('NEXTAUTH_URL', 'https://example.com')
+
+    vi.mocked(SessioneMercato.find).mockResolvedValue([])
+    vi.mocked(SessioneMercato.create).mockImplementation((data) => data as any)
+    vi.mocked(SessioneMercato.save).mockImplementation(async (e) => e as any)
+
+    const utenti = [{ idUtente: 1, mail: 'test@example.com', presidente: 'Tester', adminLevel: false }]
+    vi.mocked(Utenti.find).mockResolvedValue(utenti as any)
+
+    const now = Date.now()
+    await createSessione({
+      input: {
+        dataApertura: new Date(now + 3600000),
+        dataChiusura: new Date(now + 7200000),
+        maxProposte: 5,
+        acquistiEffettivi: 3,
+        tipoValuta: 'euro',
+        astaInChiaro: true,
+      },
+    })
+
+    expect(vi.mocked(ReSendMailAsync)).toHaveBeenCalled()
+    const htmlCall = vi.mocked(ReSendMailAsync).mock.calls[0]![3]
+    expect(htmlCall).toContain('Modalità Asta in Chiaro')
+    expect(htmlCall).toContain('tempo reale')
+
+    vi.unstubAllEnvs()
+  })
+
+  it('HTML escaping: presidente con <script> non produce XSS', async () => {
+    vi.stubEnv('MAIL_ENABLED', 'true')
+    vi.stubEnv('NEXTAUTH_URL', 'https://example.com')
+
+    vi.mocked(SessioneMercato.find).mockResolvedValue([])
+    vi.mocked(SessioneMercato.create).mockImplementation((data) => data as any)
+    vi.mocked(SessioneMercato.save).mockImplementation(async (e) => e as any)
+
+    const utenti = [
+      { idUtente: 1, mail: 'test@example.com', presidente: '<script>alert("xss")</script>', adminLevel: false },
+    ]
+    vi.mocked(Utenti.find).mockResolvedValue(utenti as any)
+
+    const now = Date.now()
+    await createSessione({
+      input: {
+        dataApertura: new Date(now + 3600000),
+        dataChiusura: new Date(now + 7200000),
+        maxProposte: 5,
+        acquistiEffettivi: 3,
+        tipoValuta: 'fantamilioni',
+        astaInChiaro: false,
+      },
+    })
+
+    const htmlCall = vi.mocked(ReSendMailAsync).mock.calls[0]![3]
+    expect(htmlCall).not.toContain('<script>')
+    expect(htmlCall).toContain('&lt;script&gt;')
+
+    vi.unstubAllEnvs()
+  })
+
+  it('NEXTAUTH_URL mancante lancia errore esplicito (non mail malformata)', async () => {
+    vi.stubEnv('MAIL_ENABLED', 'true')
+    vi.stubEnv('NEXTAUTH_URL', '')
+
+    vi.mocked(SessioneMercato.find).mockResolvedValue([])
+    vi.mocked(SessioneMercato.create).mockImplementation((data) => data as any)
+    vi.mocked(SessioneMercato.save).mockImplementation(async (e) => e as any)
+
+    const utenti = [{ idUtente: 1, mail: 'test@example.com', presidente: 'Test', adminLevel: false }]
+    vi.mocked(Utenti.find).mockResolvedValue(utenti as any)
+
+    const now = Date.now()
+    await expect(
+      createSessione({
+        input: {
+          dataApertura: new Date(now + 3600000),
+          dataChiusura: new Date(now + 7200000),
+          maxProposte: 5,
+          acquistiEffettivi: 3,
+          tipoValuta: 'fantamilioni',
+          astaInChiaro: false,
+        },
+      }),
+    ).rejects.toThrow('NEXTAUTH_URL non configurato')
+
+    vi.unstubAllEnvs()
+  })
+
+  it('errore di notifica non viene ingoiato: lancia ORPCError se notifica fallisce', async () => {
+    vi.stubEnv('MAIL_ENABLED', 'true')
+    vi.stubEnv('NEXTAUTH_URL', 'https://example.com')
+
+    vi.mocked(SessioneMercato.find).mockResolvedValue([])
+    vi.mocked(SessioneMercato.create).mockImplementation((data) => data as any)
+    const savedSessione = { id: 99, maxProposte: 5, acquistiEffettivi: 3, tipoValuta: 'fantamilioni', astaInChiaro: false, dataApertura: new Date(), dataChiusura: new Date() }
+    vi.mocked(SessioneMercato.save).mockResolvedValue(savedSessione as any)
+
+    // Simuliamo fallimento nel recupero presidenti
+    vi.mocked(Utenti.find).mockRejectedValue(new Error('DB connection lost'))
+
+    const now = Date.now()
+    await expect(
+      createSessione({
+        input: {
+          dataApertura: new Date(now + 3600000),
+          dataChiusura: new Date(now + 7200000),
+          maxProposte: 5,
+          acquistiEffettivi: 3,
+          tipoValuta: 'fantamilioni',
+          astaInChiaro: false,
+        },
+      }),
+    ).rejects.toThrow('DB connection lost')
+
+    vi.unstubAllEnvs()
   })
 })
