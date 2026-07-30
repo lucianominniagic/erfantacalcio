@@ -898,7 +898,7 @@ export async function getProposteAstaInChiaro({ ctx }: { ctx: MercatoCtx; input:
       aggiudicato: scadenza <= now,
       offertaMassima: {
         prezzo: Number(leader.prezzoOfferto),
-        nomeSquadra: leader.Utente?.nomeSquadra ?? `Squadra ${leader.idSquadra}`,
+        presidente: leader.Utente?.presidente ?? `Squadra ${leader.idSquadra}`,
       },
       miaOfferta: miaOfferta ? Number(miaOfferta.prezzoOfferto) : null,
     }

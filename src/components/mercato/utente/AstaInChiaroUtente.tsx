@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import {
   Alert,
   Box,
@@ -170,7 +170,7 @@ export default function AstaInChiaroUtente() {
     if (sonoIlLeaderGuard) {
       const msg =
         `Sei già il miglior offerente. Attendi che un'altra squadra rilanci prima di poter fare una nuova offerta.`
-      setErroriProposta((prev) => ({ ...prev, [idGiocatore]: msg }))
+      // setErroriProposta((prev) => ({ ...prev, [idGiocatore]: msg }))
       setSnackbar({ open: true, message: msg, severity: 'error' })
       return
     }
@@ -243,17 +243,33 @@ export default function AstaInChiaroUtente() {
           </Alert>
         ) : (
           <TableContainer component={Paper} variant="outlined">
-            <Table size="small">
+            <Table
+              size="small"
+              sx={{
+                tableLayout: { xs: 'fixed', md: 'auto' },
+                '& td, & th': { px: { xs: 0.75, md: 1.5 } },
+              }}
+            >
               <TableHead>
                 <TableRow>
-                  <TableCell>Giocatore</TableCell>
-                  <TableCell>Offerta massima</TableCell>
-                  <TableCell>Mia offerta</TableCell>
-                  <TableCell>Stato / Scadenza</TableCell>
-                  <TableCell sx={{ width: 200 }}>
+                  <TableCell sx={{ width: { xs: '38%', md: 'auto' } }}>
+                    Giocatore
+                  </TableCell>
+                  <TableCell sx={{ width: { xs: '32%', md: 'auto' } }}>
+                    Offerta max.
+                  </TableCell>
+                  <TableCell sx={{ width: { xs: '30%', md: 'auto' } }}>
+                    Mia offerta
+                  </TableCell>
+                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                    Stato / Scadenza
+                  </TableCell>
+                  <TableCell
+                    sx={{ display: { xs: 'none', md: 'table-cell' }, width: 200 }}
+                  >
                     Nuova offerta ({lv})
                   </TableCell>
-                  <TableCell />
+                  <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }} />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -265,238 +281,449 @@ export default function AstaInChiaroUtente() {
                   const haOfferta = asta.miaOfferta !== null
                   const isScaduta = asta.aggiudicato
 
-                  // ── Riga scaduta/aggiudicata ───────────────────────────
+                  // ── asta aggiudicata ──
                   if (isScaduta) {
                     return (
-                      <TableRow
-                        key={asta.idGiocatore}
-                        sx={{
-                          opacity: 0.85,
-                        }}
-                      >
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            fontWeight={700}
-                            noWrap
-                            color="text.secondary"
+                      <Fragment key={asta.idGiocatore}>
+                        <TableRow sx={{ opacity: 0.85 }}>
+                          <TableCell
+                            sx={{
+                              borderBottom: { xs: 0, md: undefined },
+                              pb: { xs: 0.5, md: undefined },
+                            }}
                           >
-                            {asta.nomeGiocatore}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Stack direction="row" spacing={0.5} alignItems="center">
-                            <EmojiEvents
-                              fontSize="small"
-                              sx={{ color: 'warning.main' }}
-                            />
-                            <Typography variant="body2" fontWeight={600}>
-                              {asta.offertaMassima.prezzo} {lv}
+                            <Typography
+                              variant="body2"
+                              fontWeight={700}
+                              noWrap
+                              color="text.secondary"
+                            >
+                              {asta.nomeGiocatore}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              ({asta.offertaMassima.nomeSquadra})
-                            </Typography>
-                          </Stack>
-                        </TableCell>
-                        <TableCell>
-                          {haOfferta ? (
-                            <Typography variant="body2" color="text.secondary">
-                              {asta.miaOfferta} {lv}
-                            </Typography>
-                          ) : (
-                            <Typography variant="caption" color="text.secondary">
-                              —
-                            </Typography>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Stack direction="row" spacing={0.75} alignItems="center">
-                            <Chip
-                              icon={<CheckCircle />}
-                              label="Aggiudicata"
-                              size="small"
-                              color="default"
-                              variant="outlined"
-                              sx={{ fontWeight: 600, fontSize: '0.7rem' }}
-                            />
-                            <Tooltip title={`Scaduta il: ${fmtScadenza(asta.scadenza)}`}>
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{
-                                  display: { xs: 'none', sm: 'inline' },
-                                  cursor: 'default',
-                                }}
-                              >
-                                {fmtScadenza(asta.scadenza)}
-                              </Typography>
-                            </Tooltip>
-                          </Stack>
-                        </TableCell>
-                        {/* Nessun input né pulsante per aste scadute */}
-                        <TableCell />
-                        <TableCell />
-                      </TableRow>
-                    )
-                  }
-
-                  // ── Riga attiva ────────────────────────────────────────
-                  return (
-                    <TableRow
-                      key={asta.idGiocatore}
-                      sx={
-                        sonoIlLeader
-                          ? { bgcolor: alpha(theme.palette.success.main, 0.12) }
-                          : undefined
-                      }
-                    >
-                      <TableCell>
-                        <Typography variant="body2" fontWeight={700} noWrap>
-                          {asta.nomeGiocatore}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Stack
-                          direction="row"
-                          spacing={0.5}
-                          alignItems="center"
-                        >
-                          {sonoIlLeader && (
-                            <Tooltip title="Sei il miglior offerente">
+                          </TableCell>
+                          <TableCell
+                            sx={{
+                              borderBottom: { xs: 0, md: undefined },
+                              pb: { xs: 0.5, md: undefined },
+                            }}
+                          >
+                            <Stack
+                              direction="row"
+                              spacing={0.5}
+                              alignItems="center"
+                            >
                               <EmojiEvents
                                 fontSize="small"
                                 sx={{ color: 'warning.main' }}
                               />
-                            </Tooltip>
-                          )}
-                          <Typography variant="body2" fontWeight={600}>
-                            {asta.offertaMassima.prezzo} {lv}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            ({asta.offertaMassima.nomeSquadra})
-                          </Typography>
-                        </Stack>
-                      </TableCell>
-                      <TableCell>
-                        {haOfferta ? (
-                          <Typography
-                            variant="body2"
-                            color={
-                              sonoIlLeader ? 'success.main' : 'text.secondary'
-                            }
-                          >
-                            {asta.miaOfferta} {lv}
-                          </Typography>
-                        ) : (
-                          <Typography variant="caption" color="text.secondary">
-                            —
-                          </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Stack
-                          direction="row"
-                          spacing={0.5}
-                          alignItems="center"
-                        >
-                          <HourglassEmpty
-                            fontSize="small"
+                              <Typography variant="body2" fontWeight={600}>
+                                {asta.offertaMassima.prezzo} {lv}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ display: 'inline' }}
+                              >
+                                ({asta.offertaMassima.presidente})
+                              </Typography>
+                            </Stack>
+                          </TableCell>
+                          <TableCell
                             sx={{
-                              color: timer.scaduta
-                                ? 'error.main'
-                                : 'text.secondary',
+                              borderBottom: { xs: 0, md: undefined },
+                              pb: { xs: 0.5, md: undefined },
                             }}
-                          />
-                          <Tooltip
-                            title={`Scade: ${fmtScadenza(asta.scadenza)}`}
                           >
+                            {haOfferta ? (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {asta.miaOfferta} {lv}
+                              </Typography>
+                            ) : (
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                —
+                              </Typography>
+                            )}
+                          </TableCell>
+                          <TableCell
+                            sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                          >
+                            <Stack
+                              direction="row"
+                              spacing={0.75}
+                              alignItems="center"
+                            >
+                              <Chip
+                                icon={<CheckCircle />}
+                                label="Aggiudicata"
+                                size="small"
+                                color="default"
+                                variant="outlined"
+                                sx={{ fontWeight: 600, fontSize: '0.7rem' }}
+                              />
+                              <Tooltip
+                                title={`Scaduta il: ${fmtScadenza(asta.scadenza)}`}
+                              >
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                  sx={{ cursor: 'default' }}
+                                >
+                                  {fmtScadenza(asta.scadenza)}
+                                </Typography>
+                              </Tooltip>
+                            </Stack>
+                          </TableCell>
+                          <TableCell
+                            sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                          />
+                          <TableCell
+                            sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                          />
+                        </TableRow>
+
+                        <TableRow
+                          sx={{
+                            display: { xs: 'table-row', md: 'none' },
+                            opacity: 0.85,
+                          }}
+                        >
+                          <TableCell colSpan={3} sx={{ pt: 0, pb: 1 }}>
+                            <Stack
+                              direction="row"
+                              spacing={0.75}
+                              alignItems="center"
+                            >
+                              <Chip
+                                icon={<CheckCircle />}
+                                label="Aggiudicata"
+                                size="small"
+                                color="default"
+                                variant="outlined"
+                                sx={{ fontWeight: 600, fontSize: '0.7rem' }}
+                              />
+                              <Typography
+                                variant="caption"
+                                color="text.secondary"
+                              >
+                                {fmtScadenza(asta.scadenza)}
+                              </Typography>
+                            </Stack>
+                          </TableCell>
+                        </TableRow>
+                      </Fragment>
+                    )
+                  }
+
+                  const rowBg = sonoIlLeader
+                    ? { bgcolor: alpha(theme.palette.success.main, 0.12) }
+                    : {}
+
+                  return (
+                    <Fragment key={asta.idGiocatore}>
+                      <TableRow sx={rowBg}>
+                        <TableCell
+                          sx={{
+                            borderBottom: { xs: 0, md: undefined },
+                            pb: { xs: 0.5, md: undefined },
+                          }}
+                        >
+                          <Typography variant="body2" fontWeight={700} noWrap>
+                            {asta.nomeGiocatore}
+                          </Typography>
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            borderBottom: { xs: 0, md: undefined },
+                            pb: { xs: 0.5, md: undefined },
+                          }}
+                        >
+                          <Stack
+                            direction="row"
+                            spacing={0.5}
+                            alignItems="center"
+                          >
+                            {sonoIlLeader && (
+                              <Tooltip title="Sei il miglior offerente">
+                                <EmojiEvents
+                                  fontSize="small"
+                                  sx={{ color: 'warning.main' }}
+                                />
+                              </Tooltip>
+                            )}
+                            <Typography variant="body2" fontWeight={600}>
+                              {asta.offertaMassima.prezzo} {lv}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                              sx={{ display: 'inline' }}
+                            >
+                              ({asta.offertaMassima.presidente})
+                            </Typography>
+                          </Stack>
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            borderBottom: { xs: 0, md: undefined },
+                            pb: { xs: 0.5, md: undefined },
+                          }}
+                        >
+                          {haOfferta ? (
                             <Typography
                               variant="body2"
+                              color={
+                                sonoIlLeader ? 'success.main' : 'text.secondary'
+                              }
+                            >
+                              {asta.miaOfferta} {lv}
+                            </Typography>
+                          ) : (
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              —
+                            </Typography>
+                          )}
+                        </TableCell>
+                        <TableCell
+                          sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                        >
+                          <Stack
+                            direction="row"
+                            spacing={0.5}
+                            alignItems="center"
+                          >
+                            <HourglassEmpty
+                              fontSize="small"
+                              sx={{
+                                color: timer.scaduta
+                                  ? 'error.main'
+                                  : 'text.secondary',
+                              }}
+                            />
+                            <Tooltip
+                              title={`Scade: ${fmtScadenza(asta.scadenza)}`}
+                            >
+                              <Typography
+                                variant="body2"
+                                color={
+                                  timer.scaduta ? 'error.main' : 'text.primary'
+                                }
+                              >
+                                {timer.label}
+                              </Typography>
+                            </Tooltip>
+                          </Stack>
+                        </TableCell>
+                        <TableCell
+                          sx={{
+                            display: { xs: 'none', md: 'table-cell' },
+                            width: 200,
+                          }}
+                        >
+                          <Tooltip
+                            title={
+                              sonoIlLeader
+                                ? `Sei già il miglior offerente. Non puoi rilanciare finché un'altra squadra non supera la tua offerta.`
+                                : ''
+                            }
+                            disableHoverListener={!sonoIlLeader}
+                            disableFocusListener={!sonoIlLeader}
+                            disableTouchListener={!sonoIlLeader}
+                          >
+                            <span>
+                              <TextField
+                                sx={{ width: 90 }}
+                                size="small"
+                                type="number"
+                                placeholder={placeholderMin(asta.idGiocatore)}
+                                value={prezzi[asta.idGiocatore] ?? ''}
+                                onChange={(e) =>
+                                  setPrezzi((prev) => ({
+                                    ...prev,
+                                    [asta.idGiocatore]: e.target.value,
+                                  }))
+                                }
+                                InputProps={{
+                                  startAdornment: (
+                                    <InputAdornment position="start">
+                                      {lv}
+                                    </InputAdornment>
+                                  ),
+                                }}
+                                error={!!erroriProposta[asta.idGiocatore]}
+                                helperText={erroriProposta[asta.idGiocatore]}
+                                inputProps={{
+                                  min: asta.offertaMassima.prezzo + 1,
+                                  step: 1,
+                                }}
+                                disabled={sonoIlLeader}
+                              />
+                            </span>
+                          </Tooltip>
+                        </TableCell>
+                        <TableCell
+                          sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                        >
+                          <Tooltip
+                            title={
+                              sonoIlLeader
+                                ? `Non puoi rilanciare finché un'altra squadra non supera la tua offerta`
+                                : ''
+                            }
+                            disableHoverListener={!sonoIlLeader}
+                            disableFocusListener={!sonoIlLeader}
+                            disableTouchListener={!sonoIlLeader}
+                          >
+                            <span>
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={() => handleOfferta(asta.idGiocatore)}
+                                disabled={
+                                  createProposta.isPending || sonoIlLeader
+                                }
+                                aria-label={
+                                  sonoIlLeader
+                                    ? 'Sei già il miglior offerente — attendi un rilancio avversario'
+                                    : haOfferta
+                                      ? 'Rilancia'
+                                      : 'Offri'
+                                }
+                              >
+                                {sonoIlLeader
+                                  ? 'Sei in testa'
+                                  : haOfferta
+                                    ? 'Rilancia'
+                                    : 'Offri'}
+                              </Button>
+                            </span>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+
+                      <TableRow
+                        sx={{
+                          display: { xs: 'table-row', md: 'none' },
+                          ...rowBg,
+                        }}
+                      >
+                        <TableCell sx={{ pt: 0, pb: 1 }}>
+                          <Stack
+                            direction="row"
+                            spacing={0.5}
+                            alignItems="center"
+                          >
+                            <HourglassEmpty
+                              fontSize="small"
+                              sx={{
+                                color: timer.scaduta
+                                  ? 'error.main'
+                                  : 'text.secondary',
+                              }}
+                            />
+                            <Typography
+                              variant="caption"
                               color={
                                 timer.scaduta ? 'error.main' : 'text.primary'
                               }
                             >
                               {timer.label}
                             </Typography>
+                          </Stack>
+                        </TableCell>
+                        <TableCell sx={{ pt: 0, pb: 1, overflow: 'hidden' }}>
+                          <Tooltip
+                            title={
+                              sonoIlLeader
+                                ? `Sei già il miglior offerente. Non puoi rilanciare finché un'altra squadra non supera la tua offerta.`
+                                : ''
+                            }
+                            disableHoverListener={!sonoIlLeader}
+                            disableFocusListener={!sonoIlLeader}
+                            disableTouchListener={!sonoIlLeader}
+                          >
+                            <span style={{ display: 'block', width: '100%' }}>
+                              <TextField
+                                sx={{ width: 90 }}
+                                size="small"
+                                type="number"
+                                placeholder={placeholderMin(asta.idGiocatore)}
+                                value={prezzi[asta.idGiocatore] ?? ''}
+                                onChange={(e) =>
+                                  setPrezzi((prev) => ({
+                                    ...prev,
+                                    [asta.idGiocatore]: e.target.value,
+                                  }))
+                                }
+                                InputProps={{
+                                  startAdornment: (
+                                    <InputAdornment position="start">
+                                      {lv}
+                                    </InputAdornment>
+                                  ),
+                                }}
+                                error={!!erroriProposta[asta.idGiocatore]}
+                                helperText={erroriProposta[asta.idGiocatore]}
+                                inputProps={{
+                                  min: asta.offertaMassima.prezzo + 1,
+                                  step: 1,
+                                }}
+                                disabled={sonoIlLeader}
+                                sx={{
+                                  width: '100%',
+                                  '& .MuiInputBase-root': { minWidth: 0 },
+                                }}
+                              />
+                            </span>
                           </Tooltip>
-                        </Stack>
-                      </TableCell>
-                      <TableCell sx={{ width: 200 }}>
-                        <Tooltip
-                          title={
-                            sonoIlLeader
-                              ? `Sei già il miglior offerente. Non puoi rilanciare finché un'altra squadra non supera la tua offerta.`
-                              : ''
-                          }
-                          disableHoverListener={!sonoIlLeader}
-                          disableFocusListener={!sonoIlLeader}
-                          disableTouchListener={!sonoIlLeader}
-                        >
-                          <span>
-                            <TextField
-                              size="small"
-                              type="number"
-                              placeholder={placeholderMin(asta.idGiocatore)}
-                              value={prezzi[asta.idGiocatore] ?? ''}
-                              onChange={(e) =>
-                                setPrezzi((prev) => ({
-                                  ...prev,
-                                  [asta.idGiocatore]: e.target.value,
-                                }))
-                              }
-                              InputProps={{
-                                startAdornment: (
-                                  <InputAdornment position="start">
-                                    {lv}
-                                  </InputAdornment>
-                                ),
-                              }}
-                              error={!!erroriProposta[asta.idGiocatore]}
-                              helperText={erroriProposta[asta.idGiocatore]}
-                              inputProps={{
-                                min: asta.offertaMassima.prezzo + 1,
-                                step: 1,
-                              }}
-                              disabled={sonoIlLeader}
-                            />
-                          </span>
-                        </Tooltip>
-                      </TableCell>
-                      <TableCell>
-                        <Tooltip
-                          title={
-                            sonoIlLeader
-                              ? `Non puoi rilanciare finché un'altra squadra non supera la tua offerta`
-                              : ''
-                          }
-                          disableHoverListener={!sonoIlLeader}
-                          disableFocusListener={!sonoIlLeader}
-                          disableTouchListener={!sonoIlLeader}
-                        >
-                          <span>
-                            <Button
-                              size="small"
-                              variant="outlined"
-                              onClick={() => handleOfferta(asta.idGiocatore)}
-                              disabled={createProposta.isPending || sonoIlLeader}
-                              aria-label={
-                                sonoIlLeader
-                                  ? 'Sei già il miglior offerente — attendi un rilancio avversario'
+                        </TableCell>
+                        <TableCell sx={{ pt: 0, pb: 1, px: { xs: 0.5 } }}>
+                          <Tooltip
+                            title={
+                              sonoIlLeader
+                                ? `Non puoi rilanciare finché un'altra squadra non supera la tua offerta`
+                                : ''
+                            }
+                            disableHoverListener={!sonoIlLeader}
+                            disableFocusListener={!sonoIlLeader}
+                            disableTouchListener={!sonoIlLeader}
+                          >
+                            <span>
+                              <Button
+                                size="small"
+                                variant="outlined"
+                                onClick={() => handleOfferta(asta.idGiocatore)}
+                                disabled={
+                                  createProposta.isPending || sonoIlLeader
+                                }
+                                aria-label={
+                                  sonoIlLeader
+                                    ? 'Sei già il miglior offerente — attendi un rilancio avversario'
+                                    : haOfferta
+                                      ? 'Rilancia'
+                                      : 'Offri'
+                                }
+                                sx={{ minWidth: 0, whiteSpace: 'nowrap' }}
+                              >
+                                {sonoIlLeader
+                                  ? 'In testa'
                                   : haOfferta
                                     ? 'Rilancia'
-                                    : 'Offri'
-                              }
-                            >
-                              {sonoIlLeader
-                                ? 'Sei in testa'
-                                : haOfferta
-                                  ? 'Rilancia'
-                                  : 'Offri'}
-                            </Button>
-                          </span>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
+                                    : 'Offri'}
+                              </Button>
+                            </span>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    </Fragment>
                   )
                 })}
               </TableBody>
@@ -570,14 +797,21 @@ export default function AstaInChiaroUtente() {
           </Alert>
         ) : (
           <TableContainer component={Paper} variant="outlined">
-            <Table size="small">
+            <Table
+              size="small"
+              sx={{ tableLayout: { xs: 'fixed', md: 'auto' } }}
+            >
               <TableHead>
                 <TableRow>
-                  <TableCell>Nome</TableCell>
-                  <TableCell sx={{ width: 200 }}>
-                    Prima offerta ({lv})
+                  <TableCell sx={{ width: { xs: '35%', md: 'auto' } }}>
+                    Nome
                   </TableCell>
-                  <TableCell />
+                  <TableCell sx={{ width: { xs: '55%', md: 200 } }}>
+                    Offerta max. ({lv})
+                  </TableCell>
+                  <TableCell
+                    sx={{ display: { xs: 'none', md: 'table-cell' }, p: 0 }}
+                  />
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -611,31 +845,59 @@ export default function AstaInChiaroUtente() {
                         </Stack>
                       </Stack>
                     </TableCell>
-                    <TableCell sx={{ width: 200 }}>
-                      <TextField
-                        size="small"
-                        type="number"
-                        placeholder="1"
-                        value={prezzi[g.idGiocatore] ?? ''}
-                        onChange={(e) =>
-                          setPrezzi((prev) => ({
-                            ...prev,
-                            [g.idGiocatore]: e.target.value,
-                          }))
-                        }
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              {lv}
-                            </InputAdornment>
-                          ),
-                        }}
-                        error={!!erroriProposta[g.idGiocatore]}
-                        helperText={erroriProposta[g.idGiocatore]}
-                        inputProps={{ min: 1, step: 1 }}
-                      />
+                    <TableCell sx={{ width: { xs: '55%', md: 200 } }}>
+                      <Stack
+                        direction="row"
+                        alignItems="flex-start"
+                        spacing={0.5}
+                      >
+                        <TextField
+                          sx={{ width: 90 }}
+                          size="small"
+                          type="number"
+                          placeholder="1"
+                          fullWidth
+                          value={prezzi[g.idGiocatore] ?? ''}
+                          onChange={(e) =>
+                            setPrezzi((prev) => ({
+                              ...prev,
+                              [g.idGiocatore]: e.target.value,
+                            }))
+                          }
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                {lv}
+                              </InputAdornment>
+                            ),
+                          }}
+                          error={!!erroriProposta[g.idGiocatore]}
+                          helperText={erroriProposta[g.idGiocatore]}
+                          inputProps={{ min: 1, step: 1 }}
+                        />
+                        <Box
+                          sx={{
+                            display: { xs: 'flex', md: 'none' },
+                            flexShrink: 0,
+                            alignItems: 'center',
+                            pt: '2px',
+                          }}
+                        >
+                          <Button
+                            size="small"
+                            variant="contained"
+                            onClick={() => handleOfferta(g.idGiocatore)}
+                            disabled={createProposta.isPending}
+                            aria-label={`Offri per ${g.nome ?? `#${g.idGiocatore}`}`}
+                          >
+                            Offri
+                          </Button>
+                        </Box>
+                      </Stack>
                     </TableCell>
-                    <TableCell>
+                    <TableCell
+                      sx={{ display: { xs: 'none', md: 'table-cell' } }}
+                    >
                       <Button
                         size="small"
                         variant="contained"
