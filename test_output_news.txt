@@ -1,0 +1,22 @@
+
+> erfantacalcio.next-mui@0.1.0 test
+> vitest run src/__tests__/server/api/news/ --run
+
+The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mC:/Sviluppo/erfantacalcio[39m
+
+ [32m✓[39m src/__tests__/server/api/news/newsCache.test.ts [2m([22m[2m19 tests[22m[2m)[22m[90m 18[2mms[22m[39m
+ [32m✓[39m src/__tests__/server/api/news/newsService.test.ts [2m([22m[2m14 tests[22m[2m)[22m[90m 118[2mms[22m[39m
+ [32m✓[39m src/__tests__/server/api/news/gazzettaRssProvider.test.ts [2m([22m[2m25 tests[22m[2m)[22m[33m 2839[2mms[22m[39m
+   [33m[2m✓[22m[39m gazzettaRssProvider[2m > [22merror handling — retryable (5xx, timeout, network)[2m > [22mretries on HTTP 500 and eventually succeeds [33m310[2mms[22m[39m
+   [33m[2m✓[22m[39m gazzettaRssProvider[2m > [22merror handling — retryable (5xx, timeout, network)[2m > [22mretries on HTTP 503 and eventually succeeds [33m308[2mms[22m[39m
+   [33m[2m✓[22m[39m gazzettaRssProvider[2m > [22merror handling — retryable (5xx, timeout, network)[2m > [22mretries on network error and eventually succeeds [33m315[2mms[22m[39m
+   [33m[2m✓[22m[39m gazzettaRssProvider[2m > [22merror handling — retryable (5xx, timeout, network)[2m > [22mretries up to MAX_RETRIES times before failing [33m916[2mms[22m[39m
+   [33m[2m✓[22m[39m gazzettaRssProvider[2m > [22merror handling — retryable (5xx, timeout, network)[2m > [22mthrows timeout error on AbortSignal timeout [33m924[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m3 passed[39m[22m[90m (3)[39m
+[2m      Tests [22m [1m[32m58 passed[39m[22m[90m (58)[39m
+[2m   Start at [22m 15:46:35
+[2m   Duration [22m 4.47s[2m (transform 168ms, setup 63ms, collect 1.35s, tests 2.98s, environment 1ms, prepare 811ms)[22m
+

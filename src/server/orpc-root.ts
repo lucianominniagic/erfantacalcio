@@ -105,6 +105,8 @@ import { importaVotiGiornataORPCProcedure } from '~/server/api/voti/procedures/i
 import { runFormazioneReminderORPCProcedure } from '~/server/api/jobs/procedures/runFormazioneReminder.orpc'
 import { runProbabiliFormazioniORPCProcedure } from '~/server/api/jobs/procedures/runProbabiliFormazioni.orpc'
 import { getUltimaImportazioneProbabiliORPCProcedure } from '~/server/api/jobs/procedures/getUltimaImportazioneProbabili.orpc'
+// news
+import { getNewsORPCProcedure } from '~/server/api/news/procedures/getNews.orpc'
 
 export const orpcRouter = {
   albo: {
@@ -230,6 +232,9 @@ export const orpcRouter = {
     runFormazioneReminder: runFormazioneReminderORPCProcedure,
     runProbabiliFormazioni: runProbabiliFormazioniORPCProcedure,
     getUltimaImportazioneProbabili: getUltimaImportazioneProbabiliORPCProcedure,
+  },
+  news: {
+    getFeeds: getNewsORPCProcedure,
   },
 }
 
