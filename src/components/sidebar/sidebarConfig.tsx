@@ -12,6 +12,7 @@ import {
   ListAlt,
   ManageAccounts,
   MenuBook,
+  Newspaper,
   Portrait,
   Schedule,
   Storefront,
@@ -50,6 +51,12 @@ export const legaItems: NavItem[] = [
     icon: <Euro />,
   },
   { key: 'albo', label: "Albo d'oro", href: '/albo', icon: <EmojiEvents /> },
+  {
+    key: 'newsCalcio',
+    label: 'News calcio',
+    href: '/news-calcio',
+    icon: <Newspaper />,
+  },
   {
     key: 'regolamento',
     label: 'Regolamento',
