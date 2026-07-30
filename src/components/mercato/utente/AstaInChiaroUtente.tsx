@@ -62,10 +62,7 @@ export default function AstaInChiaroUtente() {
 
   // ── Prezzi offerta per giocatore (form state) ──
   const [prezzi, setPrezzi] = useState<Record<number, string>>({})
-  const [erroriProposta, setErroriProposta] = useState<Record<number, string>>(
-    {},
-  )
-
+  
   // ── Snackbar ──
   const [snackbar, setSnackbar] = useState<{
     open: boolean
@@ -170,43 +167,24 @@ export default function AstaInChiaroUtente() {
     if (sonoIlLeaderGuard) {
       const msg =
         `Sei già il miglior offerente. Attendi che un'altra squadra rilanci prima di poter fare una nuova offerta.`
-      // setErroriProposta((prev) => ({ ...prev, [idGiocatore]: msg }))
       setSnackbar({ open: true, message: msg, severity: 'error' })
       return
     }
 
     if (!prezzo || prezzo <= 0) {
-      setErroriProposta((prev) => ({
-        ...prev,
-        [idGiocatore]: 'Inserisci un prezzo valido',
-      }))
       setSnackbar({ open: true, message: 'Inserisci un prezzo valido', severity: 'error' })
       return
     }
 
     if (prezzo <= prezzoMaxCorrente) {
-      setErroriProposta((prev) => ({
-        ...prev,
-        [idGiocatore]: `L'offerta deve essere superiore all'attuale massimo (${prezzoMaxCorrente} ${lv})`,
-      }))
       setSnackbar({ open: true, message: `L'offerta deve essere superiore all'attuale massimo (${prezzoMaxCorrente} ${lv})`, severity: 'error' })
       return
     }
-
-    setErroriProposta((prev) => {
-      const next = { ...prev }
-      delete next[idGiocatore]
-      return next
-    })
 
     createProposta.mutate(
       { idGiocatore, prezzoOfferto: prezzo },
       {
         onError: (err) => {
-          setErroriProposta((prev) => ({
-            ...prev,
-            [idGiocatore]: err.message,
-          }))
           setSnackbar({ open: true, message: err.message, severity: 'error' })
         },
       },
