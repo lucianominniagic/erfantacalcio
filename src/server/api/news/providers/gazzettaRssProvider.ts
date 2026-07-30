@@ -155,7 +155,7 @@ function parseRssXml(xml: string, feedId: string): NewsArticle[] {
         const tagName = $(el).prop('name')
         return tagName === 'media:content' || tagName === 'content'
       })
-      mcUrl = mediaContent.first().attr('url') ?? null
+      mcUrl = mediaContent.first().attr('url')
     }
     if (mcUrl) return mcUrl
 
@@ -166,16 +166,16 @@ function parseRssXml(xml: string, feedId: string): NewsArticle[] {
         const tagName = $(el).prop('name')
         return tagName === 'media:thumbnail' || tagName === 'thumbnail'
       })
-      mtUrl = mediaThumbnail.first().attr('url') ?? null
+      mtUrl = mediaThumbnail.first().attr('url')
     }
     if (mtUrl) return mtUrl
 
     // 3. enclosure con type immagine
-    let enclosureUrl: string | null = null
+    let enclosureUrl: string | undefined
     $item.find('enclosure').each((_, encEl) => {
       const type = $(encEl).attr('type') ?? ''
       if (type.startsWith('image/')) {
-        enclosureUrl = $(encEl).attr('url') ?? null
+        enclosureUrl = $(encEl).attr('url')
         return false // interrompe l'iterazione
       }
     })

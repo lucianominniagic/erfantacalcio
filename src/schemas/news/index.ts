@@ -56,12 +56,12 @@ export const NEWS_FEEDS = [
     url: 'https://www.gazzetta.it/dynamic-feed/rss/section/Calcio/Estero.xml',
     order: 3,
   },
-] as const satisfies ReadonlyArray<{
+] as const satisfies readonly {
   id: NewsFeedId
   label: string
   url: string
   order: number
-}>
+}[]
 
 /** Schema Zod per validare un singolo elemento di {@link NEWS_FEEDS}. */
 export const newsFeedMetaSchema = z.object({
