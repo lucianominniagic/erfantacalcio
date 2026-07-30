@@ -180,6 +180,7 @@ export default function AstaInChiaroUtente() {
         ...prev,
         [idGiocatore]: 'Inserisci un prezzo valido',
       }))
+      setSnackbar({ open: true, message: 'Inserisci un prezzo valido', severity: 'error' })
       return
     }
 
@@ -188,6 +189,7 @@ export default function AstaInChiaroUtente() {
         ...prev,
         [idGiocatore]: `L'offerta deve essere superiore all'attuale massimo (${prezzoMaxCorrente} ${lv})`,
       }))
+      setSnackbar({ open: true, message: `L'offerta deve essere superiore all'attuale massimo (${prezzoMaxCorrente} ${lv})`, severity: 'error' })
       return
     }
 
@@ -558,8 +560,8 @@ export default function AstaInChiaroUtente() {
                                     </InputAdornment>
                                   ),
                                 }}
-                                error={!!erroriProposta[asta.idGiocatore]}
-                                helperText={erroriProposta[asta.idGiocatore]}
+                                // error={!!erroriProposta[asta.idGiocatore]}
+                                // helperText={erroriProposta[asta.idGiocatore]}
                                 inputProps={{
                                   min: asta.offertaMassima.prezzo + 1,
                                   step: 1,
@@ -670,8 +672,8 @@ export default function AstaInChiaroUtente() {
                                     </InputAdornment>
                                   ),
                                 }}
-                                error={!!erroriProposta[asta.idGiocatore]}
-                                helperText={erroriProposta[asta.idGiocatore]}
+                                // error={!!erroriProposta[asta.idGiocatore]}
+                                // helperText={erroriProposta[asta.idGiocatore]}
                                 inputProps={{
                                   min: asta.offertaMassima.prezzo + 1,
                                   step: 1,
@@ -871,8 +873,8 @@ export default function AstaInChiaroUtente() {
                               </InputAdornment>
                             ),
                           }}
-                          error={!!erroriProposta[g.idGiocatore]}
-                          helperText={erroriProposta[g.idGiocatore]}
+                          // error={!!erroriProposta[g.idGiocatore]}
+                          // helperText={erroriProposta[g.idGiocatore]}
                           inputProps={{ min: 1, step: 1 }}
                         />
                         <Box
@@ -919,7 +921,7 @@ export default function AstaInChiaroUtente() {
         open={snackbar.open}
         autoHideDuration={4000}
         onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert
           onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
