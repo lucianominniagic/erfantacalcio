@@ -195,16 +195,33 @@ export default function NewsFeedCard({
           gap: 1,
         }}
       >
-        <Typography
-          sx={{
-            fontWeight: 700,
-            fontSize: '0.9rem',
-            color: 'primary.main',
-            letterSpacing: '0.02em',
-          }}
-        >
-          {label}
-        </Typography>
+        {result?.status === 'success' && result.channelLogoUrl ? (
+          <Box
+            component="img"
+            src={result.channelLogoUrl}
+            alt={label}
+            loading="lazy"
+            sx={{
+              maxWidth: 144,
+              maxHeight: 40,
+              width: 'auto',
+              height: 'auto',
+              objectFit: 'contain',
+              display: 'block',
+            }}
+          />
+        ) : (
+          <Typography
+            sx={{
+              fontWeight: 700,
+              fontSize: '0.9rem',
+              color: 'primary.main',
+              letterSpacing: '0.02em',
+            }}
+          >
+            {label}
+          </Typography>
+        )}
         {result?.status === 'success' && result.articles.length > 0 && (
           <Chip
             label={`${result.articles.length}`}

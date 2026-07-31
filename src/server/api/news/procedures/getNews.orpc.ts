@@ -13,6 +13,6 @@ export const getNewsORPCProcedure = publicProcedure
   .route({
     method: 'GET',
     path: '/news/feeds',
-    summary: 'Feed RSS Gazzetta dello Sport — quattro sezioni news calcio',
+    summary: 'Feed RSS calcio — Gazzetta dello Sport, Corriere dello Sport, Voce Giallorossa, La Lazio Siamo Noi',
   })
   .handler(async () => fetchAllNewsFeeds())

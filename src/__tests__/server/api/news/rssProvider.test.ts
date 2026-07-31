@@ -1,6 +1,7 @@
 /**
- * gazzettaRssProvider.test — unit tests for RSS parsing, retry logic,
- * and image extraction from Gazzetta della Sport feeds.
+ * rssProvider.test — unit tests for RSS parsing, retry logic,
+ * and image extraction from generic RSS feeds (Gazzetta, Corriere dello Sport,
+ * Voce Giallorossa, La Lazio Siamo Noi).
  *
  * Uses mocked globalThis.fetch to avoid network calls and validate:
  * - HTTP error handling (4xx non-retryable vs 5xx retryable)
@@ -12,7 +13,7 @@
  * - Deterministic parsing errors don't retry
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { gazzettaRssProvider } from '~/server/api/news/providers/gazzettaRssProvider'
+import { rssProvider } from '~/server/api/news/providers/rssProvider'
 import type { NewsFeedMeta } from '~/schemas/news'
 
 // ---------------------------------------------------------------------------
@@ -21,8 +22,8 @@ import type { NewsFeedMeta } from '~/schemas/news'
 
 const mockFeed: NewsFeedMeta = {
   id: 'calcio',
-  label: 'Calcio',
-  url: 'https://www.gazzetta.it/feed/test.xml',
+  label: 'Gazzetta dello Sport',
+  url: 'https://www.gazzetta.it/dynamic-feed/rss/section/Calcio.xml',
   order: 0,
 }
 
@@ -86,6 +87,79 @@ const rssWithImageTag = `<?xml version="1.0" encoding="UTF-8"?>
       <link>https://example.com/article-imgtag</link>
       <pubDate>Thu, 01 Jan 2025 12:00:00 +0000</pubDate>
       <description><![CDATA[<img src="https://example.com/img.jpg" /><p>Description</p>]]></description>
+    </item>
+  </channel>
+</rss>`
+
+const rssWithValidChannelLogo = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <image>
+      <url>https://www.vocegiallorossa.it/logo.png</url>
+    </image>
+    <item>
+      <title>Article with valid logo</title>
+      <link>https://example.com/article-logo</link>
+      <pubDate>Thu, 01 Jan 2025 12:00:00 +0000</pubDate>
+      <description>Description</description>
+    </item>
+  </channel>
+</rss>`
+
+const rssWithLazioLogo = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <image>
+      <url>https://www.lalaziosiamonoi.it/assets/logo.jpg</url>
+    </image>
+    <item>
+      <title>La Lazio article</title>
+      <link>https://example.com/lazio-article</link>
+      <pubDate>Thu, 01 Jan 2025 12:00:00 +0000</pubDate>
+      <description>La Lazio article description</description>
+    </item>
+  </channel>
+</rss>`
+
+const rssWithoutChannelLogo = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Feed without logo</title>
+    <item>
+      <title>Article without logo</title>
+      <link>https://example.com/article-no-logo</link>
+      <pubDate>Thu, 01 Jan 2025 12:00:00 +0000</pubDate>
+      <description>Description</description>
+    </item>
+  </channel>
+</rss>`
+
+const rssWithMalformedChannelLogo = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <image>
+      <url>not-a-valid-url</url>
+    </image>
+    <item>
+      <title>Article with malformed logo URL</title>
+      <link>https://example.com/article-bad-logo</link>
+      <pubDate>Thu, 01 Jan 2025 12:00:00 +0000</pubDate>
+      <description>Description</description>
+    </item>
+  </channel>
+</rss>`
+
+const rssWithEmptyChannelLogo = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <image>
+      <url></url>
+    </image>
+    <item>
+      <title>Article with empty logo URL</title>
+      <link>https://example.com/article-empty-logo</link>
+      <pubDate>Thu, 01 Jan 2025 12:00:00 +0000</pubDate>
+      <description>Description</description>
     </item>
   </channel>
 </rss>`
@@ -171,7 +245,7 @@ const rssMissingTitle = `<?xml version="1.0" encoding="UTF-8"?>
 // Tests
 // ---------------------------------------------------------------------------
 
-describe('gazzettaRssProvider', () => {
+describe('rssProvider', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -186,14 +260,16 @@ describe('gazzettaRssProvider', () => {
         new Response(minimalRssXml, { status: 200 }),
       )
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles).toHaveLength(1)
-      expect(articles[0]?.title).toBe('Test Article')
-      expect(articles[0]?.url).toBe('https://example.com/article1')
-      expect(articles[0]?.description).toBe('Plain text description')
-      expect(articles[0]?.pubDate).toBe('2025-01-01T12:00:00.000Z')
-      expect(articles[0]?.imageUrl).toBeNull()
+      expect(result).toHaveProperty('channelLogoUrl')
+      expect(result).toHaveProperty('articles')
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.title).toBe('Test Article')
+      expect(result.articles[0]?.url).toBe('https://example.com/article1')
+      expect(result.articles[0]?.description).toBe('Plain text description')
+      expect(result.articles[0]?.pubDate).toBe('2025-01-01T12:00:00.000Z')
+      expect(result.articles[0]?.imageUrl).toBeNull()
     })
 
     it('extracts imageUrl from media:content tag', async () => {
@@ -201,10 +277,10 @@ describe('gazzettaRssProvider', () => {
         new Response(rssWithMediaContent, { status: 200 }),
       )
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles).toHaveLength(1)
-      expect(articles[0]?.imageUrl).toBe('https://example.com/image.jpg')
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.imageUrl).toBe('https://example.com/image.jpg')
     })
 
     it('falls back to media:thumbnail when media:content is absent', async () => {
@@ -212,10 +288,10 @@ describe('gazzettaRssProvider', () => {
         new Response(rssWithMediaThumbnail, { status: 200 }),
       )
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles).toHaveLength(1)
-      expect(articles[0]?.imageUrl).toBe('https://example.com/thumb.jpg')
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.imageUrl).toBe('https://example.com/thumb.jpg')
     })
 
     it('falls back to enclosure when media tags are absent', async () => {
@@ -223,10 +299,10 @@ describe('gazzettaRssProvider', () => {
         new Response(rssWithEnclosure, { status: 200 }),
       )
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles).toHaveLength(1)
-      expect(articles[0]?.imageUrl).toBe('https://example.com/enclosure.jpg')
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.imageUrl).toBe('https://example.com/enclosure.jpg')
     })
 
     it('extracts image from <img> tag in CDATA description', async () => {
@@ -234,10 +310,10 @@ describe('gazzettaRssProvider', () => {
         new Response(rssWithImageTag, { status: 200 }),
       )
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles).toHaveLength(1)
-      expect(articles[0]?.imageUrl).toBe('https://example.com/img.jpg')
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.imageUrl).toBe('https://example.com/img.jpg')
     })
 
     it('strips HTML tags from description', async () => {
@@ -245,10 +321,10 @@ describe('gazzettaRssProvider', () => {
         new Response(rssWithHtmlDescription, { status: 200 }),
       )
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles).toHaveLength(1)
-      expect(articles[0]?.description).toBe('This is bold text')
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.description).toBe('This is bold text')
     })
 
     it('limits results to NEWS_MAX_ARTICLES_PER_FEED', async () => {
@@ -256,12 +332,12 @@ describe('gazzettaRssProvider', () => {
         new Response(rssMultipleArticles, { status: 200 }),
       )
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
       // 6 articles in feed, max 5 per spec
-      expect(articles).toHaveLength(5)
-      expect(articles[0]?.title).toBe('Article 1')
-      expect(articles[4]?.title).toBe('Article 5')
+      expect(result.articles).toHaveLength(5)
+      expect(result.articles[0]?.title).toBe('Article 1')
+      expect(result.articles[4]?.title).toBe('Article 5')
     })
 
     it('normalizes RFC 822 date to ISO 8601 UTC', async () => {
@@ -269,9 +345,9 @@ describe('gazzettaRssProvider', () => {
         new Response(minimalRssXml, { status: 200 }),
       )
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles[0]?.pubDate).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
+      expect(result.articles[0]?.pubDate).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
     })
   })
 
@@ -285,7 +361,7 @@ describe('gazzettaRssProvider', () => {
         )
       })
 
-      await expect(gazzettaRssProvider.fetchFeed(mockFeed)).rejects.toThrow(
+      await expect(rssProvider.fetchFeed(mockFeed)).rejects.toThrow(
         /HTTP 404/,
       )
 
@@ -301,7 +377,7 @@ describe('gazzettaRssProvider', () => {
         )
       })
 
-      await expect(gazzettaRssProvider.fetchFeed(mockFeed)).rejects.toThrow(
+      await expect(rssProvider.fetchFeed(mockFeed)).rejects.toThrow(
         /HTTP 403/,
       )
 
@@ -315,7 +391,7 @@ describe('gazzettaRssProvider', () => {
 
       // When the only article has an invalid date, it gets discarded,
       // resulting in zero valid articles → throws "no valid articles" error
-      await expect(gazzettaRssProvider.fetchFeed(mockFeed)).rejects.toThrow(
+      await expect(rssProvider.fetchFeed(mockFeed)).rejects.toThrow(
         /nessun articolo valido/,
       )
     })
@@ -325,7 +401,7 @@ describe('gazzettaRssProvider', () => {
         new Response(rssMissingTitle, { status: 200 }),
       )
 
-      await expect(gazzettaRssProvider.fetchFeed(mockFeed)).rejects.toThrow(
+      await expect(rssProvider.fetchFeed(mockFeed)).rejects.toThrow(
         /nessun articolo valido/,
       )
     })
@@ -336,7 +412,7 @@ describe('gazzettaRssProvider', () => {
       )
 
       // XML parser should fail, throw immediately
-      await expect(gazzettaRssProvider.fetchFeed(mockFeed)).rejects.toThrow()
+      await expect(rssProvider.fetchFeed(mockFeed)).rejects.toThrow()
     })
   })
 
@@ -353,9 +429,9 @@ describe('gazzettaRssProvider', () => {
         return Promise.resolve(new Response(minimalRssXml, { status: 200 }))
       })
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles).toHaveLength(1)
+      expect(result.articles).toHaveLength(1)
       expect(callCount).toBe(2)
     })
 
@@ -374,9 +450,9 @@ describe('gazzettaRssProvider', () => {
         return Promise.resolve(new Response(minimalRssXml, { status: 200 }))
       })
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles).toHaveLength(1)
+      expect(result.articles).toHaveLength(1)
       expect(callCount).toBe(2)
     })
 
@@ -390,9 +466,9 @@ describe('gazzettaRssProvider', () => {
         return Promise.resolve(new Response(minimalRssXml, { status: 200 }))
       })
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles).toHaveLength(1)
+      expect(result.articles).toHaveLength(1)
       expect(callCount).toBe(2)
     })
 
@@ -403,7 +479,7 @@ describe('gazzettaRssProvider', () => {
         return Promise.reject(new Error('Network error'))
       })
 
-      await expect(gazzettaRssProvider.fetchFeed(mockFeed)).rejects.toThrow(
+      await expect(rssProvider.fetchFeed(mockFeed)).rejects.toThrow(
         /Network error/,
       )
 
@@ -416,7 +492,7 @@ describe('gazzettaRssProvider', () => {
         return Promise.reject(new DOMException('aborted', 'AbortError'))
       })
 
-      await expect(gazzettaRssProvider.fetchFeed(mockFeed)).rejects.toThrow()
+      await expect(rssProvider.fetchFeed(mockFeed)).rejects.toThrow()
     })
   })
 
@@ -428,7 +504,7 @@ describe('gazzettaRssProvider', () => {
         return Promise.resolve(new Response(minimalRssXml, { status: 200 }))
       })
 
-      await gazzettaRssProvider.fetchFeed(mockFeed)
+      await rssProvider.fetchFeed(mockFeed)
 
       expect(capturedInit?.headers).toBeDefined()
       const headers = capturedInit?.headers as Record<string, string>
@@ -442,7 +518,7 @@ describe('gazzettaRssProvider', () => {
         return Promise.resolve(new Response(minimalRssXml, { status: 200 }))
       })
 
-      await gazzettaRssProvider.fetchFeed(mockFeed)
+      await rssProvider.fetchFeed(mockFeed)
 
       expect(capturedInit?.headers).toBeDefined()
       const headers = capturedInit?.headers as Record<string, string>
@@ -456,7 +532,7 @@ describe('gazzettaRssProvider', () => {
         return Promise.resolve(new Response(minimalRssXml, { status: 200 }))
       })
 
-      await gazzettaRssProvider.fetchFeed(mockFeed)
+      await rssProvider.fetchFeed(mockFeed)
 
       expect(capturedInit?.cache).toBe('no-store')
     })
@@ -484,10 +560,10 @@ describe('gazzettaRssProvider', () => {
 
       global.fetch = vi.fn().mockResolvedValue(new Response(rss, { status: 200 }))
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles).toHaveLength(1)
-      expect(articles[0]?.title).toBe('Valid Article')
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.title).toBe('Valid Article')
     })
 
     it('discards article with invalid URL', async () => {
@@ -511,10 +587,10 @@ describe('gazzettaRssProvider', () => {
 
       global.fetch = vi.fn().mockResolvedValue(new Response(rss, { status: 200 }))
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles).toHaveLength(1)
-      expect(articles[0]?.title).toBe('Valid Article')
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.title).toBe('Valid Article')
     })
 
     it('allows nullable imageUrl', async () => {
@@ -522,12 +598,12 @@ describe('gazzettaRssProvider', () => {
         new Response(minimalRssXml, { status: 200 }),
       )
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles[0]?.imageUrl).toBeNull()
+      expect(result.articles[0]?.imageUrl).toBeNull()
       expect(() => {
         // Verify it passes validation
-        expect(articles[0]).toHaveProperty('imageUrl')
+        expect(result.articles[0]).toHaveProperty('imageUrl')
       }).not.toThrow()
     })
 
@@ -546,10 +622,161 @@ describe('gazzettaRssProvider', () => {
 
       global.fetch = vi.fn().mockResolvedValue(new Response(rss, { status: 200 }))
 
-      const articles = await gazzettaRssProvider.fetchFeed(mockFeed)
+      const result = await rssProvider.fetchFeed(mockFeed)
 
-      expect(articles).toHaveLength(1)
-      expect(articles[0]?.description).toBe('')
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.description).toBe('')
+    })
+  })
+
+  describe('multi-source RSS compatibility', () => {
+    it('handles different namespace declarations (media, content, etc)', async () => {
+      const corriereFeed: NewsFeedMeta = {
+        id: 'corrieredellosport',
+        label: 'Corriere dello Sport',
+        url: 'https://www.corrieredellosport.it/rss/calcio',
+        order: 1,
+      }
+
+      global.fetch = vi.fn().mockResolvedValue(
+        new Response(rssWithMediaContent, { status: 200 }),
+      )
+
+      const result = await rssProvider.fetchFeed(corriereFeed)
+
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.imageUrl).toBe('https://example.com/image.jpg')
+    })
+
+    it('parses Voce Giallorossa RSS structure', async () => {
+      const voceFeed: NewsFeedMeta = {
+        id: 'vocegiallorossa',
+        label: 'Voce Giallorossa',
+        url: 'https://www.vocegiallorossa.it/rss/',
+        order: 2,
+      }
+
+      global.fetch = vi.fn().mockResolvedValue(
+        new Response(minimalRssXml, { status: 200 }),
+      )
+
+      const result = await rssProvider.fetchFeed(voceFeed)
+
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.title).toBe('Test Article')
+    })
+
+    it('parses La Lazio Siamo Noi RSS structure', async () => {
+      const lazioFeed: NewsFeedMeta = {
+        id: 'lalaziosiamonoi',
+        label: 'La Lazio Siamo Noi',
+        url: 'https://www.lalaziosiamonoi.it/rss/',
+        order: 3,
+      }
+
+      global.fetch = vi.fn().mockResolvedValue(
+        new Response(rssWithEnclosure, { status: 200 }),
+      )
+
+      const result = await rssProvider.fetchFeed(lazioFeed)
+
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.imageUrl).toBe('https://example.com/enclosure.jpg')
+    })
+  })
+
+  describe('channel logo extraction — <channel><image><url>', () => {
+    it('extracts valid Voce Giallorossa style channel logo URL', async () => {
+      global.fetch = vi.fn().mockResolvedValue(
+        new Response(rssWithValidChannelLogo, { status: 200 }),
+      )
+
+      const result = await rssProvider.fetchFeed(mockFeed)
+
+      expect(result.channelLogoUrl).toBe('https://www.vocegiallorossa.it/logo.png')
+      expect(result.articles).toHaveLength(1)
+    })
+
+    it('extracts valid La Lazio Siamo Noi style channel logo URL', async () => {
+      global.fetch = vi.fn().mockResolvedValue(
+        new Response(rssWithLazioLogo, { status: 200 }),
+      )
+
+      const result = await rssProvider.fetchFeed(mockFeed)
+
+      expect(result.channelLogoUrl).toBe('https://www.lalaziosiamonoi.it/assets/logo.jpg')
+      expect(result.articles).toHaveLength(1)
+    })
+
+    it('returns null when channel logo tag is missing', async () => {
+      global.fetch = vi.fn().mockResolvedValue(
+        new Response(rssWithoutChannelLogo, { status: 200 }),
+      )
+
+      const result = await rssProvider.fetchFeed(mockFeed)
+
+      expect(result.channelLogoUrl).toBeNull()
+      expect(result.articles).toHaveLength(1)
+    })
+
+    it('returns null when channel logo URL is malformed', async () => {
+      global.fetch = vi.fn().mockResolvedValue(
+        new Response(rssWithMalformedChannelLogo, { status: 200 }),
+      )
+
+      const result = await rssProvider.fetchFeed(mockFeed)
+
+      expect(result.channelLogoUrl).toBeNull()
+      // Article parsing should not fail when logo URL is invalid
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.title).toBe('Article with malformed logo URL')
+    })
+
+    it('returns null when channel logo URL is empty string', async () => {
+      global.fetch = vi.fn().mockResolvedValue(
+        new Response(rssWithEmptyChannelLogo, { status: 200 }),
+      )
+
+      const result = await rssProvider.fetchFeed(mockFeed)
+
+      expect(result.channelLogoUrl).toBeNull()
+      // Article parsing should not fail when logo URL is empty
+      expect(result.articles).toHaveLength(1)
+      expect(result.articles[0]?.title).toBe('Article with empty logo URL')
+    })
+
+    it('does not affect article parsing when logo extraction fails', async () => {
+      const rssWithBadLogoButGoodArticles = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <image>
+      <url>definitely not a url!!!</url>
+    </image>
+    <item>
+      <title>First Article</title>
+      <link>https://example.com/article1</link>
+      <pubDate>Thu, 01 Jan 2025 12:00:00 +0000</pubDate>
+      <description>Valid article despite bad logo</description>
+    </item>
+    <item>
+      <title>Second Article</title>
+      <link>https://example.com/article2</link>
+      <pubDate>Thu, 01 Jan 2025 11:00:00 +0000</pubDate>
+      <description>Another valid article</description>
+    </item>
+  </channel>
+</rss>`
+
+      global.fetch = vi.fn().mockResolvedValue(
+        new Response(rssWithBadLogoButGoodArticles, { status: 200 }),
+      )
+
+      const result = await rssProvider.fetchFeed(mockFeed)
+
+      expect(result.channelLogoUrl).toBeNull()
+      expect(result.articles).toHaveLength(2)
+      expect(result.articles[0]?.title).toBe('First Article')
+      expect(result.articles[1]?.title).toBe('Second Article')
     })
   })
 })

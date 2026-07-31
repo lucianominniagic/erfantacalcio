@@ -4,40 +4,44 @@
  * Validates:
  * - All four feeds are fetched in parallel
  * - Failed feeds produce error results while others succeed
- * - Results are returned in fixed order (calcio, calciomercato, coppe, estero)
+ * - Results are returned in fixed order (calcio, corrieredellosport, vocegiallorossa, lalaziosiamonoi)
  * - Cache TTL 15 minutes and deduplication
  * - Schema validation of final response
  * - Partial failure isolation (one feed error ≠ complete failure)
+ * - NEWS_FEEDS config: order, IDs, labels, URLs
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { fetchAllNewsFeeds } from '~/server/api/news/services/newsService'
+import { NEWS_FEEDS } from '~/schemas/news'
 import { InMemoryFeedCache } from '~/server/api/news/cache/newsCache'
-import type { INewsProvider } from '~/server/api/news/providers/newsProvider'
-import type { NewsArticle } from '~/schemas/news'
+import type { INewsProvider, NewsFeedFetchResult } from '~/server/api/news/providers/newsProvider'
 
 // ---------------------------------------------------------------------------
 // Mock fixtures
 // ---------------------------------------------------------------------------
 
-const mockArticles = (title: string, url: string): NewsArticle[] => [
-  {
-    title,
-    description: `Description for ${title}`,
-    pubDate: '2025-01-01T12:00:00.000Z',
-    url: `${url}/article1`,
-    imageUrl: null,
-  },
-]
+const mockArticles = (title: string, url: string): NewsFeedFetchResult => ({
+  channelLogoUrl: `${url}/logo.png`,
+  articles: [
+    {
+      title,
+      description: `Description for ${title}`,
+      pubDate: '2025-01-01T12:00:00.000Z',
+      url: `${url}/article1`,
+      imageUrl: null,
+    },
+  ],
+})
 
 const createMockProvider = (
-  feedResults: Record<string, NewsArticle[] | Error>,
+  feedResults: Record<string, NewsFeedFetchResult | Error>,
 ): INewsProvider => ({
-  async fetchFeed(feed) {
+  fetchFeed(feed) {
     const result = feedResults[feed.id]
     if (result instanceof Error) {
       throw result
     }
-    return result
+    return Promise.resolve(result)
   },
 })
 
@@ -46,10 +50,10 @@ const createMockProvider = (
 // ---------------------------------------------------------------------------
 
 describe('newsService — fetchAllNewsFeeds', () => {
-  let cache: InMemoryFeedCache<NewsArticle[]>
+  let cache: InMemoryFeedCache<NewsFeedFetchResult>
 
   beforeEach(() => {
-    cache = new InMemoryFeedCache<NewsArticle[]>()
+    cache = new InMemoryFeedCache<NewsFeedFetchResult>()
     vi.clearAllMocks()
   })
 
@@ -61,19 +65,20 @@ describe('newsService — fetchAllNewsFeeds', () => {
     it('returns all four feeds in fixed order with success status', async () => {
       const provider = createMockProvider({
         calcio: mockArticles('Calcio Article', 'https://calcio.com'),
-        calciomercato: mockArticles('Mercato Article', 'https://mercato.com'),
-        coppe: mockArticles('Coppe Article', 'https://coppe.com'),
-        estero: mockArticles('Estero Article', 'https://estero.com'),
+        corrieredellosport: mockArticles('Corriere Article', 'https://corriere.com'),
+        vocegiallorossa: mockArticles('Voce Article', 'https://voce.com'),
+        lalaziosiamonoi: mockArticles('Lazio Article', 'https://lazio.com'),
       })
 
       const response = await fetchAllNewsFeeds(provider, cache)
 
       expect(response.feeds).toHaveLength(4)
 
-      // Verify order: calcio (0), calciomercato (1), coppe (2), estero (3)
+      // Verify order: calcio (0), corrieredellosport (1), vocegiallorossa (2), lalaziosiamonoi (3)
       expect(response.feeds[0]).toMatchObject({
         status: 'success',
         feedId: 'calcio',
+        channelLogoUrl: 'https://calcio.com/logo.png',
       })
       expect(response.feeds[0]?.status === 'success' && response.feeds[0].articles).toHaveLength(
         1,
@@ -81,41 +86,47 @@ describe('newsService — fetchAllNewsFeeds', () => {
 
       expect(response.feeds[1]).toMatchObject({
         status: 'success',
-        feedId: 'calciomercato',
+        feedId: 'corrieredellosport',
+        channelLogoUrl: 'https://corriere.com/logo.png',
       })
 
       expect(response.feeds[2]).toMatchObject({
         status: 'success',
-        feedId: 'coppe',
+        feedId: 'vocegiallorossa',
+        channelLogoUrl: 'https://voce.com/logo.png',
       })
 
       expect(response.feeds[3]).toMatchObject({
         status: 'success',
-        feedId: 'estero',
+        feedId: 'lalaziosiamonoi',
+        channelLogoUrl: 'https://lazio.com/logo.png',
       })
     })
 
     it('includes all articles from each feed in response', async () => {
       const provider = createMockProvider({
-        calcio: [
-          {
-            title: 'Article 1',
-            description: 'Desc 1',
-            pubDate: '2025-01-01T12:00:00.000Z',
-            url: 'https://example.com/1',
-            imageUrl: null,
-          },
-          {
-            title: 'Article 2',
-            description: 'Desc 2',
-            pubDate: '2025-01-01T11:00:00.000Z',
-            url: 'https://example.com/2',
-            imageUrl: null,
-          },
-        ],
-        calciomercato: mockArticles('Mercato', 'https://mercato.com'),
-        coppe: mockArticles('Coppe', 'https://coppe.com'),
-        estero: mockArticles('Estero', 'https://estero.com'),
+        calcio: {
+          channelLogoUrl: 'https://gazzetta.it/logo.png',
+          articles: [
+            {
+              title: 'Article 1',
+              description: 'Desc 1',
+              pubDate: '2025-01-01T12:00:00.000Z',
+              url: 'https://example.com/1',
+              imageUrl: null,
+            },
+            {
+              title: 'Article 2',
+              description: 'Desc 2',
+              pubDate: '2025-01-01T11:00:00.000Z',
+              url: 'https://example.com/2',
+              imageUrl: null,
+            },
+          ],
+        },
+        corrieredellosport: mockArticles('Corriere', 'https://corriere.com'),
+        vocegiallorossa: mockArticles('Voce', 'https://voce.com'),
+        lalaziosiamonoi: mockArticles('Lazio', 'https://lazio.com'),
       })
 
       const response = await fetchAllNewsFeeds(provider, cache)
@@ -129,9 +140,9 @@ describe('newsService — fetchAllNewsFeeds', () => {
     it('returns error result for failed feed and success for others', async () => {
       const provider = createMockProvider({
         calcio: mockArticles('Calcio', 'https://calcio.com'),
-        calciomercato: new Error('Feed fetch timeout'),
-        coppe: mockArticles('Coppe', 'https://coppe.com'),
-        estero: mockArticles('Estero', 'https://estero.com'),
+        corrieredellosport: new Error('Feed fetch timeout'),
+        vocegiallorossa: mockArticles('Voce', 'https://voce.com'),
+        lalaziosiamonoi: mockArticles('Lazio', 'https://lazio.com'),
       })
 
       const response = await fetchAllNewsFeeds(provider, cache)
@@ -141,7 +152,7 @@ describe('newsService — fetchAllNewsFeeds', () => {
       expect(response.feeds[0]?.status).toBe('success')
       expect(response.feeds[1]).toMatchObject({
         status: 'error',
-        feedId: 'calciomercato',
+        feedId: 'corrieredellosport',
       })
       expect(response.feeds[1]?.status === 'error' && response.feeds[1].message).toContain(
         'timeout',
@@ -153,9 +164,9 @@ describe('newsService — fetchAllNewsFeeds', () => {
     it('returns error for multiple feeds with other feeds unaffected', async () => {
       const provider = createMockProvider({
         calcio: new Error('HTTP 500'),
-        calciomercato: mockArticles('Mercato', 'https://mercato.com'),
-        coppe: new Error('Timeout'),
-        estero: mockArticles('Estero', 'https://estero.com'),
+        corrieredellosport: mockArticles('Corriere', 'https://corriere.com'),
+        vocegiallorossa: new Error('Timeout'),
+        lalaziosiamonoi: mockArticles('Lazio', 'https://lazio.com'),
       })
 
       const response = await fetchAllNewsFeeds(provider, cache)
@@ -169,9 +180,9 @@ describe('newsService — fetchAllNewsFeeds', () => {
     it('includes error message in error result', async () => {
       const provider = createMockProvider({
         calcio: new Error('Specific error message'),
-        calciomercato: mockArticles('Mercato', 'https://mercato.com'),
-        coppe: mockArticles('Coppe', 'https://coppe.com'),
-        estero: mockArticles('Estero', 'https://estero.com'),
+        corrieredellosport: mockArticles('Corriere', 'https://corriere.com'),
+        vocegiallorossa: mockArticles('Voce', 'https://voce.com'),
+        lalaziosiamonoi: mockArticles('Lazio', 'https://lazio.com'),
       })
 
       const response = await fetchAllNewsFeeds(provider, cache)
@@ -187,9 +198,9 @@ describe('newsService — fetchAllNewsFeeds', () => {
     it('returns four error results with all feeds errored', async () => {
       const provider = createMockProvider({
         calcio: new Error('Error 1'),
-        calciomercato: new Error('Error 2'),
-        coppe: new Error('Error 3'),
-        estero: new Error('Error 4'),
+        corrieredellosport: new Error('Error 2'),
+        vocegiallorossa: new Error('Error 3'),
+        lalaziosiamonoi: new Error('Error 4'),
       })
 
       const response = await fetchAllNewsFeeds(provider, cache)
@@ -197,9 +208,9 @@ describe('newsService — fetchAllNewsFeeds', () => {
       expect(response.feeds).toHaveLength(4)
       expect(response.feeds.every((f) => f.status === 'error')).toBe(true)
       expect(response.feeds[0]?.feedId).toBe('calcio')
-      expect(response.feeds[1]?.feedId).toBe('calciomercato')
-      expect(response.feeds[2]?.feedId).toBe('coppe')
-      expect(response.feeds[3]?.feedId).toBe('estero')
+      expect(response.feeds[1]?.feedId).toBe('corrieredellosport')
+      expect(response.feeds[2]?.feedId).toBe('vocegiallorossa')
+      expect(response.feeds[3]?.feedId).toBe('lalaziosiamonoi')
     })
   })
 
@@ -220,22 +231,24 @@ describe('newsService — fetchAllNewsFeeds', () => {
     })
 
     it('deduplicates concurrent requests for same feed', async () => {
-      let resolveCalcio: (val: NewsArticle[]) => void = () => {}
+      let resolveCalcio: (val: NewsFeedFetchResult) => void = () => {
+        // Intentionally empty - will be assigned in the Promise
+      }
       const calcioFetcher = vi
         .fn()
         .mockImplementation(
           () =>
-            new Promise<NewsArticle[]>((resolve) => {
+            new Promise<NewsFeedFetchResult>((resolve) => {
               resolveCalcio = resolve
             }),
         )
 
       const provider: INewsProvider = {
-        async fetchFeed(feed) {
+        fetchFeed(feed) {
           if (feed.id === 'calcio') {
             return calcioFetcher()
           }
-          return mockArticles('Other', `https://${feed.id}.com`)
+          return Promise.resolve(mockArticles('Other', `https://${feed.id}.com`))
         },
       }
 
@@ -290,9 +303,9 @@ describe('newsService — fetchAllNewsFeeds', () => {
     it('validates and returns newsCalcioResponseSchema-compliant response', async () => {
       const provider = createMockProvider({
         calcio: mockArticles('Calcio', 'https://calcio.com'),
-        calciomercato: mockArticles('Mercato', 'https://mercato.com'),
-        coppe: mockArticles('Coppe', 'https://coppe.com'),
-        estero: mockArticles('Estero', 'https://estero.com'),
+        corrieredellosport: mockArticles('Corriere', 'https://corriere.com'),
+        vocegiallorossa: mockArticles('Voce', 'https://voce.com'),
+        lalaziosiamonoi: mockArticles('Lazio', 'https://lazio.com'),
       })
 
       const response = await fetchAllNewsFeeds(provider, cache)
@@ -306,35 +319,26 @@ describe('newsService — fetchAllNewsFeeds', () => {
 
   describe('parallel execution', () => {
     it('fetches all four feeds in parallel, not sequentially', async () => {
-      let calcioStarted = false
-      let mercatoStarted = false
-      let coppeStarted = false
-      let esteroStarted = false
-
       const timings: string[] = []
 
       const provider: INewsProvider = {
         async fetchFeed(feed) {
           if (feed.id === 'calcio') {
-            calcioStarted = true
             timings.push('calcio-start')
             await new Promise((resolve) => setTimeout(resolve, 100))
             timings.push('calcio-end')
-          } else if (feed.id === 'calciomercato') {
-            mercatoStarted = true
-            timings.push('mercato-start')
+          } else if (feed.id === 'corrieredellosport') {
+            timings.push('corriere-start')
             await new Promise((resolve) => setTimeout(resolve, 100))
-            timings.push('mercato-end')
-          } else if (feed.id === 'coppe') {
-            coppeStarted = true
-            timings.push('coppe-start')
+            timings.push('corriere-end')
+          } else if (feed.id === 'vocegiallorossa') {
+            timings.push('voce-start')
             await new Promise((resolve) => setTimeout(resolve, 100))
-            timings.push('coppe-end')
-          } else if (feed.id === 'estero') {
-            esteroStarted = true
-            timings.push('estero-start')
+            timings.push('voce-end')
+          } else if (feed.id === 'lalaziosiamonoi') {
+            timings.push('lazio-start')
             await new Promise((resolve) => setTimeout(resolve, 100))
-            timings.push('estero-end')
+            timings.push('lazio-end')
           }
           return mockArticles('Test', `https://${feed.id}.com`)
         },
@@ -360,9 +364,9 @@ describe('newsService — fetchAllNewsFeeds', () => {
     it('handles Error object with message property', async () => {
       const provider = createMockProvider({
         calcio: new Error('Network timeout'),
-        calciomercato: mockArticles('Mercato', 'https://mercato.com'),
-        coppe: mockArticles('Coppe', 'https://coppe.com'),
-        estero: mockArticles('Estero', 'https://estero.com'),
+        corrieredellosport: mockArticles('Corriere', 'https://corriere.com'),
+        vocegiallorossa: mockArticles('Voce', 'https://voce.com'),
+        lalaziosiamonoi: mockArticles('Lazio', 'https://lazio.com'),
       })
 
       const response = await fetchAllNewsFeeds(provider, cache)
@@ -373,12 +377,12 @@ describe('newsService — fetchAllNewsFeeds', () => {
 
     it('handles non-Error thrown values', async () => {
       const provider: INewsProvider = {
-        async fetchFeed(feed) {
+        fetchFeed(feed) {
           if (feed.id === 'calcio') {
             // eslint-disable-next-line @typescript-eslint/only-throw-error
             throw 'some string error'
           }
-          return mockArticles('Test', `https://${feed.id}.com`)
+          return Promise.resolve(mockArticles('Test', `https://${feed.id}.com`))
         },
       }
 
@@ -392,11 +396,79 @@ describe('newsService — fetchAllNewsFeeds', () => {
   })
 
   describe('default provider and cache', () => {
-    it('uses default provider and cache when not injected', async () => {
+    it('uses default provider and cache when not injected', () => {
       // Just verify that calling without arguments doesn't throw
       // We can't test the actual fetch without network, but we can verify
       // the function signature works
       expect(typeof fetchAllNewsFeeds).toBe('function')
+    })
+  })
+
+  describe('NEWS_FEEDS configuration validation', () => {
+    it('validates NEWS_FEEDS order: calcio (0), corrieredellosport (1), vocegiallorossa (2), lalaziosiamonoi (3)', () => {
+      expect(NEWS_FEEDS).toHaveLength(4)
+      expect(NEWS_FEEDS[0].id).toBe('calcio')
+      expect(NEWS_FEEDS[0].order).toBe(0)
+      expect(NEWS_FEEDS[1].id).toBe('corrieredellosport')
+      expect(NEWS_FEEDS[1].order).toBe(1)
+      expect(NEWS_FEEDS[2].id).toBe('vocegiallorossa')
+      expect(NEWS_FEEDS[2].order).toBe(2)
+      expect(NEWS_FEEDS[3].id).toBe('lalaziosiamonoi')
+      expect(NEWS_FEEDS[3].order).toBe(3)
+    })
+
+    it('validates NEWS_FEEDS labels are distinct and non-empty', () => {
+      const labels = NEWS_FEEDS.map((f) => f.label)
+      expect(labels).toHaveLength(4)
+      labels.forEach((label) => {
+        expect(label).toBeTruthy()
+        expect(label.length).toBeGreaterThan(0)
+      })
+      // Check uniqueness
+      expect(new Set(labels).size).toBe(4)
+    })
+
+    it('validates NEWS_FEEDS contains correct labels and sources', () => {
+      const gazzetta = NEWS_FEEDS.find((f) => f.id === 'calcio')
+      expect(gazzetta?.label).toBe('Gazzetta dello Sport')
+
+      const corriere = NEWS_FEEDS.find((f) => f.id === 'corrieredellosport')
+      expect(corriere?.label).toBe('Corriere dello Sport')
+
+      const voce = NEWS_FEEDS.find((f) => f.id === 'vocegiallorossa')
+      expect(voce?.label).toBe('Voce Giallorossa')
+
+      const lazio = NEWS_FEEDS.find((f) => f.id === 'lalaziosiamonoi')
+      expect(lazio?.label).toBe('La Lazio Siamo Noi')
+    })
+
+    it('validates NEWS_FEEDS URLs are valid and distinct', () => {
+      const urls = NEWS_FEEDS.map((f) => f.url)
+      expect(urls).toHaveLength(4)
+
+      urls.forEach((url) => {
+        expect(url).toMatch(/^https:\/\//)
+        expect(url.length).toBeGreaterThan(0)
+      })
+
+      // Check uniqueness
+      expect(new Set(urls).size).toBe(4)
+    })
+
+    it('validates NEWS_FEEDS order values are sequential integers starting at 0', () => {
+      const orders = NEWS_FEEDS.map((f) => f.order)
+      expect(orders).toEqual([0, 1, 2, 3])
+    })
+
+    it('frontends render feeds in NEWS_FEEDS order with correct labels', () => {
+      // Simulate what frontend does: sort by order and display labels
+      const sortedFeeds = [...NEWS_FEEDS].sort((a, b) => a.order - b.order)
+
+      expect(sortedFeeds[0]?.label).toBe('Gazzetta dello Sport')
+      expect(sortedFeeds[1]?.label).toBe('Corriere dello Sport')
+      expect(sortedFeeds[2]?.label).toBe('Voce Giallorossa')
+      expect(sortedFeeds[3]?.label).toBe('La Lazio Siamo Noi')
+    })
     })
   })
 })

@@ -1,21 +1,28 @@
 /**
- * gazzettaRssProvider — implementazione di INewsProvider per i feed RSS
- * della Gazzetta dello Sport.
+ * rssProvider — implementazione source-neutral di INewsProvider per feed RSS
+ * calcistici (Gazzetta dello Sport, Corriere dello Sport, Voce Giallorossa,
+ * La Lazio Siamo Noi).
  *
  * Caratteristiche:
  * - AbortSignal.timeout() con budget FETCH_TIMEOUT_MS per tentativo.
  * - Retry (max MAX_RETRIES extra tentativi) solo per errori HTTP 5xx e
  *   di rete; errori 4xx e di parsing vengono lanciati immediatamente.
  * - Parsing XML robusto con cheerio (xmlMode: true).
- * - Estrazione immagine da: media:content → media:thumbnail → enclosure →
- *   <img> nel testo CDATA della description.
+ * - Estrazione logo canale: `<channel><image><url>` (tag standard RSS 2.0),
+ *   validato come URL assoluto; `null` se assente o non valido, senza far
+ *   fallire il feed.
+ * - Estrazione immagine articolo da: media:content → media:thumbnail →
+ *   enclosure → <img> nel testo CDATA della description.
  * - Date RFC 822 normalizzate in ISO 8601 UTC ("Z" è offset valido per
  *   z.string().datetime({ offset: true })).
- * - Descrizione: strippata di tag HTML, restituita come testo puro.
+ * - Descrizione: strippata di tag HTML, restituita come testo puro;
+ *   entità non-breaking space (\u00a0) convertite in spazi ordinari e
+ *   sequenze di whitespace ridotte a singolo spazio.
  * - Output validato articolo per articolo con newsArticleSchema; articoli
  *   non validi vengono scartati senza far fallire l'intero feed.
  */
 import * as cheerio from 'cheerio'
+import { z } from 'zod'
 import type { AnyNode } from 'domhandler'
 
 import {
@@ -24,7 +31,7 @@ import {
   type NewsArticle,
   type NewsFeedMeta,
 } from '~/schemas/news'
-import type { INewsProvider } from './newsProvider'
+import type { INewsProvider, NewsFeedFetchResult } from './newsProvider'
 
 // ---------------------------------------------------------------------------
 // Costanti
@@ -94,9 +101,31 @@ async function fetchXml(url: string): Promise<string> {
   throw lastError
 }
 
+/**
+ * Schema Zod riutilizzabile per validare un URL assoluto.
+ * Usato sia per `channelLogoUrl` che per qualsiasi altra URL estratta
+ * dinamicamente dal XML (stessa convenzione di newsArticleSchema).
+ */
+const absoluteUrlSchema = z.string().url()
+
 // ---------------------------------------------------------------------------
 // Parsing XML RSS
 // ---------------------------------------------------------------------------
+
+/**
+ * Estrae e valida il logo del canale dal tag standard RSS 2.0
+ * `<channel><image><url>`. Restituisce `null` quando:
+ * - il tag non è presente nel feed;
+ * - il valore estratto non è un URL assoluto valido secondo Zod.
+ *
+ * Non lancia mai: un logo mancante o non valido non invalida il feed.
+ */
+function extractChannelLogoUrl($: cheerio.CheerioAPI): string | null {
+  const raw = $('channel > image > url').first().text().trim()
+  if (!raw) return null
+  const result = absoluteUrlSchema.safeParse(raw)
+  return result.success ? result.data : null
+}
 
 /**
  * Estrae la data di pubblicazione da una stringa RFC 822 e la converte
@@ -115,25 +144,41 @@ function normalizePubDate(raw: string): string {
 
 /**
  * Rimuove i tag HTML da una stringa e restituisce testo puro.
+ *
  * Usa cheerio per sicurezza (nessuna regex su HTML arbitrario).
+ * Dopo l'estrazione del testo:
+ * - i caratteri U+00A0 (non-breaking space, inclusi quelli prodotti da
+ *   entità doppiamente codificate come `&amp;nbsp;`) sono convertiti in
+ *   spazi ASCII ordinari;
+ * - le sequenze di whitespace multiplo vengono ridotte a un singolo spazio.
  */
 function stripHtml(html: string): string {
   if (!html) return ''
   const $d = cheerio.load(html)
-  return $d('body').text().trim()
+  return $d('body')
+    .text()
+    .replace(/\u00a0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 /**
- * Parsa il contenuto XML di un feed RSS e restituisce gli articoli validati.
+ * Parsa il contenuto XML di un feed RSS e restituisce il risultato tipizzato.
  *
  * L'helper `extractImageUrl` è definito come funzione interna per chiudersi
  * sul `$` root (CheerioAPI) ed evitare di propagarlo come parametro extra.
  *
  * Articoli che falliscono la validazione Zod vengono scartati silenziosamente.
  * Se non viene estratto nessun articolo, lancia NonRetryableError.
+ * Il logo del canale (`channelLogoUrl`) viene estratto indipendentemente dagli
+ * articoli: un logo assente o non valido non causa l'errore del feed.
  */
-function parseRssXml(xml: string, feedId: string): NewsArticle[] {
+function parseRssXml(xml: string, feedId: string): NewsFeedFetchResult {
   const $ = cheerio.load(xml, { xmlMode: true })
+
+  // Estrai il logo del canale prima di iterare sugli item.
+  // Fallisce silenziosamente (null) se assente o non valido.
+  const channelLogoUrl = extractChannelLogoUrl($)
 
   /**
    * Estrae l'URL dell'immagine da un item RSS, provando in ordine:
@@ -233,15 +278,16 @@ function parseRssXml(xml: string, feedId: string): NewsArticle[] {
     )
   }
 
-  return articles
+  return { channelLogoUrl, articles }
 }
 
 // ---------------------------------------------------------------------------
 // Provider
 // ---------------------------------------------------------------------------
 
-export const gazzettaRssProvider: INewsProvider = {
-  async fetchFeed(feed: NewsFeedMeta): Promise<NewsArticle[]> {
+/** Provider RSS source-neutral: funziona con qualsiasi feed RSS calcistico. */
+export const rssProvider: INewsProvider = {
+  async fetchFeed(feed: NewsFeedMeta): Promise<NewsFeedFetchResult> {
     const xml = await fetchXml(feed.url)
     return parseRssXml(xml, feed.id)
   },
