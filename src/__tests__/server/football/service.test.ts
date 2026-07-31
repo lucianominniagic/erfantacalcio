@@ -399,48 +399,104 @@ describe('football.service', () => {
   })
 
   describe('orchestrateSerieAOverview', () => {
-    it('fetches standings first, then concurrent calls to matches and scorers', async () => {
-      let standingsCalled = false
-      let matchesCalls = 0
-      let scorersCalled = false
+    it('fetches standings first (not by matchday), then calls two getMatches with date ranges in parallel', async () => {
+      const now = new Date('2024-01-28T12:00:00Z')
+      const callOrder: string[] = []
+
+      const metadata = createFootballSeasonMetadata({ currentMatchday: 15 })
 
       const provider: IFootballProvider = {
         async getStandings() {
-          standingsCalled = true
-          return {
-            standings: [],
-            metadata: createFootballSeasonMetadata(),
-          }
+          callOrder.push('getStandings')
+          return { standings: [], metadata }
         },
-        async getMatches() {
-          matchesCalls++
-          expect(standingsCalled).toBe(true)
+        async getMatches(filters) {
+          // Both getMatches calls should be invoked before completion,
+          // proving they run in parallel (Promise.all)
+          if (filters.dateFrom === '2024-01-14') {
+            callOrder.push('getMatches-latest')
+          } else if (filters.dateFrom === '2024-01-28') {
+            callOrder.push('getMatches-next')
+          }
           return []
         },
         async getScorers() {
-          scorersCalled = true
-          expect(standingsCalled).toBe(true)
+          callOrder.push('getScorers')
           return []
         },
       }
 
-      await orchestrateSerieAOverview(provider)
+      await orchestrateSerieAOverview(provider, now)
 
-      expect(standingsCalled).toBe(true)
-      expect(matchesCalls).toBe(2)
-      expect(scorersCalled).toBe(true)
+      // getStandings is called first, then parallel calls to getMatches and getScorers
+      expect(callOrder[0]).toBe('getStandings')
+      expect(callOrder.slice(1).sort()).toEqual(['getMatches-latest', 'getMatches-next', 'getScorers'].sort())
     })
 
-    it('retrieves matches for currentMatchday and nextMatchday', async () => {
-      const metadata = createFootballSeasonMetadata({ currentMatchday: 15 })
-      const matchdaysRequested: number[] = []
+    it('calls first getMatches with latest window [today-14, tomorrow)', async () => {
+      const now = new Date('2024-01-28T12:00:00Z')
+      const filtersRequested: import('~/server/football/football.types').FootballMatchFilters[] = []
+
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings: [], metadata: createFootballSeasonMetadata({ currentMatchday: 15 }) }
+        },
+        async getMatches(filters) {
+          filtersRequested.push(filters)
+          return []
+        },
+        async getScorers() {
+          return []
+        },
+      }
+
+      await orchestrateSerieAOverview(provider, now)
+
+      const latestFilter = filtersRequested.find(f => f.dateFrom === '2024-01-14')
+      expect(latestFilter).toBeDefined()
+      expect(latestFilter?.dateFrom).toBe('2024-01-14')
+      expect(latestFilter?.dateTo).toBe('2024-01-29') // tomorrow, exclusive
+    })
+
+    it('calls second getMatches with next window [today, today+21)', async () => {
+      const now = new Date('2024-01-28T12:00:00Z')
+      const filtersRequested: import('~/server/football/football.types').FootballMatchFilters[] = []
+
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings: [], metadata: createFootballSeasonMetadata({ currentMatchday: 15 }) }
+        },
+        async getMatches(filters) {
+          filtersRequested.push(filters)
+          return []
+        },
+        async getScorers() {
+          return []
+        },
+      }
+
+      await orchestrateSerieAOverview(provider, now)
+
+      const nextFilter = filtersRequested.find(f => f.dateFrom === '2024-01-28')
+      expect(nextFilter).toBeDefined()
+      expect(nextFilter?.dateFrom).toBe('2024-01-28')
+      expect(nextFilter?.dateTo).toBe('2024-02-18') // today+21, exclusive
+    })
+
+    it('ignores currentMatchday and uses only date windows', async () => {
+      const now = new Date('2024-01-28T12:00:00Z')
+      
+      // Create metadata with currentMatchday=38 (end of season)
+      const metadata = createFootballSeasonMetadata({ currentMatchday: 38 })
+      
+      const filtersRequested: import('~/server/football/football.types').FootballMatchFilters[] = []
 
       const provider: IFootballProvider = {
         async getStandings() {
           return { standings: [], metadata }
         },
-        async getMatches(matchday: number) {
-          matchdaysRequested.push(matchday)
+        async getMatches(filters) {
+          filtersRequested.push(filters)
           return []
         },
         async getScorers() {
@@ -448,30 +504,36 @@ describe('football.service', () => {
         },
       }
 
-      await orchestrateSerieAOverview(provider)
+      await orchestrateSerieAOverview(provider, now)
 
-      expect(matchdaysRequested).toContain(15)
-      expect(matchdaysRequested).toContain(16)
+      // Even with currentMatchday=38, dates should still be used
+      expect(filtersRequested).toHaveLength(2)
+      expect(filtersRequested.some(f => f.dateFrom === '2024-01-14')).toBe(true)
+      expect(filtersRequested.some(f => f.dateFrom === '2024-01-28')).toBe(true)
     })
 
     it('filters finished matches (latest) and sorts descending', async () => {
-      const metadata = createFootballSeasonMetadata({ currentMatchday: 15 })
+      const now = new Date('2024-01-28T12:00:00Z')
       const latestMatches = [
         createFootballMatch({ id: 1, utcDate: '2024-01-15T12:00:00Z', status: 'scheduled' as const }),
         createFootballMatch({ id: 2, utcDate: '2024-01-15T20:00:00Z', status: 'finished' as const }),
         createFootballMatch({ id: 3, utcDate: '2024-01-15T15:00:00Z', status: 'finished' as const }),
       ]
 
-      const matchesMap = new Map()
-      matchesMap.set(15, latestMatches)
-      matchesMap.set(16, [])
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings: [], metadata: createFootballSeasonMetadata() }
+        },
+        async getMatches(filters) {
+          if (filters.dateFrom === '2024-01-14') return latestMatches
+          return []
+        },
+        async getScorers() {
+          return []
+        },
+      }
 
-      const provider = createMockProvider({
-        standings: { standings: [], metadata },
-        matches: matchesMap,
-      })
-
-      const result = await orchestrateSerieAOverview(provider)
+      const result = await orchestrateSerieAOverview(provider, now)
 
       expect(result.latestMatches).toHaveLength(2)
       expect(result.latestMatches[0]?.utcDate).toBe('2024-01-15T20:00:00Z')
@@ -479,30 +541,63 @@ describe('football.service', () => {
     })
 
     it('filters scheduled matches (next) and sorts ascending', async () => {
-      const metadata = createFootballSeasonMetadata({ currentMatchday: 15 })
+      const now = new Date('2024-01-28T12:00:00Z')
       const nextMatches = [
-        createFootballMatch({ id: 1, utcDate: '2024-01-20T20:00:00Z', status: 'scheduled' as const }),
-        createFootballMatch({ id: 2, utcDate: '2024-01-20T14:00:00Z', status: 'scheduled' as const }),
-        createFootballMatch({ id: 3, utcDate: '2024-01-20T18:00:00Z', status: 'finished' as const }),
+        createFootballMatch({ id: 1, utcDate: '2024-02-15T20:00:00Z', status: 'scheduled' as const }),
+        createFootballMatch({ id: 2, utcDate: '2024-02-15T14:00:00Z', status: 'scheduled' as const }),
+        createFootballMatch({ id: 3, utcDate: '2024-02-15T18:00:00Z', status: 'finished' as const }),
       ]
 
-      const matchesMap = new Map()
-      matchesMap.set(15, [])
-      matchesMap.set(16, nextMatches)
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings: [], metadata: createFootballSeasonMetadata() }
+        },
+        async getMatches(filters) {
+          if (filters.dateFrom === '2024-01-28') return nextMatches
+          return []
+        },
+        async getScorers() {
+          return []
+        },
+      }
 
-      const provider = createMockProvider({
-        standings: { standings: [], metadata },
-        matches: matchesMap,
-      })
-
-      const result = await orchestrateSerieAOverview(provider)
+      const result = await orchestrateSerieAOverview(provider, now)
 
       expect(result.nextMatches).toHaveLength(2)
-      expect(result.nextMatches[0]?.utcDate).toBe('2024-01-20T14:00:00Z')
-      expect(result.nextMatches[1]?.utcDate).toBe('2024-01-20T20:00:00Z')
+      expect(result.nextMatches[0]?.utcDate).toBe('2024-02-15T14:00:00Z')
+      expect(result.nextMatches[1]?.utcDate).toBe('2024-02-15T20:00:00Z')
+    })
+
+    it('respects max 10 limit on both latest and next matches', async () => {
+      const now = new Date('2024-01-28T12:00:00Z')
+      const manyMatches = Array.from({ length: 15 }, (_, i) =>
+        createFootballMatch({
+          id: i + 1,
+          status: i < 13 ? ('finished' as const) : ('scheduled' as const),
+          utcDate: new Date(2024, 0, 15 + i).toISOString(),
+        })
+      )
+
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings: [], metadata: createFootballSeasonMetadata() }
+        },
+        async getMatches() {
+          return manyMatches
+        },
+        async getScorers() {
+          return []
+        },
+      }
+
+      const result = await orchestrateSerieAOverview(provider, now)
+
+      expect(result.latestMatches.length).toBeLessThanOrEqual(10)
+      expect(result.nextMatches.length).toBeLessThanOrEqual(10)
     })
 
     it('returns overview with all fields populated', async () => {
+      const now = new Date('2024-01-28T12:00:00Z')
       const standings = [createFootballStandingEntry()]
       const metadata = createFootballSeasonMetadata()
       const scorers = [createFootballScorer()]
@@ -515,17 +610,20 @@ describe('football.service', () => {
         createFootballMatch({ status: 'scheduled' as const }),
       ]
 
-      const matchesMap = new Map()
-      matchesMap.set(15, [...latestMatches, ...nextMatches])
-      matchesMap.set(16, [...latestMatches, ...nextMatches])
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings, metadata }
+        },
+        async getMatches(filters) {
+          if (filters.dateFrom === '2024-01-14') return latestMatches
+          return nextMatches
+        },
+        async getScorers() {
+          return scorers
+        },
+      }
 
-      const provider = createMockProvider({
-        standings: { standings, metadata },
-        matches: matchesMap,
-        scorers,
-      })
-
-      const result = await orchestrateSerieAOverview(provider)
+      const result = await orchestrateSerieAOverview(provider, now)
 
       expect(result.standings).toBeDefined()
       expect(result.latestMatches).toBeDefined()
@@ -535,20 +633,23 @@ describe('football.service', () => {
       expect(result.metadata.currentMatchday).toBe(metadata.currentMatchday)
     })
 
-    it('validates response schema', async () => {
+    it('validates response schema on success', async () => {
+      const now = new Date('2024-01-28T12:00:00Z')
       const standings = [createFootballStandingEntry()]
 
-      const metadata = createFootballSeasonMetadata()
-      const matchesMap = new Map()
-      matchesMap.set(15, [])
-      matchesMap.set(16, [])
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings, metadata: createFootballSeasonMetadata() }
+        },
+        async getMatches() {
+          return []
+        },
+        async getScorers() {
+          return []
+        },
+      }
 
-      const provider = createMockProvider({
-        standings: { standings, metadata },
-        matches: matchesMap,
-      })
-
-      const result = await orchestrateSerieAOverview(provider)
+      const result = await orchestrateSerieAOverview(provider, now)
 
       expect(result).toHaveProperty('standings')
       expect(result).toHaveProperty('latestMatches')
@@ -557,45 +658,73 @@ describe('football.service', () => {
       expect(result).toHaveProperty('metadata')
     })
 
+    it('propagates error from getStandings', async () => {
+      const now = new Date('2024-01-28T12:00:00Z')
+      const error = new Error('Standings error')
+
+      const provider: IFootballProvider = {
+        async getStandings() {
+          throw error
+        },
+        async getMatches() {
+          return []
+        },
+        async getScorers() {
+          return []
+        },
+      }
+
+      await expect(orchestrateSerieAOverview(provider, now)).rejects.toBe(error)
+    })
+
     it('propagates error from secondary calls (getMatches)', async () => {
+      const now = new Date('2024-01-28T12:00:00Z')
       const error = new Error('Matches error')
-      const matchesMap = new Map()
-      matchesMap.set(15, error)
 
-      const provider = createMockProvider({
-        standings: { standings: [], metadata: createFootballSeasonMetadata() },
-        matches: matchesMap,
-      })
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings: [], metadata: createFootballSeasonMetadata() }
+        },
+        async getMatches() {
+          throw error
+        },
+        async getScorers() {
+          return []
+        },
+      }
 
-      await expect(orchestrateSerieAOverview(provider)).rejects.toBe(error)
+      await expect(orchestrateSerieAOverview(provider, now)).rejects.toBe(error)
     })
 
     it('propagates error from secondary calls (getScorers)', async () => {
+      const now = new Date('2024-01-28T12:00:00Z')
       const error = new Error('Scorers error')
-      const matchesMap = new Map()
-      matchesMap.set(15, [])
-      matchesMap.set(16, [])
 
-      const provider = createMockProvider({
-        standings: { standings: [], metadata: createFootballSeasonMetadata() },
-        matches: matchesMap,
-        scorers: error,
-      })
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings: [], metadata: createFootballSeasonMetadata() }
+        },
+        async getMatches() {
+          return []
+        },
+        async getScorers() {
+          throw error
+        },
+      }
 
-      await expect(orchestrateSerieAOverview(provider)).rejects.toBe(error)
+      await expect(orchestrateSerieAOverview(provider, now)).rejects.toBe(error)
     })
 
     it('uses default provider when none specified', async () => {
-      // Note: This test verifies the function signature allows optional param.
-      // Full provider injection test is done with explicit provider argument above.
       const result = await orchestrateSerieAOverview(
         createMockProvider({
           standings: { standings: [], metadata: createFootballSeasonMetadata() },
           matches: new Map([
-            [15, []],
-            [16, []],
+            ['latest', []],
+            ['next', []],
           ]),
         }),
+        new Date('2024-01-28T12:00:00Z'),
       )
 
       expect(result).toBeDefined()
