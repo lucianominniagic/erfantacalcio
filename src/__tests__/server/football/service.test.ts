@@ -3,20 +3,19 @@
  *
  * Validates:
  * - getSerieAStandings: delegates to provider.getStandings()
- * - getLatestMatches: fetches standings → currentMatchday, then matches of that day filtered FINISHED, sorted desc
- * - getNextMatches: fetches standings → currentMatchday+1, filtered SCHEDULED, sorted asc
+ * - getLatestMatches: uses [today-14, tomorrow) date window, filters FINISHED, sorted desc, max 10
+ * - getNextMatches: uses [today, today+21) date window, filters SCHEDULED, sorted asc, max 10
  * - getTopScorers: delegates to provider.getScorers()
- * - orchestrateSerieAOverview: standings first, then parallel calls to getMatches (currentMatchday, nextMatchday) + getScorers
- * - orchestrateSerieAOverview: filters finished (latest desc), scheduled (next asc)
+ * - orchestrateSerieAOverview: standings first, then parallel calls (2x getMatches + getScorers)
+ * - orchestrateSerieAOverview: uses date ranges, ignores currentMatchday for filtering
  * - orchestrateSerieAOverview: validates with serieAOverviewSchema
- * - orchestrateSerieAOverview: propagates secondary call errors
- * - Accepts optional provider parameter for DI
- * - All functions use default footballDataClient when provider omitted
+ * - orchestrateSerieAOverview: propagates all errors
+ * - Accepts optional provider and now parameters for DI
+ * - All functions use default footballDataClient and new Date() when not specified
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import type { IFootballProvider, StandingsResult } from '~/server/football/football.types'
-import type { FootballMatch, FootballScorer } from '~/schemas/football'
+import type { IFootballProvider } from '~/server/football/football.types'
 import {
   getSerieAStandings,
   getLatestMatches,
@@ -25,46 +24,11 @@ import {
   orchestrateSerieAOverview,
 } from '~/server/football/football.service'
 import {
-  createFootballTeam,
   createFootballMatch,
   createFootballScorer,
   createFootballSeasonMetadata,
   createFootballStandingEntry,
 } from './fixtures'
-
-// ---------------------------------------------------------------------------
-// Mock provider factory
-// ---------------------------------------------------------------------------
-
-const createMockProvider = (overrides?: {
-  standings?: StandingsResult | Error
-  matches?: Map<number, FootballMatch[] | Error>
-  scorers?: FootballScorer[] | Error
-}): IFootballProvider => {
-  const standingsResult = overrides?.standings || {
-    standings: [],
-    metadata: createFootballSeasonMetadata(),
-  }
-
-  const matchesMap = overrides?.matches || new Map()
-  const scorersResult = overrides?.scorers || []
-
-  return {
-    async getStandings() {
-      if (standingsResult instanceof Error) throw standingsResult
-      return standingsResult
-    },
-    async getMatches(matchday: number) {
-      const result = matchesMap.get(matchday)
-      if (result instanceof Error) throw result
-      return result || []
-    },
-    async getScorers() {
-      if (scorersResult instanceof Error) throw scorersResult
-      return scorersResult
-    },
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Tests
