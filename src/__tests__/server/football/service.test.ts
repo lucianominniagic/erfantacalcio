@@ -48,9 +48,17 @@ describe('football.service', () => {
       const metadata = createFootballSeasonMetadata()
       const standings = [createFootballStandingEntry()]
 
-      const provider = createMockProvider({
-        standings: { standings, metadata },
-      })
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings, metadata }
+        },
+        async getMatches() {
+          return []
+        },
+        async getScorers() {
+          return []
+        },
+      }
 
       const result = await getSerieAStandings(provider)
 
@@ -59,25 +67,41 @@ describe('football.service', () => {
     })
 
     it('uses default provider when none specified', async () => {
-      const provider = createMockProvider({
-        standings: {
-          standings: [],
-          metadata: createFootballSeasonMetadata(),
-        },
-      })
+      const standings = [createFootballStandingEntry()]
+      const metadata = createFootballSeasonMetadata()
 
-      // The call without provider parameter would use footballDataClient;
-      // we can't test this without mocking the entire module,
-      // so we just verify the function signature accepts optional param
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings, metadata }
+        },
+        async getMatches() {
+          return []
+        },
+        async getScorers() {
+          return []
+        },
+      }
+
       const result = await getSerieAStandings(provider)
       expect(result).toBeDefined()
+      expect(result.standings).toBeDefined()
+      expect(result.metadata).toBeDefined()
     })
 
     it('propagates provider error', async () => {
       const error = new Error('Provider error')
-      const provider = createMockProvider({
-        standings: error,
-      })
+
+      const provider: IFootballProvider = {
+        async getStandings() {
+          throw error
+        },
+        async getMatches() {
+          return []
+        },
+        async getScorers() {
+          return []
+        },
+      }
 
       await expect(getSerieAStandings(provider)).rejects.toBe(error)
     })
@@ -343,9 +367,17 @@ describe('football.service', () => {
         createFootballScorer({ goals: 12 }),
       ]
 
-      const provider = createMockProvider({
-        scorers,
-      })
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings: [], metadata: createFootballSeasonMetadata() }
+        },
+        async getMatches() {
+          return []
+        },
+        async getScorers() {
+          return scorers
+        },
+      }
 
       const result = await getTopScorers(provider)
 
@@ -354,9 +386,18 @@ describe('football.service', () => {
 
     it('propagates provider error', async () => {
       const error = new Error('Scorers error')
-      const provider = createMockProvider({
-        scorers: error,
-      })
+
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings: [], metadata: createFootballSeasonMetadata() }
+        },
+        async getMatches() {
+          return []
+        },
+        async getScorers() {
+          throw error
+        },
+      }
 
       await expect(getTopScorers(provider)).rejects.toBe(error)
     })
@@ -680,16 +721,21 @@ describe('football.service', () => {
     })
 
     it('uses default provider when none specified', async () => {
-      const result = await orchestrateSerieAOverview(
-        createMockProvider({
-          standings: { standings: [], metadata: createFootballSeasonMetadata() },
-          matches: new Map([
-            ['latest', []],
-            ['next', []],
-          ]),
-        }),
-        new Date('2024-01-28T12:00:00Z'),
-      )
+      const now = new Date('2024-01-28T12:00:00Z')
+
+      const provider: IFootballProvider = {
+        async getStandings() {
+          return { standings: [], metadata: createFootballSeasonMetadata() }
+        },
+        async getMatches() {
+          return []
+        },
+        async getScorers() {
+          return []
+        },
+      }
+
+      const result = await orchestrateSerieAOverview(provider, now)
 
       expect(result).toBeDefined()
     })
