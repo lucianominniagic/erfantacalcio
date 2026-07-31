@@ -106,31 +106,92 @@ describe('footballDataClient', () => {
     })
   })
 
-  describe('getMatches', () => {
-    it('constructs URL with matchday and optional season', async () => {
+  describe('getMatches with date-based API', () => {
+    it('constructs URL with dateFrom/dateTo via URLSearchParams', async () => {
       const response = createFdMatchesResponse()
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
         new Response(JSON.stringify(response), { status: 200 }),
       )
 
-      await footballDataClient.getMatches(5, 2022)
+      await footballDataClient.getMatches({
+        dateFrom: '2024-01-15',
+        dateTo: '2024-01-22',
+      })
 
       const call = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string
-      expect(call).toContain('matchday=5')
-      expect(call).toContain('season=2022')
+      expect(call).toContain('dateFrom=2024-01-15')
+      expect(call).toContain('dateTo=2024-01-22')
     })
 
-    it('constructs URL without season when not provided', async () => {
+    it('constructs URL with matchday filter', async () => {
       const response = createFdMatchesResponse()
       ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
         new Response(JSON.stringify(response), { status: 200 }),
       )
 
-      await footballDataClient.getMatches(5)
+      await footballDataClient.getMatches({ matchday: 15 })
 
       const call = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string
-      expect(call).toContain('matchday=5')
-      expect(call).not.toContain('season=')
+      expect(call).toContain('matchday=15')
+    })
+
+    it('constructs URL with season filter', async () => {
+      const response = createFdMatchesResponse()
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        new Response(JSON.stringify(response), { status: 200 }),
+      )
+
+      await footballDataClient.getMatches({ season: 2024 })
+
+      const call = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string
+      expect(call).toContain('season=2024')
+    })
+
+    it('constructs URL combining dateFrom, dateTo, and season', async () => {
+      const response = createFdMatchesResponse()
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        new Response(JSON.stringify(response), { status: 200 }),
+      )
+
+      await footballDataClient.getMatches({
+        dateFrom: '2024-01-15',
+        dateTo: '2024-01-22',
+        season: 2024,
+      })
+
+      const call = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string
+      expect(call).toContain('season=2024')
+      expect(call).toContain('dateFrom=2024-01-15')
+      expect(call).toContain('dateTo=2024-01-22')
+    })
+
+    it('constructs URL combining matchday and season', async () => {
+      const response = createFdMatchesResponse()
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        new Response(JSON.stringify(response), { status: 200 }),
+      )
+
+      await footballDataClient.getMatches({
+        matchday: 15,
+        season: 2024,
+      })
+
+      const call = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string
+      expect(call).toContain('matchday=15')
+      expect(call).toContain('season=2024')
+    })
+
+    it('handles empty filters object (no query params)', async () => {
+      const response = createFdMatchesResponse()
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        new Response(JSON.stringify(response), { status: 200 }),
+      )
+
+      await footballDataClient.getMatches({})
+
+      const call = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string
+      expect(call).toContain('/matches')
+      expect(call).not.toContain('?')
     })
 
     it('returns array of mapped matches', async () => {
@@ -139,12 +200,24 @@ describe('footballDataClient', () => {
         new Response(JSON.stringify(response), { status: 200 }),
       )
 
-      const result = await footballDataClient.getMatches(1)
+      const result = await footballDataClient.getMatches({ matchday: 1 })
 
       expect(Array.isArray(result)).toBe(true)
       expect(result.length).toBeGreaterThan(0)
       expect(result[0]?.id).toBeDefined()
       expect(result[0]?.status).toBeDefined()
+    })
+
+    it('validates dateTo as exclusive boundary in URL', async () => {
+      const response = createFdMatchesResponse()
+      ;(global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce(
+        new Response(JSON.stringify(response), { status: 200 }),
+      )
+
+      await footballDataClient.getMatches({ dateTo: '2024-01-22' })
+
+      const call = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0]?.[0] as string
+      expect(call).toContain('dateTo=2024-01-22')
     })
   })
 
