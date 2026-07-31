@@ -95,7 +95,11 @@ export class InMemoryFeedCache<V> {
 /**
  * Istanza condivisa usata dal newsService.
  * Vive finché il processo Node.js è in esecuzione.
+ *
+ * Il tipo generico è {@link NewsFeedFetchResult} (non solo gli articoli):
+ * la cache conserva anche `channelLogoUrl` così il service layer non deve
+ * re-fetcharlo ad ogni richiesta.
  */
-import type { NewsArticle } from '~/schemas/news'
+import type { NewsFeedFetchResult } from '../providers/newsProvider'
 
-export const feedCache = new InMemoryFeedCache<NewsArticle[]>()
+export const feedCache = new InMemoryFeedCache<NewsFeedFetchResult>()

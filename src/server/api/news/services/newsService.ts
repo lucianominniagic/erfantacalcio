@@ -1,9 +1,12 @@
 /**
- * newsService — orchestrazione del fetch dei quattro feed RSS Gazzetta.
+ * newsService — orchestrazione del fetch dei quattro feed RSS calcistici
+ * (Gazzetta dello Sport, Corriere dello Sport, Voce Giallorossa,
+ * La Lazio Siamo Noi).
  *
  * Responsabilità:
  * - Avvia le quattro richieste in parallelo (Promise.all).
- * - Interpone la cache in-memory (TTL 15 minuti).
+ * - Interpone la cache in-memory (TTL 15 minuti); la cache conserva il
+ *   risultato completo ({@link NewsFeedFetchResult}) incluso `channelLogoUrl`.
  * - Isola i fallimenti: un feed in errore produce un NewsFeedError per
  *   quella sezione senza bloccare gli altri.
  * - Valida la risposta finale con newsCalcioResponseSchema prima di
@@ -20,10 +23,9 @@ import {
   type NewsCalcioResponse,
   type NewsFeedResult,
 } from '~/schemas/news'
-import { gazzettaRssProvider } from '../providers/gazzettaRssProvider'
-import type { INewsProvider } from '../providers/newsProvider'
+import { rssProvider } from '../providers/rssProvider'
+import type { INewsProvider, NewsFeedFetchResult } from '../providers/newsProvider'
 import { feedCache, InMemoryFeedCache } from '../cache/newsCache'
-import type { NewsArticle } from '~/schemas/news'
 
 // ---------------------------------------------------------------------------
 // Costanti
@@ -40,22 +42,23 @@ const FEED_CACHE_TTL_MS = 15 * 60 * 1_000
  * Recupera i quattro feed RSS in parallelo e restituisce una
  * `NewsCalcioResponse` validata.
  *
- * @param provider - Implementazione di INewsProvider (default: Gazzetta RSS).
+ * @param provider - Implementazione di INewsProvider (default: RSS source-neutral).
  * @param cache    - Cache in-memory (default: singleton di processo).
+ *                   Conserva il risultato completo (articoli + channelLogoUrl).
  */
 export async function fetchAllNewsFeeds(
-  provider: INewsProvider = gazzettaRssProvider,
-  cache: InMemoryFeedCache<NewsArticle[]> = feedCache,
+  provider: INewsProvider = rssProvider,
+  cache: InMemoryFeedCache<NewsFeedFetchResult> = feedCache,
 ): Promise<NewsCalcioResponse> {
   const results: NewsFeedResult[] = await Promise.all(
     NEWS_FEEDS.map(async (feed): Promise<NewsFeedResult> => {
       try {
-        const articles = await cache.getOrFetch(
+        const { channelLogoUrl, articles } = await cache.getOrFetch(
           feed.id,
           FEED_CACHE_TTL_MS,
           () => provider.fetchFeed(feed),
         )
-        return { status: 'success', feedId: feed.id, articles }
+        return { status: 'success', feedId: feed.id, channelLogoUrl, articles }
       } catch (err) {
         const message =
           err instanceof Error ? err.message : 'Errore sconosciuto nel fetch del feed'
