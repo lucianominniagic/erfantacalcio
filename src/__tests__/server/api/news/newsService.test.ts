@@ -234,17 +234,18 @@ describe('newsService — fetchAllNewsFeeds', () => {
       let resolveCalcio: (val: NewsFeedFetchResult) => void = () => {
         // Intentionally empty - will be assigned in the Promise
       }
-      const calcioFetcher = vi
-        .fn()
-        .mockImplementation(
-          () =>
-            new Promise<NewsFeedFetchResult>((resolve) => {
-              resolveCalcio = resolve
-            }),
-        )
+      const calcioFetcher = vi.fn((): Promise<NewsFeedFetchResult> => {
+        return new Promise<NewsFeedFetchResult>((resolve) => {
+          resolveCalcio = resolve
+        })
+      }).mockImplementation((): Promise<NewsFeedFetchResult> =>
+        new Promise<NewsFeedFetchResult>((resolve) => {
+          resolveCalcio = resolve
+        }),
+      )
 
       const provider: INewsProvider = {
-        fetchFeed(feed) {
+        fetchFeed(feed): Promise<NewsFeedFetchResult> {
           if (feed.id === 'calcio') {
             return calcioFetcher()
           }
@@ -468,7 +469,6 @@ describe('newsService — fetchAllNewsFeeds', () => {
       expect(sortedFeeds[1]?.label).toBe('Corriere dello Sport')
       expect(sortedFeeds[2]?.label).toBe('Voce Giallorossa')
       expect(sortedFeeds[3]?.label).toBe('La Lazio Siamo Noi')
-    })
     })
   })
 })
