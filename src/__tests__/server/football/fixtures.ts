@@ -36,7 +36,7 @@ export function createFdTeam(overrides?: Partial<FdTeamRaw>): FdTeamRaw {
 }
 
 export function createFdStandingEntry(
-  position: number = 1,
+  position = 1,
   overrides?: Partial<FdStandingEntryRaw>,
 ): FdStandingEntryRaw {
   return {
@@ -223,7 +223,7 @@ export function createFootballTeam(overrides?: Partial<FootballTeam>): FootballT
 }
 
 export function createFootballStandingEntry(
-  position: number = 1,
+  position = 1,
   overrides?: Partial<FootballStandingEntry>,
 ): FootballStandingEntry {
   return {

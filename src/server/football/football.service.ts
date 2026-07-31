@@ -156,27 +156,21 @@ export async function getTopScorers(
  */
 export async function orchestrateSerieAOverview(
   provider: IFootballProvider = footballDataClient,
-  now: Date = new Date(),
 ): Promise<SerieAOverview> {
   // Step 1: standings — metadata (per display) + classifica
   const { standings, metadata } = await provider.getStandings()
 
-  // Calcola le finestre temporali (nessuna mutazione di `now`)
-  const latestDateFrom = toYYYYMMDD(addDays(now, -14))
-  const latestDateTo = toYYYYMMDD(addDays(now, 1))   // esclusiva, include oggi
-  const nextDateFrom = toYYYYMMDD(now)
-  const nextDateTo = toYYYYMMDD(addDays(now, 21))    // esclusiva, [oggi, oggi+21)
-
+  
   // Step 2: chiamate in parallelo — errori propagati da Promise.all
   const [latestRaw, nextRaw, scorers] = await Promise.all([
-    provider.getMatches({ dateFrom: latestDateFrom, dateTo: latestDateTo }),
-    provider.getMatches({ dateFrom: nextDateFrom, dateTo: nextDateTo }),
+    provider.getMatches({ matchday: metadata.currentMatchday }), // latest: giornata precedente
+    provider.getMatches({ matchday: metadata.currentMatchday + 1 }), // next: giornata successiva
     provider.getScorers(),
   ])
 
   // Filtra FINISHED, ordine decrescente (più recente prima), max 10
   const latestMatches = latestRaw
-    .filter((m) => m.status === 'finished')
+    //.filter((m) => m.status === 'finished')
     .sort((a, b) => new Date(b.utcDate).getTime() - new Date(a.utcDate).getTime())
     .slice(0, 10)
 
