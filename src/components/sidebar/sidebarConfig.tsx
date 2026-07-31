@@ -15,6 +15,7 @@ import {
   Newspaper,
   Portrait,
   Schedule,
+  SportsSoccer,
   Storefront,
   ThumbsUpDown,
   UploadFile,
@@ -56,6 +57,12 @@ export const legaItems: NavItem[] = [
     label: 'News calcio',
     href: '/news-calcio',
     icon: <Newspaper />,
+  },
+  {
+    key: 'serieA',
+    label: 'Serie A',
+    href: '/serie-a',
+    icon: <SportsSoccer />,
   },
   {
     key: 'regolamento',

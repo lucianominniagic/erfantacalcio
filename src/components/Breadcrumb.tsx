@@ -16,6 +16,7 @@ const PATH_LABELS: Record<string, string> = {
   '/economia': 'Economia e premi',
   '/albo': "Albo d'oro",
   '/news-calcio': 'News calcio',
+  '/serie-a': 'Serie A',
   '/regolamento': 'Regolamento',
   '/profilo': 'Cambio password',
   '/documenti': 'Documenti',

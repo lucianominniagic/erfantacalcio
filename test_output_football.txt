@@ -1,0 +1,99 @@
+
+> erfantacalcio.next-mui@0.1.0 test
+> vitest run src/__tests__/server/football --reporter=verbose
+
+The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90mC:/Sviluppo/erfantacalcio[39m
+
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapStandings[2m > [22mmaps TOTAL standings group with correct metadata
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapStandings[2m > [22mincludes team data in standings entries
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapStandings[2m > [22mnormalizes form to nullable
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapStandings[2m > [22mthrows when TOTAL standings group is missing
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapStandings[2m > [22mthrows when currentMatchday is null
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapMatches[2m > [22mmaps array of matches preserving base fields
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapMatches[2m > [22mmaps all raw statuses to provider-neutral enum
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapMatches[2m > [22mmaps score winner from HOME_TEAM/AWAY_TEAM/DRAW to home/away/draw/null
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapMatches[2m > [22mpreserves fullTime scores
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapMatches[2m > [22mmaps halfTime null when not provided
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapMatches[2m > [22mmaps halfTime when provided
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapMatches[2m > [22mmaps team data correctly
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapScorers[2m > [22mmaps array of scorers
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapScorers[2m > [22mpreserves photo value from raw (maps provider photo field)
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapScorers[2m > [22mnormalizes assists and penalties to null when undefined/null
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapScorers[2m > [22mnormalizes playedMatches to null when undefined
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapScorers[2m > [22mmaps player and team fields preserving nulls
+ [32m✓[39m src/__tests__/server/football/mapper.test.ts[2m > [22mfootball.mapper[2m > [22mmapScorers[2m > [22mhandles missing player fields as null
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22mgetStandings[2m > [22msends request with X-Auth-Token header
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22mgetStandings[2m > [22mconstructs URL without season param when not provided
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22mgetStandings[2m > [22mconstructs URL with season param when provided
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22mgetStandings[2m > [22mvalidates response with Zod schema
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22mgetStandings[2m > [22mthrows on Zod validation failure
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22mgetMatches[2m > [22mconstructs URL with matchday and optional season
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22mgetMatches[2m > [22mconstructs URL without season when not provided
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22mgetMatches[2m > [22mreturns array of mapped matches
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22mgetScorers[2m > [22mconstructs URL with optional season param
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22mgetScorers[2m > [22mreturns array of mapped scorers
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22merror handling[2m > [22mthrows immediately on 404
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22merror handling[2m > [22mthrows immediately on 401
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22merror handling[2m > [22mthrows immediately on 429 rate limit
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22mgetSerieAStandings[2m > [22mreturns standings and metadata from provider
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22mgetSerieAStandings[2m > [22muses default provider when none specified
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22mgetSerieAStandings[2m > [22mpropagates provider error
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22mgetLatestMatches[2m > [22mfetches matches of currentMatchday and filters FINISHED status
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22mgetLatestMatches[2m > [22msorts finished matches by date descending (latest first)
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22mgetLatestMatches[2m > [22mreturns empty array if no finished matches in matchday
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22mgetNextMatches[2m > [22mfetches matches of currentMatchday+1 and filters SCHEDULED status
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22mgetNextMatches[2m > [22msorts scheduled matches by date ascending (earliest first)
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22mgetTopScorers[2m > [22mreturns array of scorers from provider
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22mgetTopScorers[2m > [22mpropagates provider error
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22morchestrateSerieAOverview[2m > [22mfetches standings first, then concurrent calls to matches and scorers
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22morchestrateSerieAOverview[2m > [22mretrieves matches for currentMatchday and nextMatchday
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22morchestrateSerieAOverview[2m > [22mfilters finished matches (latest) and sorts descending
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22morchestrateSerieAOverview[2m > [22mfilters scheduled matches (next) and sorts ascending
+ [31m×[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22morchestrateSerieAOverview[2m > [22mreturns overview with all fields populated
+[31m   → expected { year: '2023', …(4) } to be { year: '2023', …(4) } // Object.is equality
+
+If it should pass with deep equality, replace "toBe" with "toStrictEqual"
+
+Expected: { year: '2023', …(4) }
+Received: serializes to the same string
+[39m
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22morchestrateSerieAOverview[2m > [22mvalidates response schema
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22morchestrateSerieAOverview[2m > [22mpropagates error from secondary calls (getMatches)
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22morchestrateSerieAOverview[2m > [22mpropagates error from secondary calls (getScorers)
+ [32m✓[39m src/__tests__/server/football/service.test.ts[2m > [22mfootball.service[2m > [22morchestrateSerieAOverview[2m > [22muses default provider when none specified
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22merror handling[2m > [22mretries on 5xx error with backoff and throws after max attempts[33m 921[2mms[22m[39m
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22merror handling[2m > [22mretries on network error with backoff[33m 917[2mms[22m[39m
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22merror handling[2m > [22mretries with exponential backoff delay
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22mAPI key requirement[2m > [22mthrows when FOOTBALL_DATA_API_KEY is missing
+ [32m✓[39m src/__tests__/server/football/client.test.ts[2m > [22mfootballDataClient[2m > [22mcache directive[2m > [22msets cache: no-store header
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/server/football/service.test.ts > football.service > orchestrateSerieAOverview > returns overview with all fields populated
+AssertionError: expected { year: '2023', …(4) } to be { year: '2023', …(4) } // Object.is equality
+
+If it should pass with deep equality, replace "toBe" with "toStrictEqual"
+
+Expected: { year: '2023', …(4) }
+Received: serializes to the same string
+
+
+Compared values have no visual difference.
+
+ ❯ src/__tests__/server/football/service.test.ts:400:31
+    398|       expect(result.nextMatches).toBeDefined()
+    399|       expect(result.scorers).toBeDefined()
+    400|       expect(result.metadata).toBe(metadata)
+       |                               ^
+    401|     })
+    402| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m2 passed[39m[22m[90m (3)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m54 passed[39m[22m[90m (55)[39m
+[2m   Start at [22m 10:05:55
+[2m   Duration [22m 3.05s[2m (transform 237ms, setup 96ms, collect 510ms, tests 1.91s, environment 1ms, prepare 752ms)[22m
+
