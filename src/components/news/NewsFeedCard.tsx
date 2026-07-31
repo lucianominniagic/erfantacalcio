@@ -213,8 +213,8 @@ export default function NewsFeedCard({
         ) : (
           <Typography
             sx={{
-              fontWeight: 700,
-              fontSize: '0.9rem',
+              fontWeight: 750,
+              fontSize: '1rem',
               color: 'primary.main',
               letterSpacing: '0.02em',
             }}
@@ -254,7 +254,7 @@ export default function NewsFeedCard({
             <Typography
               variant="body2"
               color="error"
-              sx={{ textAlign: 'center', fontWeight: 600 }}
+              sx={{ textAlign: 'center', fontWeight: 700 }}
             >
               Feed non disponibile
             </Typography>
