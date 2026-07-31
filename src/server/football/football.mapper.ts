@@ -188,7 +188,9 @@ export function mapStandings(raw: FdStandingsResponse): StandingsResult {
 
 /** Mappa la risposta matches → array di FootballMatch DTO. */
 export function mapMatches(raw: FdMatchesResponse): FootballMatch[] {
-  return raw.matches.map(mapMatch)
+  return raw.matches
+    .map(mapMatch)
+    .sort((a, b) => new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime())
 }
 
 /** Mappa la risposta scorers → array di FootballScorer DTO. */
