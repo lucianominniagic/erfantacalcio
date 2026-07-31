@@ -45,7 +45,6 @@ function TeamCell({ team }: { team: FootballTeam }) {
       ) : (
         <Box sx={{ width: { xs: 18, sm: 22 }, flexShrink: 0 }} />
       )}
-      {/* Nome completo su sm+, abbreviazione su xs */}
       <Typography
         variant="body2"
         noWrap
@@ -55,7 +54,7 @@ function TeamCell({ team }: { team: FootballTeam }) {
           display: { xs: 'none', sm: 'block' },
         }}
       >
-        {team.shortName ?? team.name}
+        {team.name}
       </Typography>
       <Typography
         variant="body2"
@@ -118,7 +117,7 @@ export default function SerieAStandings({ standings }: SerieAStandingsProps) {
                   sx={{
                     ...thSx,
                     width: 32,
-                    display: { xs: 'none', sm: 'table-cell' },
+                    display: { sm: 'table-cell' },
                   }}
                 >
                   V
@@ -128,7 +127,7 @@ export default function SerieAStandings({ standings }: SerieAStandingsProps) {
                   sx={{
                     ...thSx,
                     width: 32,
-                    display: { xs: 'none', sm: 'table-cell' },
+                    display: { sm: 'table-cell' },
                   }}
                 >
                   N
@@ -138,7 +137,7 @@ export default function SerieAStandings({ standings }: SerieAStandingsProps) {
                   sx={{
                     ...thSx,
                     width: 32,
-                    display: { xs: 'none', sm: 'table-cell' },
+                    display: { sm: 'table-cell' },
                   }}
                 >
                   P
@@ -149,7 +148,7 @@ export default function SerieAStandings({ standings }: SerieAStandingsProps) {
                   sx={{
                     ...thSx,
                     width: 36,
-                    display: { xs: 'none', md: 'table-cell' },
+                    display: { md: 'table-cell' },
                   }}
                 >
                   GF
@@ -159,7 +158,7 @@ export default function SerieAStandings({ standings }: SerieAStandingsProps) {
                   sx={{
                     ...thSx,
                     width: 36,
-                    display: { xs: 'none', md: 'table-cell' },
+                    display: { md: 'table-cell' },
                   }}
                 >
                   GS
@@ -169,7 +168,7 @@ export default function SerieAStandings({ standings }: SerieAStandingsProps) {
                   sx={{
                     ...thSx,
                     width: 40,
-                    display: { xs: 'none', md: 'table-cell' },
+                    display: { md: 'table-cell' },
                   }}
                 >
                   DR
@@ -226,7 +225,7 @@ export default function SerieAStandings({ standings }: SerieAStandingsProps) {
                       sx={{
                         px: { xs: 0.75, sm: 1.5 },
                         py: 0.75,
-                        display: { xs: 'none', sm: 'table-cell' },
+                        display: { sm: 'table-cell' },
                       }}
                     >
                       <Typography variant="body2">{entry.won}</Typography>
@@ -236,7 +235,7 @@ export default function SerieAStandings({ standings }: SerieAStandingsProps) {
                       sx={{
                         px: { xs: 0.75, sm: 1.5 },
                         py: 0.75,
-                        display: { xs: 'none', sm: 'table-cell' },
+                        display: { sm: 'table-cell' },
                       }}
                     >
                       <Typography variant="body2">{entry.draw}</Typography>
@@ -246,7 +245,7 @@ export default function SerieAStandings({ standings }: SerieAStandingsProps) {
                       sx={{
                         px: { xs: 0.75, sm: 1.5 },
                         py: 0.75,
-                        display: { xs: 'none', sm: 'table-cell' },
+                        display: { sm: 'table-cell' },
                       }}
                     >
                       <Typography variant="body2">{entry.lost}</Typography>
@@ -258,7 +257,7 @@ export default function SerieAStandings({ standings }: SerieAStandingsProps) {
                       sx={{
                         px: { xs: 0.75, sm: 1.5 },
                         py: 0.75,
-                        display: { xs: 'none', md: 'table-cell' },
+                        display: { md: 'table-cell' },
                       }}
                     >
                       <Typography variant="body2">{entry.goalsFor}</Typography>
@@ -268,7 +267,7 @@ export default function SerieAStandings({ standings }: SerieAStandingsProps) {
                       sx={{
                         px: { xs: 0.75, sm: 1.5 },
                         py: 0.75,
-                        display: { xs: 'none', md: 'table-cell' },
+                        display: { md: 'table-cell' },
                       }}
                     >
                       <Typography variant="body2">
@@ -280,7 +279,7 @@ export default function SerieAStandings({ standings }: SerieAStandingsProps) {
                       sx={{
                         px: { xs: 0.75, sm: 1.5 },
                         py: 0.75,
-                        display: { xs: 'none', md: 'table-cell' },
+                        display: { md: 'table-cell' },
                       }}
                     >
                       <Typography
