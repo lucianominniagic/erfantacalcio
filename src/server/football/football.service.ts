@@ -171,13 +171,11 @@ export async function orchestrateSerieAOverview(
   // Filtra FINISHED, ordine decrescente (più recente prima), max 10
   const latestMatches = latestRaw
     //.filter((m) => m.status === 'finished')
-    .sort((a, b) => new Date(b.utcDate).getTime() - new Date(a.utcDate).getTime())
     .slice(0, 10)
 
   // Filtra SCHEDULED/TIMED (→ 'scheduled' nel DTO), ordine crescente, max 10
   const nextMatches = nextRaw
     .filter((m) => m.status === 'scheduled')
-    .sort((a, b) => new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime())
     .slice(0, 10)
 
   const overview = {

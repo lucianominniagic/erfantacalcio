@@ -168,7 +168,7 @@ export const footballDataClient: IFootballProvider = {
   async getMatches(filters: FootballMatchFilters): Promise<FootballMatch[]> {
     const raw = await fetchJson(matchesUrl(filters))
     const parsed = fdMatchesResponseSchema.parse(raw)
-    return mapMatches(parsed)
+    return mapMatches(parsed).sort((a, b) => new Date(a.utcDate).getTime() - new Date(b.utcDate).getTime())
   },
 
   async getScorers(season?: number): Promise<FootballScorer[]> {
