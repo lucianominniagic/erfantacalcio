@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 /**
  * service.test — unit tests for football.service orchestration.
  *

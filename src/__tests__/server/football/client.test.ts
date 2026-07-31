@@ -16,7 +16,6 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { footballDataClient } from '~/server/football/football.client'
-import type { IFootballProvider } from '~/server/football/football.types'
 import {
   createFdStandingsResponse,
   createFdMatchesResponse,
@@ -50,13 +49,10 @@ describe('footballDataClient', () => {
 
       await footballDataClient.getStandings()
 
-      expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/standings'),
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            'X-Auth-Token': 'test-api-key',
-          }),
-        }),
+      const request = vi.mocked(global.fetch).mock.calls[0]
+      expect(request?.[0].toString()).toContain('/standings')
+      expect(new Headers(request?.[1]?.headers).get('X-Auth-Token')).toBe(
+        'test-api-key',
       )
     })
 
