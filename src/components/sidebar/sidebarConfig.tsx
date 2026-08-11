@@ -145,6 +145,12 @@ export const adminItems: NavItem[] = [
     href: '/giocatori',
     icon: <ManageAccounts />,
   },
+  {
+    key: 'squadreSerieA',
+    label: 'Squadre Serie A',
+    href: '/squadre-serie-a',
+    icon: <SportsSoccer />,
+  },
   { key: 'voti', label: 'Voti', href: '/voti', icon: <ThumbsUpDown /> },
   {
     key: 'avvioStagione',

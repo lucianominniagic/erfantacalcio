@@ -11,6 +11,7 @@ import { getAlboORPCProcedure } from '~/server/api/albo/procedures/get.orpc'
 import { listClassificaORPCProcedure } from '~/server/api/classifica/procedures/list.orpc'
 import { getRisultatiStagioneORPCProcedure } from '~/server/api/economia/procedures/getRisultatiStagione.orpc'
 import { listSquadreSerieAORPCProcedure } from '~/server/api/squadreSerieA/procedures/list.orpc'
+import { updateSquadraSerieAORPCProcedure } from '~/server/api/squadreSerieA/procedures/update.orpc'
 import { getTabelliniORPCProcedure } from '~/server/api/partita/procedures/getTabellini.orpc'
 import { getFormazioniORPCProcedure } from '~/server/api/partita/procedures/getFormazioni.orpc'
 import { listTorneiORPCProcedure } from '~/server/api/tornei/procedures/list.orpc'
@@ -125,6 +126,7 @@ export const orpcRouter = {
   },
   squadreSerieA: {
     list: listSquadreSerieAORPCProcedure,
+    update: updateSquadraSerieAORPCProcedure,
   },
   tornei: {
     list: listTorneiORPCProcedure,
