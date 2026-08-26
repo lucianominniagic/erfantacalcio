@@ -30,6 +30,7 @@ export async function getCalendario<T>(
       girone: true,
       hasGiocata: true,
       hasDaRecuperare: true,
+      idTorneo: true,
       Torneo: { idTorneo: true, nome: true, gruppoFase: true },
       Partite: {
         idPartita: true,
