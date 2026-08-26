@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
 import { getIdNextGiornata } from '~/utils/torneo'
 import { calendarioSchema } from '~/schemas/calendario'
+import { IMPORTA_VOTI_CHUNK_SIZE, IMPORTA_VOTI_RUOLI } from '~/types/voti'
 
 type AlertState = {
   severity: 'success' | 'error' | 'warning'
@@ -98,27 +99,46 @@ export function useUploadVotiAdmin() {
       if (!reader.result || typeof reader.result === 'string') return
 
       const fileData = Buffer.from(new Uint8Array(reader.result)).toString('base64')
+      const idCalendario = selectedIdCalendario ?? 0
       setUploading(true)
       setProgress(0)
 
       try {
-        const stream = await orpc.voti.importaVotiGiornata.call({
-          idCalendario: selectedIdCalendario ?? 0,
+        // Il processo è spezzato in tante chiamate separate (una invocazione
+        // serverless ciascuna) per evitare il timeout di Vercel su un piano
+        // base: una singola chiamata che fa tutto (upload + reset + parse +
+        // upsert di tutti i voti + refresh statistiche) rischia di superare
+        // il limite di durata della function.
+
+        // Step 1/3: upload su Blob, reset voti esistenti, parsing CSV.
+        const { fileUrl, voti } = await orpc.voti.importaVotiInit.call({
+          idCalendario,
           fileName: filename,
           fileData,
         })
+        setProgress(15)
 
-        for await (const event of stream) {
-          setProgress(event.progress)
-          if (event.step === 'done') {
-            setUploading(false)
-            setAlert({
-              severity: 'success',
-              message: `File processato correttamente: ${event.fileUrl}`,
-              title: 'File inviato',
-            })
-          }
+        // Step 2/3: upsert dei voti, un chunk alla volta.
+        for (let i = 0; i < voti.length; i += IMPORTA_VOTI_CHUNK_SIZE) {
+          const chunk = voti.slice(i, i + IMPORTA_VOTI_CHUNK_SIZE)
+          await orpc.voti.importaVotiProcessChunk.call({ idCalendario, voti: chunk })
+          const processed = Math.min(i + chunk.length, voti.length)
+          setProgress(15 + Math.round((processed / Math.max(voti.length, 1)) * 70))
         }
+
+        // Step 3/3: refresh statistiche, un ruolo alla volta.
+        for (let i = 0; i < IMPORTA_VOTI_RUOLI.length; i++) {
+          await orpc.voti.importaVotiRefreshStats.call({ ruolo: IMPORTA_VOTI_RUOLI[i] })
+          setProgress(85 + (i + 1) * 3)
+        }
+
+        setUploading(false)
+        setProgress(100)
+        setAlert({
+          severity: 'success',
+          message: `File processato correttamente: ${fileUrl}`,
+          title: 'File inviato',
+        })
       } catch (error) {
         setUploading(false)
         setProgress(0)

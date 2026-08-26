@@ -101,7 +101,9 @@ import { getVotoORPCProcedure } from '~/server/api/voti/procedures/get.orpc'
 import { getStatisticaVotiORPCProcedure } from '~/server/api/voti/procedures/getStatisticaVoti.orpc'
 import { updateVotoORPCProcedure } from '~/server/api/voti/procedures/update.orpc'
 import { uploadVercelORPCProcedure } from '~/server/api/voti/procedures/uploadVercel.orpc'
-import { importaVotiGiornataORPCProcedure } from '~/server/api/voti/procedures/importaVotiGiornata.orpc'
+import { importaVotiInitORPCProcedure } from '~/server/api/voti/procedures/importaVotiInit.orpc'
+import { importaVotiProcessChunkORPCProcedure } from '~/server/api/voti/procedures/importaVotiProcessChunk.orpc'
+import { importaVotiRefreshStatsORPCProcedure } from '~/server/api/voti/procedures/importaVotiRefreshStats.orpc'
 // jobs
 import { runFormazioneReminderORPCProcedure } from '~/server/api/jobs/procedures/runFormazioneReminder.orpc'
 import { runProbabiliFormazioniORPCProcedure } from '~/server/api/jobs/procedures/runProbabiliFormazioni.orpc'
@@ -228,7 +230,9 @@ export const orpcRouter = {
     getStatisticaVoti: getStatisticaVotiORPCProcedure,
     update: updateVotoORPCProcedure,
     uploadVercel: uploadVercelORPCProcedure,
-    importaVotiGiornata: importaVotiGiornataORPCProcedure,
+    importaVotiInit: importaVotiInitORPCProcedure,
+    importaVotiProcessChunk: importaVotiProcessChunkORPCProcedure,
+    importaVotiRefreshStats: importaVotiRefreshStatsORPCProcedure,
   },
   jobs: {
     runFormazioneReminder: runFormazioneReminderORPCProcedure,

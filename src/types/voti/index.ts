@@ -34,3 +34,14 @@ export interface votoListType {
  * Usare `uploadVotoGiocatoreSchema.parse(...)` per validare prima dell'uso.
  */
 export type iVotoGiocatore = z.infer<typeof uploadVotoGiocatoreSchema>
+
+/**
+ * Dimensione del chunk di voti processato da UNA singola invocazione
+ * serverless durante l'importazione (vedi importaVotiService e
+ * useUploadVotiAdmin). Condivisa tra client e server per tenere il loop di
+ * chunking coerente con quanto il backend si aspetta di ricevere.
+ */
+export const IMPORTA_VOTI_CHUNK_SIZE = 10
+
+/** Ruoli per cui viene rigenerata la stored procedure statistiche. */
+export const IMPORTA_VOTI_RUOLI = ['P', 'D', 'C', 'A'] as const

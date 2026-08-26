@@ -1,16 +1,18 @@
 /**
  * importaVotiService — modulo deep per il caricamento voti di una giornata.
  *
- * Interfaccia: importaVotiGiornata({ idCalendario, fileName, fileData })
+ * Su Vercel (piano base) una singola invocazione serverless che esegue upload,
+ * reset, parsing, upsert di TUTTI i voti e refresh statistiche va facilmente in
+ * timeout. Per questo il flusso è stato spezzato in step indipendenti,
+ * richiamabili singolarmente dal client in un loop (vedi useUploadVotiAdmin):
  *
- * Il modulo orchestra internamente:
- *  1. Upload CSV su Vercel Blob
- *  2. Reset voti esistenti per la giornata
- *  3. Parsing del CSV FantaGazzetta
- *  4. Upsert voti in chunk (giocatori + auto-trasferimento + bonus/malus)
- *  5. Refresh stored procedure statistiche per ogni ruolo (P/D/C/A)
+ *  1. initImportaVoti      — upload CSV su Blob + reset voti + parsing CSV
+ *  2. processVotiChunk     — upsert di UN chunk di voti (giocatori + auto-trasferimento + bonus/malus)
+ *  3. refreshStatsRuolo    — refresh stored procedure statistiche per UN ruolo (P/D/C/A)
  *
- * Emette eventi di progresso via AsyncGenerator per feedback SSE al client.
+ * Ogni step è pensato per completarsi ben entro i limiti di durata di una
+ * function serverless; è compito del chiamante iterare finché tutti i voti
+ * sono stati processati e tutti i ruoli aggiornati.
  */
 
 import { parse } from 'csv-parse'
@@ -21,22 +23,12 @@ import { caricaVoti } from '~/server/services/caricaVotiService'
 import { uploadFile } from '~/utils/blobVercelUtils'
 import { normalizeNomeGiocatore } from '~/utils/giocatori'
 import { formatToDecimalValue } from '~/utils/numberUtils'
-import type { iVotoGiocatore } from '~/types/voti'
-
-// ─── Tipi evento ────────────────────────────────────────────────────────────
-
-export type ImportaVotiEvent =
-  | { step: 'upload'; progress: number }
-  | { step: 'reset'; progress: number }
-  | { step: 'read'; progress: number }
-  | { step: 'process'; progress: number }
-  | { step: 'stats'; ruolo: string; progress: number }
-  | { step: 'done'; progress: number; fileUrl: string }
+import { IMPORTA_VOTI_CHUNK_SIZE, IMPORTA_VOTI_RUOLI, type iVotoGiocatore } from '~/types/voti'
 
 // ─── Costanti ────────────────────────────────────────────────────────────────
-
-const CHUNK_SIZE = 10
-const RUOLI = ['P', 'D', 'C', 'A'] as const
+// Riesportate per compatibilità con eventuali import esistenti dal service.
+export const CHUNK_SIZE = IMPORTA_VOTI_CHUNK_SIZE
+export const RUOLI = IMPORTA_VOTI_RUOLI
 
 // ─── Helpers interni ─────────────────────────────────────────────────────────
 
@@ -101,7 +93,52 @@ async function resetVotiGiornata(idCalendario: number): Promise<void> {
   )
 }
 
-async function refreshStatsRuolo(ruolo: string): Promise<void> {
+// ─── Interfaccia pubblica ────────────────────────────────────────────────────
+// Ogni funzione qui sotto corrisponde a UNA sola invocazione serverless
+// richiamabile dal client. Nessuna di esse deve iterare sull'intero set di
+// voti/ruoli: la responsabilità di ripetere la chiamata fino al completamento
+// è del chiamante (vedi useUploadVotiAdmin.ts).
+
+/**
+ * Step 1/3 — upload CSV su Blob + reset voti esistenti + parsing.
+ * Operazione unica e rapida (nessun upsert massivo), eseguita in una sola
+ * invocazione. Restituisce l'elenco completo dei voti letti dal CSV: sarà il
+ * chiamante a suddividerli in chunk per lo step successivo.
+ */
+export async function initImportaVoti(input: {
+  idCalendario: number
+  fileName: string
+  fileData: string
+}): Promise<{ fileUrl: string; voti: iVotoGiocatore[] }> {
+  const blob = await uploadFile(input.fileData, input.fileName, 'voti')
+  console.info(`File voti caricato: ${blob.url}`)
+
+  await resetVotiGiornata(input.idCalendario)
+
+  const voti = await parseVotiCsv(blob.url)
+  console.info(`Voti letti dal CSV: ${voti.length}`)
+
+  return { fileUrl: blob.url, voti }
+}
+
+/**
+ * Step 2/3 — upsert di UN singolo chunk di voti (giocatori + auto-trasferimento
+ * + bonus/malus). Il chiamante deve invocarla ripetutamente, un chunk alla
+ * volta, finché tutti i voti non sono stati processati.
+ */
+export async function processVotiChunk(
+  voti: iVotoGiocatore[],
+  idCalendario: number,
+): Promise<{ processed: number }> {
+  await caricaVoti(voti, idCalendario)
+  return { processed: voti.length }
+}
+
+/**
+ * Step 3/3 — refresh della stored procedure statistiche per UN singolo ruolo
+ * (P/D/C/A). Il chiamante deve invocarla una volta per ciascun ruolo.
+ */
+export async function refreshStatsRuolo(ruolo: string): Promise<{ ruolo: string }> {
   console.info(`sp_RefreshStats_${ruolo} per stagione ${Configurazione.stagione}`)
   const queryRunner = AppDataSource.createQueryRunner()
   await queryRunner.connect()
@@ -115,42 +152,5 @@ async function refreshStatsRuolo(ruolo: string): Promise<void> {
   } finally {
     await queryRunner.release()
   }
-}
-
-// ─── Interfaccia pubblica ────────────────────────────────────────────────────
-
-export async function* importaVotiGiornata(input: {
-  idCalendario: number
-  fileName: string
-  fileData: string
-}): AsyncGenerator<ImportaVotiEvent> {
-  // 1. Upload CSV su Vercel Blob
-  const blob = await uploadFile(input.fileData, input.fileName, 'voti')
-  console.info(`File voti caricato: ${blob.url}`)
-  yield { step: 'upload', progress: 5 }
-
-  // 2. Reset voti esistenti per la giornata
-  await resetVotiGiornata(input.idCalendario)
-  yield { step: 'reset', progress: 10 }
-
-  // 3. Parsing CSV
-  const voti = await parseVotiCsv(blob.url)
-  console.info(`Voti letti dal CSV: ${voti.length}`)
-  yield { step: 'read', progress: 15 }
-
-  // 4. Upsert voti in chunk
-  for (let i = 0; i < voti.length; i += CHUNK_SIZE) {
-    const chunk = voti.slice(i, i + CHUNK_SIZE)
-    await caricaVoti(chunk, input.idCalendario)
-    const progress = 15 + Math.round(((i + chunk.length) / voti.length) * 70)
-    yield { step: 'process', progress }
-  }
-
-  // 5. Refresh statistiche per ruolo
-  for (let i = 0; i < RUOLI.length; i++) {
-    await refreshStatsRuolo(RUOLI[i])
-    yield { step: 'stats', ruolo: RUOLI[i], progress: 85 + (i + 1) * 3 }
-  }
-
-  yield { step: 'done', progress: 100, fileUrl: blob.url }
+  return { ruolo }
 }
