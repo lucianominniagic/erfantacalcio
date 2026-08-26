@@ -45,6 +45,13 @@ async function parseVotiCsv(fileUrl: string): Promise<iVotoGiocatore[]> {
   }
   const fileContent = await response.text()
 
+  // formatToDecimalValue restituisce NaN per token non numerici (es. "sv" =
+  // "senza voto"). calcBonusVoto sanitizza già NaN → 0 a valle, ma lo schema
+  // Zod di output/input delle procedure oRPC richiede number validi: si
+  // normalizza qui, così il dato che attraversa la validazione è sempre
+  // coerente con quello effettivamente salvato.
+  const orZero = (value: number): number => (isNaN(value) ? 0 : value)
+
   return new Promise((resolve, reject) => {
     parse(
       fileContent,
@@ -62,18 +69,30 @@ async function parseVotiCsv(fileUrl: string): Promise<iVotoGiocatore[]> {
             Nome: normalizeNomeGiocatore(line[`Col${Configurazione.pfColumnNome}`] ?? ''),
             Ruolo: normalizeNomeGiocatore(line[`Col${Configurazione.pfColumnRuolo}`] ?? ''),
             Squadra: line[`Col${Configurazione.pfColumnSquadra}`] ?? '',
-            Voto: formatToDecimalValue(line[`Col${Configurazione.pfColumnVoto}`] ?? '0'),
-            GolSegnati: formatToDecimalValue(line[`Col${Configurazione.pfColumnGolFatti}`] ?? '0'),
-            GolSubiti: formatToDecimalValue(line[`Col${Configurazione.pfColumnGolSubiti}`] ?? '0'),
-            Assist: formatToDecimalValue(line[`Col${Configurazione.pfColumnAssist}`] ?? '0'),
-            Ammonizione: formatToDecimalValue(line[`Col${Configurazione.pfColumnAmmo}`] ?? '0'),
-            Espulsione: formatToDecimalValue(line[`Col${Configurazione.pfColumnEspu}`] ?? '0'),
-            Autogol: formatToDecimalValue(line[`Col${Configurazione.pfColumnAutogol}`] ?? '0'),
-            RigoriErrati: formatToDecimalValue(
-              line[`Col${Configurazione.pfColumnRigErrato}`] ?? '0',
+            Voto: orZero(formatToDecimalValue(line[`Col${Configurazione.pfColumnVoto}`] ?? '0')),
+            GolSegnati: orZero(
+              formatToDecimalValue(line[`Col${Configurazione.pfColumnGolFatti}`] ?? '0'),
             ),
-            RigoriParati: formatToDecimalValue(
-              line[`Col${Configurazione.pfColumnRigParato}`] ?? '0',
+            GolSubiti: orZero(
+              formatToDecimalValue(line[`Col${Configurazione.pfColumnGolSubiti}`] ?? '0'),
+            ),
+            Assist: orZero(
+              formatToDecimalValue(line[`Col${Configurazione.pfColumnAssist}`] ?? '0'),
+            ),
+            Ammonizione: orZero(
+              formatToDecimalValue(line[`Col${Configurazione.pfColumnAmmo}`] ?? '0'),
+            ),
+            Espulsione: orZero(
+              formatToDecimalValue(line[`Col${Configurazione.pfColumnEspu}`] ?? '0'),
+            ),
+            Autogol: orZero(
+              formatToDecimalValue(line[`Col${Configurazione.pfColumnAutogol}`] ?? '0'),
+            ),
+            RigoriErrati: orZero(
+              formatToDecimalValue(line[`Col${Configurazione.pfColumnRigErrato}`] ?? '0'),
+            ),
+            RigoriParati: orZero(
+              formatToDecimalValue(line[`Col${Configurazione.pfColumnRigParato}`] ?? '0'),
             ),
           })
         },
