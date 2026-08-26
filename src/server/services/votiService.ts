@@ -53,18 +53,22 @@ export function calcBonusVoto(
     | 'bonusAutogol'
   >,
 ): BonusVotoResult {
+  const sanitize = (value: number): number => (Number.isNaN(value) ? 0 : value)
+
   return {
-    voto: input.Voto ?? 0,
-    ammonizione: input.Ammonizione === 1 ? config.bonusAmmonizione : 0,
-    espulsione: input.Espulsione === 1 ? config.bonusEspulsione : 0,
-    gol:
+    voto: sanitize(input.Voto ?? 0),
+    ammonizione: sanitize(input.Ammonizione === 1 ? config.bonusAmmonizione : 0),
+    espulsione: sanitize(input.Espulsione === 1 ? config.bonusEspulsione : 0),
+    gol: sanitize(
       input.Ruolo === 'P'
         ? input.GolSubiti * config.bonusGolSubito
         : input.GolSegnati * config.bonusGol,
-    assist: input.Assist * config.bonusAssist,
-    autogol: (input.Autogol * config.bonusAutogol) || 0, // Ensure +0, not -0
-    altriBonus:
+    ),
+    assist: sanitize(input.Assist * config.bonusAssist),
+    autogol: sanitize((input.Autogol * config.bonusAutogol) || 0),
+    altriBonus: sanitize(
       (input.RigoriParati ?? 0) * config.bonusRigoreParato +
-      (input.RigoriErrati ?? 0) * config.bonusRigoreSbagliato,
+        (input.RigoriErrati ?? 0) * config.bonusRigoreSbagliato,
+    ),
   }
 }
