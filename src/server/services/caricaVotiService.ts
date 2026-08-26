@@ -152,16 +152,23 @@ async function findAndCreateGiocatori(
     (g) => `${g.id_pf ?? ''}_${g.nome}`,
   )
 
-  // 4️⃣ Aggiorna eventuali id_pf mancanti
+  // 4️⃣ Aggiorna eventuali id_pf mancanti (giocatori trovati solo per nome,
+  // ma per cui il CSV importato fornisce un id_pf valido)
   await Promise.all(
     giocatori
-      .filter((g) => g?.id_pf)
+      .filter((g) => !g.id_pf)
       .map(async (g) => {
-        await trx.update(
-          Giocatori,
-          { idGiocatore: g.idGiocatore },
-          { id_pf: g.id_pf },
+        const matchingPlayer = players.find(
+          (p) => p.nome === g.nome && p.id_pf != null,
         )
+        if (matchingPlayer && matchingPlayer.id_pf != null) {
+          await trx.update(
+            Giocatori,
+            { idGiocatore: g.idGiocatore },
+            { id_pf: matchingPlayer.id_pf },
+          )
+          g.id_pf = matchingPlayer.id_pf
+        }
       }),
   )
 
