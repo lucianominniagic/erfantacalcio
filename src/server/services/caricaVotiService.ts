@@ -60,15 +60,13 @@ export async function caricaVoti(
         }
 
         const bonusData = calcBonusVoto(votoGiocatore, Configurazione)
-        const votoSave = trx.create(Voti, bonusData)
-
         const criteria = {
           idGiocatore: idGiocatore,
           idCalendario: idCalendario,
         }
         const isExists = await trx.exists(Voti, { where: criteria })
 
-        const votoData = _.omit(votoSave, ['idCalendario', 'idGiocatore'])
+        const votoData = _.omit(bonusData, ['idCalendario', 'idGiocatore'])
 
         if (isExists) {
           await trx.update(Voti, criteria, votoData)
