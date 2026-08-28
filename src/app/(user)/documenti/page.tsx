@@ -170,7 +170,7 @@ export default function DocumentiPage() {
           <DocumentCard
             title="Quotazioni Gazzetta"
             image="/images/giocatori.jpg"
-            href="/docs/QuotazioniExcel.xlsx"
+            href="/docs/QuotazioniExcel26-27.xlsx"
             fileType="xlsx"
           />
         </Grid>
@@ -178,7 +178,7 @@ export default function DocumentiPage() {
           <DocumentCard
             title="Quotazioni Gazzetta"
             image="/images/giocatori.jpg"
-            href="/docs/QuotazioniExcel.csv"
+            href="/docs/QuotazioniExcel26-27.csv"
             fileType="csv"
           />
         </Grid>
