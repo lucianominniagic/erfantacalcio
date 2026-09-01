@@ -13,6 +13,7 @@ import { toShirtTemplate } from '../selectColors'
 import { ShirtSVG } from '../selectColors/shirtSVG'
 import { GenericCard } from '~/components/cards'
 import type { MagliaType } from '~/schemas/maglia'
+import { magliaRichiedeSfondoBianco } from '~/utils/maglia'
 
 interface FormazioneVoto {
   titolare: boolean
@@ -108,6 +109,13 @@ export function FormazioneSquadra({
                         width={26}
                         height={22}
                         alt={g.Giocatore.nome}
+                        style={{
+                          backgroundColor: magliaRichiedeSfondoBianco(
+                            g.Giocatore.Trasferimenti[0]?.SquadraSerieA?.maglia,
+                          )
+                            ? '#fff'
+                            : undefined,
+                        }}
                       />
                     </Tooltip>
                   </Grid>
@@ -149,6 +157,13 @@ export function FormazioneSquadra({
                         width={26}
                         height={22}
                         alt={g.Giocatore.nome}
+                        style={{
+                          backgroundColor: magliaRichiedeSfondoBianco(
+                            g.Giocatore.Trasferimenti[0]?.SquadraSerieA?.maglia,
+                          )
+                            ? '#fff'
+                            : undefined,
+                        }}
                       />
                     </Tooltip>
                   </Grid>

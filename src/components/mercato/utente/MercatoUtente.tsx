@@ -35,6 +35,7 @@ import { Configurazione } from '~/config'
 import { formatDateFromIso } from '~/utils/dateUtils'
 import EsitoAggiudicazione from '~/components/mercato/shared/EsitoAggiudicazione'
 import AstaInChiaroUtente from '~/components/mercato/utente/AstaInChiaroUtente'
+import { magliaRichiedeSfondoBianco } from '~/utils/maglia'
 
 // ── Helper ───────────────────────────────────────────────────────────────────
 function fmtDate(d: Date | string) {
@@ -422,7 +423,12 @@ export default function MercatoUtente() {
                                 height={21}
                                 alt={g.nomeSquadraSerieA ?? ''}
                                 title={g.nomeSquadraSerieA ?? ''}
-                                style={{ objectFit: 'contain' }}
+                                style={{
+                                  objectFit: 'contain',
+                                  backgroundColor: magliaRichiedeSfondoBianco(g.maglia)
+                                    ? '#fff'
+                                    : undefined,
+                                }}
                               />
                             ) : (
                               <Box sx={{ width: 24, height: 21 }} />

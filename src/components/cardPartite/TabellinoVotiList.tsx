@@ -13,6 +13,7 @@ import {
 } from '@mui/icons-material'
 import Image from 'next/image'
 import { getShortName } from '~/utils/giocatori'
+import { magliaRichiedeSfondoBianco } from '~/utils/maglia'
 import { getColorByRuolo, getVotoBonus, type Tabellino } from './tabellinoHelpers'
 
 interface TabellinoVotiListProps {
@@ -39,6 +40,11 @@ export function TabellinoVotiList({ voti, onStatGiocatore }: TabellinoVotiListPr
                       width={30}
                       height={26}
                       alt={g.nome}
+                      style={{
+                        backgroundColor: magliaRichiedeSfondoBianco(g.magliaSquadraSerieA)
+                          ? '#fff'
+                          : undefined,
+                      }}
                     />
                   </Tooltip>
                 </Grid>
@@ -49,6 +55,11 @@ export function TabellinoVotiList({ voti, onStatGiocatore }: TabellinoVotiListPr
                       width={30}
                       height={26}
                       alt={g.nome}
+                      style={{
+                        backgroundColor: magliaRichiedeSfondoBianco(g.magliaSquadraSerieA)
+                          ? '#fff'
+                          : undefined,
+                      }}
                     />
                   </Tooltip>
                 </Grid>
@@ -118,6 +129,11 @@ export function TabellinoVotiList({ voti, onStatGiocatore }: TabellinoVotiListPr
                       width={30}
                       height={26}
                       alt={g.nome}
+                      style={{
+                        backgroundColor: magliaRichiedeSfondoBianco(g.magliaSquadraSerieA)
+                          ? '#fff'
+                          : undefined,
+                      }}
                     />
                   </Tooltip>
                 </Grid>
@@ -128,6 +144,11 @@ export function TabellinoVotiList({ voti, onStatGiocatore }: TabellinoVotiListPr
                       width={30}
                       height={26}
                       alt={g.nome}
+                      style={{
+                        backgroundColor: magliaRichiedeSfondoBianco(g.magliaSquadraSerieA)
+                          ? '#fff'
+                          : undefined,
+                      }}
                     />
                   </Tooltip>
                 </Grid>

@@ -30,6 +30,7 @@ import { orpc } from '~/utils/orpc'
 import { type Ruoli } from '~/types/common'
 import { getRuoloEsteso } from '~/utils/formazione'
 import { Configurazione } from '~/config'
+import { magliaRichiedeSfondoBianco } from '~/utils/maglia'
 
 // ── Helper: formatta la scadenza ────────────────────────────────────────────
 function fmtScadenza(d: Date | string) {
@@ -805,7 +806,12 @@ export default function AstaInChiaroUtente() {
                             height={21}
                             alt={g.nomeSquadraSerieA ?? ''}
                             title={g.nomeSquadraSerieA ?? ''}
-                            style={{ objectFit: 'contain' }}
+                            style={{
+                              objectFit: 'contain',
+                              backgroundColor: magliaRichiedeSfondoBianco(g.maglia)
+                                ? '#fff'
+                                : undefined,
+                            }}
                           />
                         ) : (
                           <Box sx={{ width: 24, height: 21 }} />

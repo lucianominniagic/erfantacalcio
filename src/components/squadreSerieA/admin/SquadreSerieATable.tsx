@@ -9,6 +9,7 @@ import {
 import { Edit } from '@mui/icons-material'
 import { type SquadraSerieAType } from '~/types/squadreSerieA'
 import { autosizeOptions } from '~/utils/datatable'
+import { magliaRichiedeSfondoBianco } from '~/utils/maglia'
 
 const PAGE_SIZE = 8
 
@@ -46,7 +47,12 @@ export default function SquadreSerieATable({
             height={21}
             alt={params.row.nome}
             title={params.row.nome}
-            style={{ objectFit: 'contain' }}
+            style={{
+              objectFit: 'contain',
+              backgroundColor: magliaRichiedeSfondoBianco(params.value as string)
+                ? '#fff'
+                : undefined,
+            }}
           />
         ) : null,
     },

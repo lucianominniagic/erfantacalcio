@@ -4,6 +4,7 @@ import { Box } from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import Image from 'next/image'
 import dayjs from 'dayjs'
+import { magliaRichiedeSfondoBianco } from '~/utils/maglia'
 
 interface TrasferimentoRow {
   id: number
@@ -42,6 +43,11 @@ const columns: GridColDef[] = [
         height={26}
         alt={params.row?.squadraSerieA as string}
         title={params.row?.squadraSerieA as string}
+        style={{
+          backgroundColor: magliaRichiedeSfondoBianco(params.row?.maglia as string)
+            ? '#fff'
+            : undefined,
+        }}
       />
     ),
     renderHeader: () => '',

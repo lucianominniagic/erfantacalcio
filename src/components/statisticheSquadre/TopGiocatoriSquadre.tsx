@@ -14,6 +14,7 @@ import { EmojiEvents, ScoreOutlined, StarOutlined } from '@mui/icons-material'
 import Image from 'next/image'
 import { useQuery } from '@tanstack/react-query'
 import { orpc } from '~/utils/orpc'
+import { magliaRichiedeSfondoBianco } from '~/utils/maglia'
 
 interface TopGiocatoriSquadreProps {
   idTornei: number[]
@@ -62,6 +63,9 @@ function StatRow({ icon, label, entry, formatValue }: RowProps) {
               height={20}
               alt={entry.squadraSerieA ?? ''}
               title={entry.squadraSerieA ?? ''}
+              style={{
+                backgroundColor: magliaRichiedeSfondoBianco(entry.maglia) ? '#fff' : undefined,
+              }}
             />
           ) : null}
           <Typography

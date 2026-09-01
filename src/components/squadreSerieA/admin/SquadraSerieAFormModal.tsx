@@ -11,6 +11,7 @@ import {
 import CheckIcon from '@mui/icons-material/CheckCircle'
 import Modal from '~/components/modal/Modal'
 import { type SquadraSerieAType } from '~/types/squadreSerieA'
+import { magliaRichiedeSfondoBianco } from '~/utils/maglia'
 
 interface SquadraSerieAFormModalProps {
   open: boolean
@@ -77,7 +78,14 @@ export default function SquadraSerieAFormModal({
                 width={48}
                 height={42}
                 alt={squadraSerieAInModifica.nome}
-                style={{ objectFit: 'contain' }}
+                style={{
+                  objectFit: 'contain',
+                  backgroundColor: magliaRichiedeSfondoBianco(
+                    squadraSerieAInModifica.maglia,
+                  )
+                    ? '#fff'
+                    : undefined,
+                }}
               />
             )}
           </Grid>

@@ -1,6 +1,7 @@
 'use client'
 
 import { Box, Chip, List, ListItem, Stack, Typography } from '@mui/material'
+import { magliaRichiedeSfondoBianco } from '~/utils/maglia'
 interface GiocatoreStats {
   id: number
   nome: string
@@ -57,7 +58,10 @@ export default function GiocatoriRankingList({
                 height={21}
                 alt={g.squadraSerieA ?? ''}
                 title={g.squadraSerieA ?? ''}
-                style={{ objectFit: 'contain' }}
+                style={{
+                  objectFit: 'contain',
+                  backgroundColor: magliaRichiedeSfondoBianco(g.maglia) ? '#fff' : undefined,
+                }}
               />
             ) : (
               <Box sx={{ width: 24, height: 21 }} />
