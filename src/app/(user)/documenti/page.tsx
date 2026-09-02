@@ -170,9 +170,8 @@ export default function DocumentiPage() {
           <DocumentCard
             title="Quotazioni Gazzetta"
             image="/images/giocatori.jpg"
-            // href="/docs/QuotazioniExcel26-27.xlsx"
-            href="https://static2.gazzettaobjects.it/static_images/infografiche/FREEMIUM/fantacampionato_listone_26-27.pdf"
-            fileType="pdf"
+            href="/docs/QuotazioniExcel26-27.xlsx"
+            fileType="xlsx"
           />
         </Grid>
         <Grid item xs={6} sm={3}>
