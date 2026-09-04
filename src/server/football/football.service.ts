@@ -139,5 +139,5 @@ export async function orchestrateSerieAOverview(
 export const getSerieAOverview: () => Promise<SerieAOverview> = unstable_cache(
   async (): Promise<SerieAOverview> => orchestrateSerieAOverview(footballDataClient),
   ['serie-a-overview'],
-  { revalidate: false },
+  { revalidate: 3600 },
 )
