@@ -94,8 +94,8 @@ export async function orchestrateSerieAOverview(
 
   // Step 2: chiamate in parallelo — errori propagati da Promise.all
   const [latestRaw, nextRaw, scorers] = await Promise.all([
-    provider.getMatches({ matchday: metadata.currentMatchday }), // latest: giornata corrente
-    provider.getMatches({ matchday: metadata.currentMatchday + 1 }), // next: giornata successiva
+    provider.getMatches({ matchday: metadata.currentMatchday - 1}), // latest: giornata corrente
+    provider.getMatches({ matchday: metadata.currentMatchday }), // next: giornata successiva
     provider.getScorers(),
   ])
 
