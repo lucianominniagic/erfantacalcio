@@ -162,6 +162,7 @@ export const footballDataClient: IFootballProvider = {
     )
     const raw = await fetchJson(path)
     const parsed = fdStandingsResponseSchema.parse(raw)
+    console.dir(mapStandings(parsed))
     return mapStandings(parsed)
   },
 
