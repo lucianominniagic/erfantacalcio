@@ -141,3 +141,15 @@ export const getSerieAOverview: () => Promise<SerieAOverview> = unstable_cache(
   ['serie-a-overview'],
   { revalidate: 3600 },
 )
+
+/**
+ * Versione NON cached di `orchestrateSerieAOverview`.
+ *
+ * Esegue sempre le chiamate al provider, bypassando `unstable_cache`.
+ * Utile per pagine/route che richiedono dati sempre freschi o per debug.
+ */
+export async function getSerieAOverviewUncached(
+  provider: IFootballProvider = footballDataClient,
+): Promise<SerieAOverview> {
+  return orchestrateSerieAOverview(provider)
+}
