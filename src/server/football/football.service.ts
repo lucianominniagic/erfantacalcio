@@ -93,6 +93,7 @@ export async function orchestrateSerieAOverview(
   const { standings, metadata } = await provider.getStandings()
 
   // Step 2: chiamate in parallelo — errori propagati da Promise.all
+  console.log('Current matchday:', metadata.currentMatchday)
   const [latestRaw, nextRaw, scorers] = await Promise.all([
     provider.getMatches({ matchday: metadata.currentMatchday - 1}), // latest: giornata corrente
     provider.getMatches({ matchday: metadata.currentMatchday }), // next: giornata successiva
@@ -138,5 +139,5 @@ export async function orchestrateSerieAOverview(
 export const getSerieAOverview: () => Promise<SerieAOverview> = unstable_cache(
   async (): Promise<SerieAOverview> => orchestrateSerieAOverview(footballDataClient),
   ['serie-a-overview'],
-  { revalidate: 3600 },
+  { revalidate: false },
 )
