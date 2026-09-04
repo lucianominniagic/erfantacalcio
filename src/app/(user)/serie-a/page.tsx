@@ -14,7 +14,7 @@
  */
 import { Box, Grid, Typography } from '@mui/material'
 import { SportsSoccer } from '@mui/icons-material'
-import { getSerieAOverview } from '~/server/football/football.service'
+import { getSerieAOverviewUncached } from '~/server/football/football.service'
 import SerieAStandings from '~/components/football/SerieAStandings'
 import LatestMatches from '~/components/football/LatestMatches'
 import NextMatches from '~/components/football/NextMatches'
@@ -31,7 +31,7 @@ export const metadata = {
 }
 
 export default async function SerieAPage() {
-  const overview = await getSerieAOverview()
+  const overview = await getSerieAOverviewUncached()
   const { metadata: meta } = overview
 
   return (
