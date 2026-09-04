@@ -15,7 +15,7 @@
  * Il token API non è mai esposto nella risposta.
  */
 import { NextResponse } from 'next/server'
-import { getSerieAOverviewUncached } from '~/server/football/football.service'
+import { getSerieAOverview   } from '~/server/football/football.service'
 
 // Revalidate a livello di segmento Next.js (complementare a unstable_cache)
 export const revalidate = 3600
@@ -24,7 +24,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse> {
   try {
-    const overview = await getSerieAOverviewUncached()
+    const overview = await getSerieAOverview()
     return NextResponse.json(overview)
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
