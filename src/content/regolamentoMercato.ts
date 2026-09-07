@@ -124,16 +124,17 @@ export const SEZIONE_SESSIONI_MERCATO: Section = {
   blocks: [
     {
       type: 'p',
-      text: 'Durante il periodo della sosta nazionali (orientativamente 11-17 novembre e 24-30 marzo) verrà creata una sessione di mercato sul sito.',
+      text: 'Durante la sosta delle nazionali (orientativamente 10-17 novembre e 24-30 marzo) viene creata una sessione di mercato sul sito dal pannello "Crea nuova sessione".',
     },
     { type: 'p', text: 'La sessione di mercato prevede la scelta di:' },
     {
       type: 'list',
       items: [
         'una finestra temporale (data inizio, data fine)',
-        'soldi reali o fantamilioni',
-        'un numero massimo di proposte di acquisto per ciascuna squadra',
-        'un numero massimo di giocatori acquistabili per ciascuna squadra',
+        'valuta d\'asta: Euro + restanti fantamilioni convertiti (5 FM = 1€)',
+        'numero massimo di proposte di acquisto: 10',
+        'numero massimo di giocatori acquistabili: 2',
+        'tipo di asta: al buio'
       ],
     },
     {

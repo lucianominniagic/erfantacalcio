@@ -120,8 +120,8 @@ const sections: Section[] = [
             type: 'table',
             headers: ['Fase', 'Vincente', 'Perdente'],
             rows: [
-              ['Semifinali', '90€', '150€'],
-              ['Finale', '70€', '110€'],
+              ['Semifinali', '140€', '140€'],
+              ['Finale', '60€', '140€'],
             ],
           },
           {
@@ -278,7 +278,19 @@ const sections: Section[] = [
       },
       {
         type: 'p',
-        text: 'Ciascun presidente ritardatario potrà, in autonomia, solo confermare la formazione precedente e giocarsela senza handicap.',
+        text: 'Ciascun presidente ritardatario deve, in autonomia, confermare la formazione precedente.',
+      },
+      {
+        type: 'p',
+        text: "In caso di formazione non data nelle fasi di semifinale o finale (champions o coppa perdenti) la penalità prevede:.",
+      },
+      {
+        type: 'list',
+        items: [
+          '4 punti sul conteggio',
+          '10€ di multa',
+          'Gioca la partita con la formazione precedente (di champions o coppa perdenti)'
+        ],
       },
     ],
   },
