@@ -287,7 +287,7 @@ const sections: Section[] = [
       {
         type: 'list',
         items: [
-          '4 punti sul conteggio',
+          '4 punti in meno sul conteggio della partita',
           '10€ di multa',
           'Gioca la partita con la formazione precedente (di champions o coppa perdenti)'
         ],
