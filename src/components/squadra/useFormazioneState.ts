@@ -54,6 +54,7 @@ export function useFormazioneState() {
     panca: data.panca,
     modulo: data.modulo,
     isLoading: data.isLoading,
+    ultimoAggiornamentoProbabili: data.ultimoAggiornamentoProbabili,
     // action state
     idGiocatoreStat: actions.idGiocatoreStat,
     setIdGiocatoreStat: actions.setIdGiocatoreStat,

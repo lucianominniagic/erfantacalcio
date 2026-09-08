@@ -36,6 +36,9 @@ interface ProbabiliResult {
   giocatoriAssociati?: number
   giocatoriNonAssociati?: number
   fetchedAt?: string
+  fonteSosfantaOk?: boolean
+  fonteSosfantaErrore?: string
+  giocatoriMediati?: number
 }
 
 // ─── Helper di formattazione italiano ────────────────────────────────────────
@@ -64,6 +67,12 @@ function formatProbabiliResult(data: ProbabiliResult): string {
     righe.push(`Associati: ${data.giocatoriAssociati}`)
   if (data.giocatoriNonAssociati !== undefined)
     righe.push(`Non associati: ${data.giocatoriNonAssociati}`)
+  if (data.fonteSosfantaOk === true)
+    righe.push(`Sosfanta.com: OK (${data.giocatoriMediati ?? 0} mediati)`)
+  else if (data.fonteSosfantaOk === false)
+    righe.push(
+      `Sosfanta.com: non disponibile (${data.fonteSosfantaErrore ?? 'errore sconosciuto'})`,
+    )
   return righe.join(' · ')
 }
 

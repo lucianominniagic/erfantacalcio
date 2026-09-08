@@ -127,4 +127,15 @@ export const optionalEnv = {
   NEXT_PUBLIC_BONUS_MODULO_541: Number(
     process.env.NEXT_PUBLIC_BONUS_MODULO_541 ?? '0',
   ),
+  /**
+   * Kill-switch opzionale per la fonte secondaria sosfanta.com usata nel
+   * calcolo (media) delle percentuali di probabili formazioni. Se non
+   * impostata, o impostata a un valore diverso da 'false', la fonte
+   * sosfanta.com è considerata abilitata (default: enabled). Permette di
+   * disattivarla in produzione senza un nuovo deploy.
+   */
+  PROBABILI_FORMAZIONI_SOSFANTA_ENABLED: z
+    .enum(['true', 'false'])
+    .optional()
+    .parse(process.env.PROBABILI_FORMAZIONI_SOSFANTA_ENABLED),
 }

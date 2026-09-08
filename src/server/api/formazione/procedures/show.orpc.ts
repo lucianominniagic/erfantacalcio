@@ -9,6 +9,7 @@ import { GiocatoreFormazioneType } from '~/types/squadre'
 import { moduloDefault } from '~/utils/formazione'
 import {
   Formazioni,
+  ProbabileFormazioni,
   ProbabileFormazioneGiocatori,
   Voti,
 } from '~/server/db/entities'
@@ -51,6 +52,11 @@ export const showFormazioneORPCProcedure = protectedProcedure
           },
         })
         const rosa = await getRosaDisponibile(idSquadraUtente)
+        const primaProbabileFormazione = await ProbabileFormazioni.findOne({
+          select: { fetchedAt: true },
+          where: {},
+          order: { idProbabileFormazione: 'ASC' },
+        })
         const probabiliFormazioni = await ProbabileFormazioneGiocatori.find({
           select: {
             idGiocatore: true,
@@ -95,6 +101,8 @@ export const showFormazioneORPCProcedure = protectedProcedure
           data: prossimoCalendario.data,
           modulo: datiFormazione?.modulo ?? moduloDefault,
           giocatori: formazione,
+          ultimoAggiornamentoProbabili:
+            primaProbabileFormazione?.fetchedAt ?? null,
         }
 
         return dati

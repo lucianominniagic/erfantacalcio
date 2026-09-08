@@ -198,6 +198,8 @@ export function useFormazioneData() {
     setIdPartita: (id: number) => dispatch({ type: 'SET_ID_PARTITA', payload: id }),
     isLoading,
     formazioneList,
+    ultimoAggiornamentoProbabili:
+      formazioneList.data?.ultimoAggiornamentoProbabili ?? null,
     dispatch,
   }
 }

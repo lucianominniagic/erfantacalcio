@@ -5,13 +5,24 @@
  * 1. Controlla la finestra temporale: [dataInizio - 48h, dataInizio) Europe/Rome,
  *    salvo bypass esplicito. Se fuori finestra → restituisce risultato skipped
  *    senza toccare il DB.
- * 2. Scarica l'HTML dalla fonte.
- * 3. Valida il parsing completo (parser lancia se non valido).
- * 4. In una singola transazione:
+ * 2. Scarica l'HTML dalla fonte primaria (fantacalcio.it) e, in parallelo,
+ *    dalla fonte secondaria (sosfanta.com).
+ * 3. Valida il parsing completo della fonte primaria (il parser lancia se
+ *    non valido — la fonte primaria è obbligatoria, se fallisce l'intero job
+ *    fallisce). La fonte secondaria è best-effort: un suo fallimento (fetch,
+ *    parsing, o flag di configurazione disattivato) NON fa fallire il job,
+ *    si prosegue semplicemente senza media.
+ * 4. Associa ogni giocatore sosfanta a un idGiocatore tramite lo stesso
+ *    matcher usato per fantacalcio, riusando gli stessi candidati per
+ *    stagione. I giocatori sosfanta non associabili vengono scartati:
+ *    sosfanta contribuisce solo una probabilità aggiuntiva per giocatori già
+ *    identificati dalla fonte primaria, mai nuove righe.
+ * 5. In una singola transazione:
  *    a. Elimina tutti i ProbabileFormazioneGiocatore
  *    b. Elimina tutti i ProbabileFormazione
- *    c. Inserisce nuovi ProbabileFormazione + ProbabileFormazioneGiocatore
- * 5. Restituisce conteggi.
+ *    c. Inserisce nuovi ProbabileFormazione + ProbabileFormazioneGiocatore,
+ *       con probabilita = media fantacalcio/sosfanta quando disponibile
+ * 6. Restituisce conteggi.
  *
  * Il giornataSerieA salvato è quello della prossima giornata DB, non il numero
  * eventualmente presente nella pagina fonte.
@@ -36,10 +47,15 @@ import {
   type MatchProbabile,
 } from './probabiliFormazioniParser'
 import {
+  parseSosfantaProbabiliFormazioni,
+  type SosfantaPlayer,
+} from './probabiliFormazioniSosfantaParser'
+import {
   loadCandidatiPerStagione,
   matchGiocatore,
   type CandidatesByTeam,
 } from './probabiliFormazioniMatcher'
+import { mergeProbabilita } from './probabiliFormazioniMerge'
 import { Configurazione } from '~/config'
 import { isInProbabiliFormazioniWindow } from './probabiliFormazioniWindow'
 
@@ -48,6 +64,8 @@ dayjs.extend(timezone)
 
 const TIMEZONE = 'Europe/Rome'
 const SOURCE_URL = 'https://www.fantacalcio.it/probabili-formazioni-serie-a'
+const SOSFANTA_SOURCE_URL =
+  'https://www.sosfanta.com/lista-formazioni/probabili-formazioni-serie-a/'
 const WINDOW_HOURS = 48
 
 // ─── Tipi pubblici ────────────────────────────────────────────────────────────
@@ -62,6 +80,12 @@ export interface ProbabiliFormazioniResult {
   giocatoriAssociati?: number
   giocatoriNonAssociati?: number
   fetchedAt?: string
+  /** true se fetch+parsing della fonte secondaria sosfanta.com è riuscito */
+  fonteSosfantaOk?: boolean
+  /** Presente solo quando fonteSosfantaOk === false */
+  fonteSosfantaErrore?: string
+  /** Numero di giocatori la cui probabilita è una media fantacalcio/sosfanta */
+  giocatoriMediati?: number
 }
 
 // ─── Entry point ─────────────────────────────────────────────────────────────
@@ -112,11 +136,8 @@ export async function importaProbabiliFormazioni(
     }
   }
 
-  // ── 4. Fetch HTML ─────────────────────────────────────────────────────────
-  console.log(`[probabiliFormazioni] Fetch da ${SOURCE_URL}`)
-  const html = await fetchHtml(SOURCE_URL)
-
-  // ── 5. Parsing ────────────────────────────────────────────────────────────
+  // ── 4. Fetch + parsing in parallelo (fantacalcio.it obbligatoria, ─────────
+  //      sosfanta.com best-effort) ───────────────────────────────────────────
   const expectedMatchCount = await SerieA.count({
     where: { giornata: giornataSerieA },
   })
@@ -126,16 +147,87 @@ export async function importaProbabiliFormazioni(
     )
   }
 
-  const { matches } = parseProbabiliFormazioni(html, {
-    expectedMatchCount,
-    minimumPlayersPerTeam: 12,
-  })
-  console.log(`[probabiliFormazioni] Parsed ${matches.length} match`)
+  const fantacalcioTask = async (): Promise<{ matches: MatchProbabile[] }> => {
+    console.log(`[probabiliFormazioni] Fetch da ${SOURCE_URL}`)
+    const html = await fetchHtml(SOURCE_URL)
+    return parseProbabiliFormazioni(html, {
+      expectedMatchCount,
+      minimumPlayersPerTeam: 12,
+    })
+  }
 
-  // ── 6. Carica candidati giocatori per la stagione ─────────────────────────
+  const sosfantaAbilitata = Configurazione.probabiliFormazioniSosfantaEnabled
+  const sosfantaTask = async (): Promise<{ players: SosfantaPlayer[] }> => {
+    if (!sosfantaAbilitata) {
+      throw new Error('Fonte disabilitata da configurazione')
+    }
+    console.log(`[probabiliFormazioni] Fetch da ${SOSFANTA_SOURCE_URL}`)
+    const html = await fetchHtml(SOSFANTA_SOURCE_URL)
+    return parseSosfantaProbabiliFormazioni(html)
+  }
+
+  const [fantacalcioSettled, sosfantaSettled] = await Promise.allSettled([
+    fantacalcioTask(),
+    sosfantaTask(),
+  ])
+
+  // La fonte primaria resta obbligatoria: un suo fallimento fa fallire il job.
+  if (fantacalcioSettled.status === 'rejected') {
+    throw fantacalcioSettled.reason
+  }
+  const { matches } = fantacalcioSettled.value
+  console.log(
+    `[probabiliFormazioni] Parsed ${matches.length} match (fantacalcio.it)`,
+  )
+
+  let fonteSosfantaOk = false
+  let fonteSosfantaErrore: string | undefined
+  let sosfantaPlayers: SosfantaPlayer[] = []
+
+  if (sosfantaSettled.status === 'fulfilled') {
+    fonteSosfantaOk = true
+    sosfantaPlayers = sosfantaSettled.value.players
+    console.log(
+      `[probabiliFormazioni] Parsed ${sosfantaPlayers.length} giocatori (sosfanta.com)`,
+    )
+  } else {
+    fonteSosfantaErrore =
+      sosfantaSettled.reason instanceof Error
+        ? sosfantaSettled.reason.message
+        : String(sosfantaSettled.reason)
+    console.warn(
+      `[probabiliFormazioni] Fonte sosfanta.com non disponibile: ${fonteSosfantaErrore}`,
+    )
+  }
+
+  // ── 5. Carica candidati giocatori per la stagione ─────────────────────────
   const stagione = Configurazione.stagione
   const candidatiPerSquadra: CandidatesByTeam =
     await loadCandidatiPerStagione(stagione)
+
+  // ── 6. Associa i giocatori sosfanta a idGiocatore (stesso matcher/candidati)
+  const sosfantaProbabilitaPerGiocatore = new Map<number, number>()
+  if (fonteSosfantaOk) {
+    for (const player of sosfantaPlayers) {
+      const { idGiocatore } = matchGiocatore(
+        player.nome,
+        '',
+        player.squadra,
+        candidatiPerSquadra,
+      )
+      if (idGiocatore === null) continue
+
+      if (sosfantaProbabilitaPerGiocatore.has(idGiocatore)) {
+        console.warn(
+          `[probabiliFormazioni] Giocatore sosfanta duplicato per idGiocatore=${idGiocatore} ` +
+            `(${player.nome}), mantengo la prima occorrenza`,
+        )
+        continue
+      }
+
+      sosfantaProbabilitaPerGiocatore.set(idGiocatore, player.probabilita)
+    }
+  }
 
   // ── 7. Transazione ────────────────────────────────────────────────────────
   const fetchedAt = new Date()
@@ -144,18 +236,23 @@ export async function importaProbabiliFormazioni(
     giornataSerieA,
     fetchedAt,
     candidatiPerSquadra,
+    sosfantaProbabilitaPerGiocatore,
   )
 
   console.log(
     `[probabiliFormazioni] Completato: ${stats.matchImportati} match, ` +
       `${stats.giocatoriImportati} giocatori ` +
-      `(${stats.giocatoriAssociati} associati, ${stats.giocatoriNonAssociati} non associati)`,
+      `(${stats.giocatoriAssociati} associati, ${stats.giocatoriNonAssociati} non associati), ` +
+      `sosfanta=${fonteSosfantaOk ? 'ok' : `non disponibile (${fonteSosfantaErrore})`}, ` +
+      `${stats.giocatoriMediati} mediati`,
   )
 
   return {
     status: 'ok',
     giornataSerieA,
     fetchedAt: fetchedAt.toISOString(),
+    fonteSosfantaOk,
+    ...(fonteSosfantaErrore !== undefined ? { fonteSosfantaErrore } : {}),
     ...stats,
   }
 }
@@ -190,6 +287,7 @@ interface PersistStats {
   giocatoriImportati: number
   giocatoriAssociati: number
   giocatoriNonAssociati: number
+  giocatoriMediati: number
 }
 
 async function persistiInTransazione(
@@ -197,11 +295,13 @@ async function persistiInTransazione(
   giornataSerieA: number,
   fetchedAt: Date,
   candidatiPerSquadra: CandidatesByTeam,
+  sosfantaProbabilitaPerGiocatore: Map<number, number>,
 ): Promise<PersistStats> {
   let matchImportati = 0
   let giocatoriImportati = 0
   let giocatoriAssociati = 0
   let giocatoriNonAssociati = 0
+  let giocatoriMediati = 0
 
   await AppDataSource.transaction(async (trx) => {
     // a. Elimina prima tutti i ProbabileFormazioneGiocatore
@@ -238,13 +338,31 @@ async function persistiInTransazione(
           giocatoriNonAssociati++
         }
 
+        // Media con sosfanta.com quando disponibile per lo stesso idGiocatore
+        // (senza idGiocatore non è possibile alcuna media: nome/ruolo/squadra/
+        // stato restano quelli di fantacalcio.it, invariati).
+        let probabilita = g.probabilita
+        if (matchResult.idGiocatore !== null) {
+          const merged = mergeProbabilita({
+            idGiocatore: matchResult.idGiocatore,
+            probabilitaFantacalcio: g.probabilita,
+            probabilitaSosfanta:
+              sosfantaProbabilitaPerGiocatore.get(matchResult.idGiocatore) ??
+              null,
+          })
+          probabilita = merged.probabilita
+          if (merged.fonteSosfantaUsata) {
+            giocatoriMediati++
+          }
+        }
+
         return trx.create(ProbabileFormazioneGiocatore, {
           idProbabileFormazione: savedPf.idProbabileFormazione,
           idGiocatore: matchResult.idGiocatore,
           nomeGiocatore: g.nome,
           squadra: g.squadra,
           ruolo: g.ruolo,
-          probabilita: g.probabilita,
+          probabilita,
           stato: g.stato,
         })
       })
@@ -261,5 +379,6 @@ async function persistiInTransazione(
     giocatoriImportati,
     giocatoriAssociati,
     giocatoriNonAssociati,
+    giocatoriMediati,
   }
 }

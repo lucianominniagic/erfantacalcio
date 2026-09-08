@@ -33,6 +33,7 @@ import { pfConfig } from './pf'
 import { datesConfig } from './dates'
 import { urlsConfig } from './urls'
 import { seasonConfig } from './season'
+import { optionalEnv } from '~/env.mjs'
 
 // ─── Configurazione — shape identica a src/config.ts (backward compat) ────────
 
@@ -90,4 +91,13 @@ export const Configurazione = {
   // ── Dates
   dataGiornata1SerieA: datesConfig.dataGiornata1SerieA,
   mercatoSettembre: datesConfig.mercatoSettembre,
+
+  // ── Probabili formazioni
+  /**
+   * Kill-switch per la fonte secondaria sosfanta.com usata per la media
+   * delle percentuali di probabili formazioni. Default: abilitata (true)
+   * se la variabile d'ambiente non è impostata o è diversa da 'false'.
+   */
+  probabiliFormazioniSosfantaEnabled:
+    optionalEnv.PROBABILI_FORMAZIONI_SOSFANTA_ENABLED !== 'false',
 } as const

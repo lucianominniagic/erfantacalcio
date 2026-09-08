@@ -60,6 +60,7 @@ function Formazione() {
     confirmingPrecedente,
     handleConfirmPrecedente,
     formazioneGiaRilasciata,
+    ultimoAggiornamentoProbabili,
   } = useFormazioneState()
 
   const theme = useTheme()
@@ -260,6 +261,18 @@ function Formazione() {
                 Reset
               </Button>
             </Grid>
+            {ultimoAggiornamentoProbabili && (
+              <Grid item xs={12}>
+                <Typography variant="caption" color="text.secondary">
+                  Probabilità di titolarità aggiornate al{' '}
+                  {new Intl.DateTimeFormat('it-IT', {
+                    dateStyle: 'short',
+                    timeStyle: 'short',
+                  }).format(new Date(ultimoAggiornamentoProbabili))}{' '}
+                  · Fonti: fantacalcio.it, sosfanta.com
+                </Typography>
+              </Grid>
+            )}
           </>
         ) : (
           <FormazioneDisabilitata
