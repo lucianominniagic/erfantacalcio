@@ -2,9 +2,11 @@
  * probabiliFormazioniService — orchestrazione del cron "probabili formazioni".
  *
  * Flusso:
- * 1. Controlla la finestra temporale: [dataInizio - 48h, dataInizio) Europe/Rome,
- *    salvo bypass esplicito. Se fuori finestra → restituisce risultato skipped
- *    senza toccare il DB.
+ * 1. Controlla la finestra temporale: [dataInizio - 72h, dataInizio) Europe/Rome,
+ *    salvo bypass esplicito. Se fuori finestra → restituisce risultato skipped.
+ *    Se la finestra è scaduta (giornata già iniziata, non "troppo presto"),
+ *    elimina le probabili formazioni ormai stale per quella giornata prima
+ *    di uscire (delete idempotente, cascata su ProbabileFormazioneGiocatore).
  * 2. Scarica l'HTML dalla fonte primaria (fantacalcio.it) e, in parallelo,
  *    dalla fonte secondaria (sosfanta.com).
  * 3. Valida il parsing completo della fonte primaria (il parser lancia se
@@ -66,7 +68,7 @@ const TIMEZONE = 'Europe/Rome'
 const SOURCE_URL = 'https://www.fantacalcio.it/probabili-formazioni-serie-a'
 const SOSFANTA_SOURCE_URL =
   'https://www.sosfanta.com/lista-formazioni/probabili-formazioni-serie-a/'
-const WINDOW_HOURS = 48
+const WINDOW_HOURS = 72
 
 // ─── Tipi pubblici ────────────────────────────────────────────────────────────
 
@@ -127,6 +129,24 @@ export async function importaProbabiliFormazioni(
     )
 
     if (!inWindow) {
+      // Finestra scaduta (giornata già iniziata, non solo "troppo presto"):
+      // elimina tutti i dati ormai stale (come in persistiInTransazione,
+      // non serve filtrare per giornata: la tabella contiene solo l'ultima
+      // giornata importata). Idempotente — se già eliminati da un run
+      // precedente non trova nulla da cancellare. La delete su
+      // ProbabileFormazione basta da sola: la FK verso
+      // ProbabileFormazioneGiocatore ha `onDelete: 'CASCADE'`.
+      if (now.toDate().getTime() >= dataInizioTz.toDate().getTime()) {
+        const deleted = await ProbabileFormazione.createQueryBuilder()
+          .delete()
+          .execute()
+        if ((deleted.affected ?? 0) > 0) {
+          console.log(
+            `[probabiliFormazioni] Finestra scaduta: eliminate ${deleted.affected} probabili formazioni`,
+          )
+        }
+      }
+
       return {
         status: 'skipped',
         reason:
