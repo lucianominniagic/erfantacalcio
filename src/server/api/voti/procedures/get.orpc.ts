@@ -40,10 +40,10 @@ export const getVotoORPCProcedure = adminProcedure
       espulsione: result.espulsione ?? null,
       gol:
         result.Giocatore.ruolo === 'P'
-          ? (result.gol ?? 0 / Configurazione.bonusGolSubito)
-          : (result.gol ?? 0 / Configurazione.bonusGol),
-      assist: result.assist ?? 0 / Configurazione.bonusAssist,
-      autogol: result.autogol ?? 0 / Configurazione.bonusAutogol,
+          ? (result.gol ?? 0) / Configurazione.bonusGolSubito
+          : (result.gol ?? 0) / Configurazione.bonusGol,
+      assist: (result.assist ?? 0) / Configurazione.bonusAssist,
+      autogol: (result.autogol ?? 0) / Configurazione.bonusAutogol,
       altriBonus: result.altriBonus ?? null,
       torneo: result.Calendario.Torneo.nome,
       gruppoFase: result.Calendario.Torneo.gruppoFase,
