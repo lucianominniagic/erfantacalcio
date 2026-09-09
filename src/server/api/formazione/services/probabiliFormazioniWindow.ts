@@ -1,4 +1,5 @@
-const WINDOW_MILLISECONDS = 48 * 60 * 60 * 1000
+export const WINDOW_HOURS = 72
+const WINDOW_MILLISECONDS = WINDOW_HOURS * 60 * 60 * 1000
 
 export function isInProbabiliFormazioniWindow(
   now: Date,

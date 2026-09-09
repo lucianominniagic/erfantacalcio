@@ -410,19 +410,19 @@ describe('matchGiocatore', () => {
   describe('isInProbabiliFormazioniWindow', () => {
     const dataInizio = new Date('2026-08-22T18:45:00.000Z')
 
-    it('include esattamente le 48 ore precedenti', () => {
+    it('include esattamente le 72 ore precedenti', () => {
       expect(
         isInProbabiliFormazioniWindow(
-          new Date('2026-08-20T18:45:00.000Z'),
+          new Date('2026-08-19T18:45:00.000Z'),
           dataInizio,
         ),
       ).toBe(true)
     })
 
-    it('esclude gli istanti precedenti alle 48 ore', () => {
+    it('esclude gli istanti precedenti alle 72 ore', () => {
       expect(
         isInProbabiliFormazioniWindow(
-          new Date('2026-08-20T18:44:59.999Z'),
+          new Date('2026-08-19T18:44:59.999Z'),
           dataInizio,
         ),
       ).toBe(false)

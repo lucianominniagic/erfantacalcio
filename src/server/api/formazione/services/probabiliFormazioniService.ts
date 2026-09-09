@@ -59,7 +59,10 @@ import {
 } from './probabiliFormazioniMatcher'
 import { mergeProbabilita } from './probabiliFormazioniMerge'
 import { Configurazione } from '~/config'
-import { isInProbabiliFormazioniWindow } from './probabiliFormazioniWindow'
+import {
+  isInProbabiliFormazioniWindow,
+  WINDOW_HOURS,
+} from './probabiliFormazioniWindow'
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -68,7 +71,6 @@ const TIMEZONE = 'Europe/Rome'
 const SOURCE_URL = 'https://www.fantacalcio.it/probabili-formazioni-serie-a'
 const SOSFANTA_SOURCE_URL =
   'https://www.sosfanta.com/lista-formazioni/probabili-formazioni-serie-a/'
-const WINDOW_HOURS = 72
 
 // ─── Tipi pubblici ────────────────────────────────────────────────────────────
 
