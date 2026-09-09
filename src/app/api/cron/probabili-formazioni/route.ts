@@ -34,7 +34,7 @@ export async function GET(request: Request) {
     )
     await initializeDBConnection()
     const result = await importaProbabiliFormazioni()
-    console.log(`[cron/probabili-formazioni] Fine: status=${result.status}`)
+    console.log(`[cron/probabili-formazioni] Fine: status=${result.status} reason=${result.reason}`)
     return NextResponse.json({ ok: true, ...result })
   } catch (error) {
     console.error('[cron/probabili-formazioni]', error)
