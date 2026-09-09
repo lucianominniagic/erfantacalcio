@@ -12,8 +12,15 @@ const defaultSquadraSerieA: SquadraSerieAType = {
 }
 
 export function useSquadreSerieAAdmin() {
-  const [errorMessageModal, setErrorMessageModal] = useState('')
-  const [messageModal, setMessageModal] = useState('')
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean
+    message: string
+    severity: 'success' | 'warning' | 'error'
+  }>({
+    open: false,
+    message: '',
+    severity: 'success',
+  })
   const [openModalEdit, setOpenModalEdit] = useState(false)
   const [squadraSerieAInModifica, setSquadraSerieAInModifica] =
     useState<SquadraSerieAType>(defaultSquadraSerieA)
@@ -35,8 +42,6 @@ export function useSquadreSerieAAdmin() {
     )
     if (!squadra) return
     setSquadraSerieAInModifica(squadra)
-    setErrorMessageModal('')
-    setMessageModal('')
     setOpenModalEdit(true)
   }
 
@@ -47,25 +52,32 @@ export function useSquadreSerieAAdmin() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setErrorMessageModal('')
-    setMessageModal('')
     const responseVal = squadraSerieASchema.safeParse(squadraSerieAInModifica)
     if (!responseVal.success) {
-      setErrorMessageModal(
-        responseVal.error.issues
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: responseVal.error.issues
           .map(
             (issue) => `campo ${issue.path.toLocaleString()}: ${issue.message}`,
           )
           .join(', '),
-      )
+      })
     } else {
       try {
         await updateSquadraSerieA.mutateAsync(responseVal.data)
-        setMessageModal('Salvataggio completato')
+        handleModalClose()
+        setSnackbar({
+          open: true,
+          severity: 'success',
+          message: 'Salvataggio completato',
+        })
       } catch {
-        setErrorMessageModal(
-          'Si è verificato un errore nel salvataggio della squadra',
-        )
+        setSnackbar({
+          open: true,
+          severity: 'error',
+          message: 'Si è verificato un errore nel salvataggio della squadra',
+        })
       }
     }
   }
@@ -83,11 +95,11 @@ export function useSquadreSerieAAdmin() {
     data,
     openModalEdit,
     squadraSerieAInModifica,
-    errorMessageModal,
-    messageModal,
+    snackbar,
     // derived
     isLoading: squadreSerieAList.isLoading,
     // handlers
+    handleCloseSnackbar: () => setSnackbar((s) => ({ ...s, open: false })),
     handleEdit,
     handleModalClose,
     handleSubmit,

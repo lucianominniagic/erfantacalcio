@@ -1,6 +1,5 @@
 'use client'
 import {
-  Alert,
   Box,
   Button,
   Divider,
@@ -14,7 +13,6 @@ import {
   Switch,
   TextField,
 } from '@mui/material'
-import CheckIcon from '@mui/icons-material/CheckCircle'
 import Modal from '~/components/modal/Modal'
 import { type votoType } from '~/types/voti'
 import { Configurazione } from '~/config'
@@ -22,8 +20,6 @@ import { Configurazione } from '~/config'
 interface VotoEditModalProps {
   open: boolean
   voto: votoType
-  errorMessage: string
-  message: string
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
   onClose: () => void
   onVotoChange: (updated: votoType) => void
@@ -32,8 +28,6 @@ interface VotoEditModalProps {
 export default function VotoEditModal({
   open,
   voto,
-  errorMessage,
-  message,
   onSubmit,
   onClose,
   onVotoChange,
@@ -43,16 +37,6 @@ export default function VotoEditModal({
       <Divider />
       <Box component="form" onSubmit={onSubmit} noValidate sx={{ mt: 1 }}>
         <Grid container spacing={0}>
-          <Grid item xs={12}>
-            {errorMessage && (
-              <Stack sx={{ width: '100%' }} spacing={0}>
-                <Alert icon={<CheckIcon fontSize="inherit" />} severity="error">
-                  {errorMessage}
-                </Alert>
-              </Stack>
-            )}
-          </Grid>
-
           <Grid item xs={12}>
             <Stack direction="row" spacing={1} justifyContent="flex-start">
               <TextField
@@ -218,19 +202,6 @@ export default function VotoEditModal({
                 Chiudi
               </Button>
             </Stack>
-          </Grid>
-
-          <Grid item xs={12}>
-            {message && (
-              <Stack sx={{ width: '100%' }} spacing={0}>
-                <Alert
-                  icon={<CheckIcon fontSize="inherit" />}
-                  severity="success"
-                >
-                  {message}
-                </Alert>
-              </Stack>
-            )}
           </Grid>
         </Grid>
       </Box>

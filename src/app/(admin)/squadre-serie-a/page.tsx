@@ -1,4 +1,5 @@
 'use client'
+import { Alert, Snackbar } from '@mui/material'
 import { SportsSoccer } from '@mui/icons-material'
 import PageHeader from '~/components/PageHeader'
 import { useSquadreSerieAAdmin } from '~/components/squadreSerieA/admin/useSquadreSerieAAdmin'
@@ -10,9 +11,9 @@ export default function SquadreSerieA() {
     data,
     openModalEdit,
     squadraSerieAInModifica,
-    errorMessageModal,
-    messageModal,
+    snackbar,
     isLoading,
+    handleCloseSnackbar,
     handleEdit,
     handleModalClose,
     handleSubmit,
@@ -26,12 +27,26 @@ export default function SquadreSerieA() {
       <SquadraSerieAFormModal
         open={openModalEdit}
         squadraSerieAInModifica={squadraSerieAInModifica}
-        errorMessage={errorMessageModal}
-        message={messageModal}
         onSubmit={handleSubmit}
         onClose={handleModalClose}
         onInputChange={handleInputChange}
       />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   )
 }

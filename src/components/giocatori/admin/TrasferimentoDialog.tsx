@@ -1,6 +1,5 @@
 'use client'
 import {
-  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -14,7 +13,6 @@ import {
   Stack,
   TextField,
 } from '@mui/material'
-import CheckIcon from '@mui/icons-material/CheckCircle'
 import dayjs from 'dayjs'
 import { type AutocompleteOption } from '~/components/autocomplete/GenericAutocomplete'
 import { type trasferimentoType } from '~/types/trasferimenti'
@@ -29,8 +27,6 @@ interface TrasferimentoDialogProps {
   selectedTrasferimentoStagione: string | undefined
   squadre: AutocompleteOption[]
   squadreSerieA: AutocompleteOption[]
-  errorMessage: string
-  message: string
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
   onCancel: () => void
   onDelete: () => void
@@ -51,8 +47,6 @@ export default function TrasferimentoDialog({
   selectedTrasferimentoStagione,
   squadre,
   squadreSerieA,
-  errorMessage,
-  message,
   onSubmit,
   onCancel,
   onDelete,
@@ -176,17 +170,6 @@ export default function TrasferimentoDialog({
             }
             InputLabelProps={{ shrink: true }}
           />
-
-          {message && (
-            <Alert icon={<CheckIcon fontSize="inherit" />} severity="success">
-              {message}
-            </Alert>
-          )}
-          {errorMessage && (
-            <Alert icon={<CheckIcon fontSize="inherit" />} severity="error">
-              {errorMessage}
-            </Alert>
-          )}
         </Stack>
       </DialogContent>
 

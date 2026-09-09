@@ -1,5 +1,5 @@
 'use client'
-import { Button, Stack, Typography } from '@mui/material'
+import { Alert, Button, Snackbar, Stack, Typography } from '@mui/material'
 import { PersonSearch } from '@mui/icons-material'
 import GenericAutocomplete from '~/components/autocomplete/GenericAutocomplete'
 import PageHeader from '~/components/PageHeader'
@@ -19,10 +19,7 @@ export default function Giocatori() {
     squadre,
     squadreSerieA,
     trasferimenti,
-    errorMessageGiocatore,
-    messageGiocatore,
-    errorMessageTrasferimento,
-    messageTrasferimento,
+    snackbar,
     giocatore,
     trasferimento,
     trasferimentiIsLoading,
@@ -30,6 +27,7 @@ export default function Giocatori() {
     giocatoreNome,
     giocatoreDialogOpen,
     trasferimentoDialogOpen,
+    handleCloseSnackbar,
     handleGiocatoreSelected,
     handleOpenGiocatoreDialog,
     handleCloseGiocatoreDialog,
@@ -118,8 +116,6 @@ export default function Giocatori() {
         open={giocatoreDialogOpen}
         giocatore={giocatore}
         selectedGiocatoreId={selectedGiocatoreId}
-        errorMessage={errorMessageGiocatore}
-        message={messageGiocatore}
         onSubmit={handleUpsertGiocatore}
         onCancel={handleCancelGiocatore}
         onDelete={handleDeleteGiocatore}
@@ -136,14 +132,28 @@ export default function Giocatori() {
         selectedTrasferimentoStagione={selectedTrasferimentoStagione}
         squadre={squadre}
         squadreSerieA={squadreSerieA}
-        errorMessage={errorMessageTrasferimento}
-        message={messageTrasferimento}
         onSubmit={handleUpsertTrasferimento}
         onCancel={handleCancelTrasferimento}
         onDelete={handleDeleteTrasferimento}
         onInputChange={handleInputChange}
         onSelectChange={handleSelectChange}
       />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Stack>
   )
 }

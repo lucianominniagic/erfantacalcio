@@ -1,5 +1,5 @@
 'use client'
-import { Stack } from '@mui/material'
+import { Alert, Snackbar, Stack } from '@mui/material'
 import { GradingOutlined } from '@mui/icons-material'
 import GenericAutocomplete from '~/components/autocomplete/GenericAutocomplete'
 import PageHeader from '~/components/PageHeader'
@@ -14,11 +14,11 @@ export default function Voti() {
     giocatori,
     voti,
     voto,
-    errorMessageVoto,
-    messageVoto,
+    snackbar,
     votiIsLoading,
     votiIsSuccess,
     setVoto,
+    handleCloseSnackbar,
     handleGiocatoreSelected,
     handleEditVoto,
     handleUpdateVoto,
@@ -48,12 +48,26 @@ export default function Voti() {
       <VotoEditModal
         open={openModalEdit}
         voto={voto}
-        errorMessage={errorMessageVoto}
-        message={messageVoto}
         onSubmit={handleUpdateVoto}
         onClose={handleModalClose}
         onVotoChange={setVoto}
       />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   )
 }

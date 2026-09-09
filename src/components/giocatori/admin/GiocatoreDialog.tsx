@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import {
-  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -18,7 +17,6 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material'
-import CheckIcon from '@mui/icons-material/CheckCircle'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import SearchIcon from '@mui/icons-material/Search'
 import { type GiocatoreType } from '~/types/giocatori'
@@ -28,8 +26,6 @@ interface GiocatoreDialogProps {
   open: boolean
   giocatore: GiocatoreType
   selectedGiocatoreId: number | undefined
-  errorMessage: string
-  message: string
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
   onCancel: () => void
   onDelete: () => void
@@ -47,8 +43,6 @@ export default function GiocatoreDialog({
   open,
   giocatore,
   selectedGiocatoreId,
-  errorMessage,
-  message,
   onSubmit,
   onCancel,
   onDelete,
@@ -180,17 +174,6 @@ export default function GiocatoreDialog({
               onInputChange(e, 'anagrafica')
             }
           />
-
-          {message && (
-            <Alert icon={<CheckIcon fontSize="inherit" />} severity="success">
-              {message}
-            </Alert>
-          )}
-          {errorMessage && (
-            <Alert icon={<CheckIcon fontSize="inherit" />} severity="error">
-              {errorMessage}
-            </Alert>
-          )}
         </Stack>
       </DialogContent>
 

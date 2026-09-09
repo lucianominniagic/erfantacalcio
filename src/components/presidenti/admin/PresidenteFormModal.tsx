@@ -1,6 +1,5 @@
 'use client'
 import {
-  Alert,
   Box,
   Button,
   Checkbox,
@@ -11,15 +10,12 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import CheckIcon from '@mui/icons-material/CheckCircle'
 import Modal from '~/components/modal/Modal'
 import { type SquadraType } from '~/types/squadre'
 
 interface PresidenteFormModalProps {
   open: boolean
   utenteInModifica: SquadraType
-  errorMessage: string
-  message: string
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
   onClose: () => void
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
@@ -28,8 +24,6 @@ interface PresidenteFormModalProps {
 export default function PresidenteFormModal({
   open,
   utenteInModifica,
-  errorMessage,
-  message,
   onSubmit,
   onClose,
   onInputChange,
@@ -39,15 +33,6 @@ export default function PresidenteFormModal({
       <Divider />
       <Box component="form" onSubmit={onSubmit} noValidate sx={{ mt: 1 }}>
         <Grid container spacing={0}>
-          <Grid item xs={12}>
-            {errorMessage && (
-              <Stack sx={{ width: '100%' }} spacing={0}>
-                <Alert icon={<CheckIcon fontSize="inherit" />} severity="error">
-                  {errorMessage}
-                </Alert>
-              </Stack>
-            )}
-          </Grid>
           <Grid item xs={12}>
             <TextField
               margin="normal"
@@ -169,18 +154,6 @@ export default function PresidenteFormModal({
                 Aggiorna dati
               </Button>
             </Stack>
-          </Grid>
-          <Grid item xs={12}>
-            {message && (
-              <Stack sx={{ width: '100%' }} spacing={0}>
-                <Alert
-                  icon={<CheckIcon fontSize="inherit" />}
-                  severity="success"
-                >
-                  {message}
-                </Alert>
-              </Stack>
-            )}
           </Grid>
         </Grid>
       </Box>

@@ -1,4 +1,5 @@
 'use client'
+import { Alert, Snackbar } from '@mui/material'
 import { Groups } from '@mui/icons-material'
 import PageHeader from '~/components/PageHeader'
 import { usePresidentiAdmin } from '~/components/presidenti/admin/usePresidentiAdmin'
@@ -10,9 +11,9 @@ export default function Presidenti() {
     data,
     openModalEdit,
     utenteInModifica,
-    errorMessageModal,
-    messageModal,
+    snackbar,
     isLoading,
+    handleCloseSnackbar,
     handleEdit,
     handleModalClose,
     handleSubmit,
@@ -30,12 +31,26 @@ export default function Presidenti() {
       <PresidenteFormModal
         open={openModalEdit}
         utenteInModifica={utenteInModifica}
-        errorMessage={errorMessageModal}
-        message={messageModal}
         onSubmit={handleSubmit}
         onClose={handleModalClose}
         onInputChange={handleInputChange}
       />
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </>
   )
 }

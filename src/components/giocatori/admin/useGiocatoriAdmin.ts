@@ -44,10 +44,15 @@ export function useGiocatoriAdmin() {
   const [trasferimenti, setTrasferimenti] = useState<trasferimentoListType[]>(
     [],
   )
-  const [errorMessageGiocatore, setErrorMessageGiocatore] = useState('')
-  const [messageGiocatore, setMessageGiocatore] = useState('')
-  const [errorMessageTrasferimento, setErrorMessageTrasferimento] = useState('')
-  const [messageTrasferimento, setMessageTrasferimento] = useState('')
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean
+    message: string
+    severity: 'success' | 'warning' | 'error'
+  }>({
+    open: false,
+    message: '',
+    severity: 'success',
+  })
   const [giocatore, setGiocatore] = useState<GiocatoreType>(defaultGiocatore)
   const [trasferimento, setTrasferimento] =
     useState<trasferimentoType>(defaultTrasferimento)
@@ -161,8 +166,6 @@ export function useGiocatoriAdmin() {
       giocatoreOne.data
     ) {
       setGiocatore(giocatoreOne.data)
-      setErrorMessageGiocatore('')
-      setMessageGiocatore('')
     }
   }, [giocatoreOne.data, giocatoreOne.isSuccess, giocatoreOne.isFetching])
 
@@ -173,8 +176,6 @@ export function useGiocatoriAdmin() {
       trasferimentoOne.data
     ) {
       setTrasferimento(trasferimentoOne.data)
-      setErrorMessageTrasferimento('')
-      setMessageTrasferimento('')
     }
   }, [
     trasferimentoOne.data,
@@ -189,8 +190,6 @@ export function useGiocatoriAdmin() {
       setSelectedTrasferimentoId(undefined)
       setSelectedTrasferimentoStagione(Configurazione.stagione)
     }
-    setErrorMessageTrasferimento('')
-    setMessageTrasferimento('')
     setTrasferimentoDialogOpen(true)
   }
 
@@ -199,8 +198,6 @@ export function useGiocatoriAdmin() {
     setSelectedTrasferimentoId(undefined)
     setSelectedTrasferimentoStagione(Configurazione.stagione)
     setTrasferimento(defaultTrasferimento)
-    setErrorMessageTrasferimento('')
-    setMessageTrasferimento('')
     document?.getElementById('search_items')?.focus()
   }
 
@@ -215,8 +212,6 @@ export function useGiocatoriAdmin() {
     setSelectedTrasferimentoStagione(Configurazione.stagione)
     setGiocatore(defaultGiocatore)
     setTrasferimento(defaultTrasferimento)
-    setErrorMessageGiocatore('')
-    setMessageGiocatore('')
     await handleCancelTrasferimento()
   }
 
@@ -226,8 +221,6 @@ export function useGiocatoriAdmin() {
       setSelectedGiocatoreId(undefined)
       setSelectedGiocatore(undefined)
     }
-    setErrorMessageGiocatore('')
-    setMessageGiocatore('')
     setGiocatoreDialogOpen(true)
   }
 
@@ -236,8 +229,6 @@ export function useGiocatoriAdmin() {
     setGiocatore(
       selectedGiocatoreId ? giocatore : defaultGiocatore,
     )
-    setErrorMessageGiocatore('')
-    setMessageGiocatore('')
     document?.getElementById('search_items')?.focus()
   }
 
@@ -248,8 +239,6 @@ export function useGiocatoriAdmin() {
     setSelectedGiocatore(undefined)
     setSelectedTrasferimentoId(undefined)
     setSelectedTrasferimentoStagione(Configurazione.stagione)
-    setErrorMessageGiocatore('')
-    setMessageGiocatore('')
     document?.getElementById('search_items')?.focus()
   }
 
@@ -257,17 +246,17 @@ export function useGiocatoriAdmin() {
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault()
-    setErrorMessageGiocatore('')
-    setMessageGiocatore('')
     const responseVal = giocatoreSchema.safeParse(giocatore)
     if (!responseVal.success) {
-      setErrorMessageGiocatore(
-        responseVal.error.issues
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: responseVal.error.issues
           .map(
             (issue) => `campo ${issue.path.toLocaleString()}: ${issue.message}`,
           )
           .join(', '),
-      )
+      })
     } else {
       try {
         const idGiocatore = await giocatoreUpsert.mutateAsync({
@@ -279,18 +268,23 @@ export function useGiocatoriAdmin() {
         })
         setSelectedGiocatoreId(idGiocatore)
         setSelectedTrasferimentoStagione(Configurazione.stagione)
-        setMessageGiocatore('Salvataggio completato')
+        await handleCancelGiocatore()
+        setSnackbar({
+          open: true,
+          severity: 'success',
+          message: 'Salvataggio completato',
+        })
       } catch {
-        setErrorMessageGiocatore(
-          "Si è verificato un errore nel salvataggio dell'anagrafica giocatore",
-        )
+        setSnackbar({
+          open: true,
+          severity: 'error',
+          message: "Si è verificato un errore nel salvataggio dell'anagrafica giocatore",
+        })
       }
     }
   }
 
   const handleDeleteGiocatore = async () => {
-    setErrorMessageGiocatore('')
-    setMessageGiocatore('')
     if (selectedGiocatoreId) {
       try {
         await giocatoreDelete.mutateAsync(selectedGiocatoreId)
@@ -301,10 +295,17 @@ export function useGiocatoriAdmin() {
         setSelectedTrasferimentoId(undefined)
         setSelectedTrasferimentoStagione(Configurazione.stagione)
         document?.getElementById('search_items')?.focus()
+        setSnackbar({
+          open: true,
+          severity: 'success',
+          message: 'Eliminazione completata',
+        })
       } catch {
-        setErrorMessageGiocatore(
-          "Si è verificato un errore nell'eliminazione del giocatore",
-        )
+        setSnackbar({
+          open: true,
+          severity: 'error',
+          message: "Si è verificato un errore nell'eliminazione del giocatore",
+        })
       }
     }
   }
@@ -319,17 +320,17 @@ export function useGiocatoriAdmin() {
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault()
-    setErrorMessageTrasferimento('')
-    setMessageTrasferimento('')
     const responseVal = trasferimentoSchema.safeParse(trasferimento)
     if (!responseVal.success) {
-      setErrorMessageTrasferimento(
-        responseVal.error.issues
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: responseVal.error.issues
           .map(
             (issue) => `campo ${issue.path.toLocaleString()}: ${issue.message}`,
           )
           .join(', '),
-      )
+      })
     } else {
       try {
         const idTrasferimento = await trasferimentoUpsert.mutateAsync({
@@ -343,18 +344,23 @@ export function useGiocatoriAdmin() {
         })
         setSelectedTrasferimentoId(idTrasferimento)
         setSelectedTrasferimentoStagione(Configurazione.stagione)
-        setMessageTrasferimento('Salvataggio completato')
+        await handleCancelTrasferimento()
+        setSnackbar({
+          open: true,
+          severity: 'success',
+          message: 'Salvataggio completato',
+        })
       } catch {
-        setErrorMessageTrasferimento(
-          'Si è verificato un errore nel salvataggio del trasferimento giocatore',
-        )
+        setSnackbar({
+          open: true,
+          severity: 'error',
+          message: 'Si è verificato un errore nel salvataggio del trasferimento giocatore',
+        })
       }
     }
   }
 
   const handleDeleteTrasferimento = async () => {
-    setErrorMessageTrasferimento('')
-    setMessageTrasferimento('')
     try {
       await trasferimentoDelete.mutateAsync(trasferimento.idTrasferimento)
       setTrasferimentoDialogOpen(false)
@@ -362,10 +368,17 @@ export function useGiocatoriAdmin() {
       setSelectedTrasferimentoStagione(Configurazione.stagione)
       setTrasferimento(defaultTrasferimento)
       document?.getElementById('search_items')?.focus()
+      setSnackbar({
+        open: true,
+        severity: 'success',
+        message: 'Eliminazione completata',
+      })
     } catch {
-      setErrorMessageTrasferimento(
-        "Si è verificato un errore nell'eliminazione del trasferimento",
-      )
+      setSnackbar({
+        open: true,
+        severity: 'error',
+        message: "Si è verificato un errore nell'eliminazione del trasferimento",
+      })
     }
   }
 
@@ -425,10 +438,7 @@ export function useGiocatoriAdmin() {
     squadre,
     squadreSerieA,
     trasferimenti,
-    errorMessageGiocatore,
-    messageGiocatore,
-    errorMessageTrasferimento,
-    messageTrasferimento,
+    snackbar,
     giocatore,
     trasferimento,
     // derived
@@ -438,6 +448,8 @@ export function useGiocatoriAdmin() {
     giocatoreDialogOpen,
     trasferimentoDialogOpen,
     // handlers
+    handleCloseSnackbar: () =>
+      setSnackbar((s) => ({ ...s, open: false })),
     handleGiocatoreSelected,
     handleOpenGiocatoreDialog,
     handleCloseGiocatoreDialog,

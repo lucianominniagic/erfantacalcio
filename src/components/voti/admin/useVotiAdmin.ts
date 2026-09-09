@@ -25,8 +25,15 @@ export function useVotiAdmin() {
   const [selectedVotoId, setSelectedVotoId] = useState<number>()
   const [giocatori, setGiocatori] = useState<AutocompleteOption[]>([])
   const [voti, setVoti] = useState<votoListType[]>([])
-  const [errorMessageVoto, setErrorMessageVoto] = useState('')
-  const [messageVoto, setMessageVoto] = useState('')
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean
+    message: string
+    severity: 'success' | 'warning' | 'error'
+  }>({
+    open: false,
+    message: '',
+    severity: 'success',
+  })
   const [voto, setVoto] = useState<votoType>(defaultVoto)
 
   // ── queries ───────────────────────────────────────────────────────────────
@@ -71,8 +78,6 @@ export function useVotiAdmin() {
   useEffect(() => {
     if (!votoOne.isFetching && votoOne.isSuccess && votoOne.data) {
       setVoto(votoOne.data)
-      setErrorMessageVoto('')
-      setMessageVoto('')
       setOpenModalEdit(true)
       document?.getElementById('voto')?.focus()
     }
@@ -96,20 +101,24 @@ export function useVotiAdmin() {
 
   const handleUpdateVoto = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setErrorMessageVoto('')
-    setMessageVoto('')
     const responseVal = votoSchema.safeParse(voto)
 
     if (!responseVal.success) {
-      setErrorMessageVoto(
-        responseVal.error.issues
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: responseVal.error.issues
           .map(
             (issue) => `campo ${issue.path.toLocaleString()}: ${issue.message}`,
           )
           .join(', '),
-      )
+      })
     } else if (voto.ammonizione !== 0 && voto.espulsione !== 0) {
-      setErrorMessageVoto('Selezionare ammonizione o espulsione')
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: 'Selezionare ammonizione o espulsione',
+      })
     } else {
       try {
         await votoUpdate.mutateAsync({
@@ -123,12 +132,18 @@ export function useVotiAdmin() {
           autogol: voto.autogol ?? 0,
           altriBonus: voto.altriBonus ?? 0,
         })
-        setSelectedVotoId(undefined)
-        setMessageVoto('Salvataggio completato')
+        await handleModalClose()
+        setSnackbar({
+          open: true,
+          severity: 'success',
+          message: 'Salvataggio completato',
+        })
       } catch {
-        setErrorMessageVoto(
-          'Si è verificato un errore nel salvataggio del voto giocatore',
-        )
+        setSnackbar({
+          open: true,
+          severity: 'error',
+          message: 'Si è verificato un errore nel salvataggio del voto giocatore',
+        })
       }
     }
   }
@@ -145,13 +160,13 @@ export function useVotiAdmin() {
     giocatori,
     voti,
     voto,
-    errorMessageVoto,
-    messageVoto,
+    snackbar,
     // derived
     votiIsLoading: votiList.isLoading,
     votiIsSuccess: votiList.isSuccess,
     // handlers
     setVoto,
+    handleCloseSnackbar: () => setSnackbar((s) => ({ ...s, open: false })),
     handleGiocatoreSelected,
     handleEditVoto,
     handleUpdateVoto,

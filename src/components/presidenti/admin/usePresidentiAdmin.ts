@@ -20,8 +20,15 @@ const defaultUtente: SquadraType = {
 
 export function usePresidentiAdmin() {
   const [idSquadra, setIdSquadra] = useState<number>()
-  const [errorMessageModal, setErrorMessageModal] = useState('')
-  const [messageModal, setMessageModal] = useState('')
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean
+    message: string
+    severity: 'success' | 'warning' | 'error'
+  }>({
+    open: false,
+    message: '',
+    severity: 'success',
+  })
   const [data, setData] = useState<SquadraType[]>([])
   const [openModalEdit, setOpenModalEdit] = useState(false)
   const [utenteInModifica, setUtenteInModifica] =
@@ -49,8 +56,6 @@ export function usePresidentiAdmin() {
   useEffect(() => {
     if (!squadra.isFetching && squadra.isSuccess && squadra.data) {
       setUtenteInModifica(squadra.data)
-      setErrorMessageModal('')
-      setMessageModal('')
       setOpenModalEdit(true)
     }
   }, [squadra.data, squadra.isSuccess, squadra.isFetching])
@@ -67,25 +72,32 @@ export function usePresidentiAdmin() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setErrorMessageModal('')
-    setMessageModal('')
     const responseVal = utenteSchema.safeParse(utenteInModifica)
     if (!responseVal.success) {
-      setErrorMessageModal(
-        responseVal.error.issues
+      setSnackbar({
+        open: true,
+        severity: 'warning',
+        message: responseVal.error.issues
           .map(
             (issue) => `campo ${issue.path.toLocaleString()}: ${issue.message}`,
           )
           .join(', '),
-      )
+      })
     } else {
       try {
         await updateSquadra.mutateAsync(utenteInModifica)
-        setMessageModal('Salvataggio completato')
+        handleModalClose()
+        setSnackbar({
+          open: true,
+          severity: 'success',
+          message: 'Salvataggio completato',
+        })
       } catch {
-        setErrorMessageModal(
-          "Si è verificato un errore nel salvataggio dell'utente",
-        )
+        setSnackbar({
+          open: true,
+          severity: 'error',
+          message: "Si è verificato un errore nel salvataggio dell'utente",
+        })
       }
     }
   }
@@ -104,11 +116,11 @@ export function usePresidentiAdmin() {
     data,
     openModalEdit,
     utenteInModifica,
-    errorMessageModal,
-    messageModal,
+    snackbar,
     // derived
     isLoading: squadreList.isLoading,
     // handlers
+    handleCloseSnackbar: () => setSnackbar((s) => ({ ...s, open: false })),
     handleEdit,
     handleModalClose,
     handleSubmit,
