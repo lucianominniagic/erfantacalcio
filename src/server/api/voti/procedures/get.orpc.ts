@@ -38,10 +38,7 @@ export const getVotoORPCProcedure = adminProcedure
       voto: result.voto ?? null,
       ammonizione: result.ammonizione ?? null,
       espulsione: result.espulsione ?? null,
-      gol:
-        result.Giocatore.ruolo === 'P'
-          ? (result.gol ?? 0)
-          : (result.gol ?? 0),
+      gol: Math.abs(result.gol ?? 0),
       assist: result.assist ?? 0,
       autogol: result.autogol ?? 0,
       altriBonus: result.altriBonus ?? null,
