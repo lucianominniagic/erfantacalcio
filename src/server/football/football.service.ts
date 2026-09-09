@@ -93,10 +93,22 @@ export async function orchestrateSerieAOverview(
   const { standings, metadata } = await provider.getStandings()
 
   // Step 2: chiamate in parallelo — errori propagati da Promise.all
-  console.log('Current matchday:', metadata.currentMatchday)
+  const now = new Date()
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+  const sevenDaysAhead = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
+  const toDateString = (date: Date): string => date.toISOString().split('T')[0]!
+
   const [latestRaw, nextRaw, scorers] = await Promise.all([
-    provider.getMatches({ matchday: metadata.currentMatchday - 1}), // latest: giornata corrente
-    provider.getMatches({ matchday: metadata.currentMatchday }), // next: giornata successiva
+    provider.getMatches({
+      status: 'FINISHED',
+      dateFrom: toDateString(sevenDaysAgo),
+      dateTo: toDateString(now),
+    }), // latest: giornata corrente
+    provider.getMatches({
+      status: 'TIMED',
+      dateFrom: toDateString(now),
+      dateTo: toDateString(sevenDaysAhead),
+    }), // next: giornata successiva
     provider.getScorers(),
   ])
 

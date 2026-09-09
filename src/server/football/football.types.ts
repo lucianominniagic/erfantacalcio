@@ -43,6 +43,8 @@ export interface FootballMatchFilters {
   matchday?: number
   /** Anno di inizio stagione (es. 2024). Omettere = stagione corrente. */
   season?: number
+  /** Stato della partita (es. 'FINISHED', 'TIMED'). */
+  status?: string
 }
 
 // ---------------------------------------------------------------------------
