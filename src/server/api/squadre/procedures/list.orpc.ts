@@ -1,9 +1,17 @@
+import { z } from 'zod'
 import { publicProcedure } from '~/server/orpc'
 import { Utenti } from '~/server/db/entities'
 
 export const listSquadreORPCProcedure = publicProcedure
   .route({ method: 'GET', path: '/squadre/list', summary: 'Lista squadre fantasy' })
-  .handler(async ({ context }) => {
+  .input(
+    z
+      .object({
+        ordinaAlfabetico: z.boolean().optional(),
+      })
+      .optional(),
+  )
+  .handler(async ({ context, input }) => {
     try {
       let utenti = await Utenti.find({
         select: {
@@ -24,7 +32,7 @@ export const listSquadreORPCProcedure = publicProcedure
 
       const idSquadraUtenteConnesso = context.session?.user?.idSquadra
 
-      if (idSquadraUtenteConnesso) {
+      if (!input?.ordinaAlfabetico && idSquadraUtenteConnesso) {
         const userSquadraIndex = utenti.findIndex(
           (squadra) => squadra.idUtente === idSquadraUtenteConnesso,
         )

@@ -7,6 +7,7 @@ export const listSquadreSerieAORPCProcedure = publicProcedure
     try {
       return await SquadreSerieA.find({
         select: { idSquadraSerieA: true, nome: true, maglia: true },
+        order: { nome: 'asc' },
       })
     } catch (error) {
       console.error('Si è verificato un errore', error)

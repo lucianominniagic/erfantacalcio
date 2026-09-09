@@ -84,6 +84,7 @@ export function useGiocatoriAdmin() {
   )
   const squadreList = useQuery(
     orpc.squadre.list.queryOptions({
+      input: { ordinaAlfabetico: true },
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
     }),
