@@ -1,6 +1,5 @@
 import { z } from 'zod'
 import { adminProcedure } from '~/server/orpc'
-import { Configurazione } from '~/config'
 import { Voti } from '~/server/db/entities'
 
 export const getVotoORPCProcedure = adminProcedure
