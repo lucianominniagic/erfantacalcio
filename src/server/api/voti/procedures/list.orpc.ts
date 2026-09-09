@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { publicProcedure } from '~/server/orpc'
+import { Configurazione } from '~/config'
 import { Voti } from '~/server/db/entities'
 
 export const listVotiORPCProcedure = publicProcedure
@@ -50,9 +51,12 @@ export const listVotiORPCProcedure = publicProcedure
           voto: c.voto,
           ammonizione: c.ammonizione,
           espulsione: c.espulsione,
-          gol: Math.abs(c.gol ?? 0),
-          assist: (c.assist ?? 0),
-          autogol: (c.autogol ?? 0),
+          gol:
+            c.Giocatore.ruolo === 'P'
+              ? (c.gol ?? 0) / Configurazione.bonusGolSubito
+              : (c.gol ?? 0) / Configurazione.bonusGol,
+          assist: (c.assist ?? 0) / Configurazione.bonusAssist,
+          autogol: (c.autogol ?? 0) / Configurazione.bonusAutogol,
           altriBonus: c.altriBonus,
           torneo: c.Calendario.Torneo.nome,
           gruppoFase: c.Calendario.Torneo.gruppoFase,
