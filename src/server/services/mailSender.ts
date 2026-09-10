@@ -36,5 +36,5 @@ export async function ReSendMailAsync(
     console.error('Errore invio mail:', error)
     return
   }
-  console.info('Mail inviata con successo a:', to, 'cc:', cc, 'subject:', subject, 'data:', data)
+  console.info('Mail inviata con successo to:', to, 'cc:', cc, 'subject:', subject, 'data:', data)
 }
