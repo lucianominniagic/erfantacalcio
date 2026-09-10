@@ -26,7 +26,7 @@ export async function ReSendMailAsync(
 
   const { data, error } = await resend.emails.send({
     from: env.MAIL_FROM ?? 'notify@erfantacalcio.com',
-    to,
+    to: to,
     ...(cc !== '' && { cc }),
     subject,
     html: htmlMessage,
@@ -36,5 +36,5 @@ export async function ReSendMailAsync(
     console.error('Errore invio mail:', error)
     return
   }
-  console.info('Mail inviata con successo:', data)
+  console.info('Mail inviata con successo a:', to, 'cc:', cc, 'subject:', subject, 'data:', data)
 }
