@@ -89,7 +89,7 @@ export async function salvaFormazione(input: SalvaFormazioneInput): Promise<void
   const mailEnabled = env.MAIL_ENABLED === 'true'
   if (mailEnabled) {
     console.log(`Invio notifica mail inserimento formazione`)
-    const { to, cc, avversario } = resolveFormazioneMailRecipients(partita, idSquadra)
+    const { to, cc, submitter } = resolveFormazioneMailRecipients(partita, idSquadra)
     const subject = `ErFantacalcio: Formazione partita ${partita.SquadraHome?.nomeSquadra} - ${partita.SquadraAway?.nomeSquadra}`
     const descrizioneGiornata = getDescrizioneGiornataCompact(
       partita.Calendario.giornataSerieA,
@@ -98,7 +98,7 @@ export async function salvaFormazione(input: SalvaFormazioneInput): Promise<void
       partita.Calendario.Torneo.gruppoFase,
     )
     const htmlMessage = buildFormazioneCreatedHtml({
-      avversarioPresidente: avversario,
+      avversarioPresidente: submitter,
       descrizioneGiornata,
       dataInserimentoFormazione: formatDateTime(dataInserimentoFormazione),
       dataCalcioInizio: formatDateTime(partita.Calendario.data ?? new Date()),
@@ -209,12 +209,12 @@ export async function confermaPrecedente(idSquadra: number, verificaEsistenti = 
 
     for (const { partita, descrizioneGiornata } of partiteConDettagli) {
       const subject = `ErFantacalcio: Conferma formazione precedente – ${partita.SquadraHome?.nomeSquadra} - ${partita.SquadraAway?.nomeSquadra}`
-      const { to, cc, avversario, submitter, nomeSquadraSubmitter } =
+      const { to, cc, submitter, nomeSquadraSubmitter } =
         resolveFormazioneMailRecipients(partita, idSquadra)
 
       if (to && cc) {
         const htmlMessage = buildConfermaPrecedenteHtml({
-          avversarioPresidente: avversario,
+          avversarioPresidente: submitter,
           descrizioneGiornata,
           dataConferma: formatDateTime(nowInItalyIso()),
           dataCalcioInizio: formatDateTime(partita.Calendario.data ?? new Date()),
