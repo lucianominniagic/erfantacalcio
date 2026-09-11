@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/cron/formazione-reminder",
-      "schedule": "0 10 * * *"
+      "schedule": "0 8 * * *"
     }
   ]
 }
