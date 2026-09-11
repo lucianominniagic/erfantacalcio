@@ -74,11 +74,41 @@ export interface ConfermaPrecedenteAdminMailData {
 // ─── Templates ────────────────────────────────────────────────────────────────
 
 /**
+ * Appellativi scherzosi (comprensivi di articolo) usati per identificare l'avversario nelle mail.
+ */
+const appellativiAvversario = [
+  "l'infame",
+  "lo scorretto",
+  "il traditore",
+  "il furfante",
+  "l'arrogante",
+  "il permaloso",
+  "il senza tetto",
+  "il perfido",
+  "il subdolo",
+  "il maledetto",
+  "il losco",
+  "l'inetto",
+  "l'arrivista",
+  "il sionista",
+  "il chiacchierone"
+]
+
+/**
+ * Restituisce un appellativo scherzoso scelto casualmente tra `appellativiAvversario`.
+ */
+function getAppellativoAvversarioRandom(): string {
+  return appellativiAvversario[
+    Math.floor(Math.random() * appellativiAvversario.length)
+  ]
+}
+
+/**
  * HTML per la notifica all'avversario quando un presidente inserisce la formazione.
  */
 export function buildFormazioneCreatedHtml(data: FormazioneMailData): string {
   return `Notifica automatica da erFantacalcio.com<br><br>
-              Il tuo avversario, l'infame ${data.avversarioPresidente}, ha inserito la formazione per la prossima partita <br> <br>
+              Il tuo avversario, ${getAppellativoAvversarioRandom()} ${data.avversarioPresidente}, ha inserito la formazione per la prossima partita <br> <br>
               <b>Dettagli partita:</b><br>
               Giornata: ${data.descrizioneGiornata}<br>
               Data inserimento formazione: ${data.dataInserimentoFormazione}<br>
@@ -142,7 +172,6 @@ export function buildFormazionePromemoriaHtml(data: {
 import {
   tipoAstaDaBoolean,
   REGOLE_PER_TIPO_ASTA,
-  SEZIONE_SESSIONI_MERCATO,
   type Block,
 } from '~/content/regolamentoMercato'
 
