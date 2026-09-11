@@ -10,6 +10,7 @@ export const getUltimaImportazioneProbabiliORPCProcedure = adminProcedure
   .handler(async () => {
     const ultimaImportazione = await ProbabileFormazione.findOne({
       select: { fetchedAt: true },
+      where: {},
       order: { fetchedAt: 'DESC' },
     })
 
