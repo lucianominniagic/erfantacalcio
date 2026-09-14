@@ -53,7 +53,7 @@ export function FormazioneDisabilitata({
         textAlign="center"
       >
         {formazioneGiaRilasciata
-          ? 'Formazione già rilasciata fuori orario consentito'
+          ? 'Partite in corso, formazione non rilasciabile'
           : message}
       </Typography>
       {canConfirmPrecedente && (
