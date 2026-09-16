@@ -69,7 +69,7 @@
     "@types/bcryptjs": "^3.0.0",
     "@types/crypto-js": "^4.2.2",
     "@types/lodash": "^4.17.21",
-    "@types/node": "^18.19.130",
+    "@types/node": "^22.20.3",
     "@types/pg": "^8.16.0",
     "@types/react": "^19.2.7",
     "@vitest/coverage-v8": "^5.0.1",
