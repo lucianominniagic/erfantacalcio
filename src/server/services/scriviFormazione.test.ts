@@ -30,8 +30,14 @@ import { AppDataSource } from '~/data-source'
 import { nowInItalyIso } from '~/utils/dateUtils'
 
 describe('scriviFormazione', () => {
-  let mockEntityManager: any
-  let mockTransactionCallback: any
+  type MockEntityManager = {
+    find: ReturnType<typeof vi.fn>
+    delete: ReturnType<typeof vi.fn>
+    insert: ReturnType<typeof vi.fn>
+  }
+
+  let mockEntityManager: MockEntityManager
+  let mockTransactionCallback: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
     vi.clearAllMocks()

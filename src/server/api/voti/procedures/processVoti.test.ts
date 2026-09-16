@@ -9,7 +9,19 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 
 // Mock Configurazione to avoid environment variable loading
-let mockConfigurazione: any
+interface MockConfigurazione {
+  bonusGol: number
+  bonusAssist: number
+  bonusGolSubito: number
+  bonusAmmonizione: number
+  bonusEspulsione: number
+  bonusRigoreParato: number
+  bonusRigoreSbagliato: number
+  bonusAutogol: number
+  stagione: number
+}
+
+let mockConfigurazione: MockConfigurazione
 
 beforeAll(() => {
   mockConfigurazione = {
@@ -63,13 +75,10 @@ describe('processVoti — Bonus Calculation Logic', () => {
 
     it('should calculate gol bonus for field player', () => {
       // arrange
-      const ruolo = 'A'
       const golSegnati = 2
 
       // act
-      const result = ruolo === 'P'
-        ? golSegnati * mockConfigurazione.bonusGolSubito
-        : golSegnati * mockConfigurazione.bonusGol
+      const result = golSegnati * mockConfigurazione.bonusGol
 
       // assert
       expect(result).toBe(6)
@@ -158,13 +167,10 @@ describe('processVoti — Bonus Calculation Logic', () => {
       // arrange
       const ammonizione = 1
       const gol = 1
-      const ruolo = 'A'
-
+      
       // act
       const bonusAmm = ammonizione === 1 ? mockConfigurazione.bonusAmmonizione : 0
-      const bonusGol = ruolo === 'P'
-        ? gol * mockConfigurazione.bonusGolSubito
-        : gol * mockConfigurazione.bonusGol
+      const bonusGol = gol * mockConfigurazione.bonusGol
 
       const totalBonus = bonusAmm + bonusGol
 
@@ -191,13 +197,10 @@ describe('processVoti — Bonus Calculation Logic', () => {
 
     it('field player should use bonusGol', () => {
       // arrange
-      const ruolo = 'D'
       const golSegnati = 1
 
       // act
-      const result = ruolo === 'P'
-        ? golSegnati * mockConfigurazione.bonusGolSubito
-        : golSegnati * mockConfigurazione.bonusGol
+      const result = golSegnati * mockConfigurazione.bonusGol
 
       // assert
       expect(result).toBe(3)

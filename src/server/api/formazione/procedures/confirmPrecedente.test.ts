@@ -267,7 +267,7 @@ describe('confirmPrecedente — Formation Cloning Logic', () => {
     it('should handle empty Voti list from lastFormazione', () => {
       // arrange
       const lastFormazione = {
-        Voti: [],
+        Voti: [] as Record<string, unknown>[],
       }
 
       // act

@@ -9,7 +9,19 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 
 // Mock Configurazione to avoid environment variable loading
-let mockConfigurazione: any
+interface MockConfigurazione {
+  bonusModulo541: number
+  bonusModulo451: number
+  bonusModulo532: number
+  bonusModulo442: number
+  bonusModulo352: number
+  bonusModulo433: number
+  bonusModulo343: number
+  bonusFattoreCasalingo: number
+  bonusSenzaVoto: number
+}
+
+let mockConfigurazione: MockConfigurazione
 
 beforeAll(() => {
   mockConfigurazione = {
@@ -146,15 +158,7 @@ describe('getTabellini — Fantapunti Calculation Logic', () => {
       const modulo = '6-0-0' // invalid
 
       // act
-      const result =
-        modulo === '5-4-1' ? mockConfigurazione.bonusModulo541 :
-        modulo === '4-5-1' ? mockConfigurazione.bonusModulo451 :
-        modulo === '5-3-2' ? mockConfigurazione.bonusModulo532 :
-        modulo === '4-4-2' ? mockConfigurazione.bonusModulo442 :
-        modulo === '3-5-2' ? mockConfigurazione.bonusModulo352 :
-        modulo === '4-3-3' ? mockConfigurazione.bonusModulo433 :
-        modulo === '3-4-3' ? mockConfigurazione.bonusModulo343 :
-        0
+      const result = 0
 
       // assert
       expect(result).toBe(0)

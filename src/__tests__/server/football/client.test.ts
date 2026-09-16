@@ -294,7 +294,7 @@ describe('footballDataClient', () => {
       expect(global.fetch).toHaveBeenCalledTimes(3)
 
       vi.useFakeTimers()
-    }, { timeout: 15000 })
+    }, 15000)
 
     it('retries on network error with backoff', async () => {
       ;(global.fetch as ReturnType<typeof vi.fn>)
@@ -312,7 +312,7 @@ describe('footballDataClient', () => {
       expect(global.fetch).toHaveBeenCalledTimes(3)
 
       vi.useFakeTimers()
-    }, { timeout: 15000 })
+    }, 15000)
 
     it('retries with exponential backoff delay', async () => {
       ;(global.fetch as ReturnType<typeof vi.fn>)
