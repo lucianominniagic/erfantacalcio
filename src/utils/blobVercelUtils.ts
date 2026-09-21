@@ -10,6 +10,7 @@ export async function uploadFile(
   const blob = await put(`${folder}/${fileName}`, arrayBuffer, {
     access: 'public',
     addRandomSuffix: false,
+    allowOverwrite: true,
   })
   return blob
 }
