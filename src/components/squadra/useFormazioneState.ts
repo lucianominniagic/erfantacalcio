@@ -48,7 +48,7 @@ export function useFormazioneState() {
     giornate: data.giornate,
     idTorneo: data.idTorneo,
     setIdTorneo: data.setIdTorneo,
-    setIdPartita: data.setIdPartita,
+    setSalvaEntrambe: data.setSalvaEntrambe,
     rosa: data.rosa,
     campo: data.campo,
     panca: data.panca,

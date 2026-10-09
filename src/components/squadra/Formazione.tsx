@@ -45,7 +45,7 @@ function Formazione() {
     enableRosa,
     message,
     giornate,
-    setIdPartita,
+    setSalvaEntrambe,
     rosa,
     campo,
     panca,
@@ -155,11 +155,11 @@ function Formazione() {
                       margin="dense"
                       required
                       name="giornata"
-                      onChange={(e) =>
-                        e.target.value !== 0
-                          ? resetFormazione(e.target.value as number)
-                          : setIdPartita(0)
-                      }
+                      onChange={(e) => {
+                        const value = e.target.value as number
+                        setSalvaEntrambe(value === 0)
+                        if (value !== 0) resetFormazione(value)
+                      }}
                       defaultValue={
                         giornate.length > 1 ? 0 : giornate[0]?.idTorneo
                       }

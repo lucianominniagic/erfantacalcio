@@ -92,6 +92,8 @@ export function useFormazioneData() {
   const [message, setMessage] = useState('')
   const [giornate, setGiornate] = useState<z.infer<typeof giornataSchema>[]>([])
   const [idTorneo, setIdTorneo] = useState<number>()
+  // Indipendente da idPartita, che viene sovrascritto dal caricamento della formazione
+  const [salvaEntrambe, setSalvaEntrambe] = useState(true)
   const [state, dispatch] = useReducer(formazioneReducer, initialState)
 
   const calendarioProssima = useQuery(
@@ -195,7 +197,8 @@ export function useFormazioneData() {
     idTorneo,
     setIdTorneo,
     ...state,
-    setIdPartita: (id: number) => dispatch({ type: 'SET_ID_PARTITA', payload: id }),
+    salvaEntrambe,
+    setSalvaEntrambe,
     isLoading,
     formazioneList,
     ultimoAggiornamentoProbabili:

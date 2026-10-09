@@ -27,6 +27,7 @@ export function useFormazioneActions(
     rosa,
     modulo,
     idSquadra,
+    salvaEntrambe,
     dispatch,
   } = data
 
@@ -59,10 +60,12 @@ export function useFormazioneActions(
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
+    const salvaTutte = salvaEntrambe && giornate.length > 1
+
     if (rosa.length > 0 || campo.length !== 11) {
       alert.setAlertMessage('Completa la formazione')
       alert.setAlertSeverity('error')
-    } else if (!idPartita && idPartita !== 0) {
+    } else if (!salvaTutte && !idPartita) {
       alert.setAlertMessage('Nessuna partita in programma, impossibile procedere')
       alert.setAlertSeverity('error')
     } else {
@@ -73,27 +76,32 @@ export function useFormazioneActions(
         riserva: giocatore.riserva,
       }))
 
-      if (idPartita !== 0) {
-        await saveFormazione.mutateAsync({ idPartita, modulo, giocatori: giocatoriPayload })
-        alert.setAlertMessage(
-          `Salvataggio completato: ${
-            giornate.find((g) => g.partite.some((p) => p.idPartita === idPartita))?.Title ?? ''
-          }`,
-        )
-      } else {
-        await Promise.all(
-          giornate.map(async (g) => {
-            const idP = g.partite
+      try {
+        if (!salvaTutte) {
+          await saveFormazione.mutateAsync({ idPartita, modulo, giocatori: giocatoriPayload })
+          alert.setAlertMessage(
+            `Salvataggio completato: ${
+              giornate.find((g) => g.partite.some((p) => p.idPartita === idPartita))?.Title ?? ''
+            }`,
+          )
+        } else {
+          const idPartite = giornate.flatMap((g) =>
+            g.partite
               .filter((c) => c.idHome === idSquadra || c.idAway === idSquadra)
-              .map((p) => p.idPartita)[0]
-            await saveFormazione.mutateAsync({ idPartita: idP, modulo, giocatori: giocatoriPayload })
-          }),
-        )
-        alert.setAlertMessage(
-          'Salvataggio completato per entrambe le giornate di campionato e champions',
-        )
+              .map((p) => p.idPartita),
+          )
+          await Promise.all(
+            idPartite.map((idP) =>
+              saveFormazione.mutateAsync({ idPartita: idP, modulo, giocatori: giocatoriPayload }),
+            ),
+          )
+          alert.setAlertMessage(
+            'Salvataggio completato per entrambe le giornate di campionato e champions',
+          )
+        }
+      } finally {
+        setSaving(false)
       }
-      setSaving(false)
     }
     alert.setOpenAlert(true)
   }
