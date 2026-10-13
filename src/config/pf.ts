@@ -35,7 +35,7 @@ const parseIntEnv = (key: string, fallback: number): number =>
 // ─── Valore validato (fail-fast al momento dell'import) ───────────────────────
 
 export const pfConfig: PfConfig = pfConfigSchema.parse({
-  pfColumns: parseIntEnv('NEXT_PUBLIC_PF_COUNT', 35),
+  pfColumns: parseIntEnv('NEXT_PUBLIC_PF_COUNT', 40),
   pfColumnIdGiocatore: parseIntEnv('NEXT_PUBLIC_PF_IDGIOCATORE', 0),
   pfColumnNome: parseIntEnv('NEXT_PUBLIC_PF_NOME', 0),
   pfColumnRuolo: parseIntEnv('NEXT_PUBLIC_PF_RUOLO', 0),

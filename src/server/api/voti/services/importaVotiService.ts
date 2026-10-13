@@ -22,6 +22,7 @@ import { Voti } from '~/server/db/entities'
 import { caricaVoti } from '~/server/services/caricaVotiService'
 import { uploadFile } from '~/utils/blobVercelUtils'
 import { normalizeNomeGiocatore } from '~/utils/giocatori'
+import { base64ToBuffer } from '~/utils/stringUtils'
 import { formatToDecimalValue } from '~/utils/numberUtils'
 import { IMPORTA_VOTI_CHUNK_SIZE, IMPORTA_VOTI_RUOLI, type iVotoGiocatore } from '~/types/voti'
 
@@ -32,18 +33,16 @@ export const RUOLI = IMPORTA_VOTI_RUOLI
 
 // ─── Helpers interni ─────────────────────────────────────────────────────────
 
-async function parseVotiCsv(fileUrl: string): Promise<iVotoGiocatore[]> {
+// Il contenuto viene letto direttamente dal base64 ricevuto, senza rileggere il
+// file dal Blob: subito dopo l'upload l'URL pubblico può rispondere 404 (CDN).
+async function parseVotiCsv(fileData: string): Promise<iVotoGiocatore[]> {
   const voti: iVotoGiocatore[] = []
   const headers: string[] = []
   for (let i = 1; i <= Configurazione.pfColumns; i++) {
     headers.push(`Col${i}`)
   }
 
-  const response = await fetch(fileUrl)
-  if (!response.ok) {
-    throw new Error(`Impossibile leggere il file voti: ${response.statusText}`)
-  }
-  const fileContent = await response.text()
+  const fileContent = base64ToBuffer(fileData).toString('utf-8')
 
   // formatToDecimalValue restituisce NaN per token non numerici (es. "sv" =
   // "senza voto"). calcBonusVoto sanitizza già NaN → 0 a valle, ma lo schema
@@ -58,6 +57,7 @@ async function parseVotiCsv(fileUrl: string): Promise<iVotoGiocatore[]> {
       {
         delimiter: '\t',
         columns: headers,
+        relax_column_count: true,
         on_record: (line: Record<string, string>) => {
           if (isNaN(parseFloat(line[`Col${Configurazione.pfColumnIdGiocatore}`] ?? '0'))) {
             return
@@ -134,7 +134,7 @@ export async function initImportaVoti(input: {
 
   await resetVotiGiornata(input.idCalendario)
 
-  const voti = await parseVotiCsv(blob.url)
+  const voti = await parseVotiCsv(input.fileData)
   console.info(`Voti letti dal CSV: ${voti.length}`)
 
   return { fileUrl: blob.url, voti }
