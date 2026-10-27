@@ -11,6 +11,7 @@ import {
   IconButton,
   Tooltip,
   Typography,
+  useMediaQuery,
 } from '@mui/material'
 import { DarkMode, LightMode, Login, Logout, SportsSoccer } from '@mui/icons-material'
 import { darken, useTheme } from '@mui/material/styles'
@@ -21,6 +22,12 @@ import { legaItems, profiloItems, adminItems } from './sidebarConfig'
 import { SidebarSection } from './SidebarSection'
 
 export const SIDEBAR_WIDTH = 240
+const mobileBottomNavigationHrefs = new Set([
+  '/formazione',
+  '/mercato',
+  '/statistiche_giocatori',
+  '/economia',
+])
 
 interface SidebarProps {
   mobileOpen: boolean
@@ -31,7 +38,14 @@ function SidebarContent() {
   const { data: session } = useSession()
   const pathname = usePathname() ?? ''
   const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const { mode, toggleMode } = useThemeMode()
+  const profileNavigationItems = isMobile
+    ? profiloItems.filter((item) => !mobileBottomNavigationHrefs.has(item.href))
+    : profiloItems
+  const leagueNavigationItems = isMobile
+    ? legaItems.filter((item) => !mobileBottomNavigationHrefs.has(item.href))
+    : legaItems
 
   const headerBg = `linear-gradient(135deg, ${theme.palette.background.default} 0%, ${darken(theme.palette.primary.dark, 0.9)} 100%)`
   const titleColor = theme.palette.primary.main
@@ -142,10 +156,10 @@ function SidebarContent() {
         {session?.user && (
           <>
             <Divider sx={{ mx: 2, my: 0.5 }} />
-            <SidebarSection title="Il mio profilo" items={profiloItems} pathname={pathname} defaultOpen={!adminItems.some((i) => i.href === pathname)} />
+            <SidebarSection title="Il mio profilo" items={profileNavigationItems} pathname={pathname} defaultOpen={!adminItems.some((i) => i.href === pathname)} />
           </>
         )}
-        <SidebarSection title="Lega" items={legaItems} pathname={pathname} defaultOpen={!adminItems.some((i) => i.href === pathname)} />
+        <SidebarSection title="Lega" items={leagueNavigationItems} pathname={pathname} defaultOpen={!adminItems.some((i) => i.href === pathname)} />
         {session?.user?.ruolo === RuoloUtente.admin && (
           <>
             <Divider sx={{ mx: 2, my: 0.5 }} />

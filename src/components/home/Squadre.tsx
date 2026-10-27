@@ -55,15 +55,20 @@ export default function Squadre() {
       >
         <Grid container spacing={0}>
           {squadreList.data?.map((squadra) => (
-            <Grid item xs={3} key={squadra.id}>
+            <Grid
+              item
+              xs={6}
+              key={squadra.id}
+              sx={{ display: 'flex', justifyContent: 'center', p: 1 }}
+            >
               <Link
                 href={`/squadra/${squadra.id}`}
-                style={{ textDecoration: 'none' }}
+                style={{ textDecoration: 'none', width: '100%' }}
               >
                 <Card
                   sx={{
-                    minWidth: 84,
-                    maxWidth: 84,
+                    width: '85%',
+                    minWidth: 0,
                     marginBottom: '4px',
                     transition: 'transform 0.15s ease, border-color 0.15s ease',
                     '&:hover': {
@@ -73,13 +78,20 @@ export default function Squadre() {
                   }}
                 >
                   <CardActionArea>
-                    <Box sx={{ overflow: 'hidden', height: 68 }}>
+                    <Box
+                      sx={{
+                        overflow: 'hidden',
+                        width: '100%',
+                        aspectRatio: '4 / 3',
+                      }}
+                    >
                       <CardMedia
                         component="img"
-                        height="68"
                         image={squadra.foto ?? ''}
                         alt={squadra.squadra}
                         sx={{
+                          width: '100%',
+                          height: '100%',
                           objectFit: 'cover',
                           transition: 'transform 0.3s ease',
                           '.MuiCardActionArea-root:hover &': {

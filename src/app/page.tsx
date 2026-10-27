@@ -21,10 +21,15 @@ import StatistichePreviewCard from '~/components/home/StatistichePreviewCard'
 import Calendario from '~/components/home/Calendario'
 import Modal from '~/components/modal/Modal'
 import CardPartite from '~/components/cardPartite/CardPartite'
+import Formazione from '~/components/squadra/Formazione'
 import { useSession } from 'next-auth/react'
+import { Suspense } from 'react'
 import { z } from 'zod'
 import { Configurazione } from '~/config'
 import { giornataSchema } from '~/schemas/calendario'
+import MobileBottomNavigation, {
+  type MobileHomeSection,
+} from '~/components/navigation/MobileBottomNavigation'
 
 export default function HomePage() {
   const { data: session } = useSession()
@@ -63,6 +68,12 @@ export default function HomePage() {
   const [isChampions, setIsChampions] = useState<boolean>(false)
   const [isCalendarioRecuperi, setIsCalendarioRecuperi] =
     useState<boolean>(false)
+  const [mobileSection, setMobileSection] =
+    useState<MobileHomeSection>('calendario')
+  const activeMobileSection =
+    mobileSection === 'formazione' && !session?.user
+      ? 'calendario'
+      : mobileSection
 
   const hasSemifinaliTeams =
     !championsBracket.isLoading &&
@@ -162,157 +173,202 @@ export default function HomePage() {
 
   return (
     <>
-      <Grid container spacing={0}>
-        <Slide direction={'down'} in={true}>
-          <Grid item xs={12}>
-            <Squadre />
-          </Grid>
-        </Slide>
+      <Grid container spacing={0} sx={isXs ? { pb: 9 } : undefined}>
+        {(!isXs || activeMobileSection === 'squadre') && (
+          <Slide direction={'down'} in={true}>
+            <Grid item xs={12}>
+              <Squadre />
+            </Grid>
+          </Slide>
+        )}
         {!torneiList.isLoading && (
           <>
             {new Date() >= Configurazione.dataGiornata1SerieA && (
               <>
-                <Grid item xs={12} sm={6} sx={!isXs ? { pt: '15px' } : {}}>
-                  <Calendario
-                    tipo={'risultati'}
-                    prefixTitle="Risultati:"
-                    enableTabs={true}
-                  ></Calendario>
-                  {stagionefinita ? (
-                    <Box
-                      sx={{
-                        pt: '15px',
-                        display: 'flex',
-                        flexDirection: isXs ? 'column' : 'row',
-                        gap: 2,
-                      }}
-                    >
-                      <Box sx={{ flex: 1 }}>
-                        <EconomiaPreviewCard />
-                      </Box>
-                      <Box sx={{ flex: 1 }}>
-                        <StatistichePreviewCard />
-                      </Box>
-                    </Box>
-                  ) : (
-                    <>
-                      <Calendario
-                        tipo={'prossima'}
-                        prefixTitle=""
-                        enableTabs={true}
-                      ></Calendario>
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          '& > *': { m: 1 },
-                        }}
-                      >
-                        <CalendarioButtonGroup onSelect={handleCalendario} />
-                      </Box>
-                    </>
+                <Grid
+                  item
+                  xs={12}
+                  sm={6}
+                  sx={
+                    !isXs || activeMobileSection === 'calendario'
+                      ? !isXs
+                        ? { pt: '15px' }
+                        : {}
+                      : { display: 'none' }
+                  }
+                >
+                  {(!isXs || activeMobileSection === 'calendario') && (
+                    <Calendario
+                      tipo={'risultati'}
+                      prefixTitle="Risultati:"
+                      enableTabs={true}
+                    ></Calendario>
                   )}
+                  {stagionefinita
+                    ? (!isXs || activeMobileSection === 'calendario') && (
+                        <Box
+                          sx={{
+                            pt: '15px',
+                            display: 'flex',
+                            flexDirection: isXs ? 'column' : 'row',
+                            gap: 2,
+                          }}
+                        >
+                          <Box sx={{ flex: 1 }}>
+                            <EconomiaPreviewCard />
+                          </Box>
+                          <Box sx={{ flex: 1 }}>
+                            <StatistichePreviewCard />
+                          </Box>
+                        </Box>
+                      )
+                    : (!isXs || activeMobileSection === 'calendario') && (
+                        <>
+                          <Calendario
+                            tipo={'prossima'}
+                            prefixTitle=""
+                            enableTabs={true}
+                          ></Calendario>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              '& > *': { m: 1 },
+                            }}
+                          >
+                            <CalendarioButtonGroup
+                              onSelect={handleCalendario}
+                            />
+                          </Box>
+                        </>
+                      )}
                 </Grid>
                 <Grid
                   item
                   xs={12}
                   sm={6}
-                  sx={!isXs ? { pr: '2px', pl: '15px', pt: '15px' } : {}}
+                  sx={
+                    !isXs || activeMobileSection === 'classifica'
+                      ? !isXs
+                        ? { pr: '2px', pl: '15px', pt: '15px' }
+                        : {}
+                      : { display: 'none' }
+                  }
                 >
-                  {(() => {
-                    const classificheConHasClassifica = torneiList.data?.filter(
-                      (t) => t.hasClassifica,
-                    )
-                    const classificheCampionato =
-                      classificheConHasClassifica?.filter(
-                        (t) => t.nome.toLowerCase() === 'campionato',
-                      )
-                    const classificheChampions =
-                      classificheConHasClassifica?.filter(
-                        (t) => t.nome.toLowerCase() !== 'campionato',
+                  {(!isXs || activeMobileSection === 'classifica') &&
+                    (() => {
+                      const classificheConHasClassifica =
+                        torneiList.data?.filter((t) => t.hasClassifica)
+                      const classificheCampionato =
+                        classificheConHasClassifica?.filter(
+                          (t) => t.nome.toLowerCase() === 'campionato',
+                        )
+                      const classificheChampions =
+                        classificheConHasClassifica?.filter(
+                          (t) => t.nome.toLowerCase() !== 'campionato',
+                        )
+
+                      const renderClassifica = (
+                        torneo: NonNullable<
+                          typeof classificheConHasClassifica
+                        >[0],
+                      ) => (
+                        <>
+                          <br></br>
+                          <Classifica
+                            key={torneo.idTorneo}
+                            nomeTorneo={torneo.nome ?? ''}
+                            idTorneo={torneo.idTorneo}
+                            gruppo={torneo.gruppoFase ?? ''}
+                          />
+                        </>
                       )
 
-                    const renderClassifica = (
-                      torneo: NonNullable<
-                        typeof classificheConHasClassifica
-                      >[0],
-                    ) => (
-                      <>
-                        <br></br>
-                        <Classifica
-                          key={torneo.idTorneo}
-                          nomeTorneo={torneo.nome ?? ''}
-                          idTorneo={torneo.idTorneo}
-                          gruppo={torneo.gruppoFase ?? ''}
-                        />
-                      </>
-                    )
-
-                    return (
-                      <Box>
-                        <Tabs
-                          value={classificaTab}
-                          onChange={(_, v: number) => setClassificaTab(v)}
-                        >
-                          <Tab label="Campionato" />
-                          <Tab label="Champions" />
-                        </Tabs>
-                        {classificaTab === 0 &&
-                          classificheCampionato?.map(renderClassifica)}
-                        {classificaTab === 1 &&
-                          classificheChampions?.map(renderClassifica)}
-                        <br></br>
-                        <Tabs
-                          value={coppaTab}
-                          onChange={(_, v: number) => setCoppaTab(v)}
-                        >
-                          <Tab
-                            label="Fase finale Champions"
-                            disabled={!hasSemifinaliTeams}
-                          />
-                          <Tab
-                            label="Coppa Perdenti"
-                            disabled={!hasSemifinaliTeamsCoppaPerdenti}
-                          />
-                        </Tabs>
-                        {coppaTab === 0 && (
-                          <>
-                            <br></br>
-                            <ChampionsBracket
-                              semifinaliAndata={
-                                championsBracket.data?.semifinaliAndata ?? null
-                              }
-                              semifinaliRitorno={
-                                championsBracket.data?.semifinaliRitorno ?? null
-                              }
-                              finale={championsBracket.data?.finale ?? null}
+                      return (
+                        <Box>
+                          <Tabs
+                            value={classificaTab}
+                            onChange={(_, v: number) => setClassificaTab(v)}
+                          >
+                            <Tab label="Campionato" />
+                            <Tab label="Champions" />
+                          </Tabs>
+                          {classificaTab === 0 &&
+                            classificheCampionato?.map(renderClassifica)}
+                          {classificaTab === 1 &&
+                            classificheChampions?.map(renderClassifica)}
+                          <br></br>
+                          <Tabs
+                            value={coppaTab}
+                            onChange={(_, v: number) => setCoppaTab(v)}
+                          >
+                            <Tab
+                              label="Fase finale Champions"
+                              disabled={!hasSemifinaliTeams}
                             />
-                          </>
-                        )}
-                        {coppaTab === 1 && (
-                          <>
-                            <br></br>
-                            <ChampionsBracket
-                              semifinaliAndata={
-                                coppaPerdentiBracket.data?.semifinaliAndata ?? null
-                              }
-                              semifinaliRitorno={
-                                coppaPerdentiBracket.data?.semifinaliRitorno ?? null
-                              }
-                              finale={coppaPerdentiBracket.data?.finale ?? null}
+                            <Tab
+                              label="Coppa Perdenti"
+                              disabled={!hasSemifinaliTeamsCoppaPerdenti}
                             />
-                          </>
-                        )}
-                      </Box>
-                    )
-                  })()}
+                          </Tabs>
+                          {coppaTab === 0 && (
+                            <>
+                              <br></br>
+                              <ChampionsBracket
+                                semifinaliAndata={
+                                  championsBracket.data?.semifinaliAndata ??
+                                  null
+                                }
+                                semifinaliRitorno={
+                                  championsBracket.data?.semifinaliRitorno ??
+                                  null
+                                }
+                                finale={championsBracket.data?.finale ?? null}
+                              />
+                            </>
+                          )}
+                          {coppaTab === 1 && (
+                            <>
+                              <br></br>
+                              <ChampionsBracket
+                                semifinaliAndata={
+                                  coppaPerdentiBracket.data?.semifinaliAndata ??
+                                  null
+                                }
+                                semifinaliRitorno={
+                                  coppaPerdentiBracket.data
+                                    ?.semifinaliRitorno ?? null
+                                }
+                                finale={
+                                  coppaPerdentiBracket.data?.finale ?? null
+                                }
+                              />
+                            </>
+                          )}
+                        </Box>
+                      )
+                    })()}
                 </Grid>
               </>
             )}
           </>
         )}
+        {isXs && activeMobileSection === 'formazione' && session?.user && (
+          <Grid item xs={12}>
+            <Suspense fallback={<div>Caricamento...</div>}>
+              <Formazione />
+            </Suspense>
+          </Grid>
+        )}
       </Grid>
+
+      {isXs && (
+        <MobileBottomNavigation
+          value={activeMobileSection}
+          onHomeSectionChange={setMobileSection}
+        />
+      )}
 
       <Modal
         title={titleModalCalendario}

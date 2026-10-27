@@ -8,15 +8,37 @@ import {
   Toolbar,
   IconButton,
   useTheme,
-  useMediaQuery,
 } from '@mui/material'
 import { alpha, darken } from '@mui/material/styles'
 import { Menu as MenuIcon, SportsSoccer } from '@mui/icons-material'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import ProvidersWrapper from '~/ProvidersWrapper'
 import Sidebar, { SIDEBAR_WIDTH } from '~/components/sidebar/Sidebar'
+import MobileBottomNavigation, {
+  type MobileNavigationValue,
+} from '~/components/navigation/MobileBottomNavigation'
 import { Configurazione } from '~/config'
 import Breadcrumb from '~/components/Breadcrumb'
+
+function GlobalMobileNavigation() {
+  const pathname = usePathname()
+
+  if (pathname === '/') return null
+
+  const value: MobileNavigationValue =
+    pathname === '/mercato'
+      ? 'mercato'
+      : pathname === '/statistiche_giocatori'
+        ? 'giocatori'
+        : pathname === '/economia'
+          ? 'economia'
+          : pathname === '/formazione'
+            ? 'formazione'
+            : 'calendario'
+
+  return <MobileBottomNavigation value={value} />
+}
 
 function MobileTopBar({ onMenuClick }: { onMenuClick: () => void }) {
   const theme = useTheme()
@@ -111,8 +133,7 @@ export default function ClientLayout({
 }: {
   children: React.ReactNode
 }) {
-  const theme = useTheme()
-  const isXs = useMediaQuery(theme.breakpoints.down('md'))
+  const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
@@ -144,7 +165,15 @@ export default function ClientLayout({
           {/* Mobile spacer for top bar */}
           <Box sx={{ display: { xs: 'block', md: 'none' }, height: '48px' }} />
 
-          <Container maxWidth="lg" sx={{ mt: '8px', mb: '8px', flex: 1 }}>
+          <Container
+            maxWidth="lg"
+            sx={{
+              mt: '8px',
+              mb: '8px',
+              flex: 1,
+              pb: { xs: pathname === '/' ? 0 : '80px', md: 0 },
+            }}
+          >
             <Breadcrumb />
             {children}
           </Container>
@@ -152,6 +181,7 @@ export default function ClientLayout({
           <Footer />
         </Box>
       </Box>
+      <GlobalMobileNavigation />
     </ProvidersWrapper>
   )
 }
