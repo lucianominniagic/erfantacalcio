@@ -102,6 +102,15 @@ export default function Calendario({
 
   return (
     <>
+      {!calendarioList.isLoading &&
+        calendarioList.data &&
+        calendarioList.data.length === 0 && (
+          <Alert severity="info" sx={{ mt: 1 }}>
+            {tipo === 'risultati'
+              ? 'Nessun risultato disponibile.'
+              : 'Nessuna prossima giornata disponibile.'}
+          </Alert>
+        )}
       {!calendarioList.isLoading && calendarioList.data && (
         <>
           {enableTabs && groups.length > 1 && (
