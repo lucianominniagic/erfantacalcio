@@ -27,12 +27,13 @@ import { Suspense } from 'react'
 import { z } from 'zod'
 import { Configurazione } from '~/config'
 import { giornataSchema } from '~/schemas/calendario'
-import MobileBottomNavigation, {
-  type MobileHomeSection,
-} from '~/components/navigation/MobileBottomNavigation'
+import MobileBottomNavigation from '~/components/navigation/MobileBottomNavigation'
+import { useMobileNavigation } from '~/components/navigation/MobileNavigationContext'
 
 export default function HomePage() {
   const { data: session } = useSession()
+  const { homeSection: mobileSection, setHomeSection: setMobileSection } =
+    useMobileNavigation()
   const torneiList = useQuery(
     orpc.tornei.list.queryOptions({
       refetchOnWindowFocus: false,
@@ -68,8 +69,6 @@ export default function HomePage() {
   const [isChampions, setIsChampions] = useState<boolean>(false)
   const [isCalendarioRecuperi, setIsCalendarioRecuperi] =
     useState<boolean>(false)
-  const [mobileSection, setMobileSection] =
-    useState<MobileHomeSection>('calendario')
   const activeMobileSection =
     mobileSection === 'formazione' && !session?.user
       ? 'calendario'

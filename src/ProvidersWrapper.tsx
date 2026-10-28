@@ -12,6 +12,7 @@ import { themeOptions } from './theme'
 import { lightThemeOptions } from './theme/lightTheme'
 import componentsOverride from './theme/overrides'
 import { ThemeModeProvider, useThemeMode } from './theme/themeContext'
+import { MobileNavigationProvider } from './components/navigation/MobileNavigationContext'
 
 function ThemedApp({ children }: { children: ReactNode }) {
   const { mode } = useThemeMode()
@@ -53,7 +54,9 @@ export default function ProvidersWrapper({
     <ThemeModeProvider>
       <QueryClientProvider client={queryClient}>
         <SessionProvider>
-          <ThemedApp>{children}</ThemedApp>
+          <MobileNavigationProvider>
+            <ThemedApp>{children}</ThemedApp>
+          </MobileNavigationProvider>
         </SessionProvider>
       </QueryClientProvider>
     </ThemeModeProvider>
