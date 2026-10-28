@@ -18,26 +18,35 @@ import Sidebar, { SIDEBAR_WIDTH } from '~/components/sidebar/Sidebar'
 import MobileBottomNavigation, {
   type MobileNavigationValue,
 } from '~/components/navigation/MobileBottomNavigation'
+import { useMobileNavigation } from '~/components/navigation/MobileNavigationContext'
 import { Configurazione } from '~/config'
 import Breadcrumb from '~/components/Breadcrumb'
 
 function GlobalMobileNavigation() {
   const pathname = usePathname()
+  const { setHomeSection } = useMobileNavigation()
 
   if (pathname === '/') return null
 
-  const value: MobileNavigationValue =
-    pathname === '/mercato'
-      ? 'mercato'
-      : pathname === '/statistiche_giocatori'
-        ? 'giocatori'
-        : pathname === '/economia'
-          ? 'economia'
-          : pathname === '/formazione'
-            ? 'formazione'
-            : 'calendario'
+  let value: MobileNavigationValue = null
+  if (pathname === '/mercato') {
+    value = 'mercato'
+  } else if (pathname === '/statistiche_giocatori') {
+    value = 'giocatori'
+  } else if (pathname === '/economia') {
+    value = 'economia'
+  } else if (pathname === '/formazione') {
+    value = 'formazione'
+  } else if (pathname.startsWith('/squadra/')) {
+    value = 'squadre'
+  }
 
-  return <MobileBottomNavigation value={value} />
+  return (
+    <MobileBottomNavigation
+      value={value}
+      onHomeSectionChange={setHomeSection}
+    />
+  )
 }
 
 function MobileTopBar({ onMenuClick }: { onMenuClick: () => void }) {

@@ -6,39 +6,29 @@ import {
   useTheme,
 } from '@mui/material'
 import {
-  CalendarMonth,
   Euro,
   EmojiEvents,
   Gavel,
   Groups,
+  Home,
   Portrait,
   ViewWeek,
 } from '@mui/icons-material'
 import { useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import type { SyntheticEvent } from 'react'
+import {
+  getMobileNavigationIntent,
+  type MobileHomeSection,
+  type MobileNavigationActionValue,
+} from './mobileNavigation'
 
-export type MobileHomeSection =
-  | 'formazione'
-  | 'calendario'
-  | 'classifica'
-  | 'squadre'
-
-export type MobileNavigationValue =
-  | MobileHomeSection
-  | 'mercato'
-  | 'giocatori'
-  | 'economia'
+export type { MobileHomeSection, MobileNavigationValue } from './mobileNavigation'
 
 interface MobileBottomNavigationProps {
-  value: MobileNavigationValue
+  value: MobileNavigationActionValue | null
   onHomeSectionChange?: (section: MobileHomeSection) => void
-}
-
-const pageRoutes: Partial<Record<MobileNavigationValue, string>> = {
-  mercato: '/mercato',
-  giocatori: '/statistiche_giocatori',
-  economia: '/economia',
 }
 
 export default function MobileBottomNavigation({
@@ -47,6 +37,7 @@ export default function MobileBottomNavigation({
 }: MobileBottomNavigationProps) {
   const { data: session } = useSession()
   const router = useRouter()
+  const pathname = usePathname() ?? '/'
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
 
@@ -54,28 +45,13 @@ export default function MobileBottomNavigation({
 
   const handleChange = (
     _: SyntheticEvent,
-    nextValue: MobileNavigationValue,
+    nextValue: MobileNavigationActionValue,
   ) => {
     if (nextValue === 'formazione' && !session?.user) return
 
-    if (onHomeSectionChange) {
-      switch (nextValue) {
-        case 'formazione':
-        case 'calendario':
-        case 'classifica':
-        case 'squadre':
-          onHomeSectionChange(nextValue)
-          return
-      }
-    }
-
-    const route = pageRoutes[nextValue]
-    if (route) {
-      router.push(route)
-      return
-    }
-
-    router.push(nextValue === 'formazione' ? '/formazione' : '/')
+    const intent = getMobileNavigationIntent(nextValue, pathname)
+    if (intent.homeSection) onHomeSectionChange?.(intent.homeSection)
+    if (intent.href) router.push(intent.href)
   }
 
   return (
@@ -114,6 +90,11 @@ export default function MobileBottomNavigation({
         },
       }}
     >
+      <BottomNavigationAction
+        label="Home"
+        icon={<Home />}
+        value="calendario"
+      />
       {session?.user && (
         <BottomNavigationAction
           label="Formazione"
@@ -121,11 +102,6 @@ export default function MobileBottomNavigation({
           value="formazione"
         />
       )}
-      <BottomNavigationAction
-        label="Calendario"
-        icon={<CalendarMonth />}
-        value="calendario"
-      />
       <BottomNavigationAction
         label="Classifica"
         icon={<EmojiEvents />}
