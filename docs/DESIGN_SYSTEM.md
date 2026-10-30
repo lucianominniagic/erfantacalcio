@@ -280,6 +280,17 @@ Implementazione: `CircularProgress color="warning"` centrato.
 
 ## 8. Convenzioni di stile
 
+### Esiti del mercato su mobile
+
+`EsitoAggiudicazione` usa schede giocatore sotto il breakpoint `sm` (768px):
+vincitore, prezzo e priorità restano visibili, mentre le offerte e il dettaglio
+per proposta sono espandibili. Il riepilogo mostra giocatori, assegnazioni e
+somma dei prezzi vincenti nella valuta della sessione; la ricerca filtra per
+giocatore o presidente senza alterare questi totali. Da `sm` in poi restano
+disponibili le due tabelle. Il componente è condiviso tra utenti e amministratori.
+I contenitori flex devono potersi restringere (`minWidth: 0`) per confinare lo
+scroll delle tabelle senza allargare la pagina.
+
 ### Gerarchia: dove mettere gli stili
 
 | Caso | Dove |

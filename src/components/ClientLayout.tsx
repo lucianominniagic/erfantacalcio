@@ -167,6 +167,7 @@ export default function ClientLayout({
             display: 'flex',
             flexDirection: 'column',
             minHeight: '100vh',
+            minWidth: 0,
             width: { md: `calc(100% - ${SIDEBAR_WIDTH}px)` },
             ml: { md: 0 },
           }}

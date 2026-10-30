@@ -72,6 +72,7 @@
     "@types/node": "^22.20.3",
     "@types/pg": "^8.16.0",
     "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.3.0",
     "@vitest/coverage-v8": "^5.0.1",
     "baseline-browser-mapping": "^2.10.23",
     "cross-env": "^10.1.0",
