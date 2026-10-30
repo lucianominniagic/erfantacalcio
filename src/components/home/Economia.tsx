@@ -1,162 +1,88 @@
-
 'use client'
-import { useMemo } from 'react'
+
+import { useId, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { orpc } from '~/utils/orpc'
-import { calcolaEconomia } from '~/server/services/economiaService'
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Alert,
   Avatar,
   Box,
   Chip,
-  Grid,
+  Divider,
   Paper,
   Skeleton,
   Stack,
-  Tooltip,
   Typography,
-  useTheme,
 } from '@mui/material'
 import {
   AccountBalanceWallet,
-  EmojiEvents,
-  Group,
+  ExpandMore,
   MilitaryTech,
-  MonetizationOn,
-  RemoveCircleOutline,
-  TrendingDown,
-  TrendingUp,
 } from '@mui/icons-material'
+import PageHeader from '~/components/PageHeader'
+import { orpc } from '~/utils/orpc'
+import { calcolaEconomia } from '~/server/services/economiaService'
 import { formatCurrency } from '~/utils/numberUtils'
-import { GenericCard } from '~/components/cards'
 
-function MetricBox({
+function MoneyRow({
   label,
   value,
-  icon,
-  color = 'primary',
-}: {
-  label: string
-  value: string
-  icon: React.ReactNode
-  color?: 'primary' | 'success' | 'error' | 'warning' | 'info'
-}) {
-  const theme = useTheme()
-  return (
-    <Paper
-      elevation={1}
-      sx={{
-        p: 2,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 1.5,
-        borderLeft: `4px solid ${theme.palette[color].main}`,
-        height: '100%',
-      }}
-    >
-      <Box sx={{ color: `${color}.main`, display: 'flex' }}>{icon}</Box>
-      <Box>
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{ fontWeight: 500 }}
-        >
-          {label}
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          sx={{ fontWeight: 700, lineHeight: 1.2 }}
-        >
-          {value}
-        </Typography>
-      </Box>
-    </Paper>
-  )
-}
-
-function PremioRow({
-  label,
-  value,
-  perc,
+  strong = false,
 }: {
   label: string
   value: number
-  perc: number
+  strong?: boolean
 }) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        py: 0.75,
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        '&:last-child': { borderBottom: 'none' },
-      }}
+    <Stack
+      direction="row"
+      justifyContent="space-between"
+      gap={2}
+      sx={{ py: 1 }}
     >
-      <Typography variant="body2" color="text.secondary">
+      <Typography
+        variant="body2"
+        color={strong ? 'text.primary' : 'text.secondary'}
+        fontWeight={strong ? 700 : 400}
+        sx={{ minWidth: 0 }}
+      >
         {label}
       </Typography>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Chip
-          label={`${perc}%`}
-          size="small"
-          variant="outlined"
-          color="primary"
-          sx={{ fontSize: '0.7rem', height: 20 }}
-        />
-        <Typography
-          variant="body2"
-          sx={{ fontWeight: 600, minWidth: 90, textAlign: 'right' }}
-        >
-          {formatCurrency(value)}
-        </Typography>
-      </Box>
-    </Box>
+      <Typography variant="body2" fontWeight={700} sx={{ flexShrink: 0 }}>
+        {formatCurrency(value)}
+      </Typography>
+    </Stack>
   )
 }
 
 export default function Economia() {
-  const theme = useTheme()
-
+  const id = useId()
   const detrazioneSito = parseFloat(
     process.env.NEXT_PUBLIC_COSTI_DOMINIO ?? '0',
   )
-
   const economiaList = useQuery(
     orpc.squadre.list.queryOptions({
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
     }),
   )
-
   const saldoData = useQuery(
     orpc.economia.getRisultatiStagione.queryOptions({
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
     }),
   )
-
   const importoAnnuale =
-    economiaList.data?.reduce(
-      (acc, item) => acc + (item.importoAnnuale ?? 0),
-      0,
-    ) ?? 0
+    economiaList.data?.reduce((sum, s) => sum + (s.importoAnnuale ?? 0), 0) ?? 0
   const importoMulte =
-    economiaList.data?.reduce(
-      (acc, item) => acc + (item.importoMulte ?? 0),
-      0,
-    ) ?? 0
+    economiaList.data?.reduce((sum, s) => sum + (s.importoMulte ?? 0), 0) ?? 0
   const importoMercato =
-    economiaList.data?.reduce(
-      (acc, item) => acc + (item.importoMercato ?? 0),
-      0,
-    ) ?? 0
+    economiaList.data?.reduce((sum, s) => sum + (s.importoMercato ?? 0), 0) ?? 0
   const montepremi =
-    importoAnnuale + importoMercato + importoMulte - detrazioneSito
-
+    importoAnnuale + importoMulte + importoMercato - detrazioneSito
   const finaleGiocata = saldoData.data?.finaleGiocata ?? false
-
   const economiaCalcolata = useMemo(() => {
     if (!economiaList.data || !saldoData.data) return null
     return calcolaEconomia({
@@ -173,335 +99,351 @@ export default function Economia() {
     })
   }, [economiaList.data, saldoData.data, montepremi])
 
-  const isLoading = economiaList.isLoading || saldoData.isLoading
+  const header = (
+    <PageHeader title="Economia & Premi" Icon={AccountBalanceWallet} />
+  )
+  if (economiaList.isError || saldoData.isError) {
+    return (
+      <Box>
+        {header}
+        <Alert severity="error">
+          Impossibile caricare i dati economici:{' '}
+          {economiaList.error?.message ?? saldoData.error?.message}
+        </Alert>
+      </Box>
+    )
+  }
+  if (!economiaList.data || !saldoData.data || !economiaCalcolata) {
+    return (
+      <Stack spacing={2} aria-busy="true" aria-label="Caricamento economia">
+        {header}
+        <Skeleton variant="rounded" height={240} />
+        <Skeleton variant="rounded" height={320} />
+      </Stack>
+    )
+  }
+
+  const nomeSquadra = (teamId: number) =>
+    economiaList.data.find((s) => s.id === teamId)?.squadra ?? '—'
+  const nomeClassificata = (position: number) => {
+    const entry = Object.entries(saldoData.data.classificaMap ?? {}).find(
+      ([, pos]) => pos === position,
+    )
+    return entry ? nomeSquadra(Number(entry[0])) : 'Da assegnare'
+  }
+  const premi = [
+    {
+      label: '1° Campionato',
+      percent: 52,
+      value: economiaCalcolata.premi.primo,
+      team: nomeClassificata(1),
+    },
+    {
+      label: '2° Campionato',
+      percent: 20,
+      value: economiaCalcolata.premi.secondo,
+      team: nomeClassificata(2),
+    },
+    {
+      label: '3° Campionato',
+      percent: 13,
+      value: economiaCalcolata.premi.terzo,
+      team: nomeClassificata(3),
+    },
+    {
+      label: 'Champions',
+      percent: 15,
+      value: economiaCalcolata.premi.champions,
+      team:
+        saldoData.data.idVincitriceChampions != null
+          ? nomeSquadra(saldoData.data.idVincitriceChampions)
+          : finaleGiocata
+            ? 'Da assegnare'
+            : 'Finale da giocare',
+    },
+  ]
 
   return (
-    <Stack spacing={2}>
-      {/* Metric boxes */}
-      <Grid container spacing={1.5}>
-        <Grid item xs={6} sm={3}>
-          <MetricBox
-            label="Montepremi totale"
-            value={formatCurrency(montepremi)}
-            icon={<AccountBalanceWallet />}
-            color="primary"
+    <Box
+      sx={{
+        width: '100%',
+        minWidth: 0,
+        maxWidth: 1100,
+        mx: 'auto',
+        overflowWrap: 'anywhere',
+      }}
+    >
+      {header}
+      <Stack spacing={3}>
+        <Box>
+          <Chip
+            size="small"
+            variant="outlined"
+            color={finaleGiocata ? 'success' : 'warning'}
+            label={finaleGiocata ? 'Saldo definitivo' : 'Saldo provvisorio'}
           />
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <MetricBox
-            label="Totale quote"
-            value={formatCurrency(importoAnnuale)}
-            icon={<MonetizationOn />}
-            color="info"
-          />
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <MetricBox
-            label="Squadre partecipanti"
-            value={String(economiaList.data?.length ?? 0)}
-            icon={<Group />}
-            color="warning"
-          />
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <MetricBox
-            label="Detrazione sito"
-            value={formatCurrency(detrazioneSito)}
-            icon={<RemoveCircleOutline />}
-            color="error"
-          />
-        </Grid>
-      </Grid>
-
-      {/* Cards: Riepilogo + Premi */}
-      <Grid container spacing={1.5}>
-        <Grid item xs={12} sm={6}>
-          <GenericCard
-            title="Riepilogo versamenti"
-            titleVariant="h6"
-            avatar={<MonetizationOn color="primary" />}
-            showHeaderDivider
+          {!finaleGiocata && (
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              I saldi possono cambiare: la finale Champions non è ancora stata
+              giocata.
+            </Typography>
+          )}
+        </Box>
+        <Paper
+          variant="outlined"
+          sx={{
+            p: { xs: 2.5, sm: 3 },
+            borderColor: 'primary.main',
+            bgcolor: 'action.hover',
+          }}
+        >
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <AccountBalanceWallet color="primary" />
+            <Typography variant="overline">Montepremi della lega</Typography>
+          </Stack>
+          <Typography
+            component="p"
+            variant="h1"
+            sx={{ my: 1, fontSize: { xs: '2.5rem', sm: '3.5rem' } }}
           >
-            <Stack spacing={0}>
-              {[
-                { label: 'Iscrizioni', value: importoAnnuale },
-                { label: 'Multe', value: importoMulte },
-                { label: 'Mercato di riparazione', value: importoMercato },
-                { label: 'Detrazione sito', value: -detrazioneSito },
-              ].map(({ label, value }) => (
-                <Box
-                  key={label}
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    py: 0.75,
-                    borderBottom: '1px solid',
-                    borderColor: 'divider',
-                    '&:last-child': { borderBottom: 'none' },
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    {label}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 600,
-                      color: value < 0 ? 'error.main' : 'text.primary',
-                    }}
-                  >
-                    {formatCurrency(value)}
-                  </Typography>
-                </Box>
-              ))}
-              <Box
-                sx={{ display: 'flex', justifyContent: 'space-between', pt: 1 }}
-              >
-                <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                  Totale montepremi
+            {formatCurrency(montepremi)}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {economiaList.data.length} squadre · al netto dei costi sito
+          </Typography>
+          <Divider sx={{ my: 2 }} />
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+              gap: 1,
+            }}
+          >
+            {[
+              { label: 'Quote', value: importoAnnuale },
+              { label: 'Mercato', value: importoMercato },
+              { label: 'Multe', value: importoMulte },
+            ].map(({ label, value }) => (
+              <Box key={label} sx={{ minWidth: 0 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {label}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  sx={{ fontWeight: 700, color: 'primary.main' }}
-                >
-                  {formatCurrency(montepremi)}
+                <Typography fontWeight={700}>
+                  {formatCurrency(value)}
                 </Typography>
               </Box>
+            ))}
+          </Box>
+        </Paper>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: 'minmax(0, 1fr)',
+              md: 'repeat(2, minmax(0, 1fr))',
+            },
+            alignItems: 'start',
+            gap: 3,
+          }}
+        >
+          <Paper variant="outlined" sx={{ p: 2, minWidth: 0 }}>
+            <Typography variant="h6" component="h2">
+              Premi in palio
+            </Typography>
+            <Stack divider={<Divider />}>
+              {premi.map((premio) => (
+                <Stack
+                  key={premio.label}
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  gap={1}
+                  sx={{ py: 1.5 }}
+                >
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography variant="body2" fontWeight={700}>
+                      {premio.label} · {premio.percent}%
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {premio.team}
+                    </Typography>
+                  </Box>
+                  <Typography
+                    fontWeight={800}
+                    color="primary.main"
+                    sx={{ flexShrink: 0 }}
+                  >
+                    {formatCurrency(premio.value)}
+                  </Typography>
+                </Stack>
+              ))}
             </Stack>
-          </GenericCard>
-        </Grid>
-
-        <Grid item xs={12} sm={6}>
-          <GenericCard
-            title="Premi stagionali"
-            titleVariant="h6"
-            avatar={<EmojiEvents color="warning" />}
-            showHeaderDivider
-          >
-            <Stack spacing={0}>
-              <PremioRow
-                label="1° Classificato"
-                value={economiaCalcolata?.premi.primo ?? 0}
-                perc={52}
-              />
-              <PremioRow
-                label="2° Classificato"
-                value={economiaCalcolata?.premi.secondo ?? 0}
-                perc={20}
-              />
-              <PremioRow
-                label="3° Classificato"
-                value={economiaCalcolata?.premi.terzo ?? 0}
-                perc={13}
-              />
-              <PremioRow
-                label="Vincitore Champions"
-                value={economiaCalcolata?.premi.champions ?? 0}
-                perc={15}
-              />
-            </Stack>
-          </GenericCard>
-        </Grid>
-      </Grid>
-
-      {/* Squadre cards */}
-      <Box>
-        <Typography variant="h6" sx={{ mb: 1 }}>
-          Economia squadre
-        </Typography>
-        {!finaleGiocata && !isLoading && (
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ display: 'block', mb: 1.5 }}
-          >
-            * La finale Champions non è ancora stata giocata — il saldo è
-            provvisorio.
-          </Typography>
-        )}
-        <Grid container spacing={1.5}>
-          {isLoading
-            ? Array.from({ length: 8 }).map((_, i) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={i}>
-                  <Skeleton variant="rounded" height={180} />
-                </Grid>
-              ))
-            : (economiaCalcolata?.squadreCalcolate ?? []).map((calcolata) => {
-                  const squadra = economiaList.data?.find(
-                    (s) => s.id === calcolata.id,
-                  )
-                  if (!squadra) return null
-                  const premiVinti = calcolata.premiVinti
-                  const saldo = calcolata.saldo
-                  const saldoPositivo = saldo > 0
-                  const saldoZero = saldo === 0
-
-                  return (
-                    <Grid item xs={12} sm={6} md={4} lg={3} key={squadra.id}>
-                      <Paper
-                        elevation={1}
-                        sx={{
-                          p: 2,
-                          height: '100%',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: 1.5,
-                          borderTop: `3px solid ${saldoZero ? theme.palette.divider : saldoPositivo ? theme.palette.success.main : theme.palette.error.main}`,
-                        }}
+          </Paper>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="h6" component="h2" sx={{ mb: 1 }}>
+              Saldo delle squadre
+            </Typography>
+            {economiaCalcolata.squadreCalcolate.length === 0 && (
+              <Alert severity="info">Nessuna squadra partecipante.</Alert>
+            )}
+            <Stack spacing={1.5}>
+              {economiaCalcolata.squadreCalcolate.map((calcolata) => {
+                const squadra = economiaList.data.find(
+                  (s) => s.id === calcolata.id,
+                )
+                if (!squadra) return null
+                const saldo = calcolata.saldo
+                return (
+                  <Accordion
+                    key={squadra.id}
+                    disableGutters
+                    elevation={0}
+                    variant="outlined"
+                  >
+                    <AccordionSummary
+                      expandIcon={<ExpandMore />}
+                      id={`${id}-squadra-${squadra.id}`}
+                      aria-controls={`${id}-dettaglio-${squadra.id}`}
+                    >
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        gap={1}
+                        sx={{ width: '100%', minWidth: 0, pr: 1 }}
                       >
-                        {/* Header: avatar + nome */}
-                        <Box
-                          sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                        <Stack
+                          direction="row"
+                          alignItems="center"
+                          gap={1}
+                          sx={{ minWidth: 0 }}
                         >
                           <Avatar
                             src={squadra.foto ?? undefined}
-                            alt={squadra.presidente ?? ''}
-                            sx={{ width: 36, height: 36 }}
+                            alt=""
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              display: { xs: 'none', sm: 'flex' },
+                            }}
                           />
-                          <Box sx={{ overflow: 'hidden' }}>
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                fontWeight: 700,
-                                lineHeight: 1.2,
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                              }}
-                            >
+                          <Box sx={{ minWidth: 0 }}>
+                            <Typography variant="body2" fontWeight={700}>
                               {squadra.squadra}
                             </Typography>
                             <Typography
                               variant="caption"
                               color="text.secondary"
-                              sx={{ lineHeight: 1 }}
                             >
                               {squadra.presidente}
                             </Typography>
                           </Box>
-                        </Box>
-
-                        {/* Stats grid */}
-                        <Grid container spacing={0.5}>
-                          {[
-                            {
-                              label: 'Quota',
-                              value: formatCurrency(
-                                squadra.importoAnnuale ?? 0,
-                              ),
-                            },
-                            {
-                              label: 'Multe',
-                              value: formatCurrency(squadra.importoMulte ?? 0),
-                            },
-                            {
-                              label: 'Mercato',
-                              value: formatCurrency(
-                                squadra.importoMercato ?? 0,
-                              ),
-                            },
-                            {
-                              label: 'Fantamilioni',
-                              value:
-                                squadra.fantamilioni != null
-                                  ? `${squadra.fantamilioni} M`
-                                  : '—',
-                            },
-                          ].map(({ label, value }) => (
-                            <Grid item xs={6} key={label}>
-                              <Box
-                                sx={{
-                                  bgcolor: 'action.hover',
-                                  borderRadius: 1,
-                                  px: 1,
-                                  py: 0.5,
-                                }}
-                              >
-                                <Typography
-                                  variant="caption"
-                                  color="text.secondary"
-                                  sx={{ fontSize: '0.65rem', display: 'block' }}
-                                >
-                                  {label}
-                                </Typography>
-                                <Typography
-                                  variant="caption"
-                                  sx={{ fontWeight: 600, fontSize: '0.78rem' }}
-                                >
-                                  {value}
-                                </Typography>
-                              </Box>
-                            </Grid>
-                          ))}
-                        </Grid>
-
-                        {/* Premi vinti */}
-                        {premiVinti.length > 0 && (
-                          <Box
-                            sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}
+                        </Stack>
+                        <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
+                          <Typography variant="caption" color="text.secondary">
+                            {saldo > 0
+                              ? 'Da ricevere'
+                              : saldo < 0
+                                ? 'Da versare'
+                                : 'In pareggio'}
+                          </Typography>
+                          <Typography
+                            variant="h3"
+                            component="p"
+                            color={
+                              saldo > 0
+                                ? 'success.main'
+                                : saldo < 0
+                                  ? 'error.main'
+                                  : 'text.secondary'
+                            }
                           >
-                            {premiVinti.map((p) => (
-                              <Chip
-                                key={p.label}
-                                size="small"
-                                icon={<MilitaryTech fontSize="small" />}
-                                label={p.label}
-                                color={p.color}
-                                variant="filled"
-                                sx={{ fontSize: '0.7rem', fontWeight: 600 }}
-                              />
-                            ))}
-                          </Box>
-                        )}
-
-                        {/* Saldo */}
-                        <Box sx={{ mt: 'auto' }}>
-                          <Stack spacing={0.5}>
-                            <Tooltip
-                              title={
-                                !finaleGiocata
-                                  ? 'Provvisorio: finale Champions non ancora giocata'
-                                  : saldoPositivo
-                                    ? 'Importo da ricevere'
-                                    : 'Importo da pagare'
-                              }
-                            >
-                              <Chip
-                                size="small"
-                                icon={
-                                  saldoZero ? (
-                                    <RemoveCircleOutline fontSize="small" />
-                                  ) : saldoPositivo ? (
-                                    <TrendingUp fontSize="small" />
-                                  ) : (
-                                    <TrendingDown fontSize="small" />
-                                  )
-                                }
-                                label={`${saldoPositivo ? '+' : saldoZero ? '' : '-'}${squadra.isAdmin ? `${formatCurrency(Math.abs(saldo))} +${formatCurrency(detrazioneSito)} (sito)` : formatCurrency(Math.abs(saldo))}${!finaleGiocata ? ' *' : ''}`}
-                                color={
-                                  saldoZero
-                                    ? 'default'
-                                    : saldoPositivo
-                                      ? 'success'
-                                      : 'error'
-                                }
-                                variant="outlined"
-                                sx={{
-                                  fontWeight: 700,
-                                  fontSize: '0.78rem',
-                                  width: '100%',
-                                  justifyContent: 'flex-start',
-                                }}
-                              />
-                            </Tooltip>
-                          </Stack>
+                            {formatCurrency(Math.abs(saldo))}
+                          </Typography>
                         </Box>
-                      </Paper>
-                    </Grid>
-                  )
-                })}
-        </Grid>
-      </Box>
-    </Stack>
+                      </Stack>
+                    </AccordionSummary>
+                    <AccordionDetails id={`${id}-dettaglio-${squadra.id}`}>
+                      <MoneyRow
+                        label="Quota annuale"
+                        value={squadra.importoAnnuale ?? 0}
+                      />
+                      <MoneyRow
+                        label="Mercato"
+                        value={squadra.importoMercato ?? 0}
+                      />
+                      <MoneyRow
+                        label="Multe"
+                        value={squadra.importoMulte ?? 0}
+                      />
+                      <Divider />
+                      <MoneyRow
+                        label="Totale contributi"
+                        value={calcolata.pagato}
+                        strong
+                      />
+                      <MoneyRow
+                        label="Premi maturati"
+                        value={calcolata.premio}
+                        strong
+                      />
+                      <Stack
+                        direction="row"
+                        flexWrap="wrap"
+                        gap={0.5}
+                        sx={{ my: 1 }}
+                      >
+                        {calcolata.premiVinti.map((premio) => (
+                          <Chip
+                            key={premio.label}
+                            size="small"
+                            icon={<MilitaryTech />}
+                            label={premio.label}
+                            color={premio.color}
+                          />
+                        ))}
+                      </Stack>
+                      <Typography variant="caption" color="text.secondary">
+                        Saldo = premi − contributi. Budget mercato:{' '}
+                        {squadra.fantamilioni != null
+                          ? `${squadra.fantamilioni} FM`
+                          : '—'}
+                        , separato dagli euro.
+                      </Typography>
+                      {squadra.isAdmin && (
+                        <Alert severity="info" sx={{ mt: 1.5 }}>
+                          Rimborso sito separato:{' '}
+                          {formatCurrency(detrazioneSito)}, non incluso nel
+                          saldo.
+                        </Alert>
+                      )}
+                    </AccordionDetails>
+                  </Accordion>
+                )
+              })}
+            </Stack>
+          </Box>
+        </Box>
+        <Accordion disableGutters elevation={0} variant="outlined">
+          <AccordionSummary
+            expandIcon={<ExpandMore />}
+            id={`${id}-contributi`}
+            aria-controls={`${id}-contributi-dettaglio`}
+          >
+            <Typography variant="body2">
+              Come si forma il montepremi?
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails id={`${id}-contributi-dettaglio`}>
+            <MoneyRow label="Quote annuali" value={importoAnnuale} />
+            <MoneyRow label="Mercato di riparazione" value={importoMercato} />
+            <MoneyRow label="Multe" value={importoMulte} />
+            <MoneyRow label="Costi sito" value={-detrazioneSito} />
+            <Divider />
+            <MoneyRow label="Montepremi netto" value={montepremi} strong />
+          </AccordionDetails>
+        </Accordion>
+      </Stack>
+    </Box>
   )
 }

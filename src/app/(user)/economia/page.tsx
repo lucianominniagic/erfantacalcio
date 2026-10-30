@@ -1,7 +1,6 @@
 import { Grid } from '@mui/material'
 import { Suspense } from 'react'
 import Economia from '~/components/home/Economia'
-
 export default function EconomiaPage() {
   return (
     <Grid container justifyContent="center" spacing={0}>

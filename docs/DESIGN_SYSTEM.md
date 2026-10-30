@@ -280,6 +280,15 @@ Implementazione: `CircularProgress color="warning"` centrato.
 
 ## 8. Convenzioni di stile
 
+### Panoramica economia
+
+La pagina Economia mostra il montepremi netto in evidenza, poi premi e saldi
+su una colonna mobile e due colonne da `md`. Ogni squadra espone subito il saldo
+con la dicitura "Da ricevere", "Da versare" o "In pareggio"; contributi, premi
+e budget in FM sono nel dettaglio espandibile. Il rimborso sito amministratore
+resta separato dal saldo. I calcoli e gli arrotondamenti sono quelli di
+`calcolaEconomia`; lo stato provvisorio dipende dalla finale Champions.
+
 ### Esiti del mercato su mobile
 
 `EsitoAggiudicazione` usa schede giocatore sotto il breakpoint `sm` (768px):
