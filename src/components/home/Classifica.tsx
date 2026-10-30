@@ -1,13 +1,23 @@
-import React, { useMemo } from 'react'
+'use client'
+
+import { useId } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { orpc } from '~/utils/orpc'
-import { Avatar, Box, Typography, useMediaQuery, useTheme } from '@mui/material'
-import { getNomeTorneo } from '~/utils/torneo'
+import {
+  Alert,
+  Avatar,
+  Box,
+  Skeleton,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
-import { autosizeOptions, createSkeletonRows } from '~/utils/datatable'
-import { z } from 'zod'
-import { classificaSchema } from '~/schemas/classifica'
 import { MilitaryTech } from '@mui/icons-material'
+import { orpc } from '~/utils/orpc'
+import { getNomeTorneo } from '~/utils/torneo'
+import { classificaSchema } from '~/schemas/classifica'
+import { z } from 'zod'
 
 interface ClassificaProps {
   nomeTorneo: string
@@ -15,148 +25,173 @@ interface ClassificaProps {
   gruppo: string | null
 }
 
+type ClassificaRow = z.infer<typeof classificaSchema>
+
 export default function Classifica({
   nomeTorneo = '',
-  idTorneo = undefined,
+  idTorneo,
   gruppo = null,
 }: ClassificaProps) {
+  const id = useId()
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
   const classificaList = useQuery(
     orpc.classifica.list.queryOptions({
-      input: { idTorneo: idTorneo! },
-      enabled: !!idTorneo,
+      input: { idTorneo: idTorneo ?? 0 },
+      enabled: idTorneo !== undefined,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
     }),
   )
-
-  const rows = useMemo<z.infer<typeof classificaSchema>[]>(
-    () => (classificaList.isSuccess ? (classificaList.data ?? []) : []),
-    [classificaList.data, classificaList.isSuccess],
-  )
-
-  const columns: GridColDef[] = [
-    { field: 'id', hideable: true },
+  const rows = classificaList.data ?? []
+  const columns: GridColDef<ClassificaRow>[] = [
     {
       field: 'squadra',
-      type: 'string',
-      align: 'left',
-      renderHeader: () => <strong>Squadra</strong>,
+      headerName: 'Squadra',
       flex: isXs ? 5 : 4,
+      minWidth: 0,
+      renderCell: ({ row }) => (
+        <Box
+          sx={{
+            whiteSpace: 'normal',
+            overflowWrap: 'anywhere',
+            lineHeight: 1.35,
+            py: 0.75,
+          }}
+        >
+          {row.squadra}
+        </Box>
+      ),
     },
+    ...(!isXs
+      ? [
+          {
+            field: 'foto',
+            headerName: '',
+            width: 36,
+            minWidth: 36,
+            renderCell: ({ row }: { row: ClassificaRow }) => (
+              <Avatar
+                src={row.foto ?? undefined}
+                alt=""
+                sx={{ width: 24, height: 24 }}
+              />
+            ),
+          },
+        ]
+      : []),
     {
       field: 'punti',
       type: 'number',
-      align: 'right',
-      renderHeader: () => <strong>{isXs ? 'P.' : 'Punti'}</strong>,
+      headerName: isXs ? 'P.' : 'Punti',
+      description: 'Punti',
       flex: 1,
+      minWidth: 24,
+      cellClassName: 'classifica-punti',
     },
     {
       field: 'golFatti',
       type: 'number',
-      align: 'right',
-      renderHeader: () => <strong>Gol+</strong>,
+      headerName: 'Gol+',
+      description: 'Gol fatti',
       flex: 1,
+      minWidth: 30,
     },
     {
       field: 'golSubiti',
       type: 'number',
-      align: 'right',
-      renderHeader: () => <strong>Gol-</strong>,
+      headerName: 'Gol-',
+      description: 'Gol subiti',
       flex: 1,
+      minWidth: 30,
     },
     {
       field: 'giocate',
       type: 'number',
-      align: 'right',
-      renderHeader: () => <strong>{isXs ? 'G.' : 'Giocate'}</strong>,
+      headerName: isXs ? 'G.' : 'Giocate',
+      description: 'Giocate',
       flex: 1,
+      minWidth: isXs ? 24 : 55,
     },
     {
       field: 'fantapunti',
       type: 'number',
-      align: 'right',
-      renderHeader: () => <strong>{isXs ? 'FP.' : 'Fantapunti'}</strong>,
+      headerName: isXs ? 'FP.' : 'Fantapunti',
+      description: 'Fantapunti',
       valueFormatter: (value: number) =>
-        value != null ? value.toFixed(2) : '',
-      flex: isXs ? 3 : 2,
+        value.toLocaleString('it-IT', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+      flex: 2,
+      minWidth: isXs ? 58 : 78,
     },
   ]
 
-  // Inserisce la colonna "foto" in posizione [1] solo se !isXs
-  if (!isXs) {
-    columns.splice(1, 0, {
-      field: 'foto',
-      type: 'string',
-      align: 'left',
-      renderCell: (params) => (
-        <Avatar
-          src={params.row?.foto as string}
-          alt={params.row?.presidente as string}
-          sx={{ width: 24, height: 24 }}
-        />
-      ),
-      renderHeader: () => '',
-      width: 40,
-    })
-  }
-
-  const pageSize = gruppo ? 8 : 4
-
-  const skeletonRows = createSkeletonRows(pageSize)
-
   return (
-    <>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-        <MilitaryTech sx={{ color: theme.palette.champions.main, fontSize: '1.4rem' }} />
-        <Typography variant="h5">Classifica {getNomeTorneo(nomeTorneo, gruppo)}</Typography>
-      </Box>
-      <Box
-        sx={{
-          borderRadius: '0 0 12px 12px',
-          overflow: 'hidden',
-          border: '1px solid rgba(255,193,7,0.12)',
-          borderTop: 'none',
-        }}
-      >
-        <DataGrid
-          columnHeaderHeight={40}
-          rowHeight={36}
-          loading={classificaList.isLoading}
-          initialState={{
-            columns: {
-              columnVisibilityModel: {
-                id: false,
-              },
-            },
-            pagination: undefined,
-            filter: undefined,
-            density: 'compact',
-          }}
-          slotProps={{
-            loadingOverlay: {
-              variant: 'skeleton',
-            },
-          }}
-          checkboxSelection={false}
-          disableColumnFilter={true}
-          disableColumnMenu={true}
-          disableColumnSelector={true}
-          disableColumnSorting={true}
-          disableColumnResize={true}
-          hideFooter={true}
-          hideFooterPagination={true}
-          hideFooterSelectedRowCount={true}
-          columns={columns}
-          rows={classificaList.isLoading ? skeletonRows : rows}
-          disableRowSelectionOnClick={true}
-          autosizeOptions={autosizeOptions}
+    <Box sx={{ width: '100%', minWidth: 0 }}>
+      <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 2 }}>
+        <MilitaryTech sx={{ color: 'champions.main', fontSize: '1.4rem' }} />
+        <Typography id={`${id}-titolo`} variant="h5" component="h2">
+          Classifica {getNomeTorneo(nomeTorneo, gruppo)}
+        </Typography>
+      </Stack>
+      {classificaList.isError ? (
+        <Alert severity="error">
+          Impossibile caricare la classifica: {classificaList.error.message}
+        </Alert>
+      ) : classificaList.isLoading || idTorneo === undefined ? (
+        <Stack spacing={1} aria-busy="true" aria-label="Caricamento classifica">
+          {Array.from({ length: gruppo ? 8 : 4 }, (_, i) => (
+            <Skeleton key={i} variant="rounded" height={36} />
+          ))}
+        </Stack>
+      ) : rows.length === 0 ? (
+        <Alert severity="info">Classifica non ancora disponibile.</Alert>
+      ) : (
+        <Box
           sx={{
             borderRadius: '0 0 12px 12px',
+            border: 1,
+            borderColor: 'divider',
+            borderTop: 0,
           }}
-        />
-      </Box>
-    </>
+        >
+          <DataGrid
+            aria-labelledby={`${id}-titolo`}
+            autoHeight
+            columnHeaderHeight={40}
+            rowHeight={36}
+            getRowHeight={() => 'auto'}
+            getEstimatedRowHeight={() => 36}
+            getRowId={(row: ClassificaRow) => row.idSquadra}
+            columns={columns}
+            rows={rows}
+            disableColumnFilter
+            disableColumnMenu
+            disableColumnSelector
+            disableColumnSorting
+            disableColumnResize
+            disableRowSelectionOnClick
+            hideFooter
+            sx={{
+              borderRadius: '0 0 12px 12px',
+              '& .MuiDataGrid-cell, & .MuiDataGrid-columnHeader': { px: 0.5 },
+              '& .MuiDataGrid-columnHeaderTitle': {
+                fontSize: isXs ? '0.6875rem' : '0.72rem',
+              },
+              '& .MuiDataGrid-cell': {
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: 36,
+                fontVariantNumeric: 'tabular-nums',
+              },
+              '& .MuiDataGrid-cell--textRight': { justifyContent: 'flex-end' },
+              '& .classifica-punti': { fontWeight: 700, color: 'primary.main' },
+            }}
+          />
+        </Box>
+      )}
+    </Box>
   )
 }

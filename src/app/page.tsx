@@ -301,20 +301,25 @@ export default function HomePage() {
                           <Tabs
                             value={coppaTab}
                             onChange={(_, v: number) => setCoppaTab(v)}
+                            variant="fullWidth"
+                            aria-label="Coppe a eliminazione diretta"
                           >
                             <Tab
                               label="Fase finale Champions"
                               disabled={!hasSemifinaliTeams}
+                              sx={{ minWidth: 0 }}
                             />
                             <Tab
-                              label="Coppa Perdenti"
+                              label="Coppa dei Perdenti"
                               disabled={!hasSemifinaliTeamsCoppaPerdenti}
+                              sx={{ minWidth: 0 }}
                             />
                           </Tabs>
                           {coppaTab === 0 && (
                             <>
                               <br></br>
                               <ChampionsBracket
+                                titolo="Fase finale Champions"
                                 semifinaliAndata={
                                   championsBracket.data?.semifinaliAndata ??
                                   null
@@ -331,6 +336,7 @@ export default function HomePage() {
                             <>
                               <br></br>
                               <ChampionsBracket
+                                titolo="Coppa dei Perdenti"
                                 semifinaliAndata={
                                   coppaPerdentiBracket.data?.semifinaliAndata ??
                                   null

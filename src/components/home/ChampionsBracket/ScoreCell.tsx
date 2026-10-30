@@ -7,19 +7,27 @@ import { SCORE_COL_W } from './types'
 
 interface ScoreCellProps {
   gol: number | null | undefined
-  href: string
+  href: string | undefined
+  label: string
   isWinner: boolean
   championsColor: string
 }
 
-function ScoreCell({ gol, href, isWinner, championsColor }: ScoreCellProps) {
+function ScoreCell({
+  gol,
+  href,
+  label,
+  isWinner,
+  championsColor,
+}: ScoreCellProps) {
   return (
     <Box
-      component="a"
+      component={href ? 'a' : 'span'}
       href={href}
+      aria-label={label}
       sx={{
         width: SCORE_COL_W,
-        height: 28,
+        height: 44,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -28,21 +36,24 @@ function ScoreCell({ gol, href, isWinner, championsColor }: ScoreCellProps) {
         flexShrink: 0,
         transition: 'background 0.15s',
         '&:hover': { bgcolor: alpha(championsColor, 0.15) },
+        '&:focus-visible': {
+          outline: '2px solid',
+          outlineColor: 'champions.main',
+        },
       }}
     >
       <Typography
         sx={{
-          fontSize: '0.8rem',
+          fontSize: '0.875rem',
           fontWeight: isWinner ? 700 : 500,
-          color:
-            isWinner
-              ? 'success.main'
-              : gol !== null && gol !== undefined
-                ? 'text.primary'
-                : 'text.disabled',
+          color: isWinner
+            ? 'success.main'
+            : gol !== null && gol !== undefined
+              ? 'text.primary'
+              : 'text.disabled',
         }}
       >
-        {gol !== null && gol !== undefined ? gol : '–'}
+        {gol ?? '—'}
       </Typography>
     </Box>
   )

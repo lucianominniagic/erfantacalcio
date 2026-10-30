@@ -1,121 +1,156 @@
 'use client'
 
-import React from 'react'
-import { Avatar, Box, Divider, Paper, Typography } from '@mui/material'
+import {
+  Avatar,
+  Box,
+  Chip,
+  Divider,
+  Paper,
+  Stack,
+  Typography,
+} from '@mui/material'
+import { EmojiEvents } from '@mui/icons-material'
 import { alpha } from '@mui/material/styles'
 import { GiornataType } from './types'
 import { formatDateFromIso } from '~/utils/dateUtils'
 
 interface FinaleCardProps {
-  finaleGiornata: GiornataType
+  finaleGiornata: GiornataType | null
   championsColor: string
 }
 
-function FinaleCard({ finaleGiornata, championsColor }: FinaleCardProps) {
-  const partita = finaleGiornata.partite[0]
-  const isGiocata = finaleGiornata.isGiocata
-  const dateLabel = formatDateFromIso(finaleGiornata.data, 'DD/MM, HH:mm')
+export default function FinaleCard({
+  finaleGiornata,
+  championsColor,
+}: FinaleCardProps) {
+  const partita = finaleGiornata?.partite[0]
+  const assegnata = partita?.idHome != null && partita?.idAway != null
+  const isGiocata = finaleGiornata?.isGiocata ?? false
+  const golHome = partita?.golHome ?? null
+  const golAway = partita?.golAway ?? null
+  const conclusa = isGiocata && golHome !== null && golAway !== null
+  const href =
+    assegnata && finaleGiornata
+      ? `/${isGiocata ? 'tabellini' : 'formazioni'}?idPartita=${partita.idPartita}&idCalendario=${finaleGiornata.idCalendario}`
+      : undefined
+  const dateLabel = formatDateFromIso(finaleGiornata?.data, 'DD/MM, HH:mm')
+  const homeWins = conclusa && golHome > golAway
+  const awayWins = conclusa && golAway > golHome
 
-  if (!partita) return null
-
-  const href = isGiocata
-    ? `/tabellini?idPartita=${partita.idPartita}&idCalendario=${finaleGiornata.idCalendario}`
-    : `/formazioni?idPartita=${partita.idPartita}&idCalendario=${finaleGiornata.idCalendario}`
-
-  const homeWins =
-    isGiocata &&
-    partita.golHome !== null &&
-    partita.golAway !== null &&
-    partita.golHome > partita.golAway
-
-  const awayWins =
-    isGiocata &&
-    partita.golHome !== null &&
-    partita.golAway !== null &&
-    partita.golAway > partita.golHome
-
-  const teamRow = (
-    nome: string | null | undefined,
+  function teamRow(
+    nome: string,
     foto: string | null | undefined,
     gol: number | null | undefined,
-    isWinner: boolean,
-  ) => (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, py: 0.3 }}>
-      <Avatar
-        src={foto ?? ''}
-        alt={nome ?? ''}
-        variant="rounded"
-        sx={{ width: 22, height: 22, flexShrink: 0 }}
-      />
-      <Typography
-        sx={{
-          flex: 1,
-          fontSize: '0.72rem',
-          fontWeight: isWinner ? 700 : 400,
-          color: isWinner ? 'success.main' : 'text.primary',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          minWidth: 0,
-        }}
+    winner: boolean,
+  ) {
+    return (
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={1}
+        sx={{ minHeight: 44 }}
       >
-        {nome ?? '—'}
-      </Typography>
-      {isGiocata && (
+        <Avatar
+          src={foto ?? ''}
+          alt=""
+          variant="rounded"
+          sx={{ width: 24, height: 24 }}
+        />
         <Typography
+          variant="body2"
           sx={{
-            fontSize: '0.8rem',
+            flex: 1,
+            minWidth: 0,
+            overflowWrap: 'anywhere',
             fontWeight: 700,
-            flexShrink: 0,
-            minWidth: '1rem',
-            textAlign: 'right',
-            color: isWinner ? 'success.main' : 'text.primary',
+            color: winner ? 'success.main' : 'text.primary',
           }}
         >
-          {gol ?? '–'}
+          {nome}
         </Typography>
-      )}
-    </Box>
-  )
-
-  return (
-    <Box component="a" href={href} sx={{ textDecoration: 'none', display: 'block' }}>
-      <Paper
-        elevation={3}
-        sx={{
-          p: 1,
-          borderRadius: 1.5,
-          border: `1px solid ${alpha(championsColor, 0.35)}`,
-          cursor: 'pointer',
-          transition: 'all 0.15s ease',
-          '&:hover': {
-            bgcolor: alpha(championsColor, 0.07),
-            borderColor: alpha(championsColor, 0.55),
-          },
-        }}
-      >
-        {/* Date header */}
-        {dateLabel && (
+        {isGiocata && (
           <Typography
-            sx={{
-              fontSize: '0.62rem',
-              fontWeight: 600,
-              color: championsColor,
-              textAlign: 'center',
-              mb: 0.5,
-              letterSpacing: '0.04em',
-            }}
+            variant="body2"
+            fontWeight={800}
+            color={winner ? 'success.main' : 'text.primary'}
           >
-            {dateLabel}
+            {gol ?? '—'}
           </Typography>
         )}
+      </Stack>
+    )
+  }
 
-        {teamRow(partita.squadraHome, partita.fotoHome, partita.golHome, homeWins)}
-        <Divider sx={{ my: 0.2 }} />
-        {teamRow(partita.squadraAway, partita.fotoAway, partita.golAway, awayWins)}
+  return (
+    <Box
+      component={href ? 'a' : 'div'}
+      href={href}
+      aria-label={
+        href ? `Finale: ${isGiocata ? 'tabellino' : 'formazioni'}` : undefined
+      }
+      sx={{
+        textDecoration: 'none',
+        minWidth: 0,
+        '&:focus-visible': {
+          outline: '2px solid',
+          outlineColor: 'champions.main',
+        },
+      }}
+    >
+      <Paper
+        variant="outlined"
+        sx={{
+          p: 2,
+          borderColor: championsColor,
+          '&:hover': href
+            ? { bgcolor: alpha(championsColor, 0.07) }
+            : undefined,
+        }}
+      >
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+          <EmojiEvents sx={{ color: championsColor }} />
+          <Typography variant="subtitle2" component="h3">
+            Finale · gara unica
+          </Typography>
+        </Stack>
+        <Chip
+          size="small"
+          variant="outlined"
+          color={conclusa ? 'success' : 'default'}
+          label={
+            conclusa
+              ? 'Conclusa'
+              : !assegnata
+                ? 'Finaliste da determinare'
+                : isGiocata
+                  ? 'Risultato in aggiornamento'
+                  : 'Da giocare'
+          }
+          sx={{ mb: 2 }}
+        />
+        <Stack spacing={1.5} divider={<Divider />}>
+          {teamRow(
+            partita?.squadraHome ?? 'Vincente semifinale 1',
+            partita?.fotoHome,
+            partita?.golHome,
+            homeWins,
+          )}
+          {teamRow(
+            partita?.squadraAway ?? 'Vincente semifinale 2',
+            partita?.fotoAway,
+            partita?.golAway,
+            awayWins,
+          )}
+        </Stack>
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ mt: 2, display: 'block' }}
+        >
+          {dateLabel || 'Data da definire'}
+          {!isGiocata ? ' · nessun risultato disponibile' : ''}
+        </Typography>
       </Paper>
     </Box>
   )
 }
-
-export default FinaleCard

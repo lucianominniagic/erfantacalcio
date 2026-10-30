@@ -280,6 +280,27 @@ Implementazione: `CircularProgress color="warning"` centrato.
 
 ## 8. Convenzioni di stile
 
+### Tabella classifica
+
+Campionato e gironi Champions mantengono il DataGrid originale, con una riga
+per squadra e tutte le colonne visibili senza scroll orizzontale. Su smartphone
+le intestazioni sono compatte (P., Gol+, Gol-, G., FP.), i padding ridotti e
+le larghezze minime proporzionate ai valori. I punti sono in evidenza e i nomi
+lunghi vanno a capo, senza trasformare le righe in schede o nascondere dati.
+L'ordine resta quello dell'API. I fantapunti usano due decimali e formattazione
+italiana. Nessun controllo demo o evidenziazione personale.
+
+### Tabellone a eliminazione diretta
+
+Fase finale Champions e Coppa dei Perdenti usano il tabellone orizzontale
+(opzione B): due semifinali a sinistra e finale centrata a destra, con scroll
+confinato al contenitore su smartphone. Le schede mostrano andata, ritorno,
+totale e stato; i punteggi mantengono i link a formazioni o tabellini.
+Totali e vincitori sono mostrati solo con entrambe le gare concluse e tutti
+i risultati disponibili, abbinando il ritorno per ID squadra. La finale usa
+le squadre assegnate dal calendario, senza dedurle da risultati parziali.
+Non sono presenti controlli demo o istruzioni testuali sullo scorrimento.
+
 ### Lista compatta giocatori
 
 La pagina Statistiche Giocatori usa un selettore esclusivo P/D/C/A e righe
