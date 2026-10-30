@@ -1,187 +1,127 @@
 'use client'
-import React from 'react'
+
+import { useId, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { orpc } from '~/utils/orpc'
+import Link from 'next/link'
 import {
+  Alert,
+  Avatar,
   Box,
   Card,
   CardActionArea,
   CardContent,
-  CardMedia,
-  CircularProgress,
-  Grid,
+  Chip,
+  InputAdornment,
+  TextField,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material'
-import Link from 'next/link'
+import { ChevronRight, Groups, Search } from '@mui/icons-material'
+import { orpc } from '~/utils/orpc'
+import PageHeader from '~/components/PageHeader'
+import LoadingSpinner from '~/components/LinearProgressBar/LoadingSpinner'
 
 export default function Squadre() {
-  const theme = useTheme()
-  const isXs = useMediaQuery(theme.breakpoints.down('md'))
-
+  const id = useId()
+  const [search, setSearch] = useState('')
   const squadreList = useQuery(
     orpc.squadre.list.queryOptions({
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
     }),
   )
-
-  if (squadreList.isLoading) {
-    return (
-      <Box
-        sx={{
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <CircularProgress color="warning" />
-      </Box>
-    )
-  }
-
-  if (isXs) {
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: '10px',
-          flexWrap: 'wrap',
-        }}
-      >
-        <Grid container spacing={0}>
-          {squadreList.data?.map((squadra) => (
-            <Grid
-              item
-              xs={6}
-              key={squadra.id}
-              sx={{ display: 'flex', justifyContent: 'center', p: 1 }}
-            >
-              <Link
-                href={`/squadra/${squadra.id}`}
-                style={{ textDecoration: 'none', width: '100%' }}
-              >
-                <Card
-                  sx={{
-                    width: '85%',
-                    minWidth: 0,
-                    marginBottom: '4px',
-                    transition: 'transform 0.15s ease, border-color 0.15s ease',
-                    '&:hover': {
-                      transform: 'scale(1.03)',
-                      borderColor: 'rgba(255,193,7,0.5)',
-                    },
-                  }}
-                >
-                  <CardActionArea>
-                    <Box
-                      sx={{
-                        overflow: 'hidden',
-                        width: '100%',
-                        aspectRatio: '4 / 3',
-                      }}
-                    >
-                      <CardMedia
-                        component="img"
-                        image={squadra.foto ?? ''}
-                        alt={squadra.squadra}
-                        sx={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          transition: 'transform 0.3s ease',
-                          '.MuiCardActionArea-root:hover &': {
-                            transform: 'scale(1.12)',
-                          },
-                        }}
-                      />
-                    </Box>
-                    <CardContent
-                      sx={{ paddingBottom: '1px', paddingLeft: '3px' }}
-                    >
-                      <Typography variant="body2">
-                        <h5>{squadra.squadra}</h5>
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
-              </Link>
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-    )
-  }
+  const squadre = squadreList.data ?? []
+  const query = search.trim().toLocaleLowerCase('it-IT')
+  const filtered = squadre.filter((team) =>
+    `${team.squadra} ${team.presidente}`.toLocaleLowerCase('it-IT').includes(query),
+  )
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: '12px',
-        flexWrap: 'wrap',
-        py: 1,
-      }}
-    >
-      {squadreList.data?.map((squadra) => (
-        <Link
-          key={squadra.id}
-          href={`/squadra/${squadra.id}`}
-          style={{ textDecoration: 'none' }}
-        >
-          <Card
+    <Box sx={{ width: '100%', minWidth: 0, maxWidth: 1000, mx: 'auto', py: 1 }}>
+      <PageHeader title="Squadre" subtitle="Le squadre della lega, i presidenti e le rose" Icon={Groups} />
+      {squadreList.isLoading ? (
+        <Box aria-busy="true" aria-label="Caricamento squadre"><LoadingSpinner /></Box>
+      ) : squadreList.isError ? (
+        <Alert severity="error">Impossibile caricare le squadre: {squadreList.error.message}</Alert>
+      ) : squadre.length === 0 ? (
+        <Alert severity="info">Nessuna squadra disponibile.</Alert>
+      ) : (
+        <>
+          <Chip label={`${squadre.length} squadre`} size="small" variant="outlined" sx={{ mb: 2 }} />
+          <TextField
+            fullWidth
+            size="small"
+            label="Cerca squadra o presidente"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            inputProps={{ 'aria-controls': `${id}-squadre` }}
+            InputProps={{ startAdornment: <InputAdornment position="start"><Search fontSize="small" /></InputAdornment> }}
+            sx={{ mb: 2 }}
+          />
+          {filtered.length === 0 && <Alert severity="info">Nessuna squadra trovata.</Alert>}
+          <Box
+            component="ul"
+            id={`${id}-squadre`}
+            aria-label="Squadre della lega"
             sx={{
-              minWidth: 110,
-              maxWidth: 110,
-              marginBottom: '0px',
-              cursor: 'pointer',
-              transition:
-                'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
-              '&:hover': {
-                transform: 'translateY(-3px)',
-                borderColor: 'rgba(255,193,7,0.5)',
-                boxShadow: '0 6px 20px rgba(255,193,7,0.15)',
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: 'repeat(2, minmax(0, 1fr))',
+                sm: 'repeat(3, minmax(0, 1fr))',
+                md: 'repeat(4, minmax(0, 1fr))',
               },
+              gap: { xs: 1.25, sm: 2 },
+              m: 0,
+              p: 0,
+              listStyle: 'none',
             }}
           >
-            <CardActionArea>
-              <Box sx={{ overflow: 'hidden', height: 80 }}>
-                <CardMedia
-                  component="img"
-                  height="80"
-                  image={squadra.foto ?? ''}
-                  alt={squadra.squadra}
+            {filtered.map((team) => (
+              <Card component="li" key={team.id} variant="outlined" sx={{ minWidth: 0 }}>
+                <CardActionArea
+                  component={Link}
+                  href={`/squadra/${team.id}`}
                   sx={{
-                    objectFit: 'cover',
-                    transition: 'transform 0.3s ease',
-                    '.MuiCardActionArea-root:hover &': {
-                      transform: 'scale(1.12)',
-                    },
-                  }}
-                />
-              </Box>
-              <CardContent sx={{ p: '6px 8px', '&:last-child': { pb: '6px' } }}>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    fontSize: '0.7rem',
-                    textOverflow: 'ellipsis',
-                    overflow: 'hidden',
-                    whiteSpace: 'nowrap',
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
                   }}
                 >
-                  {squadra.squadra}
-                </Typography>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Link>
-      ))}
+                  <Box sx={{ p: 1.5, width: '100%', boxSizing: 'border-box', bgcolor: 'action.hover' }}>
+                    <Avatar
+                      src={team.foto ?? undefined}
+                      alt=""
+                      variant="rounded"
+                      sx={{
+                        width: '100%',
+                        height: 'auto',
+                        aspectRatio: '4 / 3',
+                        '& img': { objectFit: 'contain' },
+                        bgcolor: 'background.default',
+                        color: 'primary.main',
+                        fontSize: '2rem',
+                      }}
+                    >
+                      {team.squadra.slice(0, 1)}
+                    </Avatar>
+                  </Box>
+                  <CardContent sx={{ width: '100%', boxSizing: 'border-box', p: 1.25, '&:last-child': { pb: 1.25 } }}>
+                    <Typography component="h3" variant="body2" fontWeight={800} sx={{ overflowWrap: 'anywhere' }}>
+                      {team.squadra}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5, overflowWrap: 'anywhere' }}>
+                      {team.presidente}
+                    </Typography>
+                    <Typography component="span" variant="caption" color="primary.main" sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 0.25 }}>
+                      Rosa e dettagli <ChevronRight fontSize="small" />
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            ))}
+          </Box>
+        </>
+      )}
     </Box>
   )
 }

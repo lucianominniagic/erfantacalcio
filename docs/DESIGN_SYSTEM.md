@@ -280,6 +280,14 @@ Implementazione: `CircularProgress color="warning"` centrato.
 
 ## 8. Convenzioni di stile
 
+### Album squadre
+
+La sezione Squadre usa la griglia B: due colonne su smartphone, tre da `sm`
+e quattro da `md`, con foto intere in formato 4:3 (senza ritaglio), nome squadra
+e presidente a capo. L'intera scheda apre `/squadra/[idSquadra]`; in assenza di
+foto appare l'iniziale. La ricerca locale filtra per squadra o presidente,
+preservando l'ordine dell'API. Lo stesso album è usato in fondo al profilo squadra.
+
 ### Tabella classifica
 
 Campionato e gironi Champions mantengono il DataGrid originale, con una riga
