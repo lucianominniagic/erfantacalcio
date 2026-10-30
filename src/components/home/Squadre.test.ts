@@ -24,7 +24,12 @@ const state = vi.hoisted<{
 
 beforeEach(() => {
   state.data = [
-    { id: 8, squadra: 'Nome squadra molto lungo', presidente: 'Presidente Uno', foto: null },
+    {
+      id: 8,
+      squadra: 'Nome squadra molto lungo',
+      presidente: 'Presidente Uno',
+      foto: null,
+    },
     { id: 2, squadra: 'Seconda', presidente: 'Presidente Due', foto: null },
   ]
   state.isLoading = false
@@ -34,22 +39,27 @@ beforeEach(() => {
 
 function render() {
   const html = renderToStaticMarkup(createElement(Squadre))
-  const text = html.replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]*>/g, '')
+  const text = html
+    .replace(/<style[\s\S]*?<\/style>/g, '')
+    .replace(/<[^>]*>/g, '')
   return { html, text }
 }
 
 describe('Squadre album', () => {
   it('renders real teams in API order with single accessible links and presidents', () => {
     const { html, text } = render()
-    expect(text.indexOf('Nome squadra molto lungo')).toBeLessThan(text.indexOf('Seconda'))
+    expect(text.indexOf('Nome squadra molto lungo')).toBeLessThan(
+      text.indexOf('Seconda'),
+    )
     expect(text).toContain('Presidente Uno')
     expect(text).toContain('Presidente Due')
-    expect(text).toContain('2 squadre')
+    expect(text).not.toContain('2 squadre')
     expect(html.match(/<a\b/g)).toHaveLength(2)
     expect(html).toContain('href="/squadra/8"')
     expect(html).toContain('href="/squadra/2"')
     expect(html).toContain('aria-label="Squadre della lega"')
-    expect(html).toContain('Cerca squadra o presidente')
+    expect(html).not.toContain('Cerca squadra o presidente')
+    expect(html).not.toContain('<input')
     expect(html).toContain('repeat(2, minmax(0, 1fr))')
     expect(html).toContain('repeat(4, minmax(0, 1fr))')
     expect(html).toContain('object-fit:contain')
@@ -66,6 +76,8 @@ describe('Squadre album', () => {
     expect(render().text).toContain('Nessuna squadra disponibile.')
     state.isError = true
     state.error = { message: 'Connessione non disponibile' }
-    expect(render().text).toContain('Impossibile caricare le squadre: Connessione non disponibile')
+    expect(render().text).toContain(
+      'Impossibile caricare le squadre: Connessione non disponibile',
+    )
   })
 })
