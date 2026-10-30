@@ -1,33 +1,56 @@
 'use client'
+
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Alert,
   Box,
-  Divider,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   FormControlLabel,
-  Grid,
+  InputAdornment,
+  IconButton,
+  MenuItem,
+  Paper,
+  Stack,
   Switch,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
   useMediaQuery,
 } from '@mui/material'
-import { useState } from 'react'
+import { Close, ExpandMore, PersonSearch, Search } from '@mui/icons-material'
+import { useId, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { orpc } from '~/utils/orpc'
 import { useTheme } from '@mui/material/styles'
+import { orpc } from '~/utils/orpc'
 import GenericAutocomplete from '~/components/autocomplete/GenericAutocomplete'
 import { type Ruoli } from '~/types/common'
 import { getRuoloEsteso } from '~/utils/formazione'
-import Modal from '../modal/Modal'
-import Giocatore from './Giocatore'
+import Giocatore from '~/components/giocatori/Giocatore'
 import GiocatoriRankingList from '~/components/giocatori/GiocatoriRankingList'
+import PageHeader from '~/components/PageHeader'
+import {
+  filtraOrdinaGiocatori,
+  type OrdinamentoGiocatori,
+} from '~/components/giocatori/giocatoriRanking'
 
-function Giocatori() {
+const ruoli: Ruoli[] = ['P', 'D', 'C', 'A']
+
+export default function Giocatori() {
+  const id = useId()
   const theme = useTheme()
   const isXs = useMediaQuery(theme.breakpoints.down('md'))
-
   const [selectedGiocatoreId, setSelectedGiocatoreId] = useState<number>()
-  const [openModalCalendario, setOpenModalCalendario] = useState(false)
+  const [openModal, setOpenModal] = useState(false)
   const [soloSvincolati, setSoloSvincolati] = useState(false)
   const [searchInput, setSearchInput] = useState('')
+  const [ricerca, setRicerca] = useState('')
   const [ruolo, setRuolo] = useState<Ruoli>('C')
+  const [ordinamento, setOrdinamento] = useState<OrdinamentoGiocatori>('media')
   const giocatoriSearch = useQuery(
     orpc.giocatori.search.queryOptions({
       input: { query: searchInput },
@@ -38,128 +61,212 @@ function Giocatori() {
   )
   const giocatoriStats = useQuery(
     orpc.giocatori.listStatistiche.queryOptions({
-      input: { ruolo: ruolo, soloSvincolati: soloSvincolati },
+      input: { ruolo, soloSvincolati },
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
     }),
   )
-
-  const handleGiocatoreSelected = async (idGiocatore: number | undefined) => {
-    if (idGiocatore === undefined) return
-    setSelectedGiocatoreId(idGiocatore)
-    setOpenModalCalendario(true)
-  }
-
-  const handleModalClose = () => {
-    setOpenModalCalendario(false)
+  const giocatori = filtraOrdinaGiocatori(
+    giocatoriStats.data ?? [],
+    ricerca,
+    ordinamento,
+    ruolo,
+  )
+  function apriGiocatore(giocatoreId: number) {
+    setSelectedGiocatoreId(giocatoreId)
+    setOpenModal(true)
   }
 
   return (
-    <>
-      <Grid container spacing={1} paddingTop={2} paddingBottom={2}>
-        <Grid item xs={12}>
-          <Typography variant="h4">Statistiche Giocatori</Typography>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <FormControlLabel
-            control={
-              <Switch
-                color="warning"
-                onChange={() => setRuolo('P')}
-                checked={ruolo === 'P'}
-              />
-            }
-            label={isXs ? 'P' : getRuoloEsteso('P', true)}
+    <Box
+      sx={{
+        width: '100%',
+        minWidth: 0,
+        maxWidth: 1100,
+        mx: 'auto',
+        overflowWrap: 'anywhere',
+      }}
+    >
+      <PageHeader title="Statistiche Giocatori" Icon={PersonSearch} />
+      <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+        <ToggleButtonGroup
+          exclusive
+          fullWidth
+          value={ruolo}
+          onChange={(_, value: Ruoli | null) => {
+            if (value) setRuolo(value)
+          }}
+          aria-label="Ruolo giocatore"
+        >
+          {ruoli.map((r) => (
+            <ToggleButton
+              key={r}
+              value={r}
+              aria-label={getRuoloEsteso(r, true)}
+              sx={{ minHeight: 44, fontWeight: 800, flex: 1, minWidth: 0 }}
+            >
+              {r}
+              <Box
+                component="span"
+                sx={{ display: { xs: 'none', md: 'inline' }, ml: 1 }}
+              >
+                {getRuoloEsteso(r, true)}
+              </Box>
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+        <Stack direction={{ xs: 'column', sm: 'row' }} gap={1.5} sx={{ mt: 2 }}>
+          <TextField
+            fullWidth
+            size="small"
+            label="Filtra nome, club o squadra fantasy"
+            value={ricerca}
+            onChange={(e) => setRicerca(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
           />
-          <FormControlLabel
-            control={
-              <Switch
-                color="warning"
-                onChange={() => setRuolo('D')}
-                checked={ruolo === 'D'}
-              />
-            }
-            label={isXs ? 'D' : getRuoloEsteso('D', true)}
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                color="warning"
-                onChange={() => setRuolo('C')}
-                checked={ruolo === 'C'}
-              />
-            }
-            label={isXs ? 'C' : getRuoloEsteso('C', true)}
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                color="warning"
-                onChange={() => setRuolo('A')}
-                checked={ruolo === 'A'}
-              />
-            }
-            label={isXs ? 'A' : getRuoloEsteso('A', true)}
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                onChange={(e) => setSoloSvincolati(e.target.checked)}
-                checked={soloSvincolati}
-              />
-            }
-            label="Solo svincolati"
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
+          <TextField
+            select
+            size="small"
+            label="Ordina per"
+            value={ordinamento}
+            onChange={(e) => {
+              const value = e.target.value
+              if (value === 'media' || value === 'presenze' || value === 'gol')
+                setOrdinamento(value)
+            }}
+            sx={{ minWidth: 170 }}
+          >
+            <MenuItem value="media">Media voto</MenuItem>
+            <MenuItem value="presenze">Presenze</MenuItem>
+            <MenuItem value="gol">
+              {ruolo === 'P' ? 'Meno gol subiti' : 'Gol segnati'}
+            </MenuItem>
+          </TextField>
+        </Stack>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={soloSvincolati}
+              onChange={(e) => setSoloSvincolati(e.target.checked)}
+            />
+          }
+          label="Solo svincolati"
+          sx={{ mt: 1 }}
+        />
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ display: 'block' }}
+        >
+          Filtri e ordinamento si applicano ai giocatori caricati per il ruolo,
+          con la soglia presenze prevista dalla lega.
+        </Typography>
+      </Paper>
+      <Accordion disableGutters elevation={0} variant="outlined" sx={{ mb: 3 }}>
+        <AccordionSummary
+          expandIcon={<ExpandMore />}
+          id={`${id}-ricerca`}
+          aria-controls={`${id}-ricerca-contenuto`}
+        >
+          <Typography variant="body2">
+            Cerchi un giocatore fuori da questa lista?
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails id={`${id}-ricerca-contenuto`}>
           <GenericAutocomplete
-            onItemSelected={(id, text) => {
-              const numericId = typeof id === 'number' ? id : undefined
-              handleGiocatoreSelected(numericId)
+            label="Cerca in tutti i giocatori"
+            placeholder="Digita almeno 2 caratteri"
+            width="100%"
+            onItemSelected={(selectedId) => {
+              if (typeof selectedId === 'number') apriGiocatore(selectedId)
             }}
             items={giocatoriSearch.data ?? []}
             loading={giocatoriSearch.isFetching}
             onInputChange={setSearchInput}
-            filterOptions={(x) => x}
+            filterOptions={(options) => options}
             allowCustomInput={false}
+            freeSolo={false}
           />
-        </Grid>
-        <Grid item xs={12} sx={{ minHeight: 500 }}>
-          <Typography variant="h5">
-            Top {getRuoloEsteso(ruolo, true)}
-          </Typography>
-          <Box sx={{ width: '100%', mt: 1 }}>
-            <GiocatoriRankingList
-              giocatori={giocatoriStats.data ?? []}
-              isLoading={giocatoriStats.isLoading}
-              onNomeClick={(id) => {
-                setSelectedGiocatoreId(id)
-                setOpenModalCalendario(true)
-              }}
-              ruolo={ruolo}
-            />
-          </Box>
-        </Grid>
-        <Grid item xs={12} minHeight={30}></Grid>
-      </Grid>
-
-      <Modal
-        title={'Statistica giocatore'}
-        open={openModalCalendario}
-        onClose={handleModalClose}
-        width={isXs ? '98%' : '1266px'}
-        height={isXs ? '98%' : ''}
+          {giocatoriSearch.isError && (
+            <Alert severity="error" sx={{ mt: 1 }}>
+              Impossibile cercare i giocatori: {giocatoriSearch.error.message}
+            </Alert>
+          )}
+        </AccordionDetails>
+      </Accordion>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="baseline"
+        gap={1}
+        sx={{ mb: 1.5 }}
       >
-        <Divider />
-        <Box sx={{ mt: 1, gap: '0px', flexWrap: 'wrap' }}>
+        <Typography variant="h6" component="h2">
+          {getRuoloEsteso(ruolo, true)}
+        </Typography>
+        {!giocatoriStats.isLoading && !giocatoriStats.isError && (
+          <Typography variant="caption" color="text.secondary" role="status">
+            {giocatori.length} risultati ·{' '}
+            {ordinamento === 'media'
+              ? 'media'
+              : ordinamento === 'presenze'
+                ? 'presenze'
+                : 'gol'}
+          </Typography>
+        )}
+      </Stack>
+      {giocatoriStats.isError ? (
+        <Alert severity="error">
+          Impossibile caricare le statistiche: {giocatoriStats.error.message}
+        </Alert>
+      ) : (
+        <Paper variant="outlined">
+          <GiocatoriRankingList
+            giocatori={giocatori}
+            isLoading={giocatoriStats.isLoading}
+            onNomeClick={apriGiocatore}
+            ruolo={ruolo}
+          />
+        </Paper>
+      )}
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ display: 'block', mt: 2 }}
+      >
+        Tocca un giocatore per aprire le statistiche dettagliate. Media voto su
+        scala 0–10.
+      </Typography>
+      <Dialog
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        fullScreen={isXs}
+        maxWidth={false}
+        aria-labelledby={`${id}-scheda-titolo`}
+        PaperProps={{ sx: { width: 1266, maxWidth: '100%' } }}
+      >
+        <DialogTitle id={`${id}-scheda-titolo`} sx={{ pr: 7 }}>
+          Statistica giocatore
+          <IconButton
+            aria-label="Chiudi scheda giocatore"
+            onClick={() => setOpenModal(false)}
+            sx={{ position: 'absolute', top: 8, right: 8 }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
           {selectedGiocatoreId !== undefined && (
             <Giocatore idGiocatore={selectedGiocatoreId} />
           )}
-        </Box>
-      </Modal>
-
-    </>
+        </DialogContent>
+      </Dialog>
+    </Box>
   )
 }
-
-export default Giocatori

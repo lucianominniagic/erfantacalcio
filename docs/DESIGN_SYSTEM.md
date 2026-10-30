@@ -280,6 +280,16 @@ Implementazione: `CircularProgress color="warning"` centrato.
 
 ## 8. Convenzioni di stile
 
+### Lista compatta giocatori
+
+La pagina Statistiche Giocatori usa un selettore esclusivo P/D/C/A e righe
+interamente attivabili con mouse, touch e tastiera. Media, gol (subiti per i
+portieri), assist e presenze restano leggibili anche su smartphone.
+Ricerca locale e ordinamento operano sul gruppo restituito dall'API per ruolo
+e filtro svincolati, rispettando soglia presenze e limite dei risultati.
+La ricerca globale rimane disponibile in una sezione espandibile separata
+e apre la scheda reale anche per giocatori fuori dalla lista.
+
 ### Panoramica economia
 
 La pagina Economia mostra il montepremi netto in evidenza, poi premi e saldi

@@ -1,19 +1,17 @@
 'use client'
 
-import { Box, Chip, List, ListItem, Stack, Typography } from '@mui/material'
+import {
+  Alert,
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  Skeleton,
+  Stack,
+  Typography,
+} from '@mui/material'
 import { magliaRichiedeSfondoBianco } from '~/utils/maglia'
-interface GiocatoreStats {
-  id: number
-  nome: string
-  squadra?: string | null
-  squadraSerieA?: string | null
-  maglia?: string | null
-  media?: number | string | null
-  golsubiti?: number | string | null
-  golfatti?: number | string | null
-  assist?: number | string | null
-  giocate?: number | string | null
-}
+import type { GiocatoreStats } from '~/components/giocatori/giocatoriRanking'
 
 interface GiocatoriRankingListProps {
   giocatori: GiocatoreStats[]
@@ -30,115 +28,111 @@ export default function GiocatoriRankingList({
 }: GiocatoriRankingListProps) {
   if (isLoading) {
     return (
-      <Box sx={{ p: 2 }}>
-        <Typography color="text.secondary">Caricamento...</Typography>
-      </Box>
+      <Stack
+        spacing={1}
+        sx={{ p: 2 }}
+        aria-busy="true"
+        aria-label="Caricamento giocatori"
+      >
+        {Array.from({ length: 5 }, (_, i) => (
+          <Skeleton key={i} variant="rounded" height={88} />
+        ))}
+      </Stack>
     )
   }
+  if (giocatori.length === 0)
+    return (
+      <Alert severity="info">Nessun giocatore corrisponde ai filtri.</Alert>
+    )
 
   return (
-    <List disablePadding>
-      {giocatori.map((g, idx) => (
-        <ListItem key={g.id} divider sx={{ px: 1, py: 0.75 }}>
-          <Stack direction="row" alignItems="center" spacing={1.5} width="100%">
-            {/* Rank */}
+    <List disablePadding aria-label="Statistiche giocatori">
+      {giocatori.map((g, index) => (
+        <ListItem key={g.id} disablePadding divider>
+          <ListItemButton
+            component="button"
+            onClick={() => onNomeClick(g.id)}
+            aria-label={`Apri statistiche di ${g.nome}`}
+            sx={{
+              width: '100%',
+              textAlign: 'left',
+              px: { xs: 1.5, sm: 2 },
+              py: 1.5,
+              gap: 1.5,
+              overflowWrap: 'anywhere',
+            }}
+          >
             <Typography
-              variant="body2"
-              color="text.disabled"
-              sx={{ minWidth: 32, textAlign: 'right', fontWeight: 700, display: { xs: 'none', sm: 'block' } }}
+              variant="caption"
+              color="text.secondary"
+              sx={{ width: 20, flexShrink: 0 }}
             >
-              #{idx + 1}
+              {index + 1}
             </Typography>
-
-            {/* Maglia */}
-            {g.maglia ? (
-              <img
-                src={g.maglia}
-                width={24}
-                height={21}
-                alt={g.squadraSerieA ?? ''}
-                title={g.squadraSerieA ?? ''}
-                style={{
-                  objectFit: 'contain',
-                  backgroundColor: magliaRichiedeSfondoBianco(g.maglia) ? '#fff' : undefined,
-                }}
-              />
-            ) : (
-              <Box sx={{ width: 24, height: 21 }} />
-            )}
-
-            {/* Nome + Squadra */}
-            <Stack flex={1} spacing={0} overflow="hidden">
-              <Typography
-                variant="body2"
-                fontWeight={700}
-                noWrap
-                sx={{
-                  cursor: 'pointer',
-                  color: 'primary.main',
-                  '&:hover': { textDecoration: 'underline' },
-                }}
-                onClick={() => onNomeClick(g.id)}
-              >
-                {g.nome}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" noWrap>
-                {g.squadra ?? 'Svincolato'}
-              </Typography>
-            </Stack>
-
-            {/* Media — stat principale prominente */}
-            <Typography
-              variant="h6"
+            <Box
               sx={{
-                minWidth: 52,
-                textAlign: 'right',
-                color: 'primary.main',
-                fontWeight: 800,
-                lineHeight: 1,
+                width: 24,
+                flexShrink: 0,
+                display: { xs: 'none', sm: 'block' },
               }}
             >
-              {g.media != null ? Number(g.media).toFixed(2) : '—'}
-            </Typography>
-
-            {/* Pillole statistiche secondarie */}
-            <Stack
-              direction="row"
-              spacing={0.5}
-              flexWrap="wrap"
-              justifyContent="flex-end"
-            >
-              {ruolo === 'P' ? (
-                <Chip
-                  size="small"
-                  label={`GS: ${g.golsubiti ?? 0}`}
-                  color="error"
-                  variant="outlined"
-                />
-              ) : (
-                <Chip
-                  size="small"
-                  label={`GF: ${g.golfatti ?? 0}`}
-                  color="success"
-                  variant="outlined"
+              {g.maglia && (
+                <Box
+                  component="img"
+                  src={g.maglia}
+                  width={24}
+                  height={21}
+                  alt={g.squadraSerieA ?? ''}
+                  sx={{
+                    objectFit: 'contain',
+                    bgcolor: magliaRichiedeSfondoBianco(g.maglia)
+                      ? 'common.white'
+                      : undefined,
+                  }}
                 />
               )}
-              { ruolo !== 'P' && (
-                <Chip
-                  size="small"
-                  label={`AS: ${g.assist ?? 0}`}
-                  color="info"
-                  variant="outlined"
-                />
-              )}
-              <Chip
-                size="small"
-                label={`P: ${g.giocate ?? 0}`}
-                variant="outlined"
-                sx={{ display: { xs: 'none', sm: 'flex' } }}
-              />
-            </Stack>
-          </Stack>
+            </Box>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography variant="body2" fontWeight={800}>
+                {g.nome}
+              </Typography>
+              <Typography
+                variant="caption"
+                color={g.squadra ? 'text.secondary' : 'success.main'}
+              >
+                {g.squadra ?? 'Svincolato'}
+                {g.squadraSerieA ? ` · ${g.squadraSerieA}` : ''}
+              </Typography>
+              <Stack direction="row" flexWrap="wrap" gap={1.5} sx={{ mt: 0.5 }}>
+                <Typography variant="caption" color="text.secondary">
+                  {ruolo === 'P'
+                    ? `${g.golsubiti ?? 0} gol subiti`
+                    : `${g.golfatti ?? 0} gol`}
+                </Typography>
+                {ruolo !== 'P' && (
+                  <Typography variant="caption" color="text.secondary">
+                    {g.assist ?? 0} assist
+                  </Typography>
+                )}
+                <Typography variant="caption" color="text.secondary">
+                  {g.giocate ?? 0} presenze
+                </Typography>
+              </Stack>
+            </Box>
+            <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
+              <Typography variant="caption" color="text.secondary">
+                Media
+              </Typography>
+              <Typography variant="h3" component="p" color="primary.main">
+                {g.media != null
+                  ? Number(g.media).toLocaleString('it-IT', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                  : '—'}
+              </Typography>
+            </Box>
+          </ListItemButton>
         </ListItem>
       ))}
     </List>
