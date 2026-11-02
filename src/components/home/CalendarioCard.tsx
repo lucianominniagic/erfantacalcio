@@ -14,15 +14,15 @@ import type { z } from 'zod'
 import type { giornataSchema } from '~/schemas/calendario'
 import { formatDateFromIso } from '~/utils/dateUtils'
 
-interface MobileCalendarioCardProps {
+interface CalendarioCardProps {
   giornata: z.infer<typeof giornataSchema>
   tipo: 'risultati' | 'prossima'
 }
 
-export default function MobileCalendarioCard({
+export default function CalendarioCard({
   giornata: g,
   tipo,
-}: MobileCalendarioCardProps) {
+}: CalendarioCardProps) {
   const title = tipo === 'risultati' ? 'Risultati' : 'Prossime partite'
 
   return (
@@ -135,7 +135,10 @@ export default function MobileCalendarioCard({
                     alt={team.name ?? ''}
                     src={team.photo ?? ''}
                     variant="rounded"
-                    sx={{ width: 30, height: 30 }}
+                    sx={{
+                      width: { xs: 30, md: 38 },
+                      height: { xs: 30, md: 38 },
+                    }}
                   />
                   <Typography
                     variant="body2"

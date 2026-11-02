@@ -6,12 +6,15 @@ import {
   Alert,
   Avatar,
   Box,
+  Divider,
+  Paper,
   Skeleton,
   Stack,
   Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material'
+import { alpha } from '@mui/material/styles'
 import { DataGrid, type GridColDef } from '@mui/x-data-grid'
 import { MilitaryTech } from '@mui/icons-material'
 import { orpc } from '~/utils/orpc'
@@ -129,19 +132,49 @@ export default function Classifica({
   ]
 
   return (
-    <Box sx={{ width: '100%', minWidth: 0 }}>
-      <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 2 }}>
-        <MilitaryTech sx={{ color: 'champions.main', fontSize: '1.4rem' }} />
-        <Typography id={`${id}-titolo`} variant="h5" component="h2">
-          Classifica {getNomeTorneo(nomeTorneo, gruppo)}
+    <Paper
+      component="section"
+      aria-labelledby={`${id}-titolo`}
+      variant="outlined"
+      sx={{ width: '100%', minWidth: 0, overflow: 'hidden', borderRadius: 2.5 }}
+    >
+      <Box
+        sx={{
+          px: 1.5,
+          py: 1.25,
+          bgcolor: (theme) => alpha(theme.palette.primary.main, 0.04),
+        }}
+      >
+        <Stack direction="row" alignItems="center" gap={0.75}>
+          <MilitaryTech sx={{ color: 'champions.main', fontSize: 17 }} />
+          <Typography
+            id={`${id}-titolo`}
+            variant="subtitle2"
+            component="h2"
+            sx={{ color: 'text.primary', fontWeight: 700 }}
+          >
+            Classifica
+          </Typography>
+        </Stack>
+        <Typography
+          variant="caption"
+          sx={{ display: 'block', mt: 0.5, color: 'text.secondary' }}
+        >
+          {getNomeTorneo(nomeTorneo, gruppo)}
         </Typography>
-      </Stack>
+      </Box>
+      <Divider />
       {classificaList.isError ? (
         <Alert severity="error">
           Impossibile caricare la classifica: {classificaList.error.message}
         </Alert>
       ) : classificaList.isLoading || idTorneo === undefined ? (
-        <Stack spacing={1} aria-busy="true" aria-label="Caricamento classifica">
+        <Stack
+          spacing={1}
+          aria-busy="true"
+          aria-label="Caricamento classifica"
+          sx={{ p: 1.5 }}
+        >
           {Array.from({ length: gruppo ? 8 : 4 }, (_, i) => (
             <Skeleton key={i} variant="rounded" height={36} />
           ))}
@@ -151,10 +184,7 @@ export default function Classifica({
       ) : (
         <Box
           sx={{
-            borderRadius: '0 0 12px 12px',
-            border: 1,
-            borderColor: 'divider',
-            borderTop: 0,
+            minWidth: 0,
           }}
         >
           <DataGrid
@@ -175,7 +205,8 @@ export default function Classifica({
             disableRowSelectionOnClick
             hideFooter
             sx={{
-              borderRadius: '0 0 12px 12px',
+              border: 0,
+              borderRadius: 0,
               '& .MuiDataGrid-cell, & .MuiDataGrid-columnHeader': { px: 0.5 },
               '& .MuiDataGrid-columnHeaderTitle': {
                 fontSize: isXs ? '0.6875rem' : '0.72rem',
@@ -192,6 +223,6 @@ export default function Classifica({
           />
         </Box>
       )}
-    </Box>
+    </Paper>
   )
 }

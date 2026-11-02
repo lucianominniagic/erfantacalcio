@@ -175,7 +175,7 @@ export default function HomePage() {
       <Grid container spacing={0} sx={isXs ? { pb: 9 } : undefined}>
         {(!isXs || activeMobileSection === 'squadre') && (
           <Slide direction={'down'} in={true}>
-            <Grid item xs={12}>
+            <Grid item xs={12} sx={!isXs ? { order: 1, mt: 2 } : undefined}>
               <Squadre />
             </Grid>
           </Slide>
@@ -199,7 +199,6 @@ export default function HomePage() {
                   {(!isXs || activeMobileSection === 'calendario') && (
                     <Calendario
                       tipo={'risultati'}
-                      prefixTitle="Risultati:"
                       enableTabs={true}
                     ></Calendario>
                   )}
@@ -225,7 +224,6 @@ export default function HomePage() {
                         <>
                           <Calendario
                             tipo={'prossima'}
-                            prefixTitle=""
                             enableTabs={true}
                           ></Calendario>
                           <Box

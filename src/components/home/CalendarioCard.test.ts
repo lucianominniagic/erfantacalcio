@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import type { z } from 'zod'
 import type { giornataSchema } from '~/schemas/calendario'
 import { formatDateFromIso } from '~/utils/dateUtils'
-import MobileCalendarioCard from './MobileCalendarioCard'
+import CalendarioCard from './CalendarioCard'
 
 const giornata: z.infer<typeof giornataSchema> = {
   idCalendario: 9,
@@ -38,10 +38,10 @@ const giornata: z.infer<typeof giornataSchema> = {
   ],
 }
 
-describe('MobileCalendarioCard', () => {
+describe('CalendarioCard', () => {
   it('renders real photos, a zero score and the existing results link', () => {
     const html = renderToStaticMarkup(
-      createElement(MobileCalendarioCard, { giornata, tipo: 'risultati' }),
+      createElement(CalendarioCard, { giornata, tipo: 'risultati' }),
     )
     expect(html).toContain('src="/images/fotoprofili/foto_alex.jpg"')
     expect(html).toContain('src="/images/fotoprofili/foto_lucks.jpg"')
@@ -52,7 +52,7 @@ describe('MobileCalendarioCard', () => {
 
   it('shows the shared date only once and keeps future lineup links', () => {
     const html = renderToStaticMarkup(
-      createElement(MobileCalendarioCard, {
+      createElement(CalendarioCard, {
         giornata: {
           ...giornata,
           isGiocata: false,
@@ -75,7 +75,7 @@ describe('MobileCalendarioCard', () => {
 
   it('renders the empty matchday message', () => {
     const html = renderToStaticMarkup(
-      createElement(MobileCalendarioCard, {
+      createElement(CalendarioCard, {
         giornata: { ...giornata, partite: [] },
         tipo: 'prossima',
       }),

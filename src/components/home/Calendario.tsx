@@ -10,25 +10,18 @@ import {
   Typography,
   Tabs,
   Tab,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material'
-import CardPartite from '~/components/cardPartite/CardPartite'
-import MobileCalendarioCard from '~/components/home/MobileCalendarioCard'
+import CalendarioCard from '~/components/home/CalendarioCard'
 
 interface CalendarioProps {
-  prefixTitle: string
   tipo: 'risultati' | 'prossima'
   enableTabs?: boolean
 }
 
 export default function Calendario({
-  prefixTitle,
   tipo,
   enableTabs = false,
 }: CalendarioProps) {
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const calendarioList =
     tipo === 'prossima'
       ? useQuery(
@@ -92,20 +85,9 @@ export default function Calendario({
         ? (groups.find((g) => g.key === selectedTorneo) ?? groups[0]).items
         : (calendarioList.data ?? [])
 
-    if (isMobile) {
-      return items.map((g) => (
-        <MobileCalendarioCard key={g.idCalendario} giornata={g} tipo={tipo} />
-      ))
-    }
-
-    return (
-      <CardPartite
-        giornata={items}
-        prefixTitle={prefixTitle}
-        maxWidth={600}
-        withAvatar={true}
-      ></CardPartite>
-    )
+    return items.map((g) => (
+      <CalendarioCard key={g.idCalendario} giornata={g} tipo={tipo} />
+    ))
   }
 
   return (
