@@ -10,8 +10,11 @@ import {
   Typography,
   Tabs,
   Tab,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
-import CardPartite from '../cardPartite/CardPartite'
+import CardPartite from '~/components/cardPartite/CardPartite'
+import MobileCalendarioCard from '~/components/home/MobileCalendarioCard'
 
 interface CalendarioProps {
   prefixTitle: string
@@ -24,16 +27,22 @@ export default function Calendario({
   tipo,
   enableTabs = false,
 }: CalendarioProps) {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const calendarioList =
     tipo === 'prossima'
-      ? useQuery(orpc.calendario.getProssimeGiornate.queryOptions({
-          refetchOnWindowFocus: false,
-          refetchOnReconnect: false,
-        }))
-      : useQuery(orpc.calendario.getUltimiRisultati.queryOptions({
-          refetchOnWindowFocus: false,
-          refetchOnReconnect: false,
-        }))
+      ? useQuery(
+          orpc.calendario.getProssimeGiornate.queryOptions({
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+          }),
+        )
+      : useQuery(
+          orpc.calendario.getUltimiRisultati.queryOptions({
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+          }),
+        )
   const [errorMessage, setErrorMessage] = useState('')
   // selectedTorneo now stores the tournament name (key) so that entries with the same name are grouped together
   const [selectedTorneo, setSelectedTorneo] = useState<string | null>(null)
@@ -78,21 +87,20 @@ export default function Calendario({
   }, [groups])
 
   const renderGiornata = () => {
-    if (enableTabs && groups.length > 1) {
-      const group = groups.find((g) => g.key === selectedTorneo) || groups[0]
-      return (
-        <CardPartite
-          giornata={group.items}
-          prefixTitle={prefixTitle}
-          maxWidth={600}
-          withAvatar={true}
-        ></CardPartite>
-      )
+    const items =
+      enableTabs && groups.length > 1
+        ? (groups.find((g) => g.key === selectedTorneo) ?? groups[0]).items
+        : (calendarioList.data ?? [])
+
+    if (isMobile) {
+      return items.map((g) => (
+        <MobileCalendarioCard key={g.idCalendario} giornata={g} tipo={tipo} />
+      ))
     }
 
     return (
       <CardPartite
-        giornata={calendarioList.data ?? []}
+        giornata={items}
         prefixTitle={prefixTitle}
         maxWidth={600}
         withAvatar={true}

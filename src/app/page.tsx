@@ -234,6 +234,18 @@ export default function HomePage() {
                               flexDirection: 'column',
                               alignItems: 'center',
                               '& > *': { m: 1 },
+                              ...(isXs && {
+                                '& .MuiButtonGroup-root': {
+                                  width: '100%',
+                                  mx: 0,
+                                },
+                                '& .MuiButton-root': {
+                                  minWidth: 0,
+                                  flex: 1,
+                                  px: 0.25,
+                                },
+                                '& .MuiButton-startIcon': { mx: 0 },
+                              }),
                             }}
                           >
                             <CalendarioButtonGroup
