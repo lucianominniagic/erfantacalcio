@@ -51,7 +51,7 @@ vi.mock('~/config', () => ({
 
 // Dopo i mock, importiamo i moduli che usiamo
 import { AppDataSource } from '~/data-source'
-import { Calendario } from '~/server/db/entities'
+import { Calendario, Giocatori, Trasferimenti, Voti } from '~/server/db/entities'
 import { caricaVoti } from './caricaVotiService'
 
 describe('caricaVoti', () => {
@@ -97,7 +97,7 @@ describe('caricaVoti', () => {
     vi.clearAllMocks()
 
     mockEntityManager = {
-      find: vi.fn(),
+      find: vi.fn().mockResolvedValue([]),
       findOne: vi.fn(),
       exists: vi.fn(),
       insert: vi.fn().mockResolvedValue({ identifiers: [{}] }),
@@ -174,7 +174,7 @@ describe('caricaVoti', () => {
 
       // Mock find giocatore per id_pf
       mockEntityManager.find.mockResolvedValueOnce([
-        { idGiocatore: 10, nome: 'Luigi Bianchi', ruolo: 'D' },
+        { idGiocatore: 10, id_pf: 42, nome: 'LUIGI BIANCHI' },
       ])
 
       // Mock findOne trasferimento
@@ -199,7 +199,11 @@ describe('caricaVoti', () => {
 
       expect(mockEntityManager.findOne).toHaveBeenCalled()
       expect(mockEntityManager.exists).toHaveBeenCalled()
-      expect(mockEntityManager.update).toHaveBeenCalled()
+      expect(mockEntityManager.update).toHaveBeenCalledWith(
+        Voti,
+        { idGiocatore: 10, idCalendario },
+        expect.objectContaining({ voto: 6 }),
+      )
     })
   })
 
@@ -214,7 +218,7 @@ describe('caricaVoti', () => {
       ;(Calendario.findOneOrFail as any).mockResolvedValue(calendario)
 
       mockEntityManager.find.mockResolvedValueOnce([
-        { idGiocatore: 10, nome: 'Mario Rossi', ruolo: 'D' },
+        { idGiocatore: 10, id_pf: 42, nome: 'MARIO ROSSI' },
       ])
 
       mockEntityManager.findOne.mockResolvedValueOnce({
@@ -231,8 +235,10 @@ describe('caricaVoti', () => {
       // assert
       expect(mockEntityManager.exists).toHaveBeenCalled()
       expect(mockEntityManager.insert).toHaveBeenCalledWith(
-        expect.anything(),
+        Voti,
         expect.objectContaining({
+          idGiocatore: 10,
+          idCalendario,
           voto: 6,
         }),
       )
@@ -250,8 +256,9 @@ describe('caricaVoti', () => {
       ;(Calendario.findOneOrFail as any).mockResolvedValue(calendario)
 
       mockEntityManager.find.mockResolvedValueOnce([
-        { idGiocatore: 10, nome: 'Mario Rossi', ruolo: 'D' },
+        { idGiocatore: 10, id_pf: 42, nome: 'MARIO ROSSI' },
       ])
+      mockEntityManager.find.mockResolvedValueOnce([])
 
       // Mock findOne trasferimento = null (no trasferimento)
       mockEntityManager.findOne.mockResolvedValueOnce(null)
@@ -268,7 +275,7 @@ describe('caricaVoti', () => {
 
       // assert
       expect(mockEntityManager.insert).toHaveBeenCalledWith(
-        expect.anything(),
+        Trasferimenti,
         expect.objectContaining({
           idGiocatore: 10,
           idSquadraSerieA: 100,
@@ -286,7 +293,7 @@ describe('caricaVoti', () => {
       ;(Calendario.findOneOrFail as any).mockResolvedValue(calendario)
 
       mockEntityManager.find.mockResolvedValueOnce([
-        { idGiocatore: 10, nome: 'Mario Rossi', ruolo: 'D' },
+        { idGiocatore: 10, id_pf: 42, nome: 'MARIO ROSSI' },
       ])
 
       // Mock findOne trasferimento = exists
@@ -301,7 +308,12 @@ describe('caricaVoti', () => {
       await caricaVoti(voti, idCalendario)
 
       // assert
-      expect(mockEntityManager.insert.mock.calls.length).toBeGreaterThan(0)
+      expect(mockEntityManager.insert).not.toHaveBeenCalled()
+      expect(mockEntityManager.update).toHaveBeenCalledWith(
+        Voti,
+        { idGiocatore: 10, idCalendario },
+        expect.objectContaining({ voto: 6 }),
+      )
     })
   })
 
@@ -316,7 +328,7 @@ describe('caricaVoti', () => {
       ;(Calendario.findOneOrFail as any).mockResolvedValue(calendario)
 
       mockEntityManager.find.mockResolvedValueOnce([
-        { idGiocatore: 10, nome: 'Mario Rossi', ruolo: 'D' },
+        { idGiocatore: 10, id_pf: 42, nome: 'MARIO ROSSI' },
       ])
 
       mockEntityManager.findOne.mockResolvedValueOnce({
@@ -348,11 +360,7 @@ describe('caricaVoti', () => {
       ;(Calendario.findOneOrFail as any).mockResolvedValue(calendario)
 
       mockEntityManager.find.mockResolvedValueOnce([])
-      mockEntityManager.create.mockReturnValue({
-        idGiocatore: 99,
-        nome: 'Marco Verdi',
-        ruolo: 'C',
-      })
+      mockEntityManager.find.mockResolvedValueOnce([])
       mockEntityManager.insert.mockResolvedValueOnce({ identifiers: [{ idGiocatore: 99 }] })
       mockEntityManager.findOne.mockResolvedValueOnce(null)
       mockEntityManager.find.mockResolvedValueOnce([
@@ -367,10 +375,21 @@ describe('caricaVoti', () => {
 
       // assert
       expect(mockEntityManager.insert).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({
-          nome: 'Marco Verdi',
-        }),
+        Giocatori,
+        [{
+          id_pf: 42,
+          nome: 'MARCO VERDI',
+          nomeFantaGazzetta: null,
+          ruolo: 'C',
+        }],
+      )
+      expect(mockEntityManager.insert).toHaveBeenCalledWith(
+        Trasferimenti,
+        expect.objectContaining({ idGiocatore: 99, idSquadraSerieA: 100 }),
+      )
+      expect(mockEntityManager.insert).toHaveBeenCalledWith(
+        Voti,
+        expect.objectContaining({ idGiocatore: 99, idCalendario, voto: 6 }),
       )
     })
   })
