@@ -53,6 +53,7 @@ The testability trade-off is acceptable given the small team size and the fact t
 - **Less boilerplate**: `Utenti.findOne({ where: { username } })` instead of `userRepository.findOne(...)`.
 - **Transactions**: `AppDataSource.transaction(async trx => { ... })` with explicit `EntityManager` for transactional operations.
 - **NamingStrategy**: a custom `NamingStrategy` (`src/server/db/utils/namingStrategy`) maps camelCase TypeScript fields to snake_case DB columns automatically (e.g., `nomeSquadra` → `nome_squadra`).
+- **Next.js runtime**: `next.config.mjs` lists `typeorm` in `serverExternalPackages` so its dynamic PostgreSQL driver loading uses native Node.js resolution instead of bundling.
 - **Type-safe numeric columns**: `pg.types.setTypeParser` in `data-source.ts` parses PostgreSQL `numeric`/`decimal` columns to JS `number` (avoids the default string output).
 
 ### Negative / Trade-offs

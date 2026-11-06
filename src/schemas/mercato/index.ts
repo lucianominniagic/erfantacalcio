@@ -20,6 +20,10 @@ export const tipoValutaEnum = z.enum(['fantamilioni', 'euro'])
 
 export type TipoValuta = z.infer<typeof tipoValutaEnum>
 
+export const ruoloMercatoEnum = z.enum(['P', 'D', 'C', 'A'])
+
+export type RuoloMercato = z.infer<typeof ruoloMercatoEnum>
+
 // ---------------------------------------------------------------------------
 // createSessioneSchema — adminProcedure
 // ---------------------------------------------------------------------------
@@ -38,6 +42,12 @@ export const createSessioneSchema = z
     acquistiEffettivi: z.number().int().min(1),
     tipoValuta: tipoValutaEnum.default('fantamilioni'),
     astaInChiaro: z.boolean().default(false),
+    ruoliAbilitati: z
+      .array(ruoloMercatoEnum)
+      .default([])
+      .refine((ruoli) => new Set(ruoli).size === ruoli.length, {
+        message: 'I ruoli abilitati non possono essere duplicati',
+      }),
   })
   .refine((data) => data.dataChiusura > data.dataApertura, {
     message: 'dataChiusura deve essere successiva a dataApertura',
@@ -51,8 +61,17 @@ export const createSessioneSchema = z
     message: 'astaInChiaro è disponibile solo per sessioni in euro',
     path: ['astaInChiaro'],
   })
+  .refine((data) => !data.astaInChiaro || data.ruoliAbilitati.length === 0, {
+    message: 'I ruoli abilitati sono disponibili solo per sessioni al buio',
+    path: ['ruoliAbilitati'],
+  })
 
-export type CreateSessioneInput = z.infer<typeof createSessioneSchema>
+export type CreateSessioneInput = Omit<
+  z.infer<typeof createSessioneSchema>,
+  'ruoliAbilitati'
+> & {
+  ruoliAbilitati?: RuoloMercato[]
+}
 
 // ---------------------------------------------------------------------------
 // createPropostaSchema — protectedProcedure
@@ -105,7 +124,7 @@ export type GetProposteSessioneInput = z.infer<typeof getProposteSessioneSchema>
  * Input per ottenere la lista giocatori svincolati filtrata per ruolo e stagione.
  */
 export const getGiocatoriSvincolatiSchema = z.object({
-  ruolo: z.enum(['P', 'D', 'C', 'A']),
+  ruolo: ruoloMercatoEnum,
   stagione: z.string().min(1),
 })
 

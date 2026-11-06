@@ -31,6 +31,9 @@ vi.mock('~/server/db/entities', () => ({
     save: vi.fn(),
     create: vi.fn(),
   },
+  Giocatori: {
+    findOne: vi.fn(),
+  },
   PropostaMercato: {
     findOne: vi.fn(),
     find: vi.fn(),
@@ -77,7 +80,7 @@ vi.mock('~/server/services/mailSender', () => ({
 // Import AFTER mocks are defined
 import { createProposta, createSessione, deleteProposta, getSessioneAttiva, getSessioniMercato, getMieProposte, getGiocatoriSvincolati, riordinaProposte } from './mercatoService'
 
-import { SessioneMercato, PropostaMercato, Trasferimento, Utente, Utenti } from '~/server/db/entities'
+import { Giocatori, SessioneMercato, PropostaMercato, Trasferimento, Utente, Utenti } from '~/server/db/entities'
 import { ReSendMailAsync } from '~/server/services/mailSender'
 
 // ============================================================================
@@ -118,6 +121,7 @@ interface SessioneMercatoStub {
   dataChiusura: Date
   maxProposte: number
   tipoValuta: 'fantamilioni' | 'euro'
+  ruoliAbilitati: ('P' | 'D' | 'C' | 'A')[]
   ProposteMercato: PropostaMercatoStub[]
 }
 
@@ -152,6 +156,7 @@ function makeSessioneMercato(overrides: Partial<SessioneMercatoStub> = {}): Sess
     dataChiusura: new Date(now.getTime() + 86400000), // 1 day from now (still open)
     maxProposte: 5,
     tipoValuta: 'fantamilioni',
+    ruoliAbilitati: [],
     ProposteMercato: [],
     ...overrides,
   }
@@ -318,7 +323,7 @@ describe('createProposta', () => {
     )
     vi.mocked(Utente.findOne).mockResolvedValue(utente as any)
     vi.mocked(PropostaMercato.find).mockResolvedValue([
-      makePropostaMercato({ idSquadra: 1, prezzoOfferto: 100, deletedAt: null }) as any,
+      makePropostaMercato({ idSquadra: 1, idGiocatore: 99, prezzoOfferto: 100, deletedAt: null }) as any,
     ])
     vi.mocked(PropostaMercato.create).mockReturnValue(makePropostaMercato() as any)
     vi.mocked(PropostaMercato.save).mockResolvedValue(makePropostaMercato() as any)
@@ -512,6 +517,7 @@ describe('getSessioneAttiva', () => {
     expect(result).toBeDefined()
     if (result) {
       expect(result.tipoValuta).toEqual('fantamilioni')
+      expect(result.ruoliAbilitati).toEqual([])
       expect(result.myCount).toEqual(2) // 2 proposte from squadra 1
       expect(result.countPerSquadra).toMatchObject({ 'Squadra Alpha': 2, 'Squadra Beta': 1 })
     }
@@ -732,6 +738,22 @@ describe('getGiocatoriSvincolati', () => {
         relations: expect.objectContaining({ SquadraSerieA: true }),
       }),
     )
+  })
+
+  it('rejects roles not enabled in the active session', async () => {
+    const ctx = makeMockContext()
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(
+      makeSessioneMercato({ ruoliAbilitati: ['D'] }) as any,
+    )
+
+    await expect(
+      getGiocatoriSvincolati({
+        ctx,
+        input: { ruolo: 'A', stagione: '2025-2026' },
+      }),
+    ).rejects.toThrow('Questo ruolo non è abilitato')
+
+    expect(Trasferimento.find).not.toHaveBeenCalled()
   })
 })
 
@@ -962,6 +984,7 @@ describe('createSessione', () => {
       acquistiEffettivi: 3,
       tipoValuta: 'fantamilioni' as const,
       astaInChiaro: false,
+      ruoliAbilitati: ['A'] as ('P' | 'D' | 'C' | 'A')[],
     }
 
     await createSessione({ input })
@@ -971,6 +994,7 @@ describe('createSessione', () => {
     expect(callArg.acquistiEffettivi).toBe(3)
     expect(callArg.maxProposte).toBe(5)
     expect(callArg.tipoValuta).toBe('fantamilioni')
+    expect(callArg.ruoliAbilitati).toEqual(['A'])
   })
 
   // ── Notifica mail ────────────────────────────────────────────────────────
@@ -1659,5 +1683,30 @@ describe('createSessione — email notification QA requirements', () => {
     ).rejects.toThrow('DB connection lost')
 
     vi.unstubAllEnvs()
+  })
+})
+
+describe('createProposta — ruoli abilitati', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('rejects a player whose role is not enabled for the active session', async () => {
+    vi.mocked(SessioneMercato.findOne).mockResolvedValue(
+      makeSessioneMercato({ ruoliAbilitati: ['D'] }) as any,
+    )
+    vi.mocked(Giocatori.findOne).mockResolvedValue({
+      idGiocatore: 100,
+      ruolo: 'A',
+    } as any)
+
+    await expect(
+      createProposta({
+        ctx: makeMockContext(),
+        input: { idGiocatore: 100, prezzoOfferto: 10 },
+      }),
+    ).rejects.toThrow('Il ruolo del giocatore non è abilitato')
+
+    expect(Trasferimento.findOne).not.toHaveBeenCalled()
   })
 })

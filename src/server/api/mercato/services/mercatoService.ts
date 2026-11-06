@@ -2,7 +2,7 @@ import { ORPCError } from '@orpc/server'
 import { IsNull, LessThanOrEqual, MoreThan, Not } from 'typeorm'
 import { env } from 'process'
 import { AppDataSource } from '~/data-source'
-import { SessioneMercato, PropostaMercato, Trasferimento, Utente, Utenti } from '~/server/db/entities'
+import { Giocatori, SessioneMercato, PropostaMercato, Trasferimento, Utente, Utenti } from '~/server/db/entities'
 import type { CreateSessioneInput, GetGiocatoriSvincolatiInput, CreatePropostaInput, DeletePropostaInput, RiordinaProposteInput, AggiudicaSessioneInput, GetProposteSessioneInput } from '~/schemas/mercato'
 import { aggiudica, type PropostaInput } from './aggiudicazione'
 import {
@@ -63,6 +63,7 @@ export async function getSessioneAttiva({ ctx }: { ctx: MercatoCtx; input: Recor
     acquistiEffettivi: sessione.acquistiEffettivi,
     tipoValuta: sessione.tipoValuta,
     astaInChiaro: sessione.astaInChiaro,
+    ruoliAbilitati: sessione.ruoliAbilitati ?? [],
     myCount,
     countPerSquadra,
   }
@@ -153,6 +154,7 @@ export async function createSessione({ input }: { input: CreateSessioneInput }) 
     acquistiEffettivi: input.acquistiEffettivi,
     tipoValuta: input.tipoValuta,
     astaInChiaro: input.astaInChiaro,
+    ruoliAbilitati: input.ruoliAbilitati ?? [],
   })
 
   const saved = await SessioneMercato.save(sessione)
@@ -249,6 +251,15 @@ export async function getGiocatoriSvincolati({
   ctx: MercatoCtx
   input: GetGiocatoriSvincolatiInput
 }) {
+  const sessione = await findSessioneAttiva()
+  const ruoliAbilitati = sessione?.ruoliAbilitati ?? []
+
+  if (ruoliAbilitati.length > 0 && !ruoliAbilitati.includes(input.ruolo)) {
+    throw new ORPCError('BAD_REQUEST', {
+      message: 'Questo ruolo non è abilitato nella sessione di mercato',
+    })
+  }
+
   const svincolati = await Trasferimento.find({
     where: {
       dataCessione: IsNull(),
@@ -263,7 +274,6 @@ export async function getGiocatoriSvincolati({
 
   // Nelle sessioni astaInChiaro, escludi i giocatori la cui asta è già scaduta
   // (MIN(proposta.createdAt) + 24h ≤ now OPPURE sessione.dataChiusura ≤ now).
-  const sessione = await findSessioneAttiva()
   const giocatoriAggiudicatiIds = new Set<number>()
 
   if (sessione?.astaInChiaro) {
@@ -318,6 +328,23 @@ export async function createProposta({
 
   if (!sessione) {
     throw new ORPCError('NOT_FOUND', { message: 'Nessuna sessione di mercato attiva' })
+  }
+
+  const ruoliAbilitati = sessione.ruoliAbilitati ?? []
+  if (ruoliAbilitati.length > 0) {
+    const giocatore = await Giocatori.findOne({
+      where: { idGiocatore: input.idGiocatore },
+      select: { idGiocatore: true, ruolo: true },
+    })
+
+    if (
+      !giocatore ||
+      !ruoliAbilitati.some((ruolo) => ruolo === giocatore.ruolo)
+    ) {
+      throw new ORPCError('BAD_REQUEST', {
+        message: 'Il ruolo del giocatore non è abilitato nella sessione di mercato',
+      })
+    }
   }
 
   if (sessione.astaInChiaro) {
@@ -840,6 +867,7 @@ export async function listSessioni() {
     acquistiEffettivi: s.acquistiEffettivi,
     tipoValuta: s.tipoValuta,
     astaInChiaro: s.astaInChiaro,
+    ruoliAbilitati: s.ruoliAbilitati ?? [],
     stato: calcolaStato(s, now),
   }))
 }
@@ -944,6 +972,3 @@ export async function getProposteAstaInChiaro({ ctx }: { ctx: MercatoCtx; input:
     }
   })
 }
-
-
-

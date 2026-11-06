@@ -6,8 +6,11 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Checkbox,
   Chip,
   Collapse,
+  FormControlLabel,
+  FormGroup,
   MenuItem,
   Select,
   Stack,
@@ -23,6 +26,10 @@ import { orpc } from '~/utils/orpc'
 import LoadingSpinner from '~/components/LinearProgressBar/LoadingSpinner'
 import PageHeader from '~/components/PageHeader'
 import EsitoAggiudicazione from '~/components/mercato/shared/EsitoAggiudicazione'
+import { getRuoloEsteso } from '~/utils/formazione'
+import { type Ruoli } from '~/types/common'
+
+const RUOLI_MERCATO: Ruoli[] = ['P', 'D', 'C', 'A']
 
 // ── Sub-component: aggiudicazione di una sessione chiusa ────────────────────
 function AggiudicazioneSessione({ idSessione }: { idSessione: number }) {
@@ -82,6 +89,7 @@ export default function MercatoAdmin() {
   const [tipoValuta, setTipoValuta] = useState<'fantamilioni' | 'euro'>(
     'fantamilioni',
   )
+  const [ruoliAbilitati, setRuoliAbilitati] = useState<Ruoli[]>([])
   const [formError, setFormError] = useState('')
   const [formSuccess, setFormSuccess] = useState('')
 
@@ -105,6 +113,7 @@ export default function MercatoAdmin() {
       setDataChiusura('')
       setModalitaAsta('buio')
       setTipoValuta('fantamilioni')
+      setRuoliAbilitati([])
       void refetch()
     },
     onError: (err) => {
@@ -131,6 +140,8 @@ export default function MercatoAdmin() {
       maxProposte,
       acquistiEffettivi,
       tipoValuta,
+      astaInChiaro: modalitaAsta === 'chiaro',
+      ruoliAbilitati: modalitaAsta === 'buio' ? ruoliAbilitati : [],
     })
   }
 
@@ -228,6 +239,34 @@ export default function MercatoAdmin() {
               </Select>
             </Stack>
 
+            {modalitaAsta === 'buio' && (
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  Ruoli disponibili (nessuna selezione = tutti i giocatori)
+                </Typography>
+                <FormGroup row>
+                  {RUOLI_MERCATO.map((ruolo) => (
+                    <FormControlLabel
+                      key={ruolo}
+                      control={
+                        <Checkbox
+                          checked={ruoliAbilitati.includes(ruolo)}
+                          onChange={(event) => {
+                            setRuoliAbilitati((current) =>
+                              event.target.checked
+                                ? [...current, ruolo]
+                                : current.filter((value) => value !== ruolo),
+                            )
+                          }}
+                        />
+                      }
+                      label={`${ruolo} — ${getRuoloEsteso(ruolo, true)}`}
+                    />
+                  ))}
+                </FormGroup>
+              </Box>
+            )}
+
             <Box>
               <Button
                 variant="contained"
@@ -276,7 +315,10 @@ export default function MercatoAdmin() {
                         {s.acquistiEffettivi} &nbsp;·&nbsp;{' '}
                         {s.tipoValuta === 'fantamilioni'
                           ? 'Fantamilioni'
-                          : 'Euro reali'}
+                          : 'Euro reali'} &nbsp;·&nbsp; Ruoli:{' '}
+                        {s.ruoliAbilitati?.length
+                          ? s.ruoliAbilitati.join(', ')
+                          : 'Tutti'}
                       </Typography>
                     </Box>
                     <Stack direction="row" spacing={1} alignItems="center">

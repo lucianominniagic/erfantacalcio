@@ -36,6 +36,15 @@ export class SessioneMercato extends BaseEntity {
   @Column({ name: 'asta_in_chiaro', type: 'boolean', default: false })
   astaInChiaro!: boolean
 
+  @Column({
+    name: 'ruoli_abilitati',
+    type: 'varchar',
+    length: 1,
+    array: true,
+    default: () => "'{}'",
+  })
+  ruoliAbilitati!: ('P' | 'D' | 'C' | 'A')[]
+
   @OneToMany(() => PropostaMercato, (p: PropostaMercato) => p.SessioneMercato)
   ProposteMercato!: Relation<PropostaMercato[]>
 }

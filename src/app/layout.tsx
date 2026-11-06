@@ -1,12 +1,15 @@
-import { Montserrat } from 'next/font/google'
+import localFont from 'next/font/local'
 import ClientLayout from '~/components/ClientLayout'
 import type { ReactNode } from 'react'
 
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
+// Self-hosting avoids intermittent failures from extensionless Google Fonts URLs.
+const montserrat = localFont({
+  src: './fonts/Montserrat-latin.woff2',
+  weight: '300 700',
+  style: 'normal',
   display: 'swap',
   variable: '--font-montserrat',
+  declarations: [{ prop: 'font-family', value: 'Montserrat' }],
 })
 
 export default async function RootLayout({

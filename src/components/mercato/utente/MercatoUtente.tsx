@@ -37,6 +37,8 @@ import EsitoAggiudicazione from '~/components/mercato/shared/EsitoAggiudicazione
 import AstaInChiaroUtente from '~/components/mercato/utente/AstaInChiaroUtente'
 import { magliaRichiedeSfondoBianco } from '~/utils/maglia'
 
+const RUOLI_MERCATO: Ruoli[] = ['P', 'D', 'C', 'A']
+
 // ── Helper ───────────────────────────────────────────────────────────────────
 function fmtDate(d: Date | string) {
   return new Date(d).toLocaleString('it-IT', {
@@ -62,9 +64,16 @@ export default function MercatoUtente() {
       refetchOnReconnect: false,
     }))
 
+  const ruoliDisponibili = sessione?.ruoliAbilitati?.length
+    ? sessione.ruoliAbilitati
+    : RUOLI_MERCATO
+  const ruoloSelezionato = ruoliDisponibili.includes(ruolo)
+    ? ruolo
+    : (ruoliDisponibili[0] ?? 'C')
+
   const { data: giocatori, isLoading: loadingGiocatori } =
     useQuery(orpc.mercato.getGiocatoriSvincolati.queryOptions({
-      input: { ruolo: ruolo, stagione: Configurazione.stagione },
+      input: { ruolo: ruoloSelezionato, stagione: Configurazione.stagione },
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       enabled: !!sessione,
@@ -103,7 +112,7 @@ export default function MercatoUtente() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: orpc.mercato.getMieProposte.queryKey() })
       void queryClient.invalidateQueries({ queryKey: orpc.mercato.getSessioneAttiva.queryKey() })
-      void queryClient.invalidateQueries({ queryKey: orpc.mercato.getGiocatoriSvincolati.queryKey({ input: { ruolo, stagione: Configurazione.stagione } }) })
+      void queryClient.invalidateQueries({ queryKey: orpc.mercato.getGiocatoriSvincolati.queryKey({ input: { ruolo: ruoloSelezionato, stagione: Configurazione.stagione } }) })
       setSnackbar({ open: true, message: 'Proposta inviata con successo', severity: 'success' })
     },
   })
@@ -371,25 +380,26 @@ export default function MercatoUtente() {
           {/* ── Lista giocatori svincolati ── */}
           <Box>
             <Typography variant="h6" sx={{ mb: 1 }}>
-              Giocatori svincolati — {getRuoloEsteso(ruolo, true)}
+              Giocatori svincolati — {getRuoloEsteso(ruoloSelezionato, true)}
             </Typography>
             <Box sx={{ mb: 1 }}>
-              <FormControlLabel
-                control={<Switch color="warning" onChange={() => setRuolo('P')} checked={ruolo === 'P'} />}
-                label={isXs ? 'P' : getRuoloEsteso('P', true)}
+              {ruoliDisponibili.map((ruoloDisponibile) => (
+                <FormControlLabel
+                  key={ruoloDisponibile}
+                  control={
+                    <Switch
+                      color="warning"
+                      onChange={() => setRuolo(ruoloDisponibile)}
+                      checked={ruoloSelezionato === ruoloDisponibile}
+                    />
+                  }
+                  label={
+                    isXs
+                      ? ruoloDisponibile
+                      : getRuoloEsteso(ruoloDisponibile, true)
+                  }
               />
-              <FormControlLabel
-                control={<Switch color="warning" onChange={() => setRuolo('D')} checked={ruolo === 'D'} />}
-                label={isXs ? 'D' : getRuoloEsteso('D', true)}
-              />
-              <FormControlLabel
-                control={<Switch color="warning" onChange={() => setRuolo('C')} checked={ruolo === 'C'} />}
-                label={isXs ? 'C' : getRuoloEsteso('C', true)}
-              />
-              <FormControlLabel
-                control={<Switch color="warning" onChange={() => setRuolo('A')} checked={ruolo === 'A'} />}
-                label={isXs ? 'A' : getRuoloEsteso('A', true)}
-              />
+              ))}
             </Box>
             {loadingGiocatori ? (
               <Stack spacing={1}>
